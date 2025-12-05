@@ -25,7 +25,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     )
     
     def employee_count(self, obj):
-        return obj.employee_count
+        return obj.employees.filter(employment_status='active').count()
     employee_count.short_description = 'Employees'
 
 

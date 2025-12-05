@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Validation Schema
 const loginSchema = z.object({
@@ -37,8 +38,10 @@ const LoginPage = () => {
                 user: result.user,
                 token: result.tokens.access
             }));
+            toast.success('Welcome back!');
             navigate('/dashboard');
         } catch (err) {
+            toast.error(err?.data?.error || 'Login failed. Please check your credentials.');
             console.error('Login failed:', err);
         }
     };

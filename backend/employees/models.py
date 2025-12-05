@@ -49,11 +49,6 @@ class Department(models.Model):
     
     def __str__(self):
         return f"{self.name} - {self.company.name}"
-    
-    @property
-    def employee_count(self):
-        """Count active employees in this department"""
-        return self.employees.filter(employment_status='active').count()
 
 
 class Employee(models.Model):

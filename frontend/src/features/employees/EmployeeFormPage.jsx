@@ -19,6 +19,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
+import toast from 'react-hot-toast';
 
 // Validation Schema
 const employeeSchema = z.object({
@@ -84,6 +85,7 @@ const EmployeeFormPage = () => {
     const { data: departments } = useGetDepartmentsQuery();
     const { data: employees } = useGetEmployeesQuery({ employment_status: 'active' }); // For manager select
     const { data: employeeData, isLoading: isLoadingEmployee } = useGetEmployeeQuery(id, { skip: !isEditMode });
+    const { refetch: refetchEmployees } = useGetEmployeesQuery();
 
     const [createEmployee, { isLoading: isCreating }] = useCreateEmployeeMutation();
     const [updateEmployee, { isLoading: isUpdating }] = useUpdateEmployeeMutation();
@@ -130,11 +132,15 @@ const EmployeeFormPage = () => {
 
             if (isEditMode) {
                 await updateEmployee({ id, formData }).unwrap();
+                toast.success('Employee updated successfully!');
             } else {
                 await createEmployee(formData).unwrap();
+                toast.success('Employee created successfully!');
             }
+            refetchEmployees();
             navigate('/employees');
         } catch (error) {
+            toast.error(error?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} employee`);
             console.error('Failed to save employee:', error);
         }
     };
@@ -143,8 +149,11 @@ const EmployeeFormPage = () => {
         if (window.confirm('Are you sure you want to delete this employee? This action cannot be undone.')) {
             try {
                 await deleteEmployee(id).unwrap();
+                toast.success('Employee deleted successfully!');
+                refetchEmployees();
                 navigate('/employees');
             } catch (error) {
+                toast.error(error?.data?.error || 'Failed to delete employee');
                 console.error('Failed to delete employee:', error);
             }
         }

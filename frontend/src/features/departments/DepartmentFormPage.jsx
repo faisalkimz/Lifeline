@@ -8,19 +8,21 @@ import {
     useCreateDepartmentMutation,
     useUpdateDepartmentMutation,
     useGetDepartmentQuery,
+    useGetDepartmentsQuery,
     useDeleteDepartmentMutation,
     useGetEmployeesQuery
 } from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import toast from 'react-hot-toast';
 
-// Validation Schema
+// Validation Schema - Manager is optional, can be assigned later
 const departmentSchema = z.object({
     name: z.string().min(1, "Department name is required"),
     code: z.string().min(1, "Department code is required").max(10, "Code must be 10 characters or less"),
     description: z.string().optional(),
-    manager: z.string().optional().nullable(),
+    manager: z.string().optional().nullable(), // Optional - assign managers later
     is_active: z.boolean().default(true),
 });
 
@@ -46,6 +48,8 @@ const DepartmentFormPage = () => {
     const [createDepartment, { isLoading: isCreating }] = useCreateDepartmentMutation();
     const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
     const [deleteDepartment, { isLoading: isDeleting }] = useDeleteDepartmentMutation();
+    // This will be used to refetch after mutations
+    const { refetch: refetchDepartments } = useGetDepartmentsQuery(undefined, { skip: true });
 
     const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm({
         resolver: zodResolver(departmentSchema),
@@ -71,12 +75,17 @@ const DepartmentFormPage = () => {
 
             if (isEditMode) {
                 await updateDepartment({ id, ...cleanData }).unwrap();
+                toast.success('Department updated successfully!');
             } else {
                 await createDepartment(cleanData).unwrap();
+                toast.success('Department created successfully!');
             }
-            navigate('/departments');
+            // Add a small delay to ensure cache invalidation completes
+            setTimeout(() => navigate('/departments'), 500);
         } catch (error) {
             console.error('Failed to save department:', error);
+            console.error('Error details:', error?.data, error?.status, error?.originalStatus);
+            toast.error(error?.data?.error || `Failed to ${isEditMode ? 'update' : 'create'} department`);
         }
     };
 
@@ -84,8 +93,11 @@ const DepartmentFormPage = () => {
         if (window.confirm('Are you sure you want to delete this department? This action cannot be undone.')) {
             try {
                 await deleteDepartment(id).unwrap();
+                toast.success('Department deleted successfully!');
+                refetchDepartments();
                 navigate('/departments');
             } catch (error) {
+                toast.error(error?.data?.error || 'Failed to delete department');
                 console.error('Failed to delete department:', error);
             }
         }

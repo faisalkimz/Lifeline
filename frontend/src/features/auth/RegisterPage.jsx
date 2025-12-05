@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 // Validation Schema
 const registerSchema = z.object({
@@ -42,8 +43,10 @@ const RegisterPage = () => {
                 user: result.user,
                 token: result.tokens.access
             }));
+            toast.success('Account created successfully! Welcome to LahHR!');
             navigate('/dashboard');
         } catch (err) {
+            toast.error(err?.data?.error || 'Registration failed. Please check your details.');
             console.error('Registration failed:', err);
         }
     };

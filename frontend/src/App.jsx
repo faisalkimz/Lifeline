@@ -11,6 +11,7 @@ import DepartmentListPage from './features/departments/DepartmentListPage';
 import DepartmentFormPage from './features/departments/DepartmentFormPage';
 import OrgChartPage from './features/departments/OrgChartPage';
 import MyProfilePage from './features/employees/MyProfilePage';
+import ManagerManagementPage from './features/managers/ManagerManagementPage';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/departments/new" element={<DepartmentFormPage />} />
         <Route path="/departments/:id/edit" element={<DepartmentFormPage />} />
         <Route path="/org-chart" element={<OrgChartPage />} />
+        <Route path="/managers" element={<ManagerManagementPage />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
       </Route>

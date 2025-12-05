@@ -4,14 +4,18 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const api = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({
-        baseUrl: '/api',
+        baseUrl: 'http://localhost:8000/api',
         prepareHeaders: (headers, { getState }) => {
             // Get token from local state
             const token = getState().auth.token;
+            console.log('🔑 RTK Query - Token:', token ? 'Present' : 'Missing');
 
             // If we have a token, set the Authorization header
             if (token) {
                 headers.set('authorization', `Bearer ${token}`);
+                console.log('✅ RTK Query - Authorization header set');
+            } else {
+                console.log('⚠️ RTK Query - No token available');
             }
 
             return headers;
@@ -73,10 +77,10 @@ export const api = createApi({
             invalidatesTags: [{ type: 'Employee', id: 'LIST' }],
         }),
         updateEmployee: builder.mutation({
-            query: ({ id, ...data }) => ({
+            query: ({ id, formData, ...data }) => ({
                 url: `/employees/${id}/`,
                 method: 'PUT',
-                body: data,
+                body: formData || data,
             }),
             invalidatesTags: (result, error, { id }) => [
                 { type: 'Employee', id },

@@ -40,12 +40,19 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         """Filter departments by company"""
         user = self.request.user
         
+        from django.db.models import Count, Q
+        
+        # Base queryset with annotations
+        queryset = Department.objects.annotate(
+            employee_count=Count('employees', filter=Q(employees__employment_status='active'))
+        )
+        
         # Super admins see all departments
         if user.role == 'super_admin':
-            return Department.objects.all().select_related('company', 'manager')
+            return queryset.select_related('company', 'manager')
         
         # Regular users only see departments from their company
-        return Department.objects.filter(company=user.company).select_related('company', 'manager')
+        return queryset.filter(company=user.company).select_related('company', 'manager')
     
     def get_serializer_class(self):
         """Use create serializer for POST"""
@@ -122,6 +129,23 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         return EmployeeSerializer
     
     @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Get current user's employee record"""
+        try:
+            # Try to find employee by email
+            employee = Employee.objects.get(
+                company=request.user.company,
+                email=request.user.email
+            )
+            serializer = EmployeeSerializer(employee)
+            return Response(serializer.data)
+        except Employee.DoesNotExist:
+            return Response(
+                {'error': 'No employee record found for this user.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=False, methods=['get'])
     def active(self, request):
         """Get all active employees"""
         employees = self.get_queryset().filter(employment_status='active')
@@ -165,6 +189,63 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         """Get employee statistics"""
         queryset = self.get_queryset()
         
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        thirty_days_ago = timezone.now().date() - timedelta(days=30)
+        
+        # Recent Hires (Last 5)
+        recent_hires_list = queryset.order_by('-join_date')[:5]
+        
+        # Upcoming Events (Next 30 days)
+        today = timezone.now().date()
+        next_30_days = today + timedelta(days=30)
+        
+        # Birthdays logic (ignoring year)
+        # This is tricky in standard SQL/ORM across years. 
+        # For simplicity in this phase, we'll fetch active employees and filter in python 
+        # or use a raw query if performance matters. 
+        # Python filter for MVP:
+        active_employees = queryset.filter(employment_status='active')
+        upcoming_birthdays = []
+        upcoming_anniversaries = []
+        
+        for emp in active_employees:
+            # Birthday check
+            if emp.date_of_birth:
+                bday_this_year = emp.date_of_birth.replace(year=today.year)
+                if bday_this_year < today:
+                    bday_this_year = bday_this_year.replace(year=today.year + 1)
+                
+                if today <= bday_this_year <= next_30_days:
+                    upcoming_birthdays.append({
+                        'id': emp.id,
+                        'name': emp.full_name,
+                        'date': bday_this_year,
+                        'type': 'Birthday',
+                        'original_date': emp.date_of_birth
+                    })
+            
+            # Anniversary check
+            if emp.join_date:
+                anniv_this_year = emp.join_date.replace(year=today.year)
+                if anniv_this_year < today:
+                    anniv_this_year = anniv_this_year.replace(year=today.year + 1)
+                
+                if today <= anniv_this_year <= next_30_days:
+                    years = anniv_this_year.year - emp.join_date.year
+                    if years > 0:
+                        upcoming_anniversaries.append({
+                            'id': emp.id,
+                            'name': emp.full_name,
+                            'date': anniv_this_year,
+                            'type': 'Work Anniversary',
+                            'years': years
+                        })
+        
+        # Sort events by date
+        upcoming_events = sorted(upcoming_birthdays + upcoming_anniversaries, key=lambda x: x['date'])[:5]
+
         stats = {
             'total': queryset.count(),
             'active': queryset.filter(employment_status='active').count(),
@@ -172,6 +253,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             'suspended': queryset.filter(employment_status='suspended').count(),
             'terminated': queryset.filter(employment_status='terminated').count(),
             'resigned': queryset.filter(employment_status='resigned').count(),
+            'new_hires': queryset.filter(join_date__gte=thirty_days_ago).count(),
+            'departments_count': Department.objects.filter(company=request.user.company).count(),
+            'recent_hires_list': EmployeeListSerializer(recent_hires_list, many=True).data,
+            'upcoming_events': upcoming_events,
             'by_type': {
                 'full_time': queryset.filter(employment_type='full_time').count(),
                 'part_time': queryset.filter(employment_type='part_time').count(),

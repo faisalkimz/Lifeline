@@ -58,7 +58,8 @@ class DepartmentCreateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Department
-        fields = ['name', 'code', 'description', 'manager', 'is_active']
+        fields = ['id', 'name', 'code', 'description', 'manager', 'is_active']
+        read_only_fields = ['id']
     
     def create(self, validated_data):
         """Create department with company from request context"""
@@ -158,7 +159,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         model = Employee
         fields = [
             # Personal Information (Required)
-            'first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender', 'photo',
+            'id', 'first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender', 'photo',
             # National ID & Documents
             'national_id', 'passport_number', 'tin_number', 'nssf_number',
             # Contact Information
@@ -176,6 +177,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             # Notes
             'notes'
         ]
+        read_only_fields = ['id']
     
     def create(self, validated_data):
         """Create employee with company from request context"""

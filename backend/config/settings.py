@@ -48,7 +48,15 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
+    
+    # Our apps
+    "accounts",
+    "employees",
 ]
+
+
+# Custom User Model (CRITICAL for multi-tenant)
+AUTH_USER_MODEL = 'accounts.User'
 
 
 MIDDLEWARE = [

@@ -1,0 +1,29 @@
+# LahHR Backend Dependencies
+# Python 3.11+ required
+
+# Core Django
+Django==5.0.1
+python-dotenv==1.0.0
+
+# Django REST Framework
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.1
+
+# CORS
+django-cors-headers==4.3.1
+
+# Image handling
+Pillow==10.2.0
+
+# Database (PostgreSQL for production)
+psycopg2-binary==2.9.9
+
+# Async tasks
+celery==5.3.4
+redis==5.0.1
+
+# Development tools
+pytest==7.4.3
+pytest-django==4.7.0
+black==23.12.1
+flake8==6.1.0

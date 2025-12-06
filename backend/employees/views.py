@@ -201,8 +201,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             employment_status='active'
         ).distinct().prefetch_related('subordinates', 'department')
 
-        # Serialize with subordinates data
-        serializer = EmployeeSerializer(managers, many=True, context={'request': request})
+        # Serialize with subordinates data using EmployeeListSerializer
+        # which includes subordinates field for frontend compatibility
+        serializer = EmployeeListSerializer(managers, many=True, context={'request': request})
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])

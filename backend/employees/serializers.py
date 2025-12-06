@@ -192,6 +192,23 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         return Employee.objects.create(company=company, **validated_data)
 
 
+class EmployeeBasicSerializer(serializers.ModelSerializer):
+    """
+    Basic employee serializer for subordinates (prevents recursion).
+    Excludes subordinates field to avoid infinite loops.
+    """
+    department_name = serializers.CharField(source='department.name', read_only=True)
+    full_name = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Employee
+        fields = [
+            'id', 'employee_number', 'first_name', 'last_name', 'full_name',
+            'email', 'phone', 'department_name', 'job_title', 'employment_status',
+            'join_date', 'photo'
+        ]
+
+
 class EmployeeListSerializer(serializers.ModelSerializer):
     """
     Lightweight serializer for employee lists.
@@ -199,13 +216,15 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     """
     department_name = serializers.CharField(source='department.name', read_only=True)
     full_name = serializers.ReadOnlyField()
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
     subordinates_count = serializers.SerializerMethodField()
     subordinates = serializers.SerializerMethodField()
 
     class Meta:
         model = Employee
         fields = [
-            'id', 'employee_number', 'full_name', 'email', 'phone',
+            'id', 'employee_number', 'first_name', 'last_name', 'full_name', 'email', 'phone',
             'department_name', 'job_title', 'employment_status',
             'join_date', 'photo', 'subordinates_count', 'subordinates'
         ]
@@ -217,7 +236,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     def get_subordinates(self, obj):
         """Get list of direct subordinates (only basic info for performance)"""
         subordinates = obj.subordinates.filter(employment_status='active')
-        return EmployeeListSerializer(subordinates, many=True, context=self.context).data
+        return EmployeeBasicSerializer(subordinates, many=True, context=self.context).data
 
 
 class EmployeeUpdateSerializer(serializers.ModelSerializer):

@@ -199,14 +199,25 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     """
     department_name = serializers.CharField(source='department.name', read_only=True)
     full_name = serializers.ReadOnlyField()
-    
+    subordinates_count = serializers.SerializerMethodField()
+    subordinates = serializers.SerializerMethodField()
+
     class Meta:
         model = Employee
         fields = [
             'id', 'employee_number', 'full_name', 'email', 'phone',
             'department_name', 'job_title', 'employment_status',
-            'join_date', 'photo'
+            'join_date', 'photo', 'subordinates_count', 'subordinates'
         ]
+
+    def get_subordinates_count(self, obj):
+        """Get count of direct subordinates"""
+        return obj.subordinates.filter(employment_status='active').count()
+
+    def get_subordinates(self, obj):
+        """Get list of direct subordinates (only basic info for performance)"""
+        subordinates = obj.subordinates.filter(employment_status='active')
+        return EmployeeListSerializer(subordinates, many=True, context=self.context).data
 
 
 class EmployeeUpdateSerializer(serializers.ModelSerializer):

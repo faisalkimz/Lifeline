@@ -191,7 +191,20 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         ).values('id', 'name', 'employee_count')
         
         return Response(list(departments))
-    
+
+    @action(detail=False, methods=['get'])
+    def managers(self, request):
+        """Get all managers with their subordinates"""
+        # Get employees who have subordinates (managers)
+        managers = self.get_queryset().filter(
+            subordinates__isnull=False,
+            employment_status='active'
+        ).distinct().prefetch_related('subordinates', 'department')
+
+        # Serialize with subordinates data
+        serializer = EmployeeSerializer(managers, many=True, context={'request': request})
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get employee statistics"""

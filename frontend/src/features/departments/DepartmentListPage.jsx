@@ -51,7 +51,9 @@ const DepartmentListPage = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
     // Fetch data
-    const { data: departments, isLoading, refetch, error } = useGetDepartmentsQuery();
+    const { data: departments, isLoading, refetch, error } = useGetDepartmentsQuery(undefined, {
+        skip: !isAuthenticated
+    });
     const [deleteDepartment] = useDeleteDepartmentMutation();
 
 

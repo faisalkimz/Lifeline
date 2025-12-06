@@ -1,15 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { logout } from '../features/auth/authSlice';
 
-// Enhanced base query with authentication error handling
 const baseQueryWithAuth = fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_API_BASE_URL || '/api'}`,
     prepareHeaders: (headers, { getState }) => {
-        // Get authentication state
         const token = getState().auth.token;
         const isAuthenticated = getState().auth.isAuthenticated;
 
-        // Only set Authorization header if user is authenticated and has a token
         if (isAuthenticated && token) {
             headers.set('authorization', `Bearer ${token}`);
         }
@@ -18,15 +15,11 @@ const baseQueryWithAuth = fetchBaseQuery({
     }
 });
 
-// Enhanced base query with automatic logout on 401
 const baseQueryWithReauth = async (args, api, extraOptions) => {
     let result = await baseQueryWithAuth(args, api, extraOptions);
 
     if (result.error && result.error.status === 401) {
-        // Token is invalid/expired, logout user
         api.dispatch(logout());
-
-        // Optionally redirect to login
         if (typeof window !== 'undefined') {
             window.location.href = '/login';
         }
@@ -35,13 +28,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
     return result;
 };
 
-// Create the base API slice
 export const api = createApi({
     reducerPath: 'api',
     baseQuery: baseQueryWithReauth,
     tagTypes: ['User', 'Company', 'Department', 'Employee'],
     endpoints: (builder) => ({
-        // Auth Endpoints
         login: builder.mutation({
             query: (credentials) => ({
                 url: '/auth/login/',
@@ -67,8 +58,6 @@ export const api = createApi({
             query: () => '/auth/me/',
             providesTags: ['User']
         }),
-
-        // Employee Endpoints
         getEmployees: builder.query({
             query: (params) => ({
                 url: '/employees/',
@@ -124,8 +113,6 @@ export const api = createApi({
             query: () => '/employees/managers/',
             providesTags: [{ type: 'Employee', id: 'MANAGERS' }]
         }),
-
-        // Department Endpoints
         getDepartments: builder.query({
             query: () => '/departments/',
             providesTags: (result) =>
@@ -169,7 +156,6 @@ export const api = createApi({
     })
 });
 
-// Export all hooks in a single destructuring assignment
 export const {
     useLoginMutation,
     useRegisterMutation,

@@ -13,7 +13,8 @@ import {
     X,
     Bell,
     TrendingUp,
-    User
+    User,
+    Crown
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -43,6 +44,7 @@ const DashboardLayout = () => {
         { name: 'My Profile', href: '/my-profile', icon: User },
         { name: 'Employees', href: '/employees', icon: Users },
         { name: 'Departments', href: '/departments', icon: Building2 },
+        { name: 'Managers', href: '/managers', icon: Crown },
         { name: 'Org Chart', href: '/org-chart', icon: TrendingUp },
         { name: 'Settings', href: '/settings', icon: Settings },
     ];

@@ -197,15 +197,19 @@ class EmployeeBasicSerializer(serializers.ModelSerializer):
     Basic employee serializer for subordinates (prevents recursion).
     Excludes subordinates field to avoid infinite loops.
     """
-    department_name = serializers.CharField(source='department.name', read_only=True)
+    department_name = serializers.SerializerMethodField()
     full_name = serializers.ReadOnlyField()
+
+    def get_department_name(self, obj):
+        """Get department name safely"""
+        return obj.department.name if obj.department else None
 
     class Meta:
         model = Employee
         fields = [
             'id', 'employee_number', 'first_name', 'last_name', 'full_name',
             'email', 'phone', 'department_name', 'job_title', 'employment_status',
-            'join_date', 'photo'
+            'join_date'
         ]
 
 
@@ -214,19 +218,23 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     Lightweight serializer for employee lists.
     Only includes essential fields for performance.
     """
-    department_name = serializers.CharField(source='department.name', read_only=True)
+    department_name = serializers.SerializerMethodField()
     full_name = serializers.ReadOnlyField()
     first_name = serializers.CharField(read_only=True)
     last_name = serializers.CharField(read_only=True)
     subordinates_count = serializers.SerializerMethodField()
     subordinates = serializers.SerializerMethodField()
 
+    def get_department_name(self, obj):
+        """Get department name safely"""
+        return obj.department.name if obj.department else None
+
     class Meta:
         model = Employee
         fields = [
             'id', 'employee_number', 'first_name', 'last_name', 'full_name', 'email', 'phone',
             'department_name', 'job_title', 'employment_status',
-            'join_date', 'photo', 'subordinates_count', 'subordinates'
+            'join_date', 'subordinates_count', 'subordinates'
         ]
 
     def get_subordinates_count(self, obj):

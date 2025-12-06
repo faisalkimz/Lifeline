@@ -139,3 +139,5 @@ app.delete('/api/departments/:id/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Mock API server running on http://localhost:${PORT}`);
 });
+
+

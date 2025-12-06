@@ -124,6 +124,18 @@ export const api = createApi({
             query: () => '/employees/managers/',
             providesTags: [{ type: 'Employee', id: 'MANAGERS' }]
         }),
+        promoteToManager: builder.mutation({
+            query: (promotionData) => ({
+                url: '/employees/promote_to_manager/',
+                method: 'POST',
+                body: promotionData
+            }),
+            invalidatesTags: [
+                { type: 'Employee', id: 'LIST' },
+                { type: 'Employee', id: 'MANAGERS' },
+                { type: 'Department', id: 'LIST' }
+            ]
+        }),
 
         // Department Endpoints
         getDepartments: builder.query({
@@ -187,5 +199,6 @@ export const {
     useGetDepartmentQuery,
     useCreateDepartmentMutation,
     useUpdateDepartmentMutation,
-    useDeleteDepartmentMutation
+    useDeleteDepartmentMutation,
+    usePromoteToManagerMutation
 } = api;

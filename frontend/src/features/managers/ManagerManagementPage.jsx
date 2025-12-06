@@ -4,7 +4,7 @@ import {
     Users, Building2, UserCheck, Crown,
     Search, Plus, Edit
 } from 'lucide-react';
-import { useGetManagersQuery, useGetDepartmentsQuery } from '../../store/api';
+import { useGetManagersQuery, useGetDepartmentsQuery, usePromoteToManagerMutation } from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -15,20 +15,25 @@ import {
 } from '../../components/ui/Table';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser, selectIsAuthenticated } from '../auth/authSlice';
+import PromoteManagerModal from './PromoteManagerModal';
+import toast from 'react-hot-toast';
 
 const ManagerManagementPage = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState('grid');
+    const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
 
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
-    const { data: managersData, isLoading } = useGetManagersQuery(undefined, {
+    const { data: managersData, isLoading, refetch } = useGetManagersQuery(undefined, {
         skip: !isAuthenticated
     });
     const { data: departments } = useGetDepartmentsQuery(undefined, {
         skip: !isAuthenticated
     });
+
+    const [promoteToManager, { isLoading: isPromoting }] = usePromoteToManagerMutation();
 
     const processedManagers = Array.isArray(managersData) ? managersData : [];
 
@@ -36,6 +41,21 @@ const ManagerManagementPage = () => {
         manager.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         manager.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handlePromoteEmployees = async (promotionData) => {
+        try {
+            const result = await promoteToManager(promotionData).unwrap();
+
+            toast.success(result.message || 'Employees promoted successfully!');
+
+            // Refetch managers data to show the newly promoted managers
+            refetch();
+
+        } catch (error) {
+            console.error('Promotion failed:', error);
+            toast.error(error?.data?.error || 'Failed to promote employees. Please try again.');
+        }
+    };
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -61,9 +81,9 @@ const ManagerManagementPage = () => {
                     >
                         {viewMode === 'grid' ? 'Table View' : 'Card View'}
                     </Button>
-                    <Button onClick={() => navigate('/employees/new')} className="btn-primary">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Manager
+                    <Button onClick={() => setIsPromoteModalOpen(true)} className="btn-primary">
+                        <Crown className="h-4 w-4 mr-2" />
+                        Promote to Manager
                     </Button>
                 </div>
             </div>
@@ -198,8 +218,17 @@ const ManagerManagementPage = () => {
                     </Table>
                 </div>
             </Card>
+
+            {/* Promotion Modal */}
+            <PromoteManagerModal
+                isOpen={isPromoteModalOpen}
+                onClose={() => setIsPromoteModalOpen(false)}
+                onPromote={handlePromoteEmployees}
+            />
         </div>
     );
 };
 
 export default ManagerManagementPage;
+
+

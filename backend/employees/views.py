@@ -206,6 +206,79 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         serializer = EmployeeListSerializer(managers, many=True, context={'request': request})
         return Response(serializer.data)
 
+    @action(detail=False, methods=['post'])
+    def promote_to_manager(self, request):
+        """Promote employees to managerial positions"""
+        from .models import Department
+
+        employee_ids = request.data.get('employee_ids', [])
+        manager_role = request.data.get('managerRole', 'Manager')
+        assign_as_dept_head = request.data.get('assign_as_dept_head', False)
+        department_id = request.data.get('department_id')
+
+        if not employee_ids:
+            return Response(
+                {"error": "No employees selected for promotion"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Get employees to promote
+        employees = self.get_queryset().filter(
+            id__in=employee_ids,
+            employment_status='active'
+        )
+
+        if len(employees) != len(employee_ids):
+            return Response(
+                {"error": "Some selected employees were not found or are not active"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if department assignment is valid
+        department = None
+        if assign_as_dept_head and department_id:
+            try:
+                department = Department.objects.get(
+                    id=department_id,
+                    company=request.user.company
+                )
+                # Check if department already has a manager
+                if department.manager:
+                    return Response(
+                        {"error": f"Department '{department.name}' already has a manager"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            except Department.DoesNotExist:
+                return Response(
+                    {"error": "Selected department not found"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+        promoted_employees = []
+        for employee in employees:
+            # Update job title to include manager designation
+            if manager_role and manager_role.lower() not in employee.job_title.lower():
+                employee.job_title = f"{employee.job_title} - {manager_role}"
+
+            # Assign as department head if requested
+            if assign_as_dept_head and department:
+                employee.managed_departments.add(department)
+
+            employee.save()
+            promoted_employees.append(employee)
+
+        # Serialize the promoted employees
+        serializer = EmployeeListSerializer(
+            promoted_employees,
+            many=True,
+            context={'request': request}
+        )
+
+        return Response({
+            "message": f"Successfully promoted {len(promoted_employees)} employee(s) to {manager_role}",
+            "promoted_employees": serializer.data
+        })
+
     @action(detail=False, methods=['get'])
     def stats(self, request):
         """Get employee statistics"""
@@ -235,35 +308,59 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         for emp in active_employees:
             # Birthday check
             if emp.date_of_birth:
-                bday_this_year = emp.date_of_birth.replace(year=today.year)
-                if bday_this_year < today:
-                    bday_this_year = bday_this_year.replace(year=today.year + 1)
-                
-                if today <= bday_this_year <= next_30_days:
-                    upcoming_birthdays.append({
-                        'id': emp.id,
-                        'name': emp.full_name,
-                        'date': bday_this_year,
-                        'type': 'Birthday',
-                        'original_date': emp.date_of_birth
-                    })
-            
-            # Anniversary check
-            if emp.join_date:
-                anniv_this_year = emp.join_date.replace(year=today.year)
-                if anniv_this_year < today:
-                    anniv_this_year = anniv_this_year.replace(year=today.year + 1)
-                
-                if today <= anniv_this_year <= next_30_days:
-                    years = anniv_this_year.year - emp.join_date.year
-                    if years > 0:
-                        upcoming_anniversaries.append({
+                try:
+                    bday_this_year = emp.date_of_birth.replace(year=today.year)
+                    if bday_this_year < today:
+                        bday_this_year = bday_this_year.replace(year=today.year + 1)
+
+                    if today <= bday_this_year <= next_30_days:
+                        upcoming_birthdays.append({
                             'id': emp.id,
                             'name': emp.full_name,
-                            'date': anniv_this_year,
-                            'type': 'Work Anniversary',
-                            'years': years
+                            'date': bday_this_year,
+                            'type': 'Birthday',
+                            'original_date': emp.date_of_birth
                         })
+                except ValueError:
+                    # Handle leap year birthdays (Feb 29) in non-leap years
+                    # Use March 1st as fallback
+                    try:
+                        fallback_date = emp.date_of_birth.replace(year=today.year, month=3, day=1)
+                        if fallback_date < today:
+                            fallback_date = fallback_date.replace(year=today.year + 1)
+
+                        if today <= fallback_date <= next_30_days:
+                            upcoming_birthdays.append({
+                                'id': emp.id,
+                                'name': emp.full_name,
+                                'date': fallback_date,
+                                'type': 'Birthday (Mar 1)',
+                                'original_date': emp.date_of_birth
+                            })
+                    except ValueError:
+                        # Skip if even March 1st causes issues
+                        pass
+
+            # Anniversary check
+            if emp.join_date:
+                try:
+                    anniv_this_year = emp.join_date.replace(year=today.year)
+                    if anniv_this_year < today:
+                        anniv_this_year = anniv_this_year.replace(year=today.year + 1)
+
+                    if today <= anniv_this_year <= next_30_days:
+                        years = anniv_this_year.year - emp.join_date.year
+                        if years > 0:
+                            upcoming_anniversaries.append({
+                                'id': emp.id,
+                                'name': emp.full_name,
+                                'date': anniv_this_year,
+                                'type': 'Work Anniversary',
+                                'years': years
+                            })
+                except ValueError:
+                    # Skip anniversaries with invalid dates
+                    pass
         
         # Sort events by date
         upcoming_events = sorted(upcoming_birthdays + upcoming_anniversaries, key=lambda x: x['date'])[:5]
@@ -277,7 +374,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             'resigned': queryset.filter(employment_status='resigned').count(),
             'new_hires': queryset.filter(join_date__gte=thirty_days_ago).count(),
             'departments_count': Department.objects.filter(company=request.user.company).count(),
-            'recent_hires_list': EmployeeListSerializer(recent_hires_list, many=True).data,
+            'recent_hires_list': EmployeeListSerializer(recent_hires_list, many=True, context={'request': request}).data,
             'upcoming_events': upcoming_events,
             'by_type': {
                 'full_time': queryset.filter(employment_type='full_time').count(),

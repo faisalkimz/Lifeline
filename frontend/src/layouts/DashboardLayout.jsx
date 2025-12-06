@@ -13,8 +13,7 @@ import {
     X,
     Bell,
     TrendingUp,
-    User,
-    UserCheck
+    User
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -42,7 +41,6 @@ const DashboardLayout = () => {
     const navigation = [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
         { name: 'My Profile', href: '/my-profile', icon: User },
-        { name: 'Managers', href: '/managers', icon: UserCheck },
         { name: 'Employees', href: '/employees', icon: Users },
         { name: 'Departments', href: '/departments', icon: Building2 },
         { name: 'Org Chart', href: '/org-chart', icon: TrendingUp },

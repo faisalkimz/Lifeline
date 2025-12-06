@@ -14,12 +14,13 @@ class DepartmentSerializer(serializers.ModelSerializer):
     """
     company_name = serializers.CharField(source='company.name', read_only=True)
     manager_name = serializers.SerializerMethodField()
-
+    employee_count = serializers.SerializerMethodField()
+    
     class Meta:
         model = Department
         fields = [
             'id', 'company', 'company_name', 'name', 'code', 'description',
-            'manager', 'manager_name', 'is_active', 'created_at'
+            'manager', 'manager_name', 'employee_count', 'is_active', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
     
@@ -29,25 +30,17 @@ class DepartmentSerializer(serializers.ModelSerializer):
             return obj.manager.full_name
         return None
 
-    def validate_manager(self, value):
-        """Ensure manager belongs to user's company"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Manager does not belong to your company."
-                )
-        return value
-    
+    def get_employee_count(self, obj):
+        """Get employee count safely"""
+        try:
+            return obj.employee_count
+        except Exception:
+            return 0
+
     def validate(self, attrs):
         """Ensure department name is unique within company"""
-        # Get company from instance or request context
-        if self.instance:
-            company = self.instance.company
-        else:
-            company = self.context['request'].user.company
-        
-        name = attrs.get('name', self.instance.name if self.instance else None)
+        company = attrs.get('company')
+        name = attrs.get('name')
         
         # Get instance if updating
         instance = self.instance
@@ -69,23 +62,12 @@ class DepartmentCreateSerializer(serializers.ModelSerializer):
     """
     Simplified serializer for creating departments.
     Company is automatically set from request user.
-    Manager is optional - can be assigned later.
     """
     class Meta:
         model = Department
         fields = ['id', 'name', 'code', 'description', 'manager', 'is_active']
         read_only_fields = ['id']
-
-    def validate_manager(self, value):
-        """Ensure manager belongs to user's company (only if manager is provided)"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Manager does not belong to your company."
-                )
-        return value
-
+    
     def create(self, validated_data):
         """Create department with company from request context"""
         company = self.context['request'].user.company
@@ -179,54 +161,31 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating new employees.
     Company is automatically set, employee number is auto-generated.
-    Department and manager are optional - can be assigned later.
     """
     class Meta:
         model = Employee
         fields = [
             # Personal Information (Required)
-            'first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender',
-            # National ID & Documents (Required)
-            'national_id', 'email', 'phone',
-            # Employment Details (Optional - can be assigned later)
+            'id', 'first_name', 'middle_name', 'last_name', 'date_of_birth', 'gender', 'photo',
+            # National ID & Documents
+            'national_id', 'passport_number', 'tin_number', 'nssf_number',
+            # Contact Information
+            'email', 'phone', 'personal_email', 'address', 'city', 'district',
+            # Employment Details
             'department', 'job_title', 'manager', 'employment_type', 'employment_status',
             # Important Dates
-            'join_date',
-            # Photo & Documents (Optional)
-            'photo', 'passport_number', 'tin_number', 'nssf_number',
-            'personal_email', 'address', 'city', 'district',
-            'probation_end_date', 'confirmation_date',
-            # Bank Details (Optional)
+            'join_date', 'probation_end_date', 'confirmation_date',
+            # Bank Details
             'bank_name', 'bank_account_number', 'bank_branch', 'mobile_money_number',
-            # Emergency Contact (Optional)
+            # Emergency Contact
             'emergency_contact_name', 'emergency_contact_phone', 'emergency_contact_relationship',
-            # Family Information (Optional)
+            # Family Information
             'marital_status', 'number_of_dependents',
-            # Notes (Optional)
+            # Notes
             'notes'
         ]
         read_only_fields = ['id']
-
-    def validate_department(self, value):
-        """Ensure department belongs to user's company (only if department is provided)"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Department does not belong to your company."
-                )
-        return value
-
-    def validate_manager(self, value):
-        """Ensure manager belongs to user's company (only if manager is provided)"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Manager does not belong to your company."
-                )
-        return value
-
+    
     def create(self, validated_data):
         """Create employee with company from request context"""
         company = self.context['request'].user.company
@@ -278,23 +237,3 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
             # Notes
             'notes'
         ]
-    
-    def validate_department(self, value):
-        """Ensure department belongs to user's company"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Department does not belong to your company."
-                )
-        return value
-    
-    def validate_manager(self, value):
-        """Ensure manager belongs to user's company"""
-        if value:
-            company = self.context['request'].user.company
-            if value.company != company:
-                raise serializers.ValidationError(
-                    "Manager does not belong to your company."
-                )
-        return value

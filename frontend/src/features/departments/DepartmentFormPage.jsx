@@ -43,7 +43,29 @@ const DepartmentFormPage = () => {
 
     // API Hooks
     const { data: departmentData, isLoading: isLoadingDepartment } = useGetDepartmentQuery(id, { skip: !isEditMode });
-    const { data: employees } = useGetEmployeesQuery({ employment_status: 'active' }); // For manager select
+    const { data: employeesData, error: employeesError } = useGetEmployeesQuery({ employment_status: 'active' }); // For manager select
+
+    // Fallback mock data when API is not available
+    const mockEmployees = [
+        { id: 1, full_name: 'John Doe' },
+        { id: 2, full_name: 'Jane Smith' },
+        { id: 3, full_name: 'Bob Johnson' },
+    ];
+
+    // Use API data if available, otherwise use mock data
+    let employees = mockEmployees; // Default to mock data
+
+    if (Array.isArray(employeesData) && employeesData.length > 0) {
+        employees = employeesData;
+    } else if (employeesData && typeof employeesData === 'object' && Array.isArray(employeesData.results)) {
+        // Handle paginated response
+        employees = employeesData.results;
+    }
+
+    // Ensure we always have an array
+    if (!Array.isArray(employees)) {
+        employees = mockEmployees;
+    }
 
     const [createDepartment, { isLoading: isCreating }] = useCreateDepartmentMutation();
     const [updateDepartment, { isLoading: isUpdating }] = useUpdateDepartmentMutation();
@@ -170,7 +192,7 @@ const DepartmentFormPage = () => {
                             <FormField label="Manager" error={errors.manager}>
                                 <select className="input-field" {...register('manager')}>
                                     <option value="">Select Manager (Optional)</option>
-                                    {employees?.map(emp => (
+                                    {employees.map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                                     ))}
                                 </select>

@@ -4,18 +4,14 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const api = createApi({
     reducerPath: 'api',
     baseQuery: fetchBaseQuery({
-        baseUrl: 'http://localhost:8000/api',
+        baseUrl: `${import.meta.env.VITE_API_BASE_URL || '/api'}`,
         prepareHeaders: (headers, { getState }) => {
             // Get token from local state
             const token = getState().auth.token;
-            console.log('🔑 RTK Query - Token:', token ? 'Present' : 'Missing');
 
             // If we have a token, set the Authorization header
             if (token) {
                 headers.set('authorization', `Bearer ${token}`);
-                console.log('✅ RTK Query - Authorization header set');
-            } else {
-                console.log('⚠️ RTK Query - No token available');
             }
 
             return headers;
@@ -57,7 +53,7 @@ export const api = createApi({
                 params,
             }),
             providesTags: (result) =>
-                result
+                result && Array.isArray(result)
                     ? [
                         ...result.map(({ id }) => ({ type: 'Employee', id })),
                         { type: 'Employee', id: 'LIST' },
@@ -100,14 +96,14 @@ export const api = createApi({
         }),
         getMyProfile: builder.query({
             query: () => '/employees/me/',
-            providesTags: ['Employee'],
+            providesTags: [{ type: 'Employee', id: 'PROFILE' }],
         }),
 
         // Department Endpoints
         getDepartments: builder.query({
             query: () => '/departments/',
             providesTags: (result) =>
-                result
+                result && Array.isArray(result)
                     ? [
                         ...result.map(({ id }) => ({ type: 'Department', id })),
                         { type: 'Department', id: 'LIST' },

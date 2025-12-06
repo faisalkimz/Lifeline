@@ -42,10 +42,8 @@ class DepartmentViewSet(viewsets.ModelViewSet):
         
         from django.db.models import Count, Q
         
-        # Base queryset with annotations
-        queryset = Department.objects.annotate(
-            employee_count=Count('employees', filter=Q(employees__employment_status='active'))
-        )
+        # Base queryset - employee_count is handled by the model property
+        queryset = Department.objects.all()
         
         # Super admins see all departments
         if user.role == 'super_admin':
@@ -60,51 +58,10 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             return DepartmentCreateSerializer
         return DepartmentSerializer
     
-    def create(self, request, *args, **kwargs):
-        """Create department and return full serializer data"""
-        # Ensure company cannot be set manually
-        data = request.data.copy()
-        if 'company' in data:
-            del data['company']
-        
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        department = serializer.save()
-        
-        # Return full department data
-        full_serializer = DepartmentSerializer(department)
-        return Response(full_serializer.data, status=status.HTTP_201_CREATED)
-    
-    def update(self, request, *args, **kwargs):
-        """Update department - ensure company cannot be changed"""
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        
-        # Ensure user cannot change company
-        data = request.data.copy()
-        if 'company' in data:
-            del data['company']
-        
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        
-        # Return full department data
-        full_serializer = DepartmentSerializer(serializer.instance)
-        return Response(full_serializer.data)
-    
     @action(detail=True, methods=['get'])
     def employees(self, request, pk=None):
         """Get all employees in this department"""
         department = self.get_object()
-        # Additional security: ensure department belongs to user's company
-        # (get_object already checks this via permissions, but double-check)
-        if department.company != request.user.company and request.user.role != 'super_admin':
-            return Response(
-                {'error': 'Department does not belong to your company.'},
-                status=status.HTTP_403_FORBIDDEN
-            )
-        # Employees are already filtered by company through the department relationship
         employees = department.employees.filter(employment_status='active')
         serializer = EmployeeListSerializer(employees, many=True)
         return Response(serializer.data)
@@ -169,51 +126,28 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return EmployeeListSerializer
         return EmployeeSerializer
     
-    def create(self, request, *args, **kwargs):
-        """Create employee - ensure company cannot be set manually"""
-        # Ensure company cannot be set manually
-        data = request.data.copy()
-        if 'company' in data:
-            del data['company']
-        
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        employee = serializer.save()
-        
-        # Return full employee data
-        full_serializer = EmployeeSerializer(employee)
-        return Response(full_serializer.data, status=status.HTTP_201_CREATED)
-    
-    def update(self, request, *args, **kwargs):
-        """Update employee - ensure company cannot be changed"""
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        
-        # Ensure user cannot change company
-        data = request.data.copy()
-        if 'company' in data:
-            del data['company']
-        
-        serializer = self.get_serializer(instance, data=data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        
-        # Return full employee data
-        full_serializer = EmployeeSerializer(serializer.instance)
-        return Response(full_serializer.data)
-    
     @action(detail=False, methods=['get'])
     def me(self, request):
         """Get current user's employee record"""
+        print(f"DEBUG: me action called for user: {request.user}, authenticated: {request.user.is_authenticated}")
+
+        if not request.user.is_authenticated:
+            return Response(
+                {'error': 'Authentication required.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
         try:
             # Try to find employee by email
             employee = Employee.objects.get(
                 company=request.user.company,
                 email=request.user.email
             )
+            print(f"DEBUG: Found employee: {employee}")
             serializer = EmployeeSerializer(employee)
             return Response(serializer.data)
         except Employee.DoesNotExist:
+            print(f"DEBUG: No employee found for email: {request.user.email}, company: {request.user.company}")
             return Response(
                 {'error': 'No employee record found for this user.'},
                 status=status.HTTP_404_NOT_FOUND
@@ -241,9 +175,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     def subordinates(self, request, pk=None):
         """Get all subordinates of this employee (if they're a manager)"""
         employee = self.get_object()
-        # Subordinates are already filtered by company through the employee relationship
-        # But ensure employee belongs to user's company (already checked by get_object)
-        subordinates = employee.subordinates.filter(company=request.user.company)
+        subordinates = employee.subordinates.all()
         serializer = EmployeeListSerializer(subordinates, many=True)
         return Response(serializer.data)
     

@@ -127,23 +127,21 @@ const ManagerManagementPage = () => {
     };
 
     return (
-        <div className="space-y-6 bg-white">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-10 bg-white">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                 <div>
                     <h1 className="text-2xl font-bold text-black">Team Leaders</h1>
-                        <p className="text-primary-600 mt-1">
-                            Manage who leads teams and departments
-                        </p>
+                    <p className="text-sm text-gray-600 mt-1 max-w-xl">Manage who leads teams and departments — view leaders, their team sizes, and quickly edit leader profiles.</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
                     <Button
-                        variant="outline"
+                        variant="ghost"
                         onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-                        className="btn-secondary"
+                        className="h-9 px-3"
                     >
                         {viewMode === 'grid' ? 'Table' : 'Cards'}
                     </Button>
-                    <Button onClick={() => setIsPromoteModalOpen(true)} className="btn-primary">
+                    <Button onClick={() => setIsPromoteModalOpen(true)} className="h-9 px-3 btn-primary">
                         <Crown className="h-4 w-4 mr-2" />
                         Promote
                     </Button>
@@ -180,7 +178,7 @@ const ManagerManagementPage = () => {
             <Card className="bg-white border border-primary-50">
                 <CardContent className="p-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search by name, title, or ID..."
                             className="pl-10"
@@ -195,7 +193,7 @@ const ManagerManagementPage = () => {
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-white">
+                            <TableRow className="bg-primary-50">
                                 <TableHead className="text-black">Leader</TableHead>
                                 <TableHead className="text-black">Department</TableHead>
                                 <TableHead className="text-center text-black">Reports</TableHead>
@@ -209,7 +207,7 @@ const ManagerManagementPage = () => {
                                     <TableRow key={i} className="">
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-primary-50 animate-pulse"></div>
+                                                <div className="h-10 w-10 rounded-full bg-primary-100 animate-pulse"></div>
                                                 <div className="space-y-1">
                                                     <div className="h-4 bg-primary-50 rounded w-32 animate-pulse"></div>
                                                     <div className="h-3 bg-primary-50 rounded w-24 animate-pulse"></div>
@@ -241,20 +239,23 @@ const ManagerManagementPage = () => {
                                         <TableRow key={manager.id} className="hover:bg-primary-50">
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    {photo ? (
-                                                        <img 
-                                                            src={photo}
-                                                            alt={manager.full_name}
-                                                            className="h-8 w-8 rounded-full object-cover bg-primary-50"
-                                                            onError={(e) => e.target.style.display = 'none'}
-                                                        />
-                                                    ) : null}
-                                                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${!photo ? 'block' : 'hidden'} bg-primary-100 text-primary-700`}>
-                                                        {manager.first_name?.[0]}{manager.last_name?.[0]}
+                                                    <div className="relative">
+                                                        {photo ? (
+                                                            <img 
+                                                                src={photo}
+                                                                alt={manager.full_name}
+                                                                className="h-10 w-10 rounded-full object-cover bg-primary-50"
+                                                                onError={(e) => e.target.style.display = 'none'}
+                                                            />
+                                                        ) : (
+                                                            <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold bg-primary-100 text-primary-700">
+                                                                {manager.first_name?.[0]}{manager.last_name?.[0]}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <div className="font-medium text-black">{manager.full_name}</div>
-                                                        <div className="text-xs text-primary-600">{manager.employee_number}</div>
+                                                        <div className="text-xs text-gray-500">{manager.employee_number}</div>
                                                     </div>
                                                 </div>
                                             </TableCell>
@@ -264,7 +265,7 @@ const ManagerManagementPage = () => {
                                                         {dept.name}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-primary-600 text-xs">None</span>
+                                                    <span className="text-gray-500 text-xs">None</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-center">
@@ -273,16 +274,18 @@ const ManagerManagementPage = () => {
                                                 </span>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="text-sm text-black">{manager.job_title}</span>
+                                                <div className="text-sm text-black max-w-xs truncate">{manager.job_title}</div>
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Button
-                                                    variant="ghost"
-                                                    className="h-8 w-8 p-0 text-primary-600 hover:text-primary-700"
-                                                    onClick={() => navigate(`/employees/${manager.id}/edit`)}
-                                                >
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        variant="ghost"
+                                                        className="h-8 w-8 p-0 text-primary-600 hover:text-primary-700"
+                                                        onClick={() => navigate(`/employees/${manager.id}/edit`)}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     );

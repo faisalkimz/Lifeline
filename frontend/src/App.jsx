@@ -13,9 +13,7 @@ import DepartmentFormPage from './features/departments/DepartmentFormPage';
 import OrgChartPage from './features/departments/OrgChartPage';
 import MyProfilePage from './features/employees/MyProfilePage';
 import ManagerManagementPage from './features/managers/ManagerManagementPage';
-import PayrollListPage from './features/payroll/PayrollListPage';
-import SalaryStructurePage from './features/payroll/SalaryStructurePage';
-import LoanManagementPage from './features/payroll/LoanManagementPage';
+import PayrollIndex from './features/payroll/PayrollIndex';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -44,9 +42,7 @@ function App() {
 
         <Route path="/managers" element={<ManagerManagementPage />} />
 
-        <Route path="/payroll" element={<PayrollListPage />} />
-        <Route path="/salary-structures" element={<SalaryStructurePage />} />
-        <Route path="/loans" element={<LoanManagementPage />} />
+        <Route path="/payroll/*" element={<PayrollIndex />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
       </Route>

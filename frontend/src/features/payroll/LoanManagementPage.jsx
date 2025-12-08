@@ -427,4 +427,5 @@ const LoanManagementPage = () => {
   );
 };
 
+export { LoanManagementPage };
 export default LoanManagementPage;

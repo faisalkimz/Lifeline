@@ -365,6 +365,66 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         # Sort events by date
         upcoming_events = sorted(upcoming_birthdays + upcoming_anniversaries, key=lambda x: x['date'])[:5]
 
+        # If there are no events in the next 30 days, compute a nearest-events fallback
+        next_events = []
+        if not upcoming_events:
+            for emp in active_employees:
+                # next birthday
+                if emp.date_of_birth:
+                    try:
+                        nb = emp.date_of_birth.replace(year=today.year)
+                        if nb < today:
+                            nb = nb.replace(year=today.year + 1)
+                        days_until = (nb - today).days
+                        next_events.append({
+                            'id': emp.id,
+                            'name': emp.full_name,
+                            'date': nb,
+                            'type': 'Birthday',
+                            'original_date': emp.date_of_birth,
+                            'days_until': days_until
+                        })
+                    except ValueError:
+                        # Leap year fallback to March 1st
+                        try:
+                            fb = emp.date_of_birth.replace(year=today.year, month=3, day=1)
+                            if fb < today:
+                                fb = fb.replace(year=today.year + 1)
+                            days_until = (fb - today).days
+                            next_events.append({
+                                'id': emp.id,
+                                'name': emp.full_name,
+                                'date': fb,
+                                'type': 'Birthday (Mar 1)',
+                                'original_date': emp.date_of_birth,
+                                'days_until': days_until
+                            })
+                        except Exception:
+                            pass
+
+                # next anniversary
+                if emp.join_date:
+                    try:
+                        na = emp.join_date.replace(year=today.year)
+                        if na < today:
+                            na = na.replace(year=today.year + 1)
+                        years = na.year - emp.join_date.year
+                        days_until = (na - today).days
+                        # Only include anniversaries that have at least 1 year
+                        next_events.append({
+                            'id': emp.id,
+                            'name': emp.full_name,
+                            'date': na,
+                            'type': 'Work Anniversary',
+                            'years': years if years > 0 else None,
+                            'days_until': days_until
+                        })
+                    except Exception:
+                        pass
+
+            # Keep the nearest 5 upcoming by days_until
+            next_events = sorted([e for e in next_events if e.get('days_until') is not None], key=lambda x: x['days_until'])[:5]
+
         stats = {
             'total': queryset.count(),
             'active': queryset.filter(employment_status='active').count(),
@@ -376,6 +436,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             'departments_count': Department.objects.filter(company=request.user.company).count(),
             'recent_hires_list': EmployeeListSerializer(recent_hires_list, many=True, context={'request': request}).data,
             'upcoming_events': upcoming_events,
+            'next_events': next_events,
             'by_type': {
                 'full_time': queryset.filter(employment_type='full_time').count(),
                 'part_time': queryset.filter(employment_type='part_time').count(),

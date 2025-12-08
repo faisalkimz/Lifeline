@@ -1,0 +1,260 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
+import { Download, Eye, Mail, DollarSign, User, Calendar } from 'lucide-react';
+
+
+const PayslipPage = () => {
+    const [selectedPayslip, setSelectedPayslip] = useState(null);
+    const [filterMonth, setFilterMonth] = useState(new Date().getMonth() + 1);
+
+    // Sample payslips data
+    const payslips = [
+        {
+            id: 1,
+            employee_name: 'John Doe',
+            employee_number: 'EMP001',
+            month: 12,
+            year: 2025,
+            basic_salary: 3000000,
+            allowances: 1000000,
+            gross_salary: 4000000,
+            paye_tax: 600000,
+            nssf_employee: 280000,
+            other_deductions: 120000,
+            total_deductions: 1000000,
+            net_salary: 3000000,
+        },
+        {
+            id: 2,
+            employee_name: 'Jane Smith',
+            employee_number: 'EMP002',
+            month: 12,
+            year: 2025,
+            basic_salary: 2500000,
+            allowances: 800000,
+            gross_salary: 3300000,
+            paye_tax: 450000,
+            nssf_employee: 231000,
+            other_deductions: 119000,
+            total_deductions: 800000,
+            net_salary: 2500000,
+        },
+    ];
+
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-UG', {
+            style: 'currency',
+            currency: 'UGX',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(value);
+    };
+
+    const PayslipModal = ({ payslip, onClose }) => {
+        if (!payslip) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <CardHeader className="bg-gradient-to-r from-primary-50 to-primary-100 border-b border-primary-200">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-2xl">Payslip</CardTitle>
+                            <button onClick={onClose} className="text-2xl leading-none">&times;</button>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-8">
+                        {/* Employee Info */}
+                        <div className="mb-8 pb-8 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4">Employee Information</h3>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div>
+                                    <p className="text-sm text-gray-600">Name</p>
+                                    <p className="text-lg font-semibold text-gray-900">{payslip.employee_name}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-600">Employee Number</p>
+                                    <p className="text-lg font-semibold text-gray-900">{payslip.employee_number}</p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-600">Period</p>
+                                    <p className="text-lg font-semibold text-gray-900">
+                                        {new Date(payslip.year, payslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-600">Generated</p>
+                                    <p className="text-lg font-semibold text-gray-900">{new Date().toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Earnings */}
+                        <div className="mb-8 pb-8 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4 text-green-700">Earnings</h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700">Basic Salary</span>
+                                    <span className="font-semibold text-gray-900">{formatCurrency(payslip.basic_salary)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700">Allowances</span>
+                                    <span className="font-semibold text-gray-900">{formatCurrency(payslip.allowances)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-3 border-t-2 border-green-200">
+                                    <span className="text-lg font-semibold text-green-700">Gross Salary</span>
+                                    <span className="text-lg font-bold text-green-600">{formatCurrency(payslip.gross_salary)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Deductions */}
+                        <div className="mb-8 pb-8 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold mb-4 text-red-700">Deductions</h3>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700">PAYE Tax</span>
+                                    <span className="font-semibold text-gray-900">{formatCurrency(payslip.paye_tax)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700">NSSF Contribution (10%)</span>
+                                    <span className="font-semibold text-gray-900">{formatCurrency(payslip.nssf_employee)}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-gray-700">Other Deductions</span>
+                                    <span className="font-semibold text-gray-900">{formatCurrency(payslip.other_deductions)}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-3 border-t-2 border-red-200">
+                                    <span className="text-lg font-semibold text-red-700">Total Deductions</span>
+                                    <span className="text-lg font-bold text-red-600">{formatCurrency(payslip.total_deductions)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Net Salary */}
+                        <div className="bg-gradient-to-r from-primary-50 to-primary-100 p-6 rounded-lg border-2 border-primary-200 mb-8">
+                            <div className="flex justify-between items-center">
+                                <span className="text-xl font-bold text-gray-900">Net Salary (Take Home)</span>
+                                <span className="text-3xl font-bold text-primary-600">{formatCurrency(payslip.net_salary)}</span>
+                            </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex gap-3 pt-6 border-t border-gray-200">
+                            <Button variant="primary" className="flex items-center gap-2">
+                                <Download className="h-4 w-4" />
+                                Download PDF
+                            </Button>
+                            <Button variant="outline" className="flex items-center gap-2">
+                                <Mail className="h-4 w-4" />
+                                Email Payslip
+                            </Button>
+                            <Button variant="outline" onClick={onClose}>Close</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        );
+    };
+
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-bold text-gray-900">Payslips</h1>
+                <p className="text-gray-600 mt-2">View and manage employee payslips</p>
+            </div>
+
+            {/* Filter */}
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex gap-4 items-end">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Filter by Month</label>
+                            <select
+                                value={filterMonth}
+                                onChange={(e) => setFilterMonth(parseInt(e.target.value))}
+                                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            >
+                                {Array.from({ length: 12 }, (_, i) => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {new Date(2025, i).toLocaleString('en-US', { month: 'long' })}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <Button variant="outline">Export</Button>
+                    </div>
+                </CardContent>
+            </Card>
+
+            {/* Payslips Table */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Employee Payslips</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Employee</TableHead>
+                                <TableHead>Employee #</TableHead>
+                                <TableHead className="text-right">Gross Salary</TableHead>
+                                <TableHead className="text-right">Deductions</TableHead>
+                                <TableHead className="text-right">Net Salary</TableHead>
+                                <TableHead>Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {payslips.map((payslip) => (
+                                <TableRow key={payslip.id} className="hover:bg-gray-50">
+                                    <TableCell className="font-medium flex items-center gap-2">
+                                        <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-sm font-bold text-primary-600">
+                                            {payslip.employee_name.split(' ').map(n => n[0]).join('')}
+                                        </div>
+                                        {payslip.employee_name}
+                                    </TableCell>
+                                    <TableCell className="text-gray-600">{payslip.employee_number}</TableCell>
+                                    <TableCell className="text-right text-green-600 font-semibold">
+                                        {formatCurrency(payslip.gross_salary)}
+                                    </TableCell>
+                                    <TableCell className="text-right text-orange-600">
+                                        {formatCurrency(payslip.total_deductions)}
+                                    </TableCell>
+                                    <TableCell className="text-right text-primary-600 font-bold">
+                                        {formatCurrency(payslip.net_salary)}
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setSelectedPayslip(payslip)}
+                                                className="flex items-center gap-1"
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                                View
+                                            </Button>
+                                            <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                                                <Download className="h-4 w-4" />
+                                                Download
+                                            </Button>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            {/* Payslip Modal */}
+            <PayslipModal payslip={selectedPayslip} onClose={() => setSelectedPayslip(null)} />
+        </div>
+    );
+};
+
+export { PayslipPage };
+export default PayslipPage;

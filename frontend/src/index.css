@@ -1,118 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-@import "tailwindcss";
+/* Tailwind layers MUST be present */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme {
+/* Your custom theme variables */
+:root {
   --font-sans: Inter, system-ui, sans-serif;
-
   --color-primary-50: #eff6ff;
   --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
   --color-primary-500: #3b82f6;
   --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
-  --color-primary-950: #172554;
-
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
-  --color-gray-950: #030712;
-
-  --color-success-50: #ecfdf5;
   --color-success-500: #10b981;
-  --color-success-700: #047857;
-
-  --color-warning-50: #fffbeb;
-  --color-warning-500: #f59e0b;
-  --color-warning-700: #b45309;
-
-  --color-error-50: #fef2f2;
   --color-error-500: #ef4444;
-  --color-error-600: #dc2626;
-  --color-error-700: #b91c1c;
-
-  --animate-fade-in: fadeIn 0.5s ease-out;
-  --animate-slide-up: slideUp 0.5s ease-out;
-
-  @keyframes fadeIn {
-    0% {
-      opacity: 0;
-    }
-
-    100% {
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideUp {
-    0% {
-      transform: translateY(10px);
-      opacity: 0;
-    }
-
-    100% {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
+  --color-warning-500: #f59e0b;
 }
 
+/* Optional: your custom components */
 @layer base {
   body {
     @apply font-sans text-gray-900 bg-gray-50 antialiased;
   }
-
-  /* Smooth scrolling for the whole app */
   html {
     scroll-behavior: smooth;
   }
 }
 
 @layer components {
-
-  /* Premium Card Style */
-  .card {
-    @apply bg-white rounded-xl border border-gray-200 shadow-sm transition-all duration-200;
-  }
-
-  .card-hover {
-    @apply hover:shadow-md hover:border-gray-300;
-  }
-
-  /* Premium Input Style */
-  .input-field {
-    @apply w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-200 focus:border-primary-500 transition-all duration-200 placeholder:text-gray-400 text-sm;
-  }
-
-  /* Premium Button Styles */
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2.5 rounded-lg font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus:ring-primary-500;
-  }
-
-  .btn-secondary {
-    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:ring-gray-200;
-  }
-
-  .btn-ghost {
-    @apply text-gray-600 hover:bg-gray-100 hover:text-gray-900;
-  }
-
-  .btn-danger {
-    @apply bg-error-500 text-white hover:bg-error-600 focus:ring-error-500;
-  }
+  .card { @apply bg-white rounded-xl border border-gray-200 shadow-sm; }
+  .btn-primary { @apply bg-primary-600 text-white; }
 }

@@ -22,7 +22,7 @@ const Checkbox = ({ checked, onCheckedChange, id, className = "" }) => {
                 className={`inline-flex items-center justify-center w-4 h-4 border-2 rounded cursor-pointer transition-colors ${
                     checked
                         ? 'bg-primary-600 border-primary-600'
-                        : 'border-gray-300 hover:border-gray-400'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                 } ${className}`}
             >
                 {checked && (
@@ -34,5 +34,7 @@ const Checkbox = ({ checked, onCheckedChange, id, className = "" }) => {
 };
 
 export { Checkbox };
+
+
 
 

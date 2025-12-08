@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # Our apps
     "accounts",
     "employees",
+    "payroll",
 ]
 
 

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import AuthLayout from './layouts/AuthLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import LoginPage from './features/auth/LoginPage';
@@ -12,8 +13,13 @@ import DepartmentFormPage from './features/departments/DepartmentFormPage';
 import OrgChartPage from './features/departments/OrgChartPage';
 import MyProfilePage from './features/employees/MyProfilePage';
 import ManagerManagementPage from './features/managers/ManagerManagementPage';
+import PayrollListPage from './features/payroll/PayrollListPage';
+import SalaryStructurePage from './features/payroll/SalaryStructurePage';
+import LoanManagementPage from './features/payroll/LoanManagementPage';
 
 function App() {
+  // Theme removed — app renders without theme side-effects
+
   return (
     <Routes>
       {/* Public Routes (Auth) */}
@@ -37,6 +43,10 @@ function App() {
         <Route path="/org-chart" element={<OrgChartPage />} />
 
         <Route path="/managers" element={<ManagerManagementPage />} />
+
+        <Route path="/payroll" element={<PayrollListPage />} />
+        <Route path="/salary-structures" element={<SalaryStructurePage />} />
+        <Route path="/loans" element={<LoanManagementPage />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
       </Route>

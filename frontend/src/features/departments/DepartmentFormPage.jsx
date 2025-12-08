@@ -169,6 +169,9 @@ const DepartmentFormPage = () => {
 
             {/* Form Content */}
             <Card>
+                <CardHeader>
+                    <CardTitle>Department Details</CardTitle>
+                </CardHeader>
                 <CardContent className="p-6">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -182,7 +185,7 @@ const DepartmentFormPage = () => {
 
                         <FormField label="Description" error={errors.description}>
                             <textarea
-                                className="input-field min-h-[100px]"
+                                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[100px] transition-shadow shadow-sm"
                                 {...register('description')}
                                 placeholder="Describe the department's function..."
                             />
@@ -190,7 +193,7 @@ const DepartmentFormPage = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <FormField label="Manager" error={errors.manager}>
-                                <select className="input-field" {...register('manager')}>
+                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('manager')}>
                                     <option value="">Select Manager (Optional)</option>
                                     {employees.map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.full_name}</option>
@@ -202,7 +205,7 @@ const DepartmentFormPage = () => {
                                 <label className="flex items-center gap-3 cursor-pointer">
                                     <input
                                         type="checkbox"
-                                        className="h-5 w-5 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                                        className="h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
                                         {...register('is_active')}
                                     />
                                     <span className="text-sm font-medium text-gray-700">Active Department</span>

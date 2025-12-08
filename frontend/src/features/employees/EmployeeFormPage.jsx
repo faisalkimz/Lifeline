@@ -73,7 +73,9 @@ const FormField = ({ label, error, children, required }) => (
 );
 
 const EmployeeFormPage = () => {
-    const { id } = useParams();
+    const { id: routeId } = useParams();
+    // Normalize route id: strip any accidental leading ':' (defensive)
+    const id = routeId ? String(routeId).replace(/^:/, '') : routeId;
     const isEditMode = !!id;
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState("personal");
@@ -167,14 +169,38 @@ const EmployeeFormPage = () => {
                 formData.append('photo', selectedFile);
             }
 
+            // Debug: log endpoint and payload summary
+            try {
+                // This shows the route id and whether we're sending a file
+                console.debug('EmployeeForm submit', { id, isEditMode, hasFile: !!selectedFile });
+            } catch (e) {
+                // ignore
+            }
+
             if (isEditMode) {
+                // updateEmployee expects an object; we use formData to allow uploads
                 await updateEmployee({ id, formData }).unwrap();
             } else {
                 await createEmployee(formData).unwrap();
             }
             navigate('/employees');
         } catch (error) {
-            console.error('Failed to save employee:', error);
+            // RTK Query throws an object; try to log useful fields and stringify response
+            const payload = error?.data || error?.error || null;
+            let payloadStr = null;
+            try {
+                payloadStr = payload ? JSON.stringify(payload) : String(payload);
+            } catch (e) {
+                payloadStr = String(payload);
+            }
+
+            console.error('Failed to save employee (detailed):', {
+                message: error?.message || String(error),
+                status: error?.status || error?.originalStatus || null,
+                data: payload,
+                dataString: payloadStr,
+                meta: error?.meta || null
+            });
         }
     };
 
@@ -249,19 +275,20 @@ const EmployeeFormPage = () => {
                 <div className="lg:col-span-3 space-y-6">
                     <Card>
                         <CardContent className="p-6 flex flex-col items-center text-center">
-                            <div className="relative h-32 w-32 rounded-full bg-gray-100 mb-4 overflow-hidden ring-4 ring-white shadow-sm group">
+                            <div className="relative h-32 w-32 rounded-full bg-gray-100 mb-4 overflow-hidden shadow-sm flex items-center justify-center">
                                 {previewImage ? (
                                     <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
                                 ) : (
-                                    <User className="h-16 w-16 text-gray-300 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                    <User className="h-16 w-16 text-gray-300" />
                                 )}
-                                <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                                    <Upload className="h-6 w-6 text-white" />
-                                    <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                                </label>
                             </div>
                             <h3 className="font-medium text-gray-900">Profile Photo</h3>
-                            <p className="text-xs text-gray-500 mt-1">Click to upload</p>
+                            <p className="text-xs text-gray-500 mt-1 mb-3">Upload a clear headshot — square photos work best.</p>
+                            <label className="inline-flex items-center gap-2 text-sm text-primary-600 cursor-pointer">
+                                <Upload className="h-4 w-4" />
+                                <span className="underline">Upload photo</span>
+                                <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                            </label>
                         </CardContent>
                     </Card>
                 </div>
@@ -269,47 +296,23 @@ const EmployeeFormPage = () => {
                 {/* Main Form */}
                 <div className="lg:col-span-9">
                     <Card>
-                        <CardHeader className="border-b border-gray-100 pb-0">
-                            <Tabs value={activeTab} className="w-full">
-                                <TabsList className="w-full justify-start bg-transparent p-0 gap-6">
-                                    <TabsTrigger
-                                        value="personal"
-                                        activeValue={activeTab}
-                                        onClick={setActiveTab}
-                                        className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary-600 data-[state=active]:text-primary-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        <User className="h-4 w-4 mr-2" />
-                                        Personal
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="employment"
-                                        activeValue={activeTab}
-                                        onClick={setActiveTab}
-                                        className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary-600 data-[state=active]:text-primary-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        <Briefcase className="h-4 w-4 mr-2" />
-                                        Employment
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="documents"
-                                        activeValue={activeTab}
-                                        onClick={setActiveTab}
-                                        className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary-600 data-[state=active]:text-primary-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        <FileText className="h-4 w-4 mr-2" />
-                                        Documents
-                                    </TabsTrigger>
-                                    <TabsTrigger
-                                        value="other"
-                                        activeValue={activeTab}
-                                        onClick={setActiveTab}
-                                        className="rounded-none border-b-2 border-transparent px-0 py-3 data-[state=active]:border-primary-600 data-[state=active]:text-primary-600 data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-                                    >
-                                        <CreditCard className="h-4 w-4 mr-2" />
-                                        Bank & Other
-                                    </TabsTrigger>
-                                </TabsList>
-                            </Tabs>
+                        <CardHeader className="pb-0">
+                            <div className="flex items-center justify-between w-full">
+                                <div>
+                                    <CardTitle className="text-lg">Employee Details</CardTitle>
+                                    <p className="text-sm text-gray-500">Fill personal, employment and document details.</p>
+                                </div>
+                                <div className="hidden md:block">
+                                    <Tabs value={activeTab} className="">
+                                        <TabsList className="flex gap-2 bg-transparent p-0">
+                                            <TabsTrigger value="personal" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline"/> Personal</TabsTrigger>
+                                            <TabsTrigger value="employment" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline"/> Employment</TabsTrigger>
+                                            <TabsTrigger value="documents" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline"/> Documents</TabsTrigger>
+                                            <TabsTrigger value="other" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline"/> Bank & Other</TabsTrigger>
+                                        </TabsList>
+                                    </Tabs>
+                                </div>
+                            </div>
                         </CardHeader>
 
                         <CardContent className="p-6">
@@ -342,14 +345,14 @@ const EmployeeFormPage = () => {
                                             <Input type="date" {...register('date_of_birth')} />
                                         </FormField>
                                         <FormField label="Gender" error={errors.gender} required>
-                                            <select className="input-field" {...register('gender')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('gender')}>
                                                 <option value="male">Male</option>
                                                 <option value="female">Female</option>
                                                 <option value="other">Other</option>
                                             </select>
                                         </FormField>
                                         <FormField label="Marital Status" error={errors.marital_status}>
-                                            <select className="input-field" {...register('marital_status')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('marital_status')}>
                                                 <option value="single">Single</option>
                                                 <option value="married">Married</option>
                                                 <option value="divorced">Divorced</option>
@@ -363,12 +366,12 @@ const EmployeeFormPage = () => {
                                             <Input {...register('address')} placeholder="Street address, Apt, etc." />
                                         </FormField>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <FormField label="City" error={errors.city}>
-                                                <Input {...register('city')} placeholder="Kampala" />
-                                            </FormField>
-                                            <FormField label="District" error={errors.district}>
-                                                <Input {...register('district')} placeholder="Kampala" />
-                                            </FormField>
+                                                <FormField label="City" error={errors.city}>
+                                                    <Input {...register('city')} placeholder="Kampala" />
+                                                </FormField>
+                                                <FormField label="District" error={errors.district}>
+                                                    <Input {...register('district')} placeholder="Kampala" />
+                                                </FormField>
                                         </div>
                                     </div>
                                 </TabsContent>
@@ -377,7 +380,7 @@ const EmployeeFormPage = () => {
                                 <TabsContent value="employment" activeValue={activeTab} className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField label="Department" error={errors.department} required>
-                                            <select className="input-field" {...register('department')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('department')}>
                                                 <option value="">Select Department</option>
                                                 {departments.map(dept => (
                                                     <option key={dept.id} value={dept.id}>{dept.name}</option>
@@ -391,7 +394,7 @@ const EmployeeFormPage = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField label="Manager" error={errors.manager}>
-                                            <select className="input-field" {...register('manager')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('manager')}>
                                                 <option value="">Select Manager (Optional)</option>
                                                 {employees.map(emp => (
                                                     <option key={emp.id} value={emp.id}>{emp.full_name}</option>
@@ -399,7 +402,7 @@ const EmployeeFormPage = () => {
                                             </select>
                                         </FormField>
                                         <FormField label="Employment Type" error={errors.employment_type} required>
-                                            <select className="input-field" {...register('employment_type')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_type')}>
                                                 <option value="full_time">Full Time</option>
                                                 <option value="part_time">Part Time</option>
                                                 <option value="contract">Contract</option>
@@ -417,7 +420,7 @@ const EmployeeFormPage = () => {
                                             <Input type="date" {...register('probation_end_date')} />
                                         </FormField>
                                         <FormField label="Status" error={errors.employment_status} required>
-                                            <select className="input-field" {...register('employment_status')}>
+                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_status')}>
                                                 <option value="active">Active</option>
                                                 <option value="on_leave">On Leave</option>
                                                 <option value="suspended">Suspended</option>
@@ -479,7 +482,7 @@ const EmployeeFormPage = () => {
                                     <h4 className="font-medium text-gray-900 border-b pb-2 pt-4">Notes</h4>
                                     <FormField label="Additional Notes" error={errors.notes}>
                                         <textarea
-                                            className="input-field min-h-[100px]"
+                                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[100px] transition-shadow shadow-sm"
                                             {...register('notes')}
                                             placeholder="Any other important details..."
                                         />

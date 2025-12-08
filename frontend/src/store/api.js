@@ -74,6 +74,12 @@ export const api = createApi({
                 url: '/employees/',
                 params
             }),
+            // Unwrap paginated responses (DRF returns {count, next, previous, results})
+            transformResponse: (response) => {
+                if (response && Array.isArray(response)) return response;
+                if (response && response.results && Array.isArray(response.results)) return response.results;
+                return response || [];
+            },
             providesTags: (result) =>
                 result && Array.isArray(result)
                     ? [
@@ -97,7 +103,8 @@ export const api = createApi({
         updateEmployee: builder.mutation({
             query: ({ id, formData, ...data }) => ({
                 url: `/employees/${id}/`,
-                method: 'PUT',
+                // Use PATCH when sending FormData (uploads) to avoid multipart+PUT issues
+                method: (typeof FormData !== 'undefined' && formData instanceof FormData) ? 'PATCH' : 'PUT',
                 body: formData || data
             }),
             invalidatesTags: (result, error, { id }) => [
@@ -122,6 +129,11 @@ export const api = createApi({
         }),
         getManagers: builder.query({
             query: () => '/employees/managers/',
+            transformResponse: (response) => {
+                if (response && Array.isArray(response)) return response;
+                if (response && response.results && Array.isArray(response.results)) return response.results;
+                return response || [];
+            },
             providesTags: [{ type: 'Employee', id: 'MANAGERS' }]
         }),
         promoteToManager: builder.mutation({
@@ -140,6 +152,11 @@ export const api = createApi({
         // Department Endpoints
         getDepartments: builder.query({
             query: () => '/departments/',
+            transformResponse: (response) => {
+                if (response && Array.isArray(response)) return response;
+                if (response && response.results && Array.isArray(response.results)) return response.results;
+                return response || [];
+            },
             providesTags: (result) =>
                 result && Array.isArray(result)
                     ? [

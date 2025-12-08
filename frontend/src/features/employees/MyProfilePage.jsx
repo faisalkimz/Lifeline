@@ -6,13 +6,13 @@ import { Button } from '../../components/ui/Button';
 import { User, Mail, Phone, MapPin, Briefcase, Calendar, Building2 } from 'lucide-react';
 
 const ProfileField = ({ icon: Icon, label, value }) => (
-    <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-        <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm text-primary-600 shrink-0">
+    <div className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="h-10 w-10 bg-white dark:bg-gray-700 rounded-full flex items-center justify-center shadow-sm text-primary-600 dark:text-primary-300 shrink-0">
             <Icon className="h-5 w-5" />
         </div>
         <div>
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
-            <p className="text-sm font-medium text-gray-900 mt-0.5">{value || 'N/A'}</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{label}</p>
+            <p className="text-sm font-medium text-gray-900 dark:text-white mt-0.5">{value || 'N/A'}</p>
         </div>
     </div>
 );
@@ -20,8 +20,25 @@ const ProfileField = ({ icon: Icon, label, value }) => (
 const MyProfilePage = () => {
     const { data: employee, isLoading, error } = useGetMyProfileQuery();
 
+    // Construct image URL helper
+    const getImageUrl = (photoPath) => {
+        if (!photoPath) return null;
+        if (photoPath.startsWith('http')) return photoPath;
+
+        if (photoPath.startsWith('/')) {
+            return `${window.location.origin}${photoPath}`;
+        }
+
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        if (baseUrl && baseUrl.startsWith('http')) {
+            return `${baseUrl.replace(/\/$/, '')}/${photoPath.replace(/^\//, '')}`;
+        }
+
+        return photoPath;
+    };
+
     // Fallback mock data for development/demo purposes
-    const mockEmployee = employee || {
+    const displayEmployee = employee || {
         first_name: 'John',
         last_name: 'Doe',
         full_name: 'John Doe',
@@ -96,17 +113,18 @@ const MyProfilePage = () => {
         <div className="max-w-4xl mx-auto space-y-6 animate-fade-in pb-10">
             {/* Header Card */}
             <Card className="overflow-hidden">
-                <div className="h-32 bg-gradient-to-r from-primary-600 to-primary-800 relative">
-                    <div className="absolute -bottom-16 left-8">
-                        <div className="h-32 w-32 rounded-full bg-white p-1 shadow-lg">
-                            {mockEmployee.photo ? (
+                    <div className="h-32 bg-white relative">
+                        <div className="absolute -bottom-16 left-8">
+                            <div className="h-32 w-32 rounded-full bg-white p-1 shadow-lg">
+                            {employee?.photo ? (
                                 <img
-                                    src={mockEmployee.photo}
-                                    alt={mockEmployee.full_name}
+                                    src={getImageUrl(employee.photo)}
+                                    alt={employee.full_name}
                                     className="h-full w-full rounded-full object-cover bg-gray-100"
+                                    onError={(e) => { e.target.style.display = 'none'; console.warn('Profile image failed to load:', e.target.src); }}
                                 />
                             ) : (
-                                <div className="h-full w-full rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
+                                <div className="h-full w-full rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-300">
                                     <User className="h-16 w-16" />
                                 </div>
                             )}
@@ -116,17 +134,17 @@ const MyProfilePage = () => {
                 <div className="pt-20 pb-6 px-8">
                     <div className="flex justify-between items-start">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">{mockEmployee.full_name}</h1>
-                            <p className="text-lg text-gray-500 font-medium">{mockEmployee.job_title}</p>
+                            <h1 className="text-3xl font-bold text-gray-900">{displayEmployee.full_name}</h1>
+                            <p className="text-lg text-gray-500 font-medium">{displayEmployee.job_title}</p>
                             <div className="flex items-center gap-2 mt-2">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${mockEmployee.employment_status === 'active'
+                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${displayEmployee.employment_status === 'active'
                                         ? "bg-success-50 text-success-700 border border-success-200"
                                         : "bg-gray-100 text-gray-700 border border-gray-200"
                                     }`}>
-                                    {mockEmployee.employment_status.toUpperCase()}
+                                    {displayEmployee.employment_status.toUpperCase()}
                                 </span>
                                 <span className="text-gray-300">•</span>
-                                <span className="text-sm text-gray-500">{mockEmployee.employee_number}</span>
+                                <span className="text-sm text-gray-500">{displayEmployee.employee_number}</span>
                             </div>
                         </div>
                     </div>
@@ -140,10 +158,10 @@ const MyProfilePage = () => {
                         <CardTitle>Personal Information</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <ProfileField icon={Mail} label="Email Address" value={mockEmployee.email} />
-                        <ProfileField icon={Phone} label="Phone Number" value={mockEmployee.phone} />
-                        <ProfileField icon={Calendar} label="Date of Birth" value={mockEmployee.date_of_birth} />
-                        <ProfileField icon={MapPin} label="Address" value={`${mockEmployee.address || ''} ${mockEmployee.city ? ', ' + mockEmployee.city : ''}`} />
+                        <ProfileField icon={Mail} label="Email Address" value={displayEmployee.email} />
+                        <ProfileField icon={Phone} label="Phone Number" value={displayEmployee.phone} />
+                        <ProfileField icon={Calendar} label="Date of Birth" value={displayEmployee.date_of_birth} />
+                        <ProfileField icon={MapPin} label="Address" value={`${displayEmployee.address || ''} ${displayEmployee.city ? ', ' + displayEmployee.city : ''}`} />
                     </CardContent>
                 </Card>
 
@@ -153,10 +171,10 @@ const MyProfilePage = () => {
                         <CardTitle>Employment Details</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <ProfileField icon={Building2} label="Department" value={mockEmployee.department_name} />
-                        <ProfileField icon={Briefcase} label="Employment Type" value={mockEmployee.employment_type?.replace('_', ' ')} />
-                        <ProfileField icon={Calendar} label="Join Date" value={mockEmployee.join_date} />
-                        <ProfileField icon={User} label="Manager" value={mockEmployee.manager ? 'Assigned' : 'None'} />
+                        <ProfileField icon={Building2} label="Department" value={displayEmployee.department_name} />
+                        <ProfileField icon={Briefcase} label="Employment Type" value={displayEmployee.employment_type?.replace('_', ' ')} />
+                        <ProfileField icon={Calendar} label="Join Date" value={displayEmployee.join_date} />
+                        <ProfileField icon={User} label="Manager" value={displayEmployee.manager_name || 'None'} />
                     </CardContent>
                 </Card>
             </div>

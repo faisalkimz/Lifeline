@@ -41,6 +41,23 @@ const EmployeeListPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
 
+    // Construct image URL helper
+    const getImageUrl = (photoPath) => {
+        if (!photoPath) return null;
+        if (photoPath.startsWith('http')) return photoPath;
+
+        if (photoPath.startsWith('/')) {
+            return `${window.location.origin}${photoPath}`;
+        }
+
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        if (baseUrl && baseUrl.startsWith('http')) {
+            return `${baseUrl.replace(/\/$/, '')}/${photoPath.replace(/^\//, '')}`;
+        }
+
+        return photoPath;
+    };
+
     // Fetch data
     const { data: employeesData, isLoading, error } = useGetEmployeesQuery({
         search: searchTerm,
@@ -205,11 +222,16 @@ const EmployeeListPage = () => {
                                     >
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold">
+                                                <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold overflow-hidden shrink-0">
                                                     {employee.photo ? (
-                                                        <img src={employee.photo} alt="" className="h-full w-full rounded-full object-cover" />
+                                                        <img
+                                                            src={getImageUrl(employee.photo)}
+                                                            alt={employee.full_name}
+                                                            className="h-full w-full object-cover"
+                                                            onError={(e) => { e.target.style.display = 'none'; }}
+                                                        />
                                                     ) : (
-                                                        employee.first_name[0] + employee.last_name[0]
+                                                        <span className="text-sm">{employee.first_name[0]}{employee.last_name[0]}</span>
                                                     )}
                                                 </div>
                                                 <div>

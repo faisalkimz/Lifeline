@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Users, Building2, UserCheck, Crown,
     Search, Plus, Edit
 } from 'lucide-react';
-import { useGetManagersQuery, useGetDepartmentsQuery, usePromoteToManagerMutation } from '../../store/api';
+import { useGetManagersQuery, useGetDepartmentsQuery, usePromoteToManagerMutation, useGetEmployeesQuery } from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -18,10 +18,29 @@ import { selectCurrentUser, selectIsAuthenticated } from '../auth/authSlice';
 import PromoteManagerModal from './PromoteManagerModal';
 import toast from 'react-hot-toast';
 
+const getImageUrl = (photoPath) => {
+    if (!photoPath) return null;
+    if (photoPath.startsWith('http')) return photoPath;
+
+    // If path is absolute on the same host (starts with '/'), use window origin
+    if (photoPath.startsWith('/')) {
+        return `${window.location.origin}${photoPath}`;
+    }
+
+    // If a VITE_API_BASE_URL is configured and looks like a URL, use it
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+    if (baseUrl && baseUrl.startsWith('http')) {
+        return `${baseUrl.replace(/\/$/, '')}/${photoPath.replace(/^\//, '')}`;
+    }
+
+    // Fallback: return the raw path so the browser can resolve relatively
+    return photoPath;
+};
+
 const ManagerManagementPage = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-    const [viewMode, setViewMode] = useState('grid');
+    const [viewMode, setViewMode] = useState('table');
     const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
 
     const isAuthenticated = useSelector(selectIsAuthenticated);
@@ -29,49 +48,92 @@ const ManagerManagementPage = () => {
     const { data: managersData, isLoading, refetch } = useGetManagersQuery(undefined, {
         skip: !isAuthenticated
     });
+    // Also fetch all active employees as a fallback source for manager-like roles
+    const { data: allEmployeesData } = useGetEmployeesQuery({ employment_status: 'active' }, { skip: !isAuthenticated });
     const { data: departments } = useGetDepartmentsQuery(undefined, {
         skip: !isAuthenticated
     });
 
+    // Debugging: log managers/departments responses to help troubleshoot missing data
+    React.useEffect(() => {
+        if (!isLoading) {
+            // eslint-disable-next-line no-console
+            console.debug('Managers data:', managersData);
+            // eslint-disable-next-line no-console
+            console.debug('Departments data:', departments);
+        }
+    }, [managersData, departments, isLoading]);
+
     const [promoteToManager, { isLoading: isPromoting }] = usePromoteToManagerMutation();
 
-    const processedManagers = Array.isArray(managersData) ? managersData : [];
+    // Handle managers data properly. If the managers endpoint returns unexpectedly few
+    // results, also include employees whose job_title contains "manager" as a fallback.
+    const managers = useMemo(() => {
+        const mgrs = Array.isArray(managersData) ? managersData.slice() : [];
 
-    const filteredManagers = processedManagers.filter(manager =>
-        manager.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        manager.job_title?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        // Normalize existing managers into a map by id
+        const byId = new Map();
+        mgrs.forEach(m => {
+            const full_name = m.full_name || `${m.first_name || ''} ${m.last_name || ''}`.trim();
+            byId.set(m.id, { ...m, full_name });
+        });
+
+        // If we have employee data, look for titles that include "manager" (case-insensitive)
+        if (Array.isArray(allEmployeesData) && allEmployeesData.length > 0) {
+            allEmployeesData.forEach(e => {
+                const title = String(e.job_title || '').toLowerCase();
+                if (title.includes('manager') && !byId.has(e.id)) {
+                    const full_name = e.full_name || `${e.first_name || ''} ${e.last_name || ''}`.trim();
+                    byId.set(e.id, { ...e, full_name });
+                }
+            });
+        }
+
+        // Return as array
+        return Array.from(byId.values());
+    }, [managersData, allEmployeesData]);
+
+    const filteredManagers = useMemo(() => {
+        const q = searchTerm.trim().toLowerCase();
+        if (!q) return managers;
+
+        return managers.filter(manager => {
+            const name = (manager.full_name || '').toLowerCase();
+            const title = (manager.job_title || '').toLowerCase();
+            const number = (manager.employee_number || '').toLowerCase();
+            return name.includes(q) || title.includes(q) || number.includes(q);
+        });
+    }, [managers, searchTerm]);
+
+    const stats = useMemo(() => ({
+        total: managers.length,
+        departmentHeads: managers.filter(m => departments?.find(d => d.manager === m.id)).length,
+        totalReports: managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0),
+        avgTeamSize: managers.length > 0
+            ? Math.round(managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0) / managers.length)
+            : 0
+    }), [managers, departments]);
 
     const handlePromoteEmployees = async (promotionData) => {
         try {
             const result = await promoteToManager(promotionData).unwrap();
-
-            toast.success(result.message || 'Employees promoted successfully!');
-
-            // Refetch managers data to show the newly promoted managers
+            toast.success(result.message || 'Employees promoted successfully');
             refetch();
-
+            setIsPromoteModalOpen(false);
         } catch (error) {
             console.error('Promotion failed:', error);
-            toast.error(error?.data?.error || 'Failed to promote employees. Please try again.');
+            toast.error(error?.data?.error || 'Failed to promote employees');
         }
     };
 
     return (
-        <div className="space-y-6 animate-fade-in">
-            {!isAuthenticated && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                    <p className="text-yellow-800 font-medium">⚠️ Not authenticated</p>
-                    <p className="text-yellow-700 text-sm">Please log in to view managers.</p>
-                </div>
-            )}
-
+        <div className="space-y-6 bg-white">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Manager Management</h1>
-                    <p className="text-gray-500 mt-1">
-                        Manage organizational hierarchy and reporting relationships.
-                    </p>
+                    <h1 className="text-2xl font-bold text-black">Team Leaders</h1>
+                        <p className="text-primary-600 mt-1">
+                            Manage who leads teams and departments
+                        </p>
                 </div>
                 <div className="flex gap-3">
                     <Button
@@ -79,51 +141,48 @@ const ManagerManagementPage = () => {
                         onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
                         className="btn-secondary"
                     >
-                        {viewMode === 'grid' ? 'Table View' : 'Card View'}
+                        {viewMode === 'grid' ? 'Table' : 'Cards'}
                     </Button>
                     <Button onClick={() => setIsPromoteModalOpen(true)} className="btn-primary">
                         <Crown className="h-4 w-4 mr-2" />
-                        Promote to Manager
+                        Promote
                     </Button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <StatCard
-                    title="Total Managers"
-                    value={processedManagers.length}
+                    title="Total Leaders"
+                    value={stats.total}
                     icon={Crown}
                     color="primary"
                 />
                 <StatCard
-                    title="Department Heads"
-                    value={processedManagers.filter(m => m.department).length}
+                    title="Dept Heads"
+                    value={stats.departmentHeads}
                     icon={Building2}
                     color="success"
                 />
                 <StatCard
-                    title="Direct Reports"
-                    value={processedManagers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0)}
+                    title="Reports"
+                    value={stats.totalReports}
                     icon={Users}
                     color="warning"
                 />
                 <StatCard
-                    title="Avg Team Size"
-                    value={processedManagers.length > 0 ?
-                        Math.round(processedManagers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0) / processedManagers.length) :
-                        0
-                    }
+                    title="Avg Team"
+                    value={stats.avgTeamSize}
                     icon={UserCheck}
                     color="info"
                 />
             </div>
 
-            <Card>
+            <Card className="bg-white border border-primary-50">
                 <CardContent className="p-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary-500" />
                         <Input
-                            placeholder="Search managers by name, title, or department..."
+                            placeholder="Search by name, title, or ID..."
                             className="pl-10"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -132,94 +191,108 @@ const ManagerManagementPage = () => {
                 </CardContent>
             </Card>
 
-            <Card className="overflow-hidden">
+            <Card className="overflow-hidden bg-white border border-primary-50">
                 <div className="overflow-x-auto">
                     <Table>
                         <TableHeader>
-                            <TableRow>
-                                <TableHead>Manager</TableHead>
-                                <TableHead>Department</TableHead>
-                                <TableHead className="text-center">Direct Reports</TableHead>
-                                <TableHead>Job Title</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                            <TableRow className="bg-white">
+                                <TableHead className="text-black">Leader</TableHead>
+                                <TableHead className="text-black">Department</TableHead>
+                                <TableHead className="text-center text-black">Reports</TableHead>
+                                <TableHead className="text-black">Role</TableHead>
+                                <TableHead className="text-right text-black">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i}>
+                                Array.from({ length: 3 }).map((_, i) => (
+                                    <TableRow key={i} className="">
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+                                                <div className="h-8 w-8 rounded-full bg-primary-50 animate-pulse"></div>
                                                 <div className="space-y-1">
-                                                    <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
-                                                    <div className="h-3 bg-gray-200 rounded w-24 animate-pulse"></div>
+                                                    <div className="h-4 bg-primary-50 rounded w-32 animate-pulse"></div>
+                                                    <div className="h-3 bg-primary-50 rounded w-24 animate-pulse"></div>
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell><div className="h-4 bg-gray-200 rounded w-20 animate-pulse"></div></TableCell>
-                                        <TableCell className="text-center"><div className="h-4 bg-gray-200 rounded w-8 animate-pulse mx-auto"></div></TableCell>
-                                        <TableCell><div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div></TableCell>
-                                        <TableCell className="text-right"><div className="h-8 w-16 bg-gray-200 rounded animate-pulse"></div></TableCell>
+                                        <TableCell><div className="h-4 bg-primary-50 rounded w-20 animate-pulse"></div></TableCell>
+                                        <TableCell className="text-center"><div className="h-4 bg-primary-50 rounded w-8 animate-pulse mx-auto"></div></TableCell>
+                                        <TableCell><div className="h-4 bg-primary-50 rounded w-24 animate-pulse"></div></TableCell>
+                                        <TableCell className="text-right"><div className="h-8 w-16 bg-primary-50 rounded animate-pulse"></div></TableCell>
                                     </TableRow>
                                 ))
                             ) : filteredManagers.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-8 text-gray-500">
-                                        No managers found. Add one to get started!
+                                    <TableCell colSpan={5} className="text-center py-12">
+                                        <div className="text-primary-600">
+                                            <Crown className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                                            <p className="font-medium">No team leaders yet</p>
+                                            <p className="text-sm mt-1">Promote an employee to get started</p>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredManagers.map((manager) => (
-                                    <TableRow key={manager.id}>
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
-                                                    {manager.first_name[0]}{manager.last_name[0]}
+                                filteredManagers.map((manager) => {
+                                    const dept = departments?.find(d => d.manager === manager.id);
+                                    const photo = getImageUrl(manager.photo);
+
+                                    return (
+                                        <TableRow key={manager.id} className="hover:bg-primary-50">
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    {photo ? (
+                                                        <img 
+                                                            src={photo}
+                                                            alt={manager.full_name}
+                                                            className="h-8 w-8 rounded-full object-cover bg-primary-50"
+                                                            onError={(e) => e.target.style.display = 'none'}
+                                                        />
+                                                    ) : null}
+                                                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${!photo ? 'block' : 'hidden'} bg-primary-100 text-primary-700`}>
+                                                        {manager.first_name?.[0]}{manager.last_name?.[0]}
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-medium text-black">{manager.full_name}</div>
+                                                        <div className="text-xs text-primary-600">{manager.employee_number}</div>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div className="font-medium text-gray-900">{manager.full_name}</div>
-                                                    <div className="text-sm text-gray-500">{manager.employee_number}</div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {departments?.find(dept => dept.manager === manager.id) ? (
-                                                <span className="inline-flex items-center px-2 py-1 rounded-md bg-blue-100 text-blue-800 text-xs font-medium">
-                                                    {departments.find(dept => dept.manager === manager.id)?.name}
+                                            </TableCell>
+                                            <TableCell>
+                                                {dept ? (
+                                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-primary-50 text-primary-700 text-xs font-medium">
+                                                        {dept.name}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-primary-600 text-xs">None</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-50 text-success-700">
+                                                    {manager.subordinates?.length || 0}
                                                 </span>
-                                            ) : (
-                                                <span className="text-gray-400 text-sm italic">No department</span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell className="text-center">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-50 text-success-700">
-                                                {manager.subordinates?.length || 0}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="text-sm text-gray-900">{manager.job_title}</span>
-                                        </TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex items-center justify-end gap-2">
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="text-sm text-black">{manager.job_title}</span>
+                                            </TableCell>
+                                            <TableCell className="text-right">
                                                 <Button
                                                     variant="ghost"
-                                                    className="h-8 w-8 p-0 text-gray-500 hover:text-primary-600"
+                                                    className="h-8 w-8 p-0 text-primary-600 hover:text-primary-700"
                                                     onClick={() => navigate(`/employees/${manager.id}/edit`)}
                                                 >
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
                             )}
                         </TableBody>
                     </Table>
                 </div>
             </Card>
 
-            {/* Promotion Modal */}
             <PromoteManagerModal
                 isOpen={isPromoteModalOpen}
                 onClose={() => setIsPromoteModalOpen(false)}
@@ -230,5 +303,7 @@ const ManagerManagementPage = () => {
 };
 
 export default ManagerManagementPage;
+
+
 
 

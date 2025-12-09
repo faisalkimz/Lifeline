@@ -2,7 +2,7 @@
 Payroll serializers for API endpoints.
 """
 from rest_framework import serializers
-from .models import SalaryStructure, PayrollRun, Payslip, Loan
+from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance
 from .utils import calculate_net_salary, get_tax_bracket_info
 
 
@@ -20,16 +20,42 @@ class SalaryStructureSerializer(serializers.ModelSerializer):
             'id', 'employee', 'employee_name', 'employee_number', 'department',
             'effective_date', 'basic_salary', 'housing_allowance', 'transport_allowance',
             'medical_allowance', 'lunch_allowance', 'other_allowances',
-            'gross_salary', 'total_allowances', 'notes', 'created_at', 'updated_at'
+            'gross_salary', 'total_allowances', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'gross_salary', 'total_allowances']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'gross_salary', 'total_allowances', 'company']
 
     def create(self, validated_data):
-        """Set created_by from request user"""
-        validated_data['created_by'] = self.context['request'].user
+        request = self.context['request']
+        user = request.user
+
+        if not user.is_authenticated:
+            raise serializers.ValidationError("Authentication required.")
+
+        # This is the KEY: Get company from the selected employee
+        employee = validated_data.get('employee')
+        if not employee:
+            raise serializers.ValidationError("Employee is required.")
+
+        # Critical security check
+        if not hasattr(employee, 'company') or not employee.company:
+            raise serializers.ValidationError(
+                "Selected employee has no company assigned. Contact admin."
+            )
+
+        # This ensures no data leakage — company comes from employee, not user
+        validated_data['company'] = employee.company
+
+        # Optional: audit trail
+        validated_data['created_by'] = user
+
         return super().create(validated_data)
 
+    def update(self, instance, validated_data):
+        employee = validated_data.get('employee', instance.employee)
+        if employee and employee.company:
+            validated_data['company'] = employee.company
 
+        return super().update(instance, validated_data)
 class PayrollRunSerializer(serializers.ModelSerializer):
     """Serializer for PayrollRun model"""
 
@@ -37,14 +63,28 @@ class PayrollRunSerializer(serializers.ModelSerializer):
     processed_by_name = serializers.CharField(source='processed_by.get_full_name', read_only=True)
     approved_by_name = serializers.CharField(source='approved_by.get_full_name', read_only=True)
     payslip_count = serializers.SerializerMethodField()
+    
+    def create(self, validated_data):
+        request = self.context['request']
+        user = request.user
+
+        if not user.is_authenticated:
+            raise serializers.ValidationError("Authentication required.")
+        if hasattr(user, 'employee') and user.employee and user.employee.company:
+            validated_data['company'] = user.employee.company
+        else:
+            raise serializers.ValidationError("Cannot determine company for payroll run.")
+
+        validated_data['processed_by'] = user
+        return super().create(validated_data)
 
     class Meta:
         model = PayrollRun
         fields = [
             'id', 'company', 'company_name', 'month', 'year', 'status',
-            'total_gross', 'total_deductions', 'total_net', 'employee_count',
+            'total_gross', 'total_deductions', 'total_net',
             'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
-            'approved_by', 'approved_by_name', 'approved_at', 'paid_at', 'notes'
+            'approved_by', 'approved_by_name', 'approved_at'
         ]
         read_only_fields = ['id', 'payslip_count']
 
@@ -125,8 +165,8 @@ class PayslipDetailSerializer(PayslipSerializer):
         return get_tax_bracket_info(obj.gross_salary)
 
 
-class LoanSerializer(serializers.ModelSerializer):
-    """Serializer for Loan model"""
+class SalaryAdvanceSerializer(serializers.ModelSerializer):
+    """Serializer for SalaryAdvance model"""
 
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_number = serializers.CharField(source='employee.employee_number', read_only=True)
@@ -134,25 +174,23 @@ class LoanSerializer(serializers.ModelSerializer):
     is_overdue = serializers.BooleanField(read_only=True)
 
     class Meta:
-        model = Loan
+        model = SalaryAdvance
         fields = [
-            'id', 'employee', 'employee_name', 'employee_number', 'loan_amount',
+            'id', 'employee', 'employee_name', 'employee_number', 'amount',
             'loan_type', 'loan_purpose', 'approved_by', 'approved_by_name',
-            'disbursement_date', 'repayment_period_months', 'monthly_deduction',
-            'total_repaid', 'balance', 'status', 'is_overdue',
-            'created_at', 'approved_at', 'completed_at'
+            'approved_at', 'repayment_period_months', 'monthly_deduction',
+            'amount_repaid', 'balance', 'status', 'is_overdue',
+            'created_at', 'requested_at', 'completed_at'
         ]
         read_only_fields = ['id', 'balance', 'is_overdue', 'approved_at', 'completed_at']
 
     def create(self, validated_data):
         """Auto-calculate monthly deduction if not provided"""
-        loan_amount = validated_data['loan_amount']
+        loan_amount = validated_data['amount']
         months = validated_data.get('repayment_period_months', 1)
 
         if 'monthly_deduction' not in validated_data or validated_data['monthly_deduction'] == 0:
-            validated_data['monthly_deduction'] = (loan_amount / months).quantize(
-                validated_data.get('loan_amount').decimal_places
-            )
+            validated_data['monthly_deduction'] = loan_amount / months
 
         return super().create(validated_data)
 
@@ -166,3 +204,4 @@ class PayrollSummarySerializer(serializers.Serializer):
     total_net = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_paye_tax = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_nssf = serializers.DecimalField(max_digits=15, decimal_places=2)
+

@@ -1,6 +1,5 @@
 import React from 'react';
 import { StatCard } from '../ui/StatCard';
-import { Users, Building2, Clock } from 'lucide-react';
 
 const KPICards = ({ stats, isLoading, managersArray }) => {
     return (
@@ -8,28 +7,28 @@ const KPICards = ({ stats, isLoading, managersArray }) => {
             <StatCard
                 title="Total"
                 value={isLoading ? "..." : stats?.total || 0}
-                icon={Users}
+                icon="Users"
                 color="primary"
                 info={`+${stats?.new_hires || 0} new`}
             />
             <StatCard
                 title="Working"
                 value={isLoading ? "..." : stats?.active || 0}
-                icon={Building2}
+                icon="Building2"
                 color="success"
                 info={`${Math.round(((stats?.active || 0) / (stats?.total || 1)) * 100)}% active`}
             />
             <StatCard
                 title="Away"
                 value={isLoading ? "..." : stats?.on_leave || 0}
-                icon={Clock}
+                icon="Clock"
                 color="warning"
                 info={`on leave now`}
             />
             <StatCard
                 title="Teams"
                 value={isLoading ? "..." : stats?.departments_count || 0}
-                icon={Building2}
+                icon="Building2"
                 color="info"
                 info={`${managersArray.length} leads`}
             />

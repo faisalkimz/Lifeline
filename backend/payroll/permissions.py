@@ -47,3 +47,4 @@ class IsEmployeeOrAdmin(permissions.BasePermission):
             return obj.user == request.user
 
         return False
+

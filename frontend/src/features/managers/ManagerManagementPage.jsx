@@ -152,25 +152,25 @@ const ManagerManagementPage = () => {
                 <StatCard
                     title="Total Leaders"
                     value={stats.total}
-                    icon={Crown}
+                    icon="Crown"
                     color="primary"
                 />
                 <StatCard
                     title="Dept Heads"
                     value={stats.departmentHeads}
-                    icon={Building2}
+                    icon="Building2"
                     color="success"
                 />
                 <StatCard
                     title="Reports"
                     value={stats.totalReports}
-                    icon={Users}
+                    icon="Users"
                     color="warning"
                 />
                 <StatCard
                     title="Avg Team"
                     value={stats.avgTeamSize}
-                    icon={UserCheck}
+                    icon="UserCheck"
                     color="info"
                 />
             </div>
@@ -306,6 +306,7 @@ const ManagerManagementPage = () => {
 };
 
 export default ManagerManagementPage;
+
 
 
 

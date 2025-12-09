@@ -4,23 +4,55 @@ Payroll API views.
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, permissions, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 
-from .models import SalaryStructure, PayrollRun, Payslip, Loan
+from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance
 from .serializers import (
     SalaryStructureSerializer, PayrollRunSerializer, PayslipSerializer,
-    PayslipDetailSerializer, LoanSerializer, PayrollSummarySerializer
+    PayslipDetailSerializer, SalaryAdvanceSerializer, PayrollSummarySerializer
 )
 from .utils import calculate_net_salary
 from .permissions import IsCompanyAdminOrHR, IsEmployeeOrAdmin
 from accounts.permissions import IsCompanyUser
 
 
+
+# payroll/views.py
+class SalaryAdvanceViewSet(viewsets.ModelViewSet):
+    queryset = SalaryAdvance.objects.all().select_related('employee', 'company', 'approved_by', 'created_by')
+    serializer_class = SalaryAdvanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """Multi-tenant: only show advances for user's company"""
+        user = self.request.user
+
+        # Superusers see everything
+        if user.is_superuser:
+            return self.queryset
+
+        # Try to get company from user's employee profile
+        if hasattr(user, 'employee') and user.employee and hasattr(user.employee, 'company') and user.employee.company:
+            return self.queryset.filter(company=user.employee.company)
+
+        # Fallback: if no employee profile, return empty (safe default)
+        return self.queryset.none()
+
+    def perform_create(self, serializer):
+        """Auto-set company from selected employee"""
+        employee = serializer.validated_data['employee']
+        if not employee.company:
+            raise serializers.ValidationError("Selected employee has no company assigned.")
+        serializer.save(
+            company=employee.company,
+            created_by=self.request.user
+        )
+        
 class SalaryStructureViewSet(viewsets.ModelViewSet):
     """ViewSet for managing employee salary structures"""
 
@@ -218,56 +250,55 @@ class PayslipViewSet(viewsets.ModelViewSet):
 class LoanViewSet(viewsets.ModelViewSet):
     """ViewSet for managing employee loans"""
 
-    serializer_class = LoanSerializer
+    serializer_class = SalaryAdvanceSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['employee', 'status', 'loan_type']
-    queryset = Loan.objects.all()
+    filterset_fields = ['employee', 'status', 'advance_type']
+    queryset = SalaryAdvance.objects.all()
 
     def get_queryset(self):
         """Filter by user's company"""
-        return Loan.objects.filter(
+        return SalaryAdvance.objects.filter(
             employee__company=self.request.user.company
         ).select_related('employee', 'approved_by')
 
     @action(detail=True, methods=['post'])
-    def approve_loan(self, request, pk=None):
-        """Approve a loan application"""
-        loan = self.get_object()
+    def approve_advance(self, request, pk=None):
+        """Approve a salary advance application"""
+        advance = self.get_object()
 
-        if loan.status != 'pending':
+        if advance.status != 'pending':
             return Response(
-                {'error': 'Loan is not in pending status'},
+                {'error': 'Salary advance is not in pending status'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        loan.status = 'active'
-        loan.approved_by = request.user
-        loan.approved_at = timezone.now()
-        loan.disbursement_date = timezone.now().date()
-        loan.save()
+        advance.status = 'active'
+        advance.approved_by = request.user
+        advance.approved_at = timezone.now()
+        advance.save()
 
-        return Response({'message': 'Loan approved and disbursed'})
+        return Response({'message': 'Salary advance approved'})
 
     @action(detail=True, methods=['post'])
-    def reject_loan(self, request, pk=None):
-        """Reject a loan application"""
-        loan = self.get_object()
+    def reject_advance(self, request, pk=None):
+        """Reject a salary advance application"""
+        advance = self.get_object()
 
-        if loan.status != 'pending':
+        if advance.status != 'pending':
             return Response(
-                {'error': 'Loan is not in pending status'},
+                {'error': 'Salary advance is not in pending status'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        loan.status = 'cancelled'
-        loan.save()
+        advance.status = 'cancelled'
+        advance.save()
 
-        return Response({'message': 'Loan rejected'})
+        return Response({'message': 'Salary advance rejected'})
 
     @action(detail=False, methods=['get'])
-    def active_loans(self, request):
-        """Get all active loans for the company"""
-        active_loans = self.get_queryset().filter(status='active')
-        serializer = self.get_serializer(active_loans, many=True)
+    def active_advances(self, request):
+        """Get all active salary advances for the company"""
+        active_advances = self.get_queryset().filter(status='active')
+        serializer = self.get_serializer(active_advances, many=True)
         return Response(serializer.data)

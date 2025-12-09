@@ -75,10 +75,10 @@ const PromoteManagerModal = ({ isOpen, onClose, onPromote }) => {
         if (!selectedEmployees.length) return;
 
         const promotionData = {
-            employeeIds: selectedEmployees,
+            employee_ids: selectedEmployees,
             managerRole,
-            assignAsDeptHead,
-            departmentId: assignAsDeptHead ? selectedDepartment : null
+            assign_as_dept_head: assignAsDeptHead,
+            department_id: assignAsDeptHead ? selectedDepartment : null
         };
 
         onPromote(promotionData);

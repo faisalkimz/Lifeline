@@ -4,8 +4,7 @@ import { DollarSign, FileText, Users, Briefcase } from 'lucide-react';
 import { PayrollDashboard } from './PayrollDashboard';
 import { PayslipPage } from './PayslipPage';
 import { SalaryStructurePage } from './SalaryStructurePage';
-import { LoanManagementPage } from './LoanManagementPage';
-
+import LoanManagementPage from './LoanManagementPage';
 
 const PayrollIndex = () => {
     const [activeTab, setActiveTab] = useState('dashboard');

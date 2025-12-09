@@ -295,30 +295,29 @@ const EmployeeFormPage = () => {
 
                 {/* Main Form */}
                 <div className="lg:col-span-9">
-                    <Card>
-                        <CardHeader className="pb-0">
-                            <div className="flex items-center justify-between w-full">
-                                <div>
-                                    <CardTitle className="text-lg">Employee Details</CardTitle>
-                                    <p className="text-sm text-gray-500">Fill personal, employment and document details.</p>
-                                </div>
-                                <div className="hidden md:block">
-                                    <Tabs value={activeTab} className="">
+                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                        <Card>
+                            <CardHeader className="pb-0">
+                                <div className="flex items-center justify-between w-full">
+                                    <div>
+                                        <CardTitle className="text-lg">Employee Details</CardTitle>
+                                        <p className="text-sm text-gray-500">Fill personal, employment and document details.</p>
+                                    </div>
+                                    <div className="hidden md:block">
                                         <TabsList className="flex gap-2 bg-transparent p-0">
-                                            <TabsTrigger value="personal" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline"/> Personal</TabsTrigger>
-                                            <TabsTrigger value="employment" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline"/> Employment</TabsTrigger>
-                                            <TabsTrigger value="documents" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline"/> Documents</TabsTrigger>
-                                            <TabsTrigger value="other" activeValue={activeTab} onClick={setActiveTab} className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline"/> Bank & Other</TabsTrigger>
+                                            <TabsTrigger value="personal" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline"/> Personal</TabsTrigger>
+                                            <TabsTrigger value="employment" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline"/> Employment</TabsTrigger>
+                                            <TabsTrigger value="documents" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline"/> Documents</TabsTrigger>
+                                            <TabsTrigger value="other" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline"/> Bank & Other</TabsTrigger>
                                         </TabsList>
-                                    </Tabs>
+                                    </div>
                                 </div>
-                            </div>
-                        </CardHeader>
+                            </CardHeader>
 
-                        <CardContent className="p-6">
-                            <form onSubmit={handleSubmit(onSubmit)}>
-                                {/* Personal Tab */}
-                                <TabsContent value="personal" activeValue={activeTab} className="space-y-6">
+                            <CardContent className="p-6">
+                                <form onSubmit={handleSubmit(onSubmit)}>
+                                    {/* Personal Tab */}
+                                    <TabsContent value="personal" className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <FormField label="First Name" error={errors.first_name} required>
                                             <Input {...register('first_name')} placeholder="e.g. John" />
@@ -377,7 +376,7 @@ const EmployeeFormPage = () => {
                                 </TabsContent>
 
                                 {/* Employment Tab */}
-                                <TabsContent value="employment" activeValue={activeTab} className="space-y-6">
+                                <TabsContent value="employment" className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField label="Department" error={errors.department} required>
                                             <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('department')}>
@@ -432,7 +431,7 @@ const EmployeeFormPage = () => {
                                 </TabsContent>
 
                                 {/* Documents Tab */}
-                                <TabsContent value="documents" activeValue={activeTab} className="space-y-6">
+                                <TabsContent value="documents" className="space-y-6">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <FormField label="National ID (NIN)" error={errors.national_id} required>
                                             <Input {...register('national_id')} placeholder="CM..." />
@@ -452,7 +451,7 @@ const EmployeeFormPage = () => {
                                 </TabsContent>
 
                                 {/* Bank & Other Tab */}
-                                <TabsContent value="other" activeValue={activeTab} className="space-y-6">
+                                <TabsContent value="other" className="space-y-6">
                                     <h4 className="font-medium text-gray-900 border-b pb-2">Bank Details</h4>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                         <FormField label="Bank Name" error={errors.bank_name}>
@@ -491,6 +490,7 @@ const EmployeeFormPage = () => {
                             </form>
                         </CardContent>
                     </Card>
+                    </Tabs>
                 </div>
             </div>
         </div>

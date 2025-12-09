@@ -1,8 +1,10 @@
 import React from 'react';
 import { Card, CardContent } from './Card';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import * as LucideIcons from 'lucide-react';
 
-export const StatCard = ({ title, value, icon: Icon, trend, trendUp, color = "primary", info }) => {
+export const StatCard = ({ title, value, icon, trend, trendUp, color = "primary", info }) => {
+    const IconComponent = LucideIcons[icon];
     // Simplified: keep card white with subtle border and shadow on hover.
     return (
         <Card className={`transition-all duration-300 border border-gray-200 hover:shadow-lg`}>
@@ -31,8 +33,8 @@ export const StatCard = ({ title, value, icon: Icon, trend, trendUp, color = "pr
                             </div>
                         )}
                     </div>
-                    <div className={`h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-white border border-gray-100`}> 
-                        <Icon className="h-7 w-7 text-primary-600" />
+                    <div className={`h-14 w-14 rounded-xl flex items-center justify-center shrink-0 bg-white border border-gray-100`}>
+                        {IconComponent && <IconComponent className="h-7 w-7 text-primary-600" />}
                     </div>
                 </div>
             </CardContent>

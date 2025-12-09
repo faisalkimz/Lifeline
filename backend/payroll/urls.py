@@ -1,18 +1,16 @@
-"""
-Payroll API URLs.
-"""
+# payroll/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 
-# Create a router for ViewSets
+# Create router ONCE
 router = DefaultRouter()
-router.register(r'salary-structures', views.SalaryStructureViewSet)
-router.register(r'payroll-runs', views.PayrollRunViewSet)
-router.register(r'payslips', views.PayslipViewSet)
-router.register(r'loans', views.LoanViewSet)
 
-# URL patterns
+router.register(r'payroll-runs', views.PayrollRunViewSet, basename='payrollrun')
+router.register(r'salary-structures', views.SalaryStructureViewSet, basename='salarystructure')
+router.register(r'salary-advances', views.SalaryAdvanceViewSet, basename='salaryadvance')
+
+
 urlpatterns = [
     path('', include(router.urls)),
 ]

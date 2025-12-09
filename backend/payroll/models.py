@@ -1,114 +1,106 @@
-"""
-Payroll models for LahHR.
-Complete payroll processing for Uganda & beyond.
-"""
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.conf import settings
 from decimal import Decimal
 from accounts.models import Company
 from employees.models import Employee
 
 
-class SalaryStructure(models.Model):
-    """
-    Employee salary structure with basic pay and allowances.
-    Tracks salary history with effective dates.
-    """
-    employee = models.ForeignKey(
-        Employee,
-        on_delete=models.CASCADE,
-        related_name='salary_structures'
-    )
+class TaxSettings(models.Model):
+    """Tax settings for each company (Uganda-specific by default)"""
 
-    # Effective date for this salary structure
-    effective_date = models.DateField(help_text="When this salary structure becomes effective")
+    COUNTRY_CHOICES = [
+        ('UG', 'Uganda'),
+        ('KE', 'Kenya'),
+        ('TZ', 'Tanzania'),
+    ]
 
-    # Earnings
-    basic_salary = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Basic monthly salary (UGX)"
-    )
+    CURRENCY_CHOICES = [
+        ('UGX', 'Uganda Shilling'),
+        ('KES', 'Kenya Shilling'),
+        ('TZS', 'Tanzania Shilling'),
+    ]
 
-    # Allowances (Uganda-specific)
-    housing_allowance = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Housing allowance"
-    )
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name='tax_settings')
+    country = models.CharField(max_length=2, choices=COUNTRY_CHOICES, default='UG')
+    currency = models.CharField(max_length=3, choices=CURRENCY_CHOICES, default='UGX')
 
-    transport_allowance = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Transport allowance"
-    )
+    # Uganda PAYE reliefs (2024)
+    personal_relief = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('240000.00'))
+    insurance_relief = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('50000.00'))
+    pension_fund_relief = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('200000.00'))
 
-    medical_allowance = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Medical allowance"
-    )
+    # NSSF settings
+    nssf_employee_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('10.00'))
+    nssf_employer_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('10.00'))
+    nssf_ceiling = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('100000.00'))
 
-    lunch_allowance = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Lunch allowance"
-    )
+    # Local Service Tax (5% for Uganda)
+    local_service_tax_enabled = models.BooleanField(default=True)
+    local_service_tax_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('5.00'))
 
-    other_allowances = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        validators=[MinValueValidator(Decimal('0.00'))],
-        help_text="Other allowances (airtime, etc.)"
-    )
+    # Tax year and effective date
+    tax_year = models.PositiveIntegerField(default=2024)
+    effective_date = models.DateField(auto_now_add=True)
 
-    # Calculated gross salary
-    gross_salary = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        editable=False,
-        help_text="Total gross salary (auto-calculated)"
-    )
-
-    # Metadata
-    created_by = models.ForeignKey(
-        'accounts.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='created_salary_structures'
-    )
+    # Audit fields
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    notes = models.TextField(blank=True, help_text="Notes about this salary change")
-
     class Meta:
-        verbose_name = "Salary Structure"
-        verbose_name_plural = "Salary Structures"
-        ordering = ['-effective_date']
-        # Only one salary structure per employee per date
-        constraints = [
-            models.UniqueConstraint(
-                fields=['employee', 'effective_date'],
-                name='unique_salary_structure_per_employee_date'
-            )
-        ]
+        verbose_name = 'Tax Settings'
+        verbose_name_plural = 'Tax Settings'
+        ordering = ['-tax_year']
 
     def __str__(self):
-        return f"{self.employee.full_name} - {self.effective_date}"
+        return f"{self.company.name} - {self.country} Tax Settings ({self.tax_year})"
+
+
+class SalaryStructure(models.Model):
+    """Employee salary structure with allowances"""
+
+    employee = models.OneToOneField(Employee, on_delete=models.CASCADE, related_name='salary_structure')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='salary_structures')
+
+    # Basic salary
+    basic_salary = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.01'))]
+    )
+
+    # Allowances
+    housing_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    transport_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    medical_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    lunch_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    other_allowances = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+
+    # Auto-calculated gross salary
+    gross_salary = models.DecimalField(max_digits=15, decimal_places=2, editable=False)
+
+    # Effective date for salary changes
+    effective_date = models.DateField()
+
+    # Status
+    is_active = models.BooleanField(default=True)
+
+    # Audit fields
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Salary Structure'
+        verbose_name_plural = 'Salary Structures'
+        ordering = ['-effective_date']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - Salary Structure"
 
     def save(self, *args, **kwargs):
-        """Auto-calculate gross salary"""
+        # Auto-calculate gross salary
         self.gross_salary = (
             self.basic_salary +
             self.housing_allowance +
@@ -119,23 +111,9 @@ class SalaryStructure(models.Model):
         )
         super().save(*args, **kwargs)
 
-    @property
-    def total_allowances(self):
-        """Calculate total allowances"""
-        return (
-            self.housing_allowance +
-            self.transport_allowance +
-            self.medical_allowance +
-            self.lunch_allowance +
-            self.other_allowances
-        )
-
 
 class PayrollRun(models.Model):
-    """
-    Monthly payroll run for a company.
-    Contains all payslips for a specific month/year.
-    """
+    """Payroll run for a specific month/year"""
 
     STATUS_CHOICES = [
         ('draft', 'Draft'),
@@ -145,221 +123,126 @@ class PayrollRun(models.Model):
         ('cancelled', 'Cancelled'),
     ]
 
-    company = models.ForeignKey(
-        Company,
-        on_delete=models.CASCADE,
-        related_name='payroll_runs'
-    )
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='payroll_runs')
+    month = models.PositiveIntegerField()
+    year = models.PositiveIntegerField()
 
-    # Payroll period
-    month = models.IntegerField(help_text="Month (1-12)")
-    year = models.IntegerField(help_text="Year (e.g., 2024)")
+    # Status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
 
-    # Status and workflow
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='draft'
-    )
+    # Totals
+    total_gross = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_paye = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_nssf_employee = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_nssf_employer = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_deductions = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_net = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
 
-    # Financial totals
-    total_gross = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Total gross salary for all employees"
-    )
-
-    total_deductions = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Total deductions for all employees"
-    )
-
-    total_net = models.DecimalField(
-        max_digits=15,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Total net salary for all employees"
-    )
-
-    # Employee count
-    employee_count = models.IntegerField(default=0, help_text="Number of employees in this payroll")
-
-    # Processing metadata
+    # Processing details
     processed_by = models.ForeignKey(
-        'accounts.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='processed_payrolls'
     )
     processed_at = models.DateTimeField(null=True, blank=True)
 
     approved_by = models.ForeignKey(
-        'accounts.User',
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name='approved_payrolls'
     )
     approved_at = models.DateTimeField(null=True, blank=True)
 
-    paid_at = models.DateTimeField(null=True, blank=True)
-
-    # Notes
-    notes = models.TextField(blank=True)
+    # Audit fields
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Payroll Run"
-        verbose_name_plural = "Payroll Runs"
+        verbose_name = 'Payroll Run'
+        verbose_name_plural = 'Payroll Runs'
+        unique_together = ['company', 'month', 'year']
         ordering = ['-year', '-month']
-        # One payroll run per company per month/year
-        constraints = [
-            models.UniqueConstraint(
-                fields=['company', 'month', 'year'],
-                name='unique_payroll_run_per_company_month_year'
-            )
-        ]
 
     def __str__(self):
-        return f"{self.company.name} - {self.month:02d}/{self.year}"
+        return f"{self.company.name} - {self.month:02d}/{self.year} Payroll"
 
 
 class Payslip(models.Model):
-    """
-    Individual payslip for an employee in a payroll run.
-    Contains detailed breakdown of earnings and deductions.
-    """
+    """Individual employee payslip"""
 
     PAYMENT_METHOD_CHOICES = [
-        ('bank_transfer', 'Bank Transfer'),
-        ('mobile_money', 'Mobile Money'),
+        ('bank', 'Bank Transfer'),
         ('cash', 'Cash'),
-        ('cheque', 'Cheque'),
+        ('mobile', 'Mobile Money'),
     ]
 
     PAYMENT_STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('paid', 'Paid'),
         ('failed', 'Failed'),
-        ('cancelled', 'Cancelled'),
     ]
 
-    payroll_run = models.ForeignKey(
-        PayrollRun,
-        on_delete=models.CASCADE,
-        related_name='payslips'
-    )
+    payroll_run = models.ForeignKey(PayrollRun, on_delete=models.CASCADE, related_name='payslips')
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='payslips')
 
-    employee = models.ForeignKey(
-        Employee,
-        on_delete=models.CASCADE,
-        related_name='payslips'
-    )
+    # Earnings
+    basic_salary = models.DecimalField(max_digits=15, decimal_places=2)
+    housing_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    transport_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    medical_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    lunch_allowance = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    other_allowances = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    bonus = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    gross_salary = models.DecimalField(max_digits=15, decimal_places=2)
 
-    # Earnings (from salary structure)
-    basic_salary = models.DecimalField(max_digits=12, decimal_places=2)
-    allowances = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    bonuses = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
-    gross_salary = models.DecimalField(max_digits=12, decimal_places=2)
+    # Deductions
+    paye_tax = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    nssf_employee = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    nssf_employer = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    loan_deduction = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    advance_deduction = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    other_deductions = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
 
-    # Deductions - Uganda Tax (PAYE)
-    paye_tax = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Pay As You Earn tax (Uganda)"
-    )
-
-    # NSSF - Employee contribution (10%)
-    nssf_employee = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="NSSF employee contribution (10%)"
-    )
-
-    # NSSF - Employer contribution (10%) - stored for reference
-    nssf_employer = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="NSSF employer contribution (10%)"
-    )
-
-    # Other deductions
-    loan_deduction = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Loan/advance repayment"
-    )
-
-    advance_deduction = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Salary advance deduction"
-    )
-
-    other_deductions = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Other deductions (insurance, etc.)"
-    )
-
-    # Total deductions
-    total_deductions = models.DecimalField(max_digits=12, decimal_places=2)
-
-    # Final amount
-    net_salary = models.DecimalField(max_digits=12, decimal_places=2)
+    # Totals
+    total_deductions = models.DecimalField(max_digits=15, decimal_places=2)
+    net_salary = models.DecimalField(max_digits=15, decimal_places=2)
 
     # Payment details
-    payment_method = models.CharField(
-        max_length=20,
-        choices=PAYMENT_METHOD_CHOICES,
-        default='bank_transfer'
-    )
-
-    payment_status = models.CharField(
-        max_length=20,
-        choices=PAYMENT_STATUS_CHOICES,
-        default='pending'
-    )
-
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, default='bank')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     payment_date = models.DateField(null=True, blank=True)
     payment_reference = models.CharField(max_length=100, blank=True)
 
-    # Payslip file (PDF)
-    payslip_file = models.FileField(
-        upload_to='payslips/',
-        null=True,
-        blank=True,
-        help_text="Generated PDF payslip"
-    )
+    # Audit fields
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        verbose_name = "Payslip"
-        verbose_name_plural = "Payslips"
-        ordering = ['payroll_run', 'employee__employee_number']
-        # One payslip per employee per payroll run
-        constraints = [
-            models.UniqueConstraint(
-                fields=['payroll_run', 'employee'],
-                name='unique_payslip_per_payroll_employee'
-            )
-        ]
+        verbose_name = 'Payslip'
+        verbose_name_plural = 'Payslips'
+        unique_together = ['payroll_run', 'employee']
+        ordering = ['-payroll_run__year', '-payroll_run__month', 'employee__first_name', 'employee__last_name']
 
     def __str__(self):
-        return f"{self.employee.full_name} - {self.payroll_run}"
+        return f"{self.employee.full_name} - {self.payroll_run.month:02d}/{self.payroll_run.year}"
 
 
-class Loan(models.Model):
-    """
-    Employee loans and advances.
-    Tracks salary advances and other loans with repayment schedules.
-    """
+class SalaryAdvance(models.Model):
+    """Salary advances and loans"""
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('defaulted', 'Defaulted'),
+    ]
 
     LOAN_TYPE_CHOICES = [
         ('salary_advance', 'Salary Advance'),
@@ -368,105 +251,57 @@ class Loan(models.Model):
         ('other', 'Other'),
     ]
 
-    STATUS_CHOICES = [
-        ('pending', 'Pending Approval'),
-        ('active', 'Active'),
-        ('completed', 'Completed'),
-        ('defaulted', 'Defaulted'),
-        ('cancelled', 'Cancelled'),
-    ]
-
-    employee = models.ForeignKey(
-        Employee,
-        on_delete=models.CASCADE,
-        related_name='loans'
-    )
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='salary_advances')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='salary_advances')
 
     # Loan details
-    loan_amount = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        validators=[MinValueValidator(Decimal('0.01'))]
-    )
+    loan_type = models.CharField(max_length=20, choices=LOAN_TYPE_CHOICES, default='salary_advance')
+    amount = models.DecimalField(max_digits=15, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
+    loan_purpose = models.TextField(blank=True)
 
-    loan_type = models.CharField(
-        max_length=20,
-        choices=LOAN_TYPE_CHOICES,
-        default='salary_advance'
-    )
+    # Repayment details
+    repayment_period_months = models.PositiveIntegerField(default=1)
+    monthly_deduction = models.DecimalField(max_digits=15, decimal_places=2, editable=False)
+    interest_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
 
-    loan_purpose = models.TextField(blank=True, help_text="Purpose of the loan")
-
-    # Approval and processing
-    approved_by = models.ForeignKey(
-        'accounts.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='approved_loans'
-    )
-
-    disbursement_date = models.DateField(null=True, blank=True)
-
-    # Repayment terms
-    repayment_period_months = models.IntegerField(
-        default=1,
-        help_text="Number of months to repay"
-    )
-
-    monthly_deduction = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Monthly deduction amount"
-    )
-
-    # Tracking
-    total_repaid = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00')
-    )
-
-    balance = models.DecimalField(
-        max_digits=12,
-        decimal_places=2,
-        default=Decimal('0.00'),
-        help_text="Remaining balance"
-    )
-
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending'
-    )
+    # Status and tracking
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    amount_repaid = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    balance = models.DecimalField(max_digits=15, decimal_places=2, editable=False)
 
     # Dates
-    created_at = models.DateTimeField(auto_now_add=True)
+    requested_at = models.DateTimeField(auto_now_add=True)
     approved_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
+    # Approval details
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='approved_advances'
+    )
+
+    # Audit fields
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
-        verbose_name = "Loan"
-        verbose_name_plural = "Loans"
-        ordering = ['-created_at']
+        verbose_name = 'Salary Advance'
+        verbose_name_plural = 'Salary Advances'
+        ordering = ['-requested_at']
 
     def __str__(self):
-        return f"{self.employee.full_name} - {self.loan_type} - UGX {self.loan_amount}"
+        return f"{self.employee.full_name} - {self.loan_type} ({self.amount})"
 
     def save(self, *args, **kwargs):
-        """Auto-calculate balance"""
-        if not self.balance:
-            self.balance = self.loan_amount
+        # Auto-calculate monthly deduction and balance
+        if self.repayment_period_months > 0:
+            self.monthly_deduction = self.amount / self.repayment_period_months
+        else:
+            self.monthly_deduction = self.amount
+
+        self.balance = self.amount - self.amount_repaid
         super().save(*args, **kwargs)
-
-    @property
-    def is_overdue(self):
-        """Check if loan is overdue"""
-        if self.status != 'active' or not self.disbursement_date:
-            return False
-
-        from django.utils import timezone
-        from dateutil.relativedelta import relativedelta
-
-        expected_completion = self.disbursement_date + relativedelta(months=self.repayment_period_months)
-        return timezone.now().date() > expected_completion and self.balance > 0

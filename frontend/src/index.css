@@ -1,33 +1,157 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 /* Tailwind layers MUST be present */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Your custom theme variables */
+/* Theme variables */
 :root {
   --font-sans: Inter, system-ui, sans-serif;
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-success-500: #10b981;
-  --color-error-500: #ef4444;
-  --color-warning-500: #f59e0b;
+
+  /* Light theme */
+  --color-bg-primary: 249 250 251;
+  --color-bg-secondary: 255 255 255;
+  --color-bg-tertiary: 243 244 246;
+  --color-text-primary: 17 24 39;
+  --color-text-secondary: 75 85 99;
+  --color-text-tertiary: 156 163 175;
+  --color-border: 229 231 235;
+  --color-border-hover: 209 213 219;
 }
 
-/* Optional: your custom components */
+.dark {
+  /* Dark theme */
+  --color-bg-primary: 17 24 39;
+  --color-bg-secondary: 31 41 55;
+  --color-bg-tertiary: 55 65 81;
+  --color-text-primary: 243 244 246;
+  --color-text-secondary: 209 213 219;
+  --color-text-tertiary: 156 163 175;
+  --color-border: 55 65 81;
+  --color-border-hover: 75 85 99;
+}
+
 @layer base {
   body {
-    @apply font-sans text-gray-900 bg-gray-50 antialiased;
+    @apply font-sans antialiased;
+    @apply bg-gray-50 dark:bg-gray-900;
+    @apply text-gray-900 dark:text-gray-100;
+    @apply transition-colors duration-200;
   }
+
   html {
     scroll-behavior: smooth;
+  }
+
+  * {
+    @apply border-gray-200 dark:border-gray-700;
   }
 }
 
 @layer components {
-  .card { @apply bg-white rounded-xl border border-gray-200 shadow-sm; }
-  .btn-primary { @apply bg-primary-600 text-white; }
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white shadow-sm hover:shadow;
+  }
+
+  .input-field {
+    @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600;
+    @apply text-gray-900 dark:text-gray-100;
+    @apply placeholder-gray-400 dark:placeholder-gray-500;
+    @apply focus:border-primary-500 focus:ring-primary-500/20;
+  }
+}
+
+/* Org Chart Styles */
+.org-chart-link {
+  stroke: #cbd5e1;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.dark .org-chart-link {
+  stroke: #4b5563;
+}
+
+.org-node-rect:hover {
+  filter: brightness(1.05) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
+}
+
+/* Smooth animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+/* Grid pattern background */
+.bg-grid-white\/10 {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+}
+
+.dark .bg-grid-white\/10 {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* Selection */
+::selection {
+  @apply bg-primary-200 dark:bg-primary-800 text-primary-900 dark:text-primary-100;
+}
+
+/* Compact utilities */
+.compact-spacing {
+  @apply p-3 space-y-3;
+}
+
+.compact-card {
+  @apply p-4 space-y-2;
+}
+
+.compact-table {
+  @apply text-sm;
+}
+
+.compact-table th {
+  @apply py-2 px-3;
+}
+
+.compact-table td {
+  @apply py-2 px-3;
 }

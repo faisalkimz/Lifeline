@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -71,9 +71,9 @@ export const api = createApi({
       providesTags: (result) =>
         result && Array.isArray(result)
           ? [
-              ...result.map(({ id }) => ({ type: 'Employee', id })),
-              { type: 'Employee', id: 'LIST' }
-            ]
+            ...result.map(({ id }) => ({ type: 'Employee', id })),
+            { type: 'Employee', id: 'LIST' }
+          ]
           : [{ type: 'Employee', id: 'LIST' }]
     }),
     getEmployee: builder.query({
@@ -117,9 +117,9 @@ export const api = createApi({
       providesTags: (result) =>
         result && Array.isArray(result)
           ? [
-              ...result.map(({ id }) => ({ type: 'Department', id })),
-              { type: 'Department', id: 'LIST' }
-            ]
+            ...result.map(({ id }) => ({ type: 'Department', id })),
+            { type: 'Department', id: 'LIST' }
+          ]
           : [{ type: 'Department', id: 'LIST' }]
     }),
     getDepartment: builder.query({
@@ -163,9 +163,9 @@ export const api = createApi({
       providesTags: (result) =>
         result && Array.isArray(result)
           ? [
-              ...result.map(({ id }) => ({ type: 'PayrollRun', id })),
-              { type: 'PayrollRun', id: 'LIST' }
-            ]
+            ...result.map(({ id }) => ({ type: 'PayrollRun', id })),
+            { type: 'PayrollRun', id: 'LIST' }
+          ]
           : [{ type: 'PayrollRun', id: 'LIST' }]
     }),
     createPayrollRun: builder.mutation({
@@ -187,9 +187,9 @@ export const api = createApi({
       providesTags: (result) =>
         result && Array.isArray(result)
           ? [
-              ...result.map(({ id }) => ({ type: 'SalaryStructure', id })),
-              { type: 'SalaryStructure', id: 'LIST' }
-            ]
+            ...result.map(({ id }) => ({ type: 'SalaryStructure', id })),
+            { type: 'SalaryStructure', id: 'LIST' }
+          ]
           : [{ type: 'SalaryStructure', id: 'LIST' }]
     }),
     createSalaryStructure: builder.mutation({
@@ -281,6 +281,42 @@ export const api = createApi({
         body: data
       }),
       invalidatesTags: ['Employee']
+    }),
+
+    // ========== LEAVE MANAGEMENT ==========
+    getLeaveRequests: builder.query({
+      query: (url) => url || '/leave/requests/',
+      providesTags: ['LeaveRequest']
+    }),
+    createLeaveRequest: builder.mutation({
+      query: ({ url, body }) => ({
+        url: url || '/leave/requests/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['LeaveRequest']
+    }),
+
+    // ========== ATTENDANCE ==========
+    clockIn: builder.mutation({
+      query: (data) => ({
+        url: '/attendance/records/clock_in/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['Attendance']
+    }),
+    clockOut: builder.mutation({
+      query: (data) => ({
+        url: '/attendance/records/clock_out/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['Attendance']
+    }),
+    getTodayAttendance: builder.query({
+      query: () => '/attendance/records/today_status/',
+      providesTags: ['Attendance']
     })
   })
 });
@@ -318,5 +354,12 @@ export const {
   useGetSalaryAdvancesQuery,
   useCreateSalaryAdvanceMutation,
   useUpdateSalaryAdvanceMutation,
+  // leave hooks
+  useGetLeaveRequestsQuery,
+  useCreateLeaveRequestMutation,
+  // attendance hooks
+  useClockInMutation,
+  useClockOutMutation,
+  useGetTodayAttendanceQuery,
 } = api;
 export default api;

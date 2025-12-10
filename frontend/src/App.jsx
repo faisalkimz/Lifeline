@@ -14,6 +14,8 @@ import OrgChartPage from './features/departments/OrgChartPage';
 import MyProfilePage from './features/employees/MyProfilePage';
 import ManagerManagementPage from './features/managers/ManagerManagementPage';
 import PayrollIndex from './features/payroll/PayrollIndex';
+import LeaveRequestsPage from './features/leave/LeaveRequestsPage';
+import AttendancePage from './features/attendance/AttendancePage';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -43,6 +45,9 @@ function App() {
         <Route path="/managers" element={<ManagerManagementPage />} />
 
         <Route path="/payroll/*" element={<PayrollIndex />} />
+
+        <Route path="/leave" element={<LeaveRequestsPage />} />
+        <Route path="/attendance" element={<AttendancePage />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
       </Route>

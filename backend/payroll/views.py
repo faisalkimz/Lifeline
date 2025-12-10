@@ -76,6 +76,13 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(company=self.request.user.company)
+    
+    def perform_create(self, serializer):
+        """Auto-assign company from logged-in user"""
+        serializer.save(
+            company=self.request.user.company,
+            processed_by=self.request.user
+        )
 
 
 # ────────────────────── PAYSLIPS ──────────────────────

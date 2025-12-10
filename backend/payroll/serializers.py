@@ -65,17 +65,8 @@ class PayrollRunSerializer(serializers.ModelSerializer):
     payslip_count = serializers.SerializerMethodField()
     
     def create(self, validated_data):
-        request = self.context['request']
-        user = request.user
-
-        if not user.is_authenticated:
-            raise serializers.ValidationError("Authentication required.")
-        if hasattr(user, 'employee') and user.employee and user.employee.company:
-            validated_data['company'] = user.employee.company
-        else:
-            raise serializers.ValidationError("Cannot determine company for payroll run.")
-
-        validated_data['processed_by'] = user
+        # Company and processed_by are set in the view's perform_create
+        # No validation needed here
         return super().create(validated_data)
 
     class Meta:

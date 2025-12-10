@@ -1,44 +1,51 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectTheme, toggleTheme } from '../../store/themeSlice';
+import React from 'react';
 import { Moon, Sun } from 'lucide-react';
-import { Button } from './Button';
+import { useTheme } from '../../contexts/ThemeContext';
 
-const ThemeToggle = () => {
-  const dispatch = useDispatch();
-  const theme = useSelector(selectTheme);
-
-  useEffect(() => {
-    // Apply theme to document element
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const handleToggle = () => {
-    dispatch(toggleTheme());
-  };
+const ThemeToggle = ({ className = '' }) => {
+  const { theme, toggleTheme, isDark } = useTheme();
 
   return (
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={handleToggle}
-      className="w-9 h-9 p-0 text-gray-600 hover:text-gray-900 dark:text-slate-400 dark:hover:text-slate-50"
-      title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+    <button
+      onClick={toggleTheme}
+      className={`
+                relative inline-flex items-center justify-center
+                w-12 h-12 rounded-xl
+                bg-white dark:bg-gray-800
+                border border-gray-200 dark:border-gray-700
+                shadow-sm hover:shadow-md
+                transition-all duration-300
+                group cursor-pointer
+                ${className}
+            `}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {theme === 'light' ? (
-        <Moon className="h-4 w-4" />
-      ) : (
-        <Sun className="h-4 w-4" />
-      )}
-    </Button>
+      {/* Sun Icon (Light Mode) */}
+      <Sun className={`
+                absolute h-5 w-5 text-amber-500
+                transition-all duration-300
+                ${isDark ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'}
+            `} />
+
+      {/* Moon Icon (Dark Mode) */}
+      <Moon className={`
+                absolute h-5 w-5 text-indigo-400
+                transition-all duration-300
+                ${isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'}
+            `} />
+
+      {/* Animated glow effect */}
+      <div className={`
+                absolute inset-0 rounded-xl
+                transition-opacity duration-300
+                ${isDark
+          ? 'bg-indigo-500/10 group-hover:bg-indigo-500/20'
+          : 'bg-amber-500/10 group-hover:bg-amber-500/20'
+        }
+            `} />
+    </button>
   );
 };
 
 export default ThemeToggle;
-
-
-

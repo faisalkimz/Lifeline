@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "accounts",
     "employees",
     "payroll",
+    "leave",  # Leave Management
+    "attendance",  # NEW: Attendance & Time Tracking
 ]
 
 

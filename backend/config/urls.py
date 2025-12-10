@@ -29,6 +29,8 @@ urlpatterns = [
     path('api/', include('accounts.urls')),  # Auth, companies, users
     path('api/', include('employees.urls')),  # Departments, employees
     path('api/', include('payroll.urls')),  # Payroll management
+    path('api/leave/', include('leave.urls')),  # Leave Management
+    path('api/attendance/', include('attendance.urls')),  # Attendance & Time Tracking
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

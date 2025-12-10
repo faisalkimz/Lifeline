@@ -98,3 +98,35 @@ class SalaryStructureViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset.filter(employee__company=self.request.user.company)
+    
+    def perform_create(self, serializer):
+        """Create salary structure with multi-tenant security validation"""
+        from rest_framework.exceptions import ValidationError
+        user = self.request.user
+        employee = serializer.validated_data['employee']
+        
+        # Security check: Validate employee belongs to user's company
+        if employee.company != user.company:
+            raise ValidationError({
+                'employee': 'Cannot create salary structure for employee from another company.'
+            })
+        
+        # Auto-assign company and creator
+        serializer.save(
+            company=user.company,
+            created_by=user
+        )
+    
+    def perform_update(self, serializer):
+        """Update salary structure with multi-tenant security validation"""
+        from rest_framework.exceptions import ValidationError
+        user = self.request.user
+        employee = serializer.validated_data.get('employee')
+        
+        # Security check if employee is being changed
+        if employee and employee.company != user.company:
+            raise ValidationError({
+                'employee': 'Cannot update salary structure with employee from another company.'
+            })
+        
+        serializer.save()

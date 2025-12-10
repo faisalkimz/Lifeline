@@ -167,6 +167,11 @@ class PayrollRun(models.Model):
         verbose_name_plural = 'Payroll Runs'
         unique_together = ['company', 'month', 'year']
         ordering = ['-year', '-month']
+        indexes = [
+            models.Index(fields=['company', 'status']),  # For filtering drafts/approved
+            models.Index(fields=['company', 'year', 'month']),  # For date queries
+            models.Index(fields=['company', '-year', '-month']),  # For recent payrolls (reverse order)
+        ]
 
     def __str__(self):
         return f"{self.company.name} - {self.month:02d}/{self.year} Payroll"

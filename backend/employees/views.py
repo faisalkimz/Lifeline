@@ -58,6 +58,35 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             return DepartmentCreateSerializer
         return DepartmentSerializer
     
+    def perform_create(self, serializer):
+        """Create department with multi-tenant security validation"""
+        user = self.request.user
+        
+        # Validate manager (if provided) belongs to same company
+        manager = serializer.validated_data.get('manager')
+        if manager and manager.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'manager': 'Cannot assign manager from another company. Please select a manager from your company.'
+            })
+        
+        # Auto-assign company
+        serializer.save(company=user.company)
+    
+    def perform_update(self, serializer):
+        """Update department with multi-tenant security validation"""
+        user = self.request.user
+        
+        # Validate manager (if provided) belongs to same company
+        manager = serializer.validated_data.get('manager')
+        if manager and manager.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'manager': 'Cannot assign manager from another company. Please select a manager from your company.'
+            })
+        
+        serializer.save()
+    
     @action(detail=True, methods=['get'])
     def employees(self, request, pk=None):
         """Get all employees in this department"""
@@ -125,6 +154,51 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         elif self.action == 'list':
             return EmployeeListSerializer
         return EmployeeSerializer
+    
+    def perform_create(self, serializer):
+        """Create employee with multi-tenant security validation"""
+        user = self.request.user
+        
+        # Validate department (if provided) belongs to same company
+        department = serializer.validated_data.get('department')
+        if department and department.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'department': 'Cannot assign employee to department from another company.'
+            })
+        
+        # Validate manager (if provided) belongs to same company
+        manager = serializer.validated_data.get('manager')
+        if manager and manager.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'manager': 'Cannot assign manager from another company.'
+            })
+        
+        # Auto-assign company
+        serializer.save(company=user.company)
+    
+    def perform_update(self, serializer):
+        """Update employee with multi-tenant security validation"""
+        user = self.request.user
+        
+        # Validate department (if provided) belongs to same company
+        department = serializer.validated_data.get('department')
+        if department and department.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'department': 'Cannot assign employee to department from another company.'
+            })
+        
+        # Validate manager (if provided) belongs to same company
+        manager = serializer.validated_data.get('manager')
+        if manager and manager.company != user.company:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({
+                'manager': 'Cannot assign manager from another company.'
+            })
+        
+        serializer.save()
     
     @action(detail=False, methods=['get'])
     def me(self, request):

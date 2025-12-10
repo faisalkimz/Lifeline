@@ -207,3 +207,4 @@ class PayrollSummarySerializer(serializers.Serializer):
     total_nssf = serializers.DecimalField(max_digits=15, decimal_places=2)
 
 
+

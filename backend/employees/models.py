@@ -208,6 +208,9 @@ class Employee(models.Model):
         indexes = [
             models.Index(fields=['company', 'employment_status']),
             models.Index(fields=['company', 'department']),
+            models.Index(fields=['company', 'join_date']),  # For recent hires queries
+            models.Index(fields=['company', 'email']),  # For login/lookup queries
+            models.Index(fields=['company', 'employee_number']),  # For employee number search
         ]
     
     def __str__(self):

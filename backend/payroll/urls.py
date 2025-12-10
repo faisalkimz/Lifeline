@@ -14,3 +14,4 @@ router.register(r'salary-advances', views.SalaryAdvanceViewSet, basename='salary
 urlpatterns = [
     path('', include(router.urls)),
 ]
+

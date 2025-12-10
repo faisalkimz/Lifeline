@@ -1,4 +1,3 @@
-// src/store/api.js
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { logout } from '../features/auth/authSlice';
 
@@ -9,7 +8,6 @@ const baseQueryWithAuth = fetchBaseQuery({
     const state = getState();
     const token = state?.auth?.token;
     const isAuthenticated = state?.auth?.isAuthenticated;
-
     if (isAuthenticated && token) {
       headers.set('authorization', `Bearer ${token}`);
     }
@@ -20,19 +18,18 @@ const baseQueryWithAuth = fetchBaseQuery({
 // Enhanced base query with automatic logout on 401
 const baseQueryWithReauth = async (args, api, extraOptions) => {
   let result = await baseQueryWithAuth(args, api, extraOptions);
-
   if (result?.error && result.error.status === 401) {
     api.dispatch(logout());
     if (typeof window !== 'undefined') window.location.href = '/login';
   }
-
   return result;
 };
 
 export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure'],
+  // FIXED: Add 'SalaryAdvance' tag
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -60,7 +57,6 @@ export const api = createApi({
       query: () => '/auth/me/',
       providesTags: ['User']
     }),
-
     // --- Employees (existing) ---
     getEmployees: builder.query({
       query: (params) => ({
@@ -110,7 +106,6 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'Employee', id: 'LIST' }]
     }),
-
     // --- Departments (existing) ---
     getDepartments: builder.query({
       query: () => '/departments/',
@@ -157,7 +152,6 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'Department', id: 'LIST' }]
     }),
-
     // --- Payroll Runs (NEW) ---
     getPayrollRuns: builder.query({
       query: () => '/payroll-runs/',
@@ -182,7 +176,6 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'PayrollRun', id: 'LIST' }]
     }),
-
     // --- Salary Structures (NEW) ---
     getSalaryStructures: builder.query({
       query: () => '/salary-structures/',
@@ -225,7 +218,6 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'SalaryStructure', id: 'LIST' }]
     }),
-
     // --- Employee Stats and Managers ---
     getEmployeeStats: builder.query({
       query: () => '/employees/stats/',
@@ -235,12 +227,21 @@ export const api = createApi({
       query: () => '/employees/managers/',
       providesTags: ['Employee']
     }),
-    // --- Salary Advances ---
+    // --- FIXED: Salary Advances ---
     getSalaryAdvances: builder.query({
       query: () => '/salary-advances/',
+      // FIXED: Better transform with logging
       transformResponse: (response) => {
-        if (response?.results && Array.isArray(response.results)) return response.results;
-        if (Array.isArray(response)) return response;
+        console.log('[API] Raw salary-advances response:', response);
+        if (response?.results && Array.isArray(response.results)) {
+          console.log('[API] Using paginated results:', response.results.length);
+          return response.results;
+        }
+        if (Array.isArray(response)) {
+          console.log('[API] Using direct array:', response.length);
+          return response;
+        }
+        console.warn('[API] Unexpected response format, returning empty:', response);
         return [];
       },
       providesTags: (result = []) => [
@@ -248,16 +249,14 @@ export const api = createApi({
         { type: 'SalaryAdvance', id: 'LIST' }
       ]
     }),
-
     createSalaryAdvance: builder.mutation({
       query: (data) => ({
         url: '/salary-advances/',
         method: 'POST',
         body: data
       }),
-      invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
+      invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]  // FIXED: Now works with tagTypes
     }),
-
     updateSalaryAdvance: builder.mutation({
       query: ({ id, ...patch }) => ({
         url: `/salary-advances/${id}/`,
@@ -269,14 +268,11 @@ export const api = createApi({
         { type: 'SalaryAdvance', id: 'LIST' }
       ]
     }),
-
     // --- My Profile ---
     getMyProfile: builder.query({
       query: () => '/employees/me/',
       providesTags: ['Employee']
     }),
-
-
     // --- Promote to Manager ---
     promoteToManager: builder.mutation({
       query: (data) => ({
@@ -289,7 +285,7 @@ export const api = createApi({
   })
 });
 
-// Export hooks
+// Export hooks (unchanged)
 export const {
   useLoginMutation,
   useRegisterMutation,
@@ -305,7 +301,6 @@ export const {
   useCreateDepartmentMutation,
   useUpdateDepartmentMutation,
   useDeleteDepartmentMutation,
-
   // payroll & salary hooks
   useGetPayrollRunsQuery,
   useCreatePayrollRunMutation,
@@ -313,19 +308,15 @@ export const {
   useCreateSalaryStructureMutation,
   useUpdateSalaryStructureMutation,
   useDeleteSalaryStructureMutation,
-
   // employee stats and managers hooks
   useGetEmployeeStatsQuery,
   useGetManagersQuery,
-
   // my profile hook
   useGetMyProfileQuery,
-
   // promote to manager hook
   usePromoteToManagerMutation,
   useGetSalaryAdvancesQuery,
   useCreateSalaryAdvanceMutation,
   useUpdateSalaryAdvanceMutation,
 } = api;
-
 export default api;

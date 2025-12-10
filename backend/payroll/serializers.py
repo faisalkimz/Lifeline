@@ -166,12 +166,12 @@ class PayslipDetailSerializer(PayslipSerializer):
 
 
 class SalaryAdvanceSerializer(serializers.ModelSerializer):
-    """Serializer for SalaryAdvance model"""
-
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_number = serializers.CharField(source='employee.employee_number', read_only=True)
     approved_by_name = serializers.CharField(source='approved_by.get_full_name', read_only=True)
     is_overdue = serializers.BooleanField(read_only=True)
+    balance = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
+    monthly_deduction = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
 
     class Meta:
         model = SalaryAdvance
@@ -182,6 +182,7 @@ class SalaryAdvanceSerializer(serializers.ModelSerializer):
             'amount_repaid', 'balance', 'status', 'is_overdue',
             'created_at', 'requested_at', 'completed_at'
         ]
+
         read_only_fields = ['id', 'balance', 'is_overdue', 'approved_at', 'completed_at']
 
     def create(self, validated_data):
@@ -204,4 +205,5 @@ class PayrollSummarySerializer(serializers.Serializer):
     total_net = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_paye_tax = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_nssf = serializers.DecimalField(max_digits=15, decimal_places=2)
+
 

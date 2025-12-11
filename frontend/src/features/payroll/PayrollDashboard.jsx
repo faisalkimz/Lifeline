@@ -8,21 +8,21 @@ import { Calendar, FileText, AlertCircle } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
 import CreatePayrollRunModal from './CreatePayrollRunModal';
 import { useGetPayrollRunsQuery } from '../../store/api';
+import toast from 'react-hot-toast';
 
 const PayrollDashboard = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [payrollRuns, setPayrollRuns] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const { data: payrollRunsData = [], isLoading } = useGetPayrollRunsQuery();
-
-  useEffect(() => {
-    if (payrollRunsData) setPayrollRuns(payrollRunsData);
-  }, [payrollRunsData]);
+  // Use RTK Query data directly (no local state needed due to cache invalidation)
+  const { data: payrollRuns = [], isLoading } = useGetPayrollRunsQuery();
 
   const handleCreatePayrollRun = () => setShowCreateModal(true);
-  const handlePayrollCreated = (newRun) => setPayrollRuns(prev => [newRun, ...prev]);
+  const handlePayrollCreated = () => {
+    // RTK Query auto-refetches, so we just close the modal.
+    // Optionally we could show a success toast here if not done in the modal.
+  };
 
   const currentPayroll = payrollRuns.find(p => p.month === selectedMonth && p.year === selectedYear);
 
@@ -71,7 +71,7 @@ const PayrollDashboard = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
               <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))} className="px-3 py-2 border rounded-lg bg-white text-black">
-                {Array.from({ length: 12 }, (_, i) => <option key={i+1} value={i+1}>{new Date(2025, i).toLocaleString('en-US', { month: 'long' })}</option>)}
+                {Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{new Date(2025, i).toLocaleString('en-US', { month: 'long' })}</option>)}
               </select>
             </div>
 
@@ -153,7 +153,11 @@ const PayrollDashboard = () => {
             </TableHeader>
             <TableBody>
               {payrollRuns.map(run => (
-                <TableRow key={run.id}>
+                <TableRow
+                  key={run.id}
+                  className="hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => toast(`Viewing details for ${new Date(run.year, run.month - 1).toLocaleString('en-US', { month: 'long' })}`, { icon: '📄' })}
+                >
                   <TableCell>{new Date(run.year, run.month - 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })}</TableCell>
                   <TableCell>{getStatusBadge(run.status)}</TableCell>
                   <TableCell className="text-right">{run.employee_count}</TableCell>

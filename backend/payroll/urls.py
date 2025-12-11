@@ -9,6 +9,7 @@ router = DefaultRouter()
 router.register(r'payroll-runs', views.PayrollRunViewSet, basename='payrollrun')
 router.register(r'salary-structures', views.SalaryStructureViewSet, basename='salarystructure')
 router.register(r'salary-advances', views.SalaryAdvanceViewSet, basename='salaryadvance')
+router.register(r'payslips', views.PayslipViewSet, basename='payslip')
 
 
 urlpatterns = [

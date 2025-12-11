@@ -51,7 +51,8 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
             'can_approve', 'can_cancel', 'created_at', 'updated_at'
         ]
         read_only_fields = [
-            'id', 'approved_by', 'approved_at', 'created_at', 'updated_at'
+            'id', 'approved_by', 'approved_at', 'created_at', 'updated_at',
+            'days_requested', 'status'
         ]
     
     def get_approved_by_name(self, obj):

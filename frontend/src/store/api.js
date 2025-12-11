@@ -154,7 +154,7 @@ export const api = createApi({
     }),
     // --- Payroll Runs (NEW) ---
     getPayrollRuns: builder.query({
-      query: () => '/payroll-runs/',
+      query: () => '/payroll/payroll-runs/',
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
@@ -170,7 +170,7 @@ export const api = createApi({
     }),
     createPayrollRun: builder.mutation({
       query: (data) => ({
-        url: '/payroll-runs/',
+        url: '/payroll/payroll-runs/',
         method: 'POST',
         body: data
       }),
@@ -178,7 +178,7 @@ export const api = createApi({
     }),
     // --- Salary Structures (NEW) ---
     getSalaryStructures: builder.query({
-      query: () => '/salary-structures/',
+      query: () => '/payroll/salary-structures/',
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
@@ -194,7 +194,7 @@ export const api = createApi({
     }),
     createSalaryStructure: builder.mutation({
       query: (data) => ({
-        url: '/salary-structures/',
+        url: '/payroll/salary-structures/',
         method: 'POST',
         body: data
       }),
@@ -202,7 +202,7 @@ export const api = createApi({
     }),
     updateSalaryStructure: builder.mutation({
       query: ({ id, ...data }) => ({
-        url: `/salary-structures/${id}/`,
+        url: `/payroll/salary-structures/${id}/`,
         method: 'PUT',
         body: data
       }),
@@ -213,7 +213,7 @@ export const api = createApi({
     }),
     deleteSalaryStructure: builder.mutation({
       query: (id) => ({
-        url: `/salary-structures/${id}/`,
+        url: `/payroll/salary-structures/${id}/`,
         method: 'DELETE'
       }),
       invalidatesTags: [{ type: 'SalaryStructure', id: 'LIST' }]
@@ -229,7 +229,7 @@ export const api = createApi({
     }),
     // --- FIXED: Salary Advances ---
     getSalaryAdvances: builder.query({
-      query: () => '/salary-advances/',
+      query: () => '/payroll/salary-advances/',
       // FIXED: Better transform with logging
       transformResponse: (response) => {
         console.log('[API] Raw salary-advances response:', response);
@@ -251,7 +251,7 @@ export const api = createApi({
     }),
     createSalaryAdvance: builder.mutation({
       query: (data) => ({
-        url: '/salary-advances/',
+        url: '/payroll/salary-advances/',
         method: 'POST',
         body: data
       }),
@@ -259,7 +259,7 @@ export const api = createApi({
     }),
     updateSalaryAdvance: builder.mutation({
       query: ({ id, ...patch }) => ({
-        url: `/salary-advances/${id}/`,
+        url: `/payroll/salary-advances/${id}/`,
         method: 'PATCH',
         body: patch
       }),
@@ -286,6 +286,11 @@ export const api = createApi({
     // ========== LEAVE MANAGEMENT ==========
     getLeaveRequests: builder.query({
       query: (url) => url || '/leave/requests/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || [];
+      },
       providesTags: ['LeaveRequest']
     }),
     createLeaveRequest: builder.mutation({
@@ -293,6 +298,32 @@ export const api = createApi({
         url: url || '/leave/requests/',
         method: 'POST',
         body
+      }),
+      invalidatesTags: ['LeaveRequest']
+    }),
+    getLeaveBalances: builder.query({
+      query: () => '/leave/balances/my_balances/',
+      providesTags: ['LeaveRequest'] // Re-fetch on request changes
+    }),
+    getLeaveTypes: builder.query({
+      query: () => '/leave/types/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || [];
+      },
+    }),
+    approveLeaveRequest: builder.mutation({
+      query: (id) => ({
+        url: `/leave/requests/${id}/approve/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['LeaveRequest']
+    }),
+    rejectLeaveRequest: builder.mutation({
+      query: (id) => ({
+        url: `/leave/requests/${id}/reject/`,
+        method: 'POST'
       }),
       invalidatesTags: ['LeaveRequest']
     }),
@@ -357,6 +388,10 @@ export const {
   // leave hooks
   useGetLeaveRequestsQuery,
   useCreateLeaveRequestMutation,
+  useGetLeaveBalancesQuery,
+  useGetLeaveTypesQuery,
+  useApproveLeaveRequestMutation,
+  useRejectLeaveRequestMutation,
   // attendance hooks
   useClockInMutation,
   useClockOutMutation,

@@ -77,7 +77,11 @@ class PayrollRunSerializer(serializers.ModelSerializer):
             'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
             'approved_by', 'approved_by_name', 'approved_at'
         ]
-        read_only_fields = ['id', 'payslip_count']
+        read_only_fields = [
+            'id', 'payslip_count', 'company', 'processed_by', 'processed_at',
+            'approved_by', 'approved_at', 'total_gross', 'total_deductions',
+            'total_net', 'status'
+        ]
 
     def get_payslip_count(self, obj):
         """Get count of payslips in this payroll run"""

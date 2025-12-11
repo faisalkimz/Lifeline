@@ -28,7 +28,7 @@ urlpatterns = [
     # API endpoints
     path('api/', include('accounts.urls')),  # Auth, companies, users
     path('api/', include('employees.urls')),  # Departments, employees
-    path('api/', include('payroll.urls')),  # Payroll management
+    path('api/payroll/', include('payroll.urls')),  # Payroll management
     path('api/leave/', include('leave.urls')),  # Leave Management
     path('api/attendance/', include('attendance.urls')),  # Attendance & Time Tracking
     

@@ -3,7 +3,7 @@ import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../store/api';
-import { LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell, TrendingUp, User, Crown, CreditCard, Calendar, Clock } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell, TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 const DashboardLayout = () => {
@@ -36,6 +36,8 @@ const DashboardLayout = () => {
     { name: 'Org Chart', href: '/org-chart', icon: TrendingUp },
     { name: 'Payroll', href: '/payroll', icon: CreditCard },
     { name: 'Leave', href: '/leave', icon: Calendar },
+    // Show Approvals for non-employees (managers, admins)
+    ...(user.role !== 'employee' ? [{ name: 'Leave Approvals', href: '/leave/approvals', icon: ClipboardCheck }] : []),
     { name: 'Attendance', href: '/attendance', icon: Clock },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];

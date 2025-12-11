@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
+from django.db.models import Q
 from datetime import datetime
 from .models import LeaveType, LeaveBalance, LeaveRequest, PublicHoliday
 from .serializers import (
@@ -110,8 +111,8 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
                 employee__company=user.company,
                 status='pending'
             ).filter(
-                models.Q(employee__manager=user.employee) |
-                models.Q(employee__company=user.company, employee__department__isnull=False)
+                Q(employee__manager=user.employee) |
+                Q(employee__company=user.company, employee__department__isnull=False)
             ).select_related('employee', 'leave_type')
         else:
             queryset = LeaveRequest.objects.none()

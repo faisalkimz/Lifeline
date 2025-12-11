@@ -1,0 +1,6 @@
+STARTING LEAVE REQUEST DEBUG...
+Found debug user.
+Using Leave Type: 2 (Annual Leave)
+Sending Payload: {'leave_type': 2, 'start_date': '2025-12-11', 'end_date': '2025-12-13', 'reason': 'Debug reason'}
+Response Code: 201
+Success!

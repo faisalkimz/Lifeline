@@ -3,7 +3,6 @@ from .models import LeaveType, LeaveBalance, LeaveRequest, PublicHoliday
 from employees.models import Employee
 from datetime import datetime, timedelta
 
-
 class LeaveTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeaveType
@@ -41,6 +40,10 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
     can_approve = serializers.SerializerMethodField()
     can_cancel = serializers.SerializerMethodField()
     
+    # Explicitly read_only to ensure validation passes (calculated by backend)
+    days_requested = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    status = serializers.CharField(read_only=True)
+    
     class Meta:
         model = LeaveRequest
         fields = [
@@ -52,9 +55,9 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id', 'approved_by', 'approved_at', 'created_at', 'updated_at',
-            'days_requested', 'status'
+            'employee'  # Read-only because it's populated from request.user
         ]
-    
+        
     def get_approved_by_name(self, obj):
         if obj.approved_by:
             return f"{obj.approved_by.first_name} {obj.approved_by.last_name}"
@@ -103,7 +106,10 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         
         # If creating for self, use current user's employee
         if 'employee' not in validated_data:
-            validated_data['employee'] = request.user.employee
+            if hasattr(request.user, 'employee') and request.user.employee:
+                validated_data['employee'] = request.user.employee
+            else:
+                 raise serializers.ValidationError({"employee": "Current user is not linked to an employee record."})
         
         return super().create(validated_data)
 

@@ -23,12 +23,19 @@
 
 ### 5. Leave Request Submission Error (400 Bad Request)
 - **Problem**: Submitting a leave request failed with 400 Bad Request.
-- **Root Cause**: `days_requested` was a required field in `LeaveRequestSerializer` but was not sent by the frontend (as it's meant to be calculated).
-- **Fix**: Updated `LeaveRequestSerializer` to make `days_requested` and `status` **read-only**. The backend already calculates `days_requested` in the `validate` method.
+- **Root Cause**: Two fields were required by the serializer but not sent by the frontend:
+    1. `days_requested`: Calculated by backend, but serialier marked it required.
+    2. `employee`: Populated from `request.user` in `create`, but validation demanded it in input.
+- **Fix**: Updated `LeaveRequestSerializer` to:
+    - Explicitly define `days_requested` as `read_only=True`.
+    - Add `employee` to `Meta.read_only_fields`.
+    - Note: This ensures validation passes, while the `create` method and `validate` method populate the fields correctly.
 
 ## Verification
 - **Frontend Build**: Passed.
 - **Backend Check**: Passed.
-- **Manual Verification**: All reported endpoints (Payroll, Leave Types, Pending Approvals, Create Request) are now functional.
+- **Manual Verification**: 
+    - `debug_leave_request.py` confirmed 201 Created for leave request submission.
+    - All other reported endpoints are functional.
 
 The application is now stable.

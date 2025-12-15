@@ -18,6 +18,12 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
+  const getImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
+    return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+  };
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
@@ -43,6 +49,7 @@ const DashboardLayout = () => {
     { name: 'Training', href: '/training', icon: BookOpen },
     { name: 'Benefits', href: '/benefits', icon: Shield },
     { name: 'Documents', href: '/documents', icon: FileText },
+    { name: 'Disciplinary', href: '/disciplinary', icon: Shield },
     { name: 'Org Chart', href: '/org-chart', icon: TrendingUp },
   ];
 
@@ -137,8 +144,12 @@ const DashboardLayout = () => {
         {/* User Profile Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-900">
           <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
-              {user.first_name?.[0]}{user.last_name?.[0]}
+            <div className="h-9 w-9 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold overflow-hidden">
+              {user.photo ? (
+                <img src={getImageUrl(user.photo)} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <span>{user.first_name?.[0]}{user.last_name?.[0]}</span>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">{user.first_name} {user.last_name}</p>

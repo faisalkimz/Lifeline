@@ -14,17 +14,22 @@ import OrgChartPage from './features/departments/OrgChartPage';
 import MyProfilePage from './features/employees/MyProfilePage';
 import ManagerManagementPage from './features/managers/ManagerManagementPage';
 import PayrollIndex from './features/payroll/PayrollIndex';
+import PayrollRunDetailsPage from './features/payroll/PayrollRunDetailsPage';
 import LeaveRequestsPage from './features/leave/LeaveRequestsPage';
 
 import AttendancePage from './features/attendance/AttendancePage';
 import PerformancePage from './features/performance/PerformancePage';
+import DisciplinaryPage from './features/disciplinary/DisciplinaryPage';
 import JobListPage from './features/recruitment/JobListPage';
 import PipelinePage from './features/recruitment/PipelinePage';
 import IntegrationsPage from './features/recruitment/IntegrationsPage';
+import CandidatePage from './features/recruitment/CandidatePage';
 import TrainingPage from './features/training/TrainingPage';
 import BenefitsPage from './features/benefits/BenefitsPage';
 import DocumentsPage from './features/documents/DocumentsPage';
 import OffboardingPage from './features/offboarding/OffboardingPage';
+import EmployeePortalLayout from './layouts/EmployeePortalLayout';
+import EmployeeDashboard from './features/employee-portal/EmployeeDashboard';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -53,13 +58,16 @@ function App() {
 
         <Route path="/managers" element={<ManagerManagementPage />} />
 
+        <Route path="/payroll/runs/:id" element={<PayrollRunDetailsPage />} />
         <Route path="/payroll/*" element={<PayrollIndex />} />
 
         <Route path="/leave" element={<LeaveRequestsPage />} />
         <Route path="/leave/approvals" element={<Navigate to="/leave" replace />} />
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/performance" element={<PerformancePage />} />
+        <Route path="/disciplinary" element={<DisciplinaryPage />} />
         <Route path="/recruitment" element={<JobListPage />} />
+        <Route path="/recruitment/candidates" element={<CandidatePage />} />
         <Route path="/recruitment/pipeline" element={<PipelinePage />} />
         <Route path="/recruitment/integrations" element={<IntegrationsPage />} />
         <Route path="/training" element={<TrainingPage />} />
@@ -68,6 +76,16 @@ function App() {
         <Route path="/offboarding" element={<OffboardingPage />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
+
+        {/* Employee Self-Service Portal */}
+        <Route path="/employee" element={<EmployeePortalLayout />}>
+          <Route path="dashboard" element={<EmployeeDashboard />} />
+          <Route path="payslips" element={<div className="p-8 text-center">Payslips - Coming Soon</div>} />
+          <Route path="leave" element={<LeaveRequestsPage />} />
+          <Route path="attendance" element={<AttendancePage />} />
+          <Route path="documents" element={<div className="p-8 text-center">My Documents - Coming Soon</div>} />
+          <Route path="profile" element={<MyProfilePage />} />
+        </Route>
       </Route>
 
       {/* Default Redirect */}

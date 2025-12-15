@@ -108,9 +108,14 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
         completed = queryset.filter(status__in=['submitted', 'acknowledged']).count()
         avg_rating = queryset.aggregate(Avg('overall_rating'))['overall_rating__avg'] or 0
         
+        active_goals = 0
+        if hasattr(user, 'employee'):
+            active_goals = Goal.objects.filter(employee=user.employee, status__in=['pending', 'in_progress']).count()
+
         return Response({
             "total_reviews": total,
             "completed_reviews": completed,
             "pending_reviews": total - completed,
-            "average_rating": round(avg_rating, 2)
+            "average_rating": round(avg_rating, 2),
+            "active_goals": active_goals
         })

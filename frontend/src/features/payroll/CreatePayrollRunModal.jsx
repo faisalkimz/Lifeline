@@ -1,5 +1,5 @@
 // src/features/payroll/CreatePayrollRunModal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -9,8 +9,36 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear(),
-    description: ''
+    description: '',
+    start_date: '',
+    end_date: '',
+    payment_date: ''
   });
+
+  // Auto-calculate dates when month/year changes
+  useEffect(() => {
+    const y = parseInt(formData.year);
+    const m = parseInt(formData.month);
+    if (!y || !m) return;
+
+    const start = `${y}-${String(m).padStart(2, '0')}-01`;
+    // Last day of month: new Date(year, monthIndex, 0).getDate() (monthIndex is 1-based here so passing m works for "day 0 of next month"?? No. Date(y, m, 0) is last day of month m. JS months 0-11.
+    // formData.month is 1-12.
+    // new Date(2025, 12, 0) -> Dec 31 2025. Correct.
+    const lastDay = new Date(y, m, 0).getDate();
+    const end = `${y}-${String(m).padStart(2, '0')}-${lastDay}`;
+
+    // Default pay day: 28th?
+    const payDay = Math.min(28, lastDay);
+    const payment = `${y}-${String(m).padStart(2, '0')}-${payDay}`;
+
+    setFormData(prev => ({
+      ...prev,
+      start_date: start,
+      end_date: end,
+      payment_date: payment
+    }));
+  }, [formData.month, formData.year]);
 
   const [createPayrollRun, { isLoading }] = useCreatePayrollRunMutation();
 
@@ -25,7 +53,10 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
       const response = await createPayrollRun({
         month: parseInt(formData.month, 10),
         year: parseInt(formData.year, 10),
-        description: formData.description || null
+        description: formData.description || null,
+        start_date: formData.start_date,
+        end_date: formData.end_date,
+        payment_date: formData.payment_date
       }).unwrap();
       if (onSuccess) onSuccess(response);
       onClose();
@@ -97,6 +128,21 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </div>
 
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Start Date</label>
+              <Input type="date" name="start_date" value={formData.start_date} onChange={handleInputChange} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">End Date</label>
+              <Input type="date" name="end_date" value={formData.end_date} onChange={handleInputChange} required />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Pay Date</label>
+              <Input type="date" name="payment_date" value={formData.payment_date} onChange={handleInputChange} required />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-1">Description (Optional)</label>
             <Input
@@ -104,7 +150,7 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Optional description..."
+              placeholder="e.g. December Salaries + Bonuses"
             />
           </div>
 
@@ -118,7 +164,7 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
           </DialogFooter>
         </form>
       </DialogContent>
-    </Dialog>
+    </Dialog >
   );
 };
 

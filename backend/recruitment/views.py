@@ -28,46 +28,48 @@ class JobViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def publish(self, request, pk=None):
+        """
+        Publish job to multiple platforms
+        
+        Expected payload:
+        {
+            "platforms": ["linkedin", "indeed", "fuzu", "brightermonday"]
+        }
+        """
+        job = self.get_object()
+        platforms = request.data.get('platforms', [])
+        
+        # Import here to avoid circular imports
+        from .services.publishing_service import JobPublishingService
+        
+        # Publish to platforms
+        results = JobPublishingService.publish_to_platforms(job, platforms)
+        
+        if results['success']:
+            return Response({
+                'status': 'published',
+                'message': f"Job published to {len([p for p, r in results['platforms'].items() if r.get('success')])} platform(s)",
+                'results': results
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'status': 'partial_failure',
+                'message': 'Some platforms failed to publish',
+                'results': results
+            }, status=status.HTTP_207_MULTI_STATUS)
+    
+    @action(detail=True, methods=['get'])
+    def analytics(self, request, pk=None):
+        """
+        Get job analytics from all platforms where it's posted
+        """
         job = self.get_object()
         
-        # 1. Update internal status
-        job.status = 'published'
-        job.published_at = timezone.now()
-        job.save()
-
-        # 2. Handle external posting if platforms requested
-        platforms = request.data.get('platforms', [])
-        results = []
+        from .services.publishing_service import JobPublishingService
         
-        for platform_key in platforms:
-            # Check if integration exists
-            integration = IntegrationSettings.objects.filter(
-                company=request.user.company, 
-                platform=platform_key, 
-                is_active=True
-            ).first()
-
-            if integration:
-                # Mock External API Call
-                # In real life: adapter.post_job(job, integration.api_key)
-                mock_external_id = f"{platform_key.upper()}-{random.randint(1000, 9999)}"
-                mock_url = f"https://{platform_key}.com/jobs/{mock_external_id}"
-                
-                ExternalJobPost.objects.create(
-                    job=job,
-                    integration=integration,
-                    external_id=mock_external_id,
-                    url=mock_url,
-                    status='active'
-                )
-                results.append(f"Posted to {platform_key}")
-            else:
-                results.append(f"Skipped {platform_key}: No active integration")
-
-        return Response({
-            'status': 'job published',
-            'details': results
-        })
+        analytics = JobPublishingService.get_analytics(job)
+        
+        return Response(analytics, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
     def close(self, request, pk=None):

@@ -1,0 +1,286 @@
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import {
+    useGetPayrollRunQuery,
+    useGetPayslipsQuery,
+    useUpdatePayslipMutation,
+    useProcessPayrollMutation,
+    useApprovePayrollMutation,
+    useMarkPayrollPaidMutation
+} from '../../store/api';
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
+import { Badge } from '../../components/ui/Badge';
+import { Input } from '../../components/ui/Input';
+import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+const PayrollRunDetailsPage = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [editingId, setEditingId] = useState(null);
+    const [editValues, setEditValues] = useState({});
+
+    // Fetch Run Details
+    const { data: run, isLoading: isLoadingRun } = useGetPayrollRunQuery(id);
+
+    // Fetch Payslips
+    // We strictly filter by payroll_run=id.
+    const { data: payslips = [], isLoading: isLoadingPayslips } = useGetPayslipsQuery({ payroll_run: id });
+
+    const [updatePayslip, { isLoading: isUpdating }] = useUpdatePayslipMutation();
+    const [processPayroll, { isLoading: isProcessing }] = useProcessPayrollMutation();
+    const [approvePayroll, { isLoading: isApproving }] = useApprovePayrollMutation();
+    const [markPaid, { isLoading: isPaying }] = useMarkPayrollPaidMutation();
+
+    // Helper functions
+    const formatCurrency = (val) => new Intl.NumberFormat('en-UG', {
+        style: 'currency', currency: 'UGX', minimumFractionDigits: 0
+    }).format(Number(val) || 0);
+
+    const getStatusBadge = (status) => {
+        const colors = {
+            draft: 'bg-gray-100 text-gray-800',
+            processing: 'bg-blue-100 text-blue-800',
+            approved: 'bg-purple-100 text-purple-800',
+            paid: 'bg-green-100 text-green-800',
+            cancelled: 'bg-red-100 text-red-800'
+        };
+        return <Badge className={colors[status] || 'bg-gray-100'}>{status}</Badge>;
+    };
+
+    // Actions
+    const handleEdit = (payslip) => {
+        setEditingId(payslip.id);
+        setEditValues({
+            bonuses: payslip.bonuses,
+            other_deductions: payslip.other_deductions,
+            loan_deduction: payslip.loan_deduction,
+            advance_deduction: payslip.advance_deduction
+        });
+    };
+
+    const handleCancel = () => {
+        setEditingId(null);
+        setEditValues({});
+    };
+
+    const handleSave = async (id) => {
+        try {
+            await updatePayslip({
+                id,
+                bonuses: parseFloat(editValues.bonuses) || 0,
+                other_deductions: parseFloat(editValues.other_deductions) || 0,
+                loan_deduction: parseFloat(editValues.loan_deduction) || 0,
+                advance_deduction: parseFloat(editValues.advance_deduction) || 0
+            }).unwrap();
+
+            toast.success('Payslip updated');
+            setEditingId(null);
+        } catch (error) {
+            console.error('Failed to update payslip', error);
+            toast.error('Failed to update payslip');
+        }
+    };
+
+    const handleProcess = async () => {
+        try {
+            await processPayroll(id).unwrap();
+            toast.success('Payroll processed successfully');
+        } catch (error) {
+            toast.error('Processing failed');
+        }
+    };
+
+    const handleApprove = async () => {
+        try {
+            await approvePayroll(id).unwrap();
+            toast.success('Payroll approved');
+        } catch (error) {
+            toast.error('Approve failed');
+        }
+    };
+    const handleMarkPaid = async () => {
+        try {
+            await markPaid(id).unwrap();
+            toast.success('Payroll marked as paid');
+        } catch (error) {
+            toast.error('Mark paid failed');
+        }
+    };
+
+    if (isLoadingRun || isLoadingPayslips) {
+        return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
+
+    if (!run) return <div>Payroll Run not found.</div>;
+
+    const isEditable = run.status === 'draft' || run.status === 'processing';
+
+    return (
+        <div className="space-y-6 pb-20">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                        <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900">
+                            Payroll Run: {new Date(run.year, run.month - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}
+                        </h1>
+                        <div className="flex items-center gap-2 mt-1">
+                            {getStatusBadge(run.status)}
+                            <span className="text-slate-500 text-sm">{payslips.length} Employees</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex gap-2">
+                    {run.status === 'draft' && (
+                        <Button onClick={handleProcess} disabled={isProcessing} className="bg-blue-600 text-white hover:bg-blue-700">
+                            {isProcessing ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
+                            Process Payroll
+                        </Button>
+                    )}
+                    {run.status === 'processing' && (
+                        <Button onClick={handleApprove} disabled={isApproving} className="bg-purple-600 text-white hover:bg-purple-700">
+                            {isApproving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                            Approve
+                        </Button>
+                    )}
+                    {run.status === 'approved' && (
+                        <Button onClick={handleMarkPaid} disabled={isPaying} className="bg-green-600 text-white hover:bg-green-700">
+                            {isPaying ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <CheckCircle className="h-4 w-4 mr-2" />}
+                            Mark Paid
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card>
+                    <CardContent className="p-4">
+                        <p className="text-sm font-medium text-slate-500">Total Gross</p>
+                        <p className="text-2xl font-bold">{formatCurrency(run.total_gross)}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4">
+                        <p className="text-sm font-medium text-slate-500">Total Deductions</p>
+                        <p className="text-2xl font-bold text-orange-600">{formatCurrency(run.total_deductions)}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4">
+                        <p className="text-sm font-medium text-slate-500">Total Net Pay</p>
+                        <p className="text-2xl font-bold text-blue-600">{formatCurrency(run.total_net)}</p>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Main Table */}
+            <Card>
+                <CardHeader>
+                    <CardTitle>Payslips</CardTitle>
+                </CardHeader>
+                <CardContent className="overflow-x-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Employee</TableHead>
+                                <TableHead className="text-right">Basic</TableHead>
+                                <TableHead className="text-right">Allowances</TableHead>
+                                <TableHead className="text-right w-32">Bonus</TableHead>
+                                <TableHead className="text-right w-32">Other Ded.</TableHead>
+                                <TableHead className="text-right">Gross</TableHead>
+                                <TableHead className="text-right">PAYE</TableHead>
+                                <TableHead className="text-right">NSSF</TableHead>
+                                <TableHead className="text-right font-bold">Net Pay</TableHead>
+                                {isEditable && <TableHead className="text-center">Actions</TableHead>}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {payslips.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={10} className="text-center py-8 text-slate-500">
+                                        No payslips found. Payroll might be in Draft state without saved items.
+                                        Click 'Process Payroll' to generate payslips.
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                payslips.map((payslip) => (
+                                    <TableRow key={payslip.id}>
+                                        <TableCell>
+                                            <div className="font-medium text-slate-900">{payslip.employee_name}</div>
+                                            <div className="text-xs text-slate-500">{payslip.department}</div>
+                                        </TableCell>
+                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.basic_salary)}</TableCell>
+                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.allowances)}</TableCell>
+
+                                        {/* Editable Columns */}
+                                        <TableCell className="text-right">
+                                            {editingId === payslip.id ? (
+                                                <Input
+                                                    type="number"
+                                                    value={editValues.bonuses}
+                                                    onChange={(e) => setEditValues({ ...editValues, bonuses: e.target.value })}
+                                                    className="w-24 h-8 text-right p-1"
+                                                />
+                                            ) : (
+                                                <span className={payslip.bonuses > 0 ? "text-green-600 font-medium" : "text-slate-400"}>
+                                                    {formatCurrency(payslip.bonuses)}
+                                                </span>
+                                            )}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            {editingId === payslip.id ? (
+                                                <Input
+                                                    type="number"
+                                                    value={editValues.other_deductions}
+                                                    onChange={(e) => setEditValues({ ...editValues, other_deductions: e.target.value })}
+                                                    className="w-24 h-8 text-right p-1"
+                                                />
+                                            ) : (
+                                                <span className={payslip.other_deductions > 0 ? "text-red-600 font-medium" : "text-slate-400"}>
+                                                    {formatCurrency(payslip.other_deductions)}
+                                                </span>
+                                            )}
+                                        </TableCell>
+
+                                        <TableCell className="text-right font-medium">{formatCurrency(payslip.gross_salary)}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(payslip.paye_tax)}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(Number(payslip.nssf_employee) + Number(payslip.nssf_employer))}</TableCell>
+                                        <TableCell className="text-right font-bold text-blue-700 text-lg">{formatCurrency(payslip.net_salary)}</TableCell>
+
+                                        {isEditable && (
+                                            <TableCell className="text-center">
+                                                {editingId === payslip.id ? (
+                                                    <div className="flex justify-center gap-1">
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" onClick={() => handleSave(payslip.id)}>
+                                                            <Save className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={handleCancel}>
+                                                            <X className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                ) : (
+                                                    <Button size="icon" variant="ghost" className="h-8 w-8 text-blue-600 hover:bg-blue-50" onClick={() => handleEdit(payslip)}>
+                                                        <Edit2 className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
+    );
+};
+
+export default PayrollRunDetailsPage;

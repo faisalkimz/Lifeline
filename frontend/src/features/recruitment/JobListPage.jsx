@@ -7,7 +7,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
-import { Plus, Briefcase, MapPin, Globe, Clock, CheckCircle } from 'lucide-react';
+import { Plus, Briefcase, MapPin, Globe, Clock, CheckCircle, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
@@ -46,6 +46,11 @@ const JobListPage = () => {
                     <p className="text-slate-500 mt-1">Manage job postings and candidates.</p>
                 </div>
                 <div className="flex gap-2">
+                    <Link to="/recruitment/candidates">
+                        <Button variant="outline" className="gap-2 bg-white hover:bg-slate-50 shadow-sm">
+                            <User className="h-4 w-4" /> Candidates
+                        </Button>
+                    </Link>
                     <Link to="/recruitment/integrations">
                         <Button variant="outline" className="gap-2 bg-white hover:bg-slate-50 shadow-sm">
                             <Globe className="h-4 w-4" /> Integrations

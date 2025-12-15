@@ -218,6 +218,71 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'SalaryStructure', id: 'LIST' }]
     }),
+
+    // ========== PAYROLL RUNS ==========
+    getPayrollRuns: builder.query({
+      query: (params) => ({
+        url: '/payroll/payroll-runs/',
+        params
+      }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || [];
+      },
+      providesTags: ['PayrollRun']
+    }),
+    getPayrollRun: builder.query({
+      query: (id) => `/payroll/payroll-runs/${id}/`,
+      providesTags: (result, error, id) => [{ type: 'PayrollRun', id }]
+    }),
+    createPayrollRun: builder.mutation({
+      query: (body) => ({
+        url: '/payroll/payroll-runs/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['PayrollRun']
+    }),
+    processPayroll: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/payroll-runs/${id}/process_payroll/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['PayrollRun']
+    }),
+    approvePayroll: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/payroll-runs/${id}/approve_payroll/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['PayrollRun']
+    }),
+    markPayrollPaid: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/payroll-runs/${id}/mark_paid/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['PayrollRun']
+    }),
+
+    // ========== PAYSLIPS ==========
+    getPayslips: builder.query({
+      query: (params) => ({
+        url: '/payroll/payslips/',
+        params
+      }),
+      providesTags: ['Payslip']
+    }),
+    updatePayslip: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/payroll/payslips/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Payslip', 'PayrollRun']
+    }),
+
     // --- Employee Stats and Managers ---
     getEmployeeStats: builder.query({
       query: () => '/employees/stats/',
@@ -468,6 +533,14 @@ export const api = createApi({
       }),
       invalidatesTags: ['Candidate']
     }),
+    updateCandidate: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/recruitment/candidates/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Candidate']
+    }),
     getApplications: builder.query({
       query: (params) => ({
         url: '/recruitment/applications/',
@@ -662,7 +735,13 @@ export const {
   useDeleteDepartmentMutation,
   // payroll & salary hooks
   useGetPayrollRunsQuery,
+  useGetPayrollRunQuery, // Added
   useCreatePayrollRunMutation,
+  useProcessPayrollMutation, // Added
+  useApprovePayrollMutation, // Added
+  useMarkPayrollPaidMutation, // Added
+  useGetPayslipsQuery, // Added
+  useUpdatePayslipMutation, // Added
   useGetSalaryStructuresQuery,
   useCreateSalaryStructureMutation,
   useUpdateSalaryStructureMutation,
@@ -706,6 +785,7 @@ export const {
   useUpdateJobMutation,
   useGetCandidatesQuery,
   useCreateCandidateMutation,
+  useUpdateCandidateMutation,
   useGetApplicationsQuery,
   useCreateApplicationMutation,
   useMoveApplicationStageMutation,

@@ -73,6 +73,7 @@ class PayrollRunSerializer(serializers.ModelSerializer):
         model = PayrollRun
         fields = [
             'id', 'company', 'company_name', 'month', 'year', 'status',
+            'start_date', 'end_date', 'payment_date', 'description',
             'total_gross', 'total_deductions', 'total_net',
             'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
             'approved_by', 'approved_by_name', 'approved_at'
@@ -115,28 +116,35 @@ class PayslipSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """Auto-calculate deductions and net salary"""
         employee = validated_data['employee']
-        gross_salary = validated_data['gross_salary']
-
-        # Get current salary structure for calculations
-        salary_structure = SalaryStructure.objects.filter(
-            employee=employee
-        ).order_by('-effective_date').first()
-
+        
+        # Get current salary structure
+        salary_structure = SalaryStructure.objects.filter(employee=employee).order_by('-effective_date').first()
+        
         if salary_structure:
+            # Use structure values for base
+            validated_data['basic_salary'] = salary_structure.basic_salary
+            validated_data['housing_allowance'] = salary_structure.housing_allowance
+            validated_data['transport_allowance'] = salary_structure.transport_allowance
+            validated_data['medical_allowance'] = salary_structure.medical_allowance
+            validated_data['lunch_allowance'] = salary_structure.lunch_allowance
+            validated_data['other_allowances'] = salary_structure.other_allowances
+            validated_data['allowances'] = salary_structure.total_allowances
+            
+            # Initial gross without bonus
+            gross = salary_structure.gross_salary + validated_data.get('bonuses', 0)
+            validated_data['gross_salary'] = gross
+            
             # Calculate tax and deductions
             calculations = calculate_net_salary(
-                salary_structure.gross_salary,
+                gross,
                 {
                     'loan_deduction': validated_data.get('loan_deduction', 0),
                     'advance_deduction': validated_data.get('advance_deduction', 0),
                     'other_deductions': validated_data.get('other_deductions', 0),
                 }
             )
-
-            # Update validated data with calculations
+            
             validated_data.update({
-                'basic_salary': salary_structure.basic_salary,
-                'allowances': salary_structure.total_allowances,
                 'paye_tax': calculations['paye_tax'],
                 'nssf_employee': calculations['nssf_employee'],
                 'nssf_employer': calculations['nssf_employer'],
@@ -145,6 +153,41 @@ class PayslipSerializer(serializers.ModelSerializer):
             })
 
         return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """Recalculate salary when updating bonuses or deductions"""
+        # Update allowed fields
+        instance.bonuses = validated_data.get('bonuses', instance.bonuses)
+        instance.other_deductions = validated_data.get('other_deductions', instance.other_deductions)
+        instance.loan_deduction = validated_data.get('loan_deduction', instance.loan_deduction)
+        instance.advance_deduction = validated_data.get('advance_deduction', instance.advance_deduction)
+        
+        # Recalculate Gross (Basic + Allowances + Bonuses)
+        total_allowances = (
+            instance.housing_allowance + instance.transport_allowance + 
+            instance.medical_allowance + instance.lunch_allowance + 
+            instance.other_allowances
+        )
+        instance.gross_salary = instance.basic_salary + total_allowances + instance.bonuses
+        
+        # Calculate new deductions/net
+        calculations = calculate_net_salary(
+            instance.gross_salary,
+            {
+                'loan_deduction': instance.loan_deduction,
+                'advance_deduction': instance.advance_deduction,
+                'other_deductions': instance.other_deductions,
+            }
+        )
+        
+        instance.paye_tax = calculations['paye_tax']
+        instance.nssf_employee = calculations['nssf_employee']
+        instance.nssf_employer = calculations['nssf_employer']
+        instance.total_deductions = calculations['total_deductions']
+        instance.net_salary = calculations['net_salary']
+        
+        instance.save()
+        return instance
 
 
 class PayslipDetailSerializer(PayslipSerializer):

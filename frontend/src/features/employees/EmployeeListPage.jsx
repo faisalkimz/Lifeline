@@ -43,15 +43,9 @@ const EmployeeListPage = () => {
 
     const getImageUrl = (photoPath) => {
         if (!photoPath) return null;
-        if (photoPath.startsWith('http')) return photoPath;
-        if (photoPath.startsWith('/')) {
-            return `${window.location.origin}${photoPath}`;
-        }
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-        if (baseUrl && baseUrl.startsWith('http')) {
-            return `${baseUrl.replace(/\/$/, '')}/${photoPath.replace(/^\//, '')}`;
-        }
-        return photoPath;
+        if (photoPath.startsWith('http') || photoPath.startsWith('data:') || photoPath.startsWith('blob:')) return photoPath;
+        const baseUrl = 'http://localhost:8000';
+        return `${baseUrl}${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
     };
 
     const { data: employeesData, isLoading } = useGetEmployeesQuery({

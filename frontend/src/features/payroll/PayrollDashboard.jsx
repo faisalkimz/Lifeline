@@ -1,5 +1,6 @@
 // src/features/payroll/PayrollDashboard.jsx
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
@@ -11,6 +12,7 @@ import { useGetPayrollRunsQuery } from '../../store/api';
 import toast from 'react-hot-toast';
 
 const PayrollDashboard = () => {
+  const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -164,7 +166,7 @@ const PayrollDashboard = () => {
                   <TableCell className="text-right font-semibold text-green-700">{formatCurrency(run.total_gross)}</TableCell>
                   <TableCell className="text-right text-orange-700">{formatCurrency(run.total_deductions)}</TableCell>
                   <TableCell className="text-right font-semibold text-blue-700">{formatCurrency(run.total_net)}</TableCell>
-                  <TableCell><Button variant="ghost" size="sm">View</Button></TableCell>
+                  <TableCell><Button variant="ghost" size="sm" onClick={() => navigate(`/payroll/runs/${run.id}`)}>View</Button></TableCell>
                 </TableRow>
               ))}
             </TableBody>

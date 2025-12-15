@@ -141,6 +141,12 @@ const EmployeeFormPage = () => {
         }
     });
 
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
+        return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+    };
+
     // Load data if editing
     useEffect(() => {
         if (employeeData) {
@@ -277,7 +283,7 @@ const EmployeeFormPage = () => {
                         <CardContent className="p-6 flex flex-col items-center text-center">
                             <div className="relative h-32 w-32 rounded-full bg-gray-100 mb-4 overflow-hidden shadow-sm flex items-center justify-center">
                                 {previewImage ? (
-                                    <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
+                                    <img src={getImageUrl(previewImage)} alt="Preview" className="h-full w-full object-cover" />
                                 ) : (
                                     <User className="h-16 w-16 text-gray-300" />
                                 )}
@@ -305,10 +311,10 @@ const EmployeeFormPage = () => {
                                     </div>
                                     <div className="hidden md:block">
                                         <TabsList className="flex gap-2 bg-transparent p-0">
-                                            <TabsTrigger value="personal" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline"/> Personal</TabsTrigger>
-                                            <TabsTrigger value="employment" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline"/> Employment</TabsTrigger>
-                                            <TabsTrigger value="documents" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline"/> Documents</TabsTrigger>
-                                            <TabsTrigger value="other" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline"/> Bank & Other</TabsTrigger>
+                                            <TabsTrigger value="personal" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline" /> Personal</TabsTrigger>
+                                            <TabsTrigger value="employment" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline" /> Employment</TabsTrigger>
+                                            <TabsTrigger value="documents" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline" /> Documents</TabsTrigger>
+                                            <TabsTrigger value="other" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline" /> Bank & Other</TabsTrigger>
                                         </TabsList>
                                     </div>
                                 </div>
@@ -318,178 +324,178 @@ const EmployeeFormPage = () => {
                                 <form onSubmit={handleSubmit(onSubmit)}>
                                     {/* Personal Tab */}
                                     <TabsContent value="personal" className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="First Name" error={errors.first_name} required>
-                                            <Input {...register('first_name')} placeholder="e.g. John" />
-                                        </FormField>
-                                        <FormField label="Middle Name" error={errors.middle_name}>
-                                            <Input {...register('middle_name')} placeholder="e.g. Davis" />
-                                        </FormField>
-                                        <FormField label="Last Name" error={errors.last_name} required>
-                                            <Input {...register('last_name')} placeholder="e.g. Doe" />
-                                        </FormField>
-                                    </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <FormField label="First Name" error={errors.first_name} required>
+                                                <Input {...register('first_name')} placeholder="e.g. John" />
+                                            </FormField>
+                                            <FormField label="Middle Name" error={errors.middle_name}>
+                                                <Input {...register('middle_name')} placeholder="e.g. Davis" />
+                                            </FormField>
+                                            <FormField label="Last Name" error={errors.last_name} required>
+                                                <Input {...register('last_name')} placeholder="e.g. Doe" />
+                                            </FormField>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="Email Address" error={errors.email} required>
-                                            <Input type="email" {...register('email')} placeholder="john.doe@company.com" />
-                                        </FormField>
-                                        <FormField label="Phone Number" error={errors.phone} required>
-                                            <Input {...register('phone')} placeholder="+256 700 000000" />
-                                        </FormField>
-                                    </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="Email Address" error={errors.email} required>
+                                                <Input type="email" {...register('email')} placeholder="john.doe@company.com" />
+                                            </FormField>
+                                            <FormField label="Phone Number" error={errors.phone} required>
+                                                <Input {...register('phone')} placeholder="+256 700 000000" />
+                                            </FormField>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="Date of Birth" error={errors.date_of_birth} required>
-                                            <Input type="date" {...register('date_of_birth')} />
-                                        </FormField>
-                                        <FormField label="Gender" error={errors.gender} required>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('gender')}>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </FormField>
-                                        <FormField label="Marital Status" error={errors.marital_status}>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('marital_status')}>
-                                                <option value="single">Single</option>
-                                                <option value="married">Married</option>
-                                                <option value="divorced">Divorced</option>
-                                                <option value="widowed">Widowed</option>
-                                            </select>
-                                        </FormField>
-                                    </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <FormField label="Date of Birth" error={errors.date_of_birth} required>
+                                                <Input type="date" {...register('date_of_birth')} />
+                                            </FormField>
+                                            <FormField label="Gender" error={errors.gender} required>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('gender')}>
+                                                    <option value="male">Male</option>
+                                                    <option value="female">Female</option>
+                                                    <option value="other">Other</option>
+                                                </select>
+                                            </FormField>
+                                            <FormField label="Marital Status" error={errors.marital_status}>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('marital_status')}>
+                                                    <option value="single">Single</option>
+                                                    <option value="married">Married</option>
+                                                    <option value="divorced">Divorced</option>
+                                                    <option value="widowed">Widowed</option>
+                                                </select>
+                                            </FormField>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="Address" error={errors.address}>
-                                            <Input {...register('address')} placeholder="Street address, Apt, etc." />
-                                        </FormField>
-                                        <div className="grid grid-cols-2 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="Address" error={errors.address}>
+                                                <Input {...register('address')} placeholder="Street address, Apt, etc." />
+                                            </FormField>
+                                            <div className="grid grid-cols-2 gap-4">
                                                 <FormField label="City" error={errors.city}>
                                                     <Input {...register('city')} placeholder="Kampala" />
                                                 </FormField>
                                                 <FormField label="District" error={errors.district}>
                                                     <Input {...register('district')} placeholder="Kampala" />
                                                 </FormField>
+                                            </div>
                                         </div>
-                                    </div>
-                                </TabsContent>
+                                    </TabsContent>
 
-                                {/* Employment Tab */}
-                                <TabsContent value="employment" className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="Department" error={errors.department} required>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('department')}>
-                                                <option value="">Select Department</option>
-                                                {departments.map(dept => (
-                                                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                                ))}
-                                            </select>
-                                        </FormField>
-                                        <FormField label="Job Title" error={errors.job_title} required>
-                                            <Input {...register('job_title')} placeholder="e.g. Senior Developer" />
-                                        </FormField>
-                                    </div>
+                                    {/* Employment Tab */}
+                                    <TabsContent value="employment" className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="Department" error={errors.department} required>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('department')}>
+                                                    <option value="">Select Department</option>
+                                                    {departments.map(dept => (
+                                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                    ))}
+                                                </select>
+                                            </FormField>
+                                            <FormField label="Job Title" error={errors.job_title} required>
+                                                <Input {...register('job_title')} placeholder="e.g. Senior Developer" />
+                                            </FormField>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="Manager" error={errors.manager}>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('manager')}>
-                                                <option value="">Select Manager (Optional)</option>
-                                                {employees.map(emp => (
-                                                    <option key={emp.id} value={emp.id}>{emp.full_name}</option>
-                                                ))}
-                                            </select>
-                                        </FormField>
-                                        <FormField label="Employment Type" error={errors.employment_type} required>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_type')}>
-                                                <option value="full_time">Full Time</option>
-                                                <option value="part_time">Part Time</option>
-                                                <option value="contract">Contract</option>
-                                                <option value="intern">Intern</option>
-                                                <option value="casual">Casual</option>
-                                            </select>
-                                        </FormField>
-                                    </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="Manager" error={errors.manager}>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('manager')}>
+                                                    <option value="">Select Manager (Optional)</option>
+                                                    {employees.map(emp => (
+                                                        <option key={emp.id} value={emp.id}>{emp.full_name}</option>
+                                                    ))}
+                                                </select>
+                                            </FormField>
+                                            <FormField label="Employment Type" error={errors.employment_type} required>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_type')}>
+                                                    <option value="full_time">Full Time</option>
+                                                    <option value="part_time">Part Time</option>
+                                                    <option value="contract">Contract</option>
+                                                    <option value="intern">Intern</option>
+                                                    <option value="casual">Casual</option>
+                                                </select>
+                                            </FormField>
+                                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="Join Date" error={errors.join_date} required>
-                                            <Input type="date" {...register('join_date')} />
-                                        </FormField>
-                                        <FormField label="Probation End" error={errors.probation_end_date}>
-                                            <Input type="date" {...register('probation_end_date')} />
-                                        </FormField>
-                                        <FormField label="Status" error={errors.employment_status} required>
-                                            <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_status')}>
-                                                <option value="active">Active</option>
-                                                <option value="on_leave">On Leave</option>
-                                                <option value="suspended">Suspended</option>
-                                                <option value="terminated">Terminated</option>
-                                                <option value="resigned">Resigned</option>
-                                            </select>
-                                        </FormField>
-                                    </div>
-                                </TabsContent>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <FormField label="Join Date" error={errors.join_date} required>
+                                                <Input type="date" {...register('join_date')} />
+                                            </FormField>
+                                            <FormField label="Probation End" error={errors.probation_end_date}>
+                                                <Input type="date" {...register('probation_end_date')} />
+                                            </FormField>
+                                            <FormField label="Status" error={errors.employment_status} required>
+                                                <select className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-shadow shadow-sm" {...register('employment_status')}>
+                                                    <option value="active">Active</option>
+                                                    <option value="on_leave">On Leave</option>
+                                                    <option value="suspended">Suspended</option>
+                                                    <option value="terminated">Terminated</option>
+                                                    <option value="resigned">Resigned</option>
+                                                </select>
+                                            </FormField>
+                                        </div>
+                                    </TabsContent>
 
-                                {/* Documents Tab */}
-                                <TabsContent value="documents" className="space-y-6">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="National ID (NIN)" error={errors.national_id} required>
-                                            <Input {...register('national_id')} placeholder="CM..." />
-                                        </FormField>
-                                        <FormField label="Passport Number" error={errors.passport_number}>
-                                            <Input {...register('passport_number')} placeholder="A..." />
-                                        </FormField>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <FormField label="TIN Number" error={errors.tin_number}>
-                                            <Input {...register('tin_number')} placeholder="100..." />
-                                        </FormField>
-                                        <FormField label="NSSF Number" error={errors.nssf_number}>
-                                            <Input {...register('nssf_number')} placeholder="NS..." />
-                                        </FormField>
-                                    </div>
-                                </TabsContent>
+                                    {/* Documents Tab */}
+                                    <TabsContent value="documents" className="space-y-6">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="National ID (NIN)" error={errors.national_id} required>
+                                                <Input {...register('national_id')} placeholder="CM..." />
+                                            </FormField>
+                                            <FormField label="Passport Number" error={errors.passport_number}>
+                                                <Input {...register('passport_number')} placeholder="A..." />
+                                            </FormField>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="TIN Number" error={errors.tin_number}>
+                                                <Input {...register('tin_number')} placeholder="100..." />
+                                            </FormField>
+                                            <FormField label="NSSF Number" error={errors.nssf_number}>
+                                                <Input {...register('nssf_number')} placeholder="NS..." />
+                                            </FormField>
+                                        </div>
+                                    </TabsContent>
 
-                                {/* Bank & Other Tab */}
-                                <TabsContent value="other" className="space-y-6">
-                                    <h4 className="font-medium text-gray-900 border-b pb-2">Bank Details</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="Bank Name" error={errors.bank_name}>
-                                            <Input {...register('bank_name')} placeholder="e.g. Stanbic Bank" />
-                                        </FormField>
-                                        <FormField label="Account Number" error={errors.bank_account_number}>
-                                            <Input {...register('bank_account_number')} placeholder="0123..." />
-                                        </FormField>
-                                        <FormField label="Branch" error={errors.bank_branch}>
-                                            <Input {...register('bank_branch')} placeholder="e.g. Forest Mall" />
-                                        </FormField>
-                                    </div>
+                                    {/* Bank & Other Tab */}
+                                    <TabsContent value="other" className="space-y-6">
+                                        <h4 className="font-medium text-gray-900 border-b pb-2">Bank Details</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <FormField label="Bank Name" error={errors.bank_name}>
+                                                <Input {...register('bank_name')} placeholder="e.g. Stanbic Bank" />
+                                            </FormField>
+                                            <FormField label="Account Number" error={errors.bank_account_number}>
+                                                <Input {...register('bank_account_number')} placeholder="0123..." />
+                                            </FormField>
+                                            <FormField label="Branch" error={errors.bank_branch}>
+                                                <Input {...register('bank_branch')} placeholder="e.g. Forest Mall" />
+                                            </FormField>
+                                        </div>
 
-                                    <h4 className="font-medium text-gray-900 border-b pb-2 pt-4">Emergency Contact</h4>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <FormField label="Contact Name" error={errors.emergency_contact_name}>
-                                            <Input {...register('emergency_contact_name')} placeholder="Next of Kin" />
-                                        </FormField>
-                                        <FormField label="Phone" error={errors.emergency_contact_phone}>
-                                            <Input {...register('emergency_contact_phone')} placeholder="+256..." />
-                                        </FormField>
-                                        <FormField label="Relationship" error={errors.emergency_contact_relationship}>
-                                            <Input {...register('emergency_contact_relationship')} placeholder="Spouse, Parent, etc." />
-                                        </FormField>
-                                    </div>
+                                        <h4 className="font-medium text-gray-900 border-b pb-2 pt-4">Emergency Contact</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <FormField label="Contact Name" error={errors.emergency_contact_name}>
+                                                <Input {...register('emergency_contact_name')} placeholder="Next of Kin" />
+                                            </FormField>
+                                            <FormField label="Phone" error={errors.emergency_contact_phone}>
+                                                <Input {...register('emergency_contact_phone')} placeholder="+256..." />
+                                            </FormField>
+                                            <FormField label="Relationship" error={errors.emergency_contact_relationship}>
+                                                <Input {...register('emergency_contact_relationship')} placeholder="Spouse, Parent, etc." />
+                                            </FormField>
+                                        </div>
 
-                                    <h4 className="font-medium text-gray-900 border-b pb-2 pt-4">Notes</h4>
-                                    <FormField label="Additional Notes" error={errors.notes}>
-                                        <textarea
-                                            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[100px] transition-shadow shadow-sm"
-                                            {...register('notes')}
-                                            placeholder="Any other important details..."
-                                        />
-                                    </FormField>
-                                </TabsContent>
-                            </form>
-                        </CardContent>
-                    </Card>
+                                        <h4 className="font-medium text-gray-900 border-b pb-2 pt-4">Notes</h4>
+                                        <FormField label="Additional Notes" error={errors.notes}>
+                                            <textarea
+                                                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 min-h-[100px] transition-shadow shadow-sm"
+                                                {...register('notes')}
+                                                placeholder="Any other important details..."
+                                            />
+                                        </FormField>
+                                    </TabsContent>
+                                </form>
+                            </CardContent>
+                        </Card>
                     </Tabs>
                 </div>
             </div>

@@ -138,6 +138,12 @@ class PayrollRun(models.Model):
     total_deductions = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     total_net = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
 
+    # Run Details
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    payment_date = models.DateField(null=True, blank=True)
+    description = models.TextField(blank=True, null=True)
+
     # Processing details
     processed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

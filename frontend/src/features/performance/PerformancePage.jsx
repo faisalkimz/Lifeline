@@ -39,19 +39,19 @@ const PerformancePage = () => {
                 />
                 <StatCard
                     title="Active Goals"
-                    value={stats?.active_goals || '3'}
+                    value={stats?.active_goals ?? 0}
                     icon={<Target className="h-5 w-5 text-purple-600" />}
                     color="bg-purple-50 text-purple-600"
                 />
                 <StatCard
                     title="Reviews Completed"
-                    value={stats?.completed_reviews || '0'}
+                    value={stats?.completed_reviews ?? 0}
                     icon={<FileText className="h-5 w-5 text-teal-600" />}
                     color="bg-teal-50 text-teal-600"
                 />
                 <StatCard
                     title="Pending Reviews"
-                    value={stats?.pending_reviews || '0'}
+                    value={stats?.pending_reviews ?? 0}
                     icon={<Clock className="h-5 w-5 text-orange-600" />}
                     color="bg-orange-50 text-orange-600"
                 />

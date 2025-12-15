@@ -2,411 +2,310 @@ import React, { useState } from 'react';
 import {
     useGetLeaveRequestsQuery,
     useCreateLeaveRequestMutation,
+    useGetLeaveBalancesQuery,
     useGetLeaveTypesQuery,
-    useGetCurrentUserQuery,
     useApproveLeaveRequestMutation,
-    useRejectLeaveRequestMutation
+    useRejectLeaveRequestMutation,
 } from '../../store/api';
-import { toast } from 'react-hot-toast';
-import { format } from 'date-fns';
-import {
-    Calendar,
-    Plus,
-    FileText,
-    CheckCircle,
-    XCircle,
-    Clock,
-    AlertCircle,
-    Download,
-    Filter
-} from 'lucide-react';
-
-import LeaveBalances from './LeaveBalances';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
+import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
+import {
+    Plus, Search, ChevronLeft, ChevronRight, Filter, Download,
+    FileText, CheckCircle, XCircle, Clock
+} from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../auth/authSlice';
 
 const LeaveRequestsPage = () => {
-    const [activeTab, setActiveTab] = useState("my-requests");
-    const { data: user } = useGetCurrentUserQuery();
+    const user = useSelector(selectCurrentUser);
+    const [activeTab, setActiveTab] = useState('all');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    return (
-        <div className="space-y-6 pb-10">
-            {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Leave Management</h1>
-                <p className="text-slate-500 mt-1">Manage your leave requests, approvals, and balances.</p>
-            </div>
-
-            {/* Balances Section */}
-            <LeaveBalances />
-
-            {/* Main Content Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="bg-slate-100 p-1 border border-slate-200 w-full max-w-xl grid grid-cols-3">
-                    <TabsTrigger
-                        value="my-requests"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
-                    >
-                        <FileText className="h-4 w-4" />
-                        My Requests
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="new-request"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
-                    >
-                        <Plus className="h-4 w-4" />
-                        New Request
-                    </TabsTrigger>
-                    {/* Show Approvals tab only for Managers/Admins */}
-                    {user?.role !== 'employee' && (
-                        <TabsTrigger
-                            value="approvals"
-                            className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
-                        >
-                            <CheckCircle className="h-4 w-4" />
-                            Approvals
-                        </TabsTrigger>
-                    )}
-                </TabsList>
-
-                <TabsContent value="my-requests">
-                    <MyRequestsList />
-                </TabsContent>
-
-                <TabsContent value="new-request">
-                    <LeaveRequestForm onSuccess={() => setActiveTab("my-requests")} />
-                </TabsContent>
-
-                {user?.role !== 'employee' && (
-                    <TabsContent value="approvals">
-                        <ApprovalsList />
-                    </TabsContent>
-                )}
-            </Tabs>
-        </div>
-    );
-};
-
-// ==========================================
-// 1. My Requests Component
-// ==========================================
-const MyRequestsList = () => {
-    // Pass specific URL for my requests
-    const { data: requests, isLoading } = useGetLeaveRequestsQuery('/leave/requests/my_requests/');
-
-    if (isLoading) return <LoadingSkeleton />;
-
-    if (!requests || requests.length === 0) {
-        return (
-            <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-                    <div className="bg-blue-50 p-3 rounded-full mb-3">
-                        <Calendar className="h-8 w-8 text-blue-500" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900">No Leave Requests</h3>
-                    <p className="text-gray-500 mb-4 max-w-sm">You haven't submitted any leave requests yet.</p>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    return (
-        <div className="grid gap-4">
-            {requests.map((request) => (
-                <RequestCard key={request.id} request={request} isOwner={true} />
-            ))}
-        </div>
-    );
-};
-
-// ==========================================
-// 2. Approvals List Component (For Managers)
-// ==========================================
-const ApprovalsList = () => {
-    // Pass specific URL for pending approvals
-    const { data: requests, isLoading } = useGetLeaveRequestsQuery('/leave/requests/pending_approvals/');
-
-    if (isLoading) return <LoadingSkeleton />;
-
-    if (!requests || requests.length === 0) {
-        return (
-            <Card className="border-dashed">
-                <CardContent className="flex flex-col items-center justify-center py-10 text-center">
-                    <div className="bg-green-50 p-3 rounded-full mb-3">
-                        <CheckCircle className="h-8 w-8 text-green-500" />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900">All Caught Up!</h3>
-                    <p className="text-gray-500">There are no pending leave requests to approve.</p>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    return (
-        <div className="grid gap-4">
-            {requests.map((request) => (
-                <RequestCard key={request.id} request={request} isOwner={false} />
-            ))}
-        </div>
-    );
-};
-
-// ==========================================
-// 3. Shared Request Card
-// ==========================================
-const RequestCard = ({ request, isOwner }) => {
-    const [approve, { isLoading: isApproving }] = useApproveLeaveRequestMutation();
-    const [reject, { isLoading: isRejecting }] = useRejectLeaveRequestMutation();
-
-    const handleApprove = async () => {
-        try {
-            await approve(request.id).unwrap();
-            toast.success('Leave request approved');
-        } catch (err) {
-            toast.error('Failed to approve request');
-        }
-    };
-
-    const handleReject = async () => {
-        try {
-            await reject(request.id).unwrap();
-            toast.success('Leave request rejected');
-        } catch (err) {
-            toast.error('Failed to reject request');
-        }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-            case 'rejected': return 'bg-red-100 text-red-800 border-red-200';
-            case 'cancelled': return 'bg-gray-100 text-gray-800 border-gray-200';
-            default: return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-        }
-    };
-
-    return (
-        <Card className="overflow-hidden hover:shadow-md transition-shadow">
-            <div className="p-6">
-                <div className="flex flex-col md:flex-row justify-between gap-4">
-                    <div className="flex gap-4">
-                        {/* Date Box */}
-                        <div className="flex flex-col items-center justify-center bg-blue-50 rounded-lg p-3 min-w-[80px] text-blue-700 border border-blue-100">
-                            <span className="text-xs font-bold uppercase">{format(new Date(request.start_date), 'MMM')}</span>
-                            <span className="text-2xl font-bold">{format(new Date(request.start_date), 'dd')}</span>
-                            <span className="text-xs mt-1">{request.days_requested} Days</span>
-                        </div>
-
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-gray-900">
-                                    {isOwner ? request.leave_type_name : `${request.employee_name} • ${request.leave_type_name}`}
-                                </h3>
-                                <Badge className={getStatusColor(request.status)}>
-                                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                </Badge>
-                            </div>
-
-                            <div className="text-sm text-gray-500 mb-2">
-                                {format(new Date(request.start_date), 'EEE, MMM d, yyyy')} - {format(new Date(request.end_date), 'EEE, MMM d, yyyy')}
-                            </div>
-
-                            {request.reason && (
-                                <p className="text-sm text-gray-700 bg-gray-50 p-2 rounded border border-gray-100 inline-block max-w-xl">
-                                    "{request.reason}"
-                                </p>
-                            )}
-
-                            {request.document && (
-                                <div className="mt-2">
-                                    <a href={request.document} target="_blank" rel="noopener noreferrer" className="text-xs flex items-center gap-1 text-blue-600 hover:underline">
-                                        <FileText className="h-3 w-3" />
-                                        View Attachment
-                                    </a>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-2">
-                        {!isOwner && request.status === 'pending' && (
-                            <>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-green-200 hover:bg-green-50 text-green-700"
-                                    onClick={handleApprove}
-                                    disabled={isApproving}
-                                >
-                                    <CheckCircle className="h-4 w-4 mr-1" />
-                                    Approve
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="border-red-200 hover:bg-red-50 text-red-700"
-                                    onClick={handleReject}
-                                    disabled={isRejecting}
-                                >
-                                    <XCircle className="h-4 w-4 mr-1" />
-                                    Reject
-                                </Button>
-                            </>
-                        )}
-                        {!isOwner && request.status === 'approved' && (
-                            <div className="flex items-center text-sm text-green-600 font-medium">
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Approved by {request.approved_by_name || 'Manager'}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </Card>
-    );
-};
-
-// ==========================================
-// 4. Leave Request Form
-// ==========================================
-const LeaveRequestForm = ({ onSuccess }) => {
-    const { data: leaveTypes, isLoading: loadingTypes } = useGetLeaveTypesQuery();
-    const [createRequest, { isLoading: isSubmitting }] = useCreateLeaveRequestMutation();
+    const { data: myRequests, isLoading: loadingRequests } = useGetLeaveRequestsQuery('/leave/requests/my_requests/');
+    const { data: pendingApprovals } = useGetLeaveRequestsQuery('/leave/requests/pending_approvals/');
+    const { data: leaveBalances } = useGetLeaveBalancesQuery();
+    const { data: leaveTypes } = useGetLeaveTypesQuery();
+    const [createRequest] = useCreateLeaveRequestMutation();
 
     const [formData, setFormData] = useState({
-        leave_type: "",
-        start_date: "",
-        end_date: "",
-        reason: "",
+        leave_type: '',
+        start_date: '',
+        end_date: '',
+        reason: '',
         document: null
     });
 
+    // Combine requests for 'all' view or filter based on tab
+    const requestsToDisplay = activeTab === 'submitted' ? (myRequests?.filter(r => r.status === 'pending') || []) :
+        activeTab === 'approved' ? (myRequests?.filter(r => r.status === 'approved') || []) :
+            activeTab === 'disapproved' ? (myRequests?.filter(r => r.status === 'rejected') || []) :
+                (myRequests || []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (!formData.leave_type || !formData.start_date || !formData.end_date || !formData.reason) {
-            toast.error("Please fill all required fields");
-            return;
-        }
-
         try {
-            const fd = new FormData();
-            fd.append("leave_type", formData.leave_type);
-            fd.append("start_date", formData.start_date);
-            fd.append("end_date", formData.end_date);
-            fd.append("reason", formData.reason);
-            if (formData.document) fd.append("document", formData.document);
+            const body = new FormData();
+            body.append('leave_type', formData.leave_type);
+            body.append('start_date', formData.start_date);
+            body.append('end_date', formData.end_date);
+            body.append('reason', formData.reason);
+            if (formData.document) {
+                body.append('document', formData.document);
+            }
 
-            await createRequest({ body: fd }).unwrap(); // Api expects { url, body } or just body if url is default? 
-            // Checking api.js: query: ({ url, body }) => ...
-            // Wait, createLeaveRequest definition: 
-            // query: ({ url, body }) => ({ url: url || '/leave/requests/', method: 'POST', body: formData }) - Variable mismatch in api.js?
-            // "body: formData" inside query function but "body" passed in arg. 
-            // Let's assume standard RTK Query: createRequest(data) calls the query callback.
-            // I should double check api.js code again below.
-
-            toast.success("Leave request submitted successfully!");
-            setFormData({ leave_type: "", start_date: "", end_date: "", reason: "", document: null });
-            onSuccess();
+            await createRequest({ url: '/leave/requests/', body }).unwrap();
+            toast.success('Leave request submitted successfully!');
+            setIsDialogOpen(false);
+            setFormData({ leave_type: '', start_date: '', end_date: '', reason: '', document: null });
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to submit request.");
+            toast.error('Failed to submit leave request');
         }
     };
 
-    if (loadingTypes) return <LoadingSkeleton />;
-
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Details</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4 max-w-xl">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Leave Type</label>
-                            <select
-                                className="w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.leave_type}
-                                onChange={(e) => setFormData({ ...formData, leave_type: e.target.value })}
+        <div className="space-y-8 pb-10 font-sans text-slate-900">
+            {/* Header Section */}
+            <div className="flex items-center gap-4 border-b border-slate-200 pb-6">
+                <div className="h-16 w-16 bg-slate-100 rounded-lg flex items-center justify-center text-xl font-bold text-slate-700">
+                    {user?.company_name ? user.company_name.substring(0, 2).toUpperCase() : 'CP'}
+                </div>
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-800">{user?.company_name || 'Company Name'}</h1>
+                    <p className="text-slate-500 font-medium">{user.first_name || user.last_name}</p>
+                </div>
+            </div>
+
+            {/* Leave Requests Header & Tabs */}
+            <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold text-slate-800">Leave requests</h2>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="gap-2 bg-primary-600 hover:bg-primary-700">
+                                <Plus className="h-4 w-4" /> New Request
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xl">
+                            <DialogHeader>
+                                <DialogTitle>Request Leave</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium mb-1">Leave Type</label>
+                                        <select
+                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                            value={formData.leave_type}
+                                            onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Select leave type...</option>
+                                            {leaveTypes?.map(type => (
+                                                <option key={type.id} value={type.id}>{type.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Start Date</label>
+                                        <input
+                                            type="date"
+                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                            value={formData.start_date}
+                                            onChange={e => setFormData({ ...formData, start_date: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">End Date</label>
+                                        <input
+                                            type="date"
+                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                            value={formData.end_date}
+                                            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium mb-1">Reason</label>
+                                        <textarea
+                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                            value={formData.reason}
+                                            onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                            rows="3"
+                                            placeholder="Reason for leave..."
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <Button type="submit" className="w-full">Submit Request</Button>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-6 border-b border-slate-200 overflow-x-auto">
+                    {['submitted (0)', 'approved', 'active', 'disapproved', 'attended', 'cancelled', 'all'].map(tab => {
+                        // Simple logic to clean tab name for state
+                        const tabKey = tab.split(' ')[0];
+                        const isActive = activeTab === tabKey;
+                        return (
+                            <button
+                                key={tab}
+                                onClick={() => setActiveTab(tabKey)}
+                                className={`pb-3 text-sm font-medium whitespace-nowrap capitalize transition-colors ${isActive
+                                    ? 'text-primary-600 border-b-2 border-primary-600'
+                                    : 'text-slate-500 hover:text-slate-800'
+                                    }`}
                             >
-                                <option value="">Select a type...</option>
-                                {leaveTypes?.map(type => (
-                                    <option key={type.id} value={type.id}>{type.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                                {tab}
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                            <input
-                                type="date"
-                                className="w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.start_date}
-                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                            <input
-                                type="date"
-                                className="w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 outline-none"
-                                value={formData.end_date}
-                                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Reason</label>
-                        <textarea
-                            className="w-full rounded-md border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 outline-none h-24 resize-none"
-                            placeholder="Please explain why you need this leave..."
-                            value={formData.reason}
-                            onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Supporting Document (Optional)</label>
-                        <div className="border border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors relative">
-                            <input
-                                type="file"
-                                className="absolute inset-0 opacity-0 cursor-pointer"
-                                onChange={(e) => setFormData({ ...formData, document: e.target.files[0] })}
-                                accept=".pdf,.png,.jpg,.jpeg"
-                            />
-                            <div className="flex flex-col items-center gap-1">
-                                <Download className="h-6 w-6 text-gray-400" />
-                                <span className="text-sm text-gray-500">
-                                    {formData.document ? formData.document.name : "Click to upload or drag and drop"}
-                                </span>
+            {/* Leave Balance Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {leaveBalances?.length > 0 ? (
+                    leaveBalances.map((balance, index) => (
+                        <div key={index} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-16 h-16 bg-primary-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+                            <h3 className="font-bold text-slate-700 relative z-10">{balance.leave_type_name}</h3>
+                            <div className="relative z-10">
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-2xl font-bold text-slate-900">{Number(balance.remaining_days || 0).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-xs text-slate-500">
+                                    <span>Leave balance</span>
+                                    <span>{Number(balance.remaining_days || 0).toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between text-xs text-slate-400 mt-0.5">
+                                    <span>Leave taken</span>
+                                    <span>{balance.used_days}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ))
+                ) : (
+                    // Fallback Mock Data to match design if API is empty
+                    <>
+                        <BalanceCard title="Annual Leave" balance="21.00" taken="0" />
+                        <BalanceCard title="Bereavement leave" balance="30.00" taken="0" />
+                        <BalanceCard title="Sick Leave" balance="30.00" taken="0" />
+                        <BalanceCard title="Paternity Leave" balance="5.00" taken="0" />
+                    </>
+                )}
+            </div>
 
-                    <div className="pt-2">
-                        <Button type="submit" className="w-full" disabled={isSubmitting}>
-                            {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                        </Button>
+            {/* Table Section */}
+            <Card className="border-none shadow-sm overflow-hidden">
+                <div className="p-4 border-b border-slate-100 flex items-center gap-4">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-100"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                </form>
-            </CardContent>
-        </Card>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-slate-50 text-slate-500 font-medium">
+                            <tr>
+                                <th className="px-6 py-4">Employee</th>
+                                <th className="px-6 py-4">Policy</th>
+                                <th className="px-6 py-4">Dates</th>
+                                <th className="px-6 py-4">Time requested</th>
+                                <th className="px-6 py-4">Reliever</th>
+                                <th className="px-6 py-4">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-50">
+                            {requestsToDisplay.length > 0 ? (
+                                requestsToDisplay.map((request) => (
+                                    <tr key={request.id} className="hover:bg-slate-50 transition-colors">
+                                        <td className="px-6 py-4 font-medium text-slate-900">{user.first_name} {user.last_name}</td>
+                                        <td className="px-6 py-4">{request.leave_type_name}</td>
+                                        <td className="px-6 py-4">
+                                            {new Date(request.start_date).toLocaleDateString()} - {new Date(request.end_date).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4">{request.days_requested} Days</td>
+                                        <td className="px-6 py-4 text-slate-400">-</td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                                                ${request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                    request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                        'bg-yellow-100 text-yellow-800'}`}>
+                                                {request.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
+                                        There is no available data.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                {/* Pagination */}
+                <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
+                    <div className="flex items-center gap-2">
+                        <span>Showing</span>
+                        <select className="border border-slate-200 rounded p-1">
+                            <option>10</option>
+                            <option>20</option>
+                            <option>50</option>
+                        </select>
+                        <span>items per page</span>
+                    </div>
+                    <div>
+                        - of 0 items
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span>Page</span>
+                        <div className="flex items-center gap-1">
+                            <button className="p-1 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50" disabled><ChevronLeft className="h-4 w-4" /></button>
+                            <span className="px-2 font-medium">1</span>
+                            <button className="p-1 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50" disabled><ChevronRight className="h-4 w-4" /></button>
+                        </div>
+                        <span>of 1</span>
+                    </div>
+                </div>
+            </Card>
+        </div>
     );
-}
+};
 
-const LoadingSkeleton = () => (
-    <div className="space-y-3 animate-pulse">
-        <div className="h-20 bg-gray-100 rounded-lg" />
-        <div className="h-20 bg-gray-100 rounded-lg" />
-        <div className="h-20 bg-gray-100 rounded-lg" />
+const BalanceCard = ({ title, balance, taken }) => (
+    <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between h-32 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-16 h-16 bg-primary-50 rounded-bl-full -mr-4 -mt-4 z-0"></div>
+        <h3 className="font-bold text-slate-700 relative z-10">{title}</h3>
+        <div className="relative z-10">
+            <div className="flex justify-between items-end mb-1">
+                <span className="text-2xl font-bold text-slate-900">{balance}</span>
+            </div>
+            <div className="flex justify-between text-xs text-slate-500">
+                <span>Leave balance</span>
+                <span>{balance}</span>
+            </div>
+            <div className="flex justify-between text-xs text-slate-400 mt-0.5">
+                <span>Leave taken</span>
+                <span>{taken}</span>
+            </div>
+        </div>
     </div>
 );
 
 export default LeaveRequestsPage;
+

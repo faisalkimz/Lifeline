@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'Candidate', 'Application', 'Interview', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -498,6 +498,34 @@ export const api = createApi({
       }),
       providesTags: ['Interview']
     }),
+    getRecruitmentIntegrations: builder.query({
+      query: () => '/recruitment/integrations/',
+      providesTags: ['RecruitmentIntegration']
+    }),
+    updateRecruitmentIntegration: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/recruitment/integrations/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['RecruitmentIntegration']
+    }),
+    createRecruitmentIntegration: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/integrations/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['RecruitmentIntegration']
+    }),
+    publishJob: builder.mutation({
+      query: ({ id, platforms }) => ({
+        url: `/recruitment/jobs/${id}/publish/`,
+        method: 'POST',
+        body: { platforms }
+      }),
+      invalidatesTags: ['Job', 'JobPost']
+    }),
 
     // ========== TRAINING & DEVELOPMENT ==========
     getCourses: builder.query({
@@ -682,6 +710,10 @@ export const {
   useCreateApplicationMutation,
   useMoveApplicationStageMutation,
   useGetInterviewsQuery,
+  useGetRecruitmentIntegrationsQuery,
+  useCreateRecruitmentIntegrationMutation,
+  useUpdateRecruitmentIntegrationMutation,
+  usePublishJobMutation,
   // Training
   useGetCoursesQuery,
   useCreateCourseMutation,

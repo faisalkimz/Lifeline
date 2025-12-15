@@ -41,9 +41,6 @@ class Job(models.Model):
     published_at = models.DateTimeField(null=True, blank=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     
-    # External Board Links (optional JSON)
-    external_links = models.JSONField(default=dict, blank=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,8 +51,50 @@ class Job(models.Model):
         return f"{self.title} - {self.company.name}"
 
 
+class IntegrationSettings(models.Model):
+    """Store credentials for external job boards"""
+    PLATFORM_CHOICES = [
+        ('linkedin', 'LinkedIn'),
+        ('indeed', 'Indeed'),
+        ('glassdoor', 'Glassdoor'),
+        ('fuzu', 'Fuzu'),
+    ]
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='job_board_integrations')
+    platform = models.CharField(max_length=50, choices=PLATFORM_CHOICES)
+    
+    client_id = models.CharField(max_length=255, blank=True)
+    client_secret = models.CharField(max_length=255, blank=True)
+    api_key = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        unique_together = ['company', 'platform']
+
+
+class ExternalJobPost(models.Model):
+    """Track a job posted to an external board"""
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='external_posts')
+    integration = models.ForeignKey(IntegrationSettings, on_delete=models.CASCADE)
+    
+    external_id = models.CharField(max_length=255, help_text="ID returned by the external platform")
+    url = models.URLField(blank=True)
+    status = models.CharField(max_length=50, default='posted')
+    
+    posted_at = models.DateTimeField(auto_now_add=True)
+
+
 class Candidate(models.Model):
     """Potential Employee"""
+    SOURCE_CHOICES = [
+        ('career_page', 'Career Page'),
+        ('linkedin', 'LinkedIn'),
+        ('indeed', 'Indeed'),
+        ('referral', 'Referral'),
+        ('agency', 'Agency'),
+        ('other', 'Other'),
+    ]
+
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='candidates')
     
     first_name = models.CharField(max_length=100)
@@ -67,15 +106,19 @@ class Candidate(models.Model):
     portfolio_url = models.URLField(blank=True)
     
     resume = models.FileField(upload_to='resumes/', null=True, blank=True)
+    cover_letter = models.TextField(blank=True)
+    
     summary = models.TextField(blank=True)
     skills = models.TextField(blank=True, help_text="Comma separated skills")
+    
+    source = models.CharField(max_length=50, choices=SOURCE_CHOICES, default='career_page')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         ordering = ['-created_at']
-        unique_together = ['company', 'email'] # Prevent duplicates per company
+        unique_together = ['company', 'email']
 
     @property
     def full_name(self):

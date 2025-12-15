@@ -11,17 +11,24 @@ import { Button } from '../../components/ui/Button';
 const BenefitsPage = () => {
     return (
         <div className="space-y-6 pb-10">
+            {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Compensation & Benefits</h1>
-                <p className="text-gray-500">Manage your insurance, allowances, and perks.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Compensation & Benefits</h1>
+                <p className="text-slate-500 mt-1">Manage your insurance, allowances, and perks.</p>
             </div>
 
             <Tabs defaultValue="my-benefits" className="space-y-6">
-                <TabsList>
-                    <TabsTrigger value="my-benefits" className="gap-2">
+                <TabsList className="bg-slate-100 p-1 w-full max-w-md grid grid-cols-2">
+                    <TabsTrigger
+                        value="my-benefits"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <Shield className="h-4 w-4" /> My Active Benefits
                     </TabsTrigger>
-                    <TabsTrigger value="available" className="gap-2">
+                    <TabsTrigger
+                        value="available"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <Gift className="h-4 w-4" /> Available Perks
                     </TabsTrigger>
                 </TabsList>

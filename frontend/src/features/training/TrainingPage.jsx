@@ -13,17 +13,24 @@ import toast from 'react-hot-toast';
 const TrainingPage = () => {
     return (
         <div className="space-y-6 pb-10">
+            {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold text-gray-900">Training & Development</h1>
-                <p className="text-gray-500">Upgrade your skills with our course catalog.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Training & Development</h1>
+                <p className="text-slate-500 mt-1">Upgrade your skills with our course catalog.</p>
             </div>
 
             <Tabs defaultValue="catalog" className="space-y-6">
-                <TabsList>
-                    <TabsTrigger value="catalog" className="gap-2">
+                <TabsList className="bg-slate-100 p-1 w-full max-w-md grid grid-cols-2">
+                    <TabsTrigger
+                        value="catalog"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <BookOpen className="h-4 w-4" /> Course Catalog
                     </TabsTrigger>
-                    <TabsTrigger value="my-training" className="gap-2">
+                    <TabsTrigger
+                        value="my-training"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <GraduationCap className="h-4 w-4" /> My Learning
                     </TabsTrigger>
                 </TabsList>
@@ -74,7 +81,7 @@ const CourseCatalog = () => {
                     <CardHeader>
                         <div className="flex justify-between items-start">
                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${course.course_type === 'internal' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-purple-100 text-purple-700'
+                                'bg-purple-100 text-purple-700'
                                 }`}>
                                 {course.course_type}
                             </span>
@@ -135,7 +142,7 @@ const MyEnrollments = () => {
                                         <Calendar className="h-3 w-3" /> {new Date(enrollment.session_date).toLocaleDateString()}
                                     </span>
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold capitalize ${enrollment.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                            enrollment.status === 'registered' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'
+                                        enrollment.status === 'registered' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'
                                         }`}>
                                         {enrollment.status}
                                     </span>

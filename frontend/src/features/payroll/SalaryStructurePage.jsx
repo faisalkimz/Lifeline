@@ -326,3 +326,4 @@ const SalaryStructurePage = () => {
 export { SalaryStructurePage };
 export default SalaryStructurePage;
 
+

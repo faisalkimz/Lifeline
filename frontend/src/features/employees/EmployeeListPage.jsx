@@ -105,33 +105,18 @@ const EmployeeListPage = () => {
     return (
         <div className="space-y-6 animate-fade-in">
             {/* Header with gradient */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 p-8 shadow-2xl">
-                {/* Background pattern */}
-                <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]" />
-                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-                <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-
-                <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                                <Users className="h-7 w-7 text-white" />
-                            </div>
-                            <h1 className="text-3xl font-bold text-white">Team Members</h1>
-                        </div>
-                        <p className="text-blue-100 text-lg">
-                            Manage and view all your amazing team members
-                        </p>
-                    </div>
-                    <Button
-                        onClick={() => navigate('/employees/new')}
-                        className="bg-white text-blue-600 hover:bg-blue-50 shadow-lg hover:shadow-xl transition-all duration-200"
-                        size="lg"
-                    >
-                        <Plus className="h-5 w-5 mr-2" />
-                        Add New Member
-                    </Button>
+            <div className="flex justify-between items-end mb-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900">Team Members</h1>
+                    <p className="text-slate-500 mt-1">Manage and view all your amazing team members</p>
                 </div>
+                <Button
+                    onClick={() => navigate('/employees/new')}
+                    className="bg-primary-600 hover:bg-primary-700 shadow-sm"
+                >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Employee
+                </Button>
             </div>
 
             {/* Stats Overview with enhanced design */}
@@ -206,14 +191,14 @@ const EmployeeListPage = () => {
             <Card className="border-0 shadow-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <Table>
-                        <TableHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
-                            <TableRow className="border-b-2 border-gray-200">
-                                <TableHead className="font-bold text-gray-700">Employee</TableHead>
-                                <TableHead className="font-bold text-gray-700">Role & Department</TableHead>
-                                <TableHead className="font-bold text-gray-700">Status</TableHead>
-                                <TableHead className="font-bold text-gray-700">Contact</TableHead>
-                                <TableHead className="font-bold text-gray-700">Joined</TableHead>
-                                <TableHead className="text-right font-bold text-gray-700">Actions</TableHead>
+                        <TableHeader className="bg-slate-50">
+                            <TableRow className="border-b border-gray-100">
+                                <TableHead className="font-semibold text-slate-600">Employee</TableHead>
+                                <TableHead className="font-semibold text-slate-600">Role & Department</TableHead>
+                                <TableHead className="font-semibold text-slate-600">Status</TableHead>
+                                <TableHead className="font-semibold text-slate-600">Contact</TableHead>
+                                <TableHead className="font-semibold text-slate-600">Joined</TableHead>
+                                <TableHead className="text-right font-semibold text-slate-600">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>

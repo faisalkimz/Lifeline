@@ -9,12 +9,12 @@ const DocumentsPage = () => {
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Document Center</h1>
-                    <p className="text-gray-500">Access company policies and personal files.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Document Center</h1>
+                    <p className="text-slate-500 mt-1">Access company policies and personal files.</p>
                 </div>
-                <Button className="gap-2 bg-indigo-600">
+                <Button className="gap-2 bg-primary-600 hover:bg-primary-700 shadow-sm">
                     <Upload className="h-4 w-4" /> Upload Document
                 </Button>
             </div>

@@ -33,30 +33,40 @@ const LeaveRequestsPage = () => {
 
     return (
         <div className="space-y-6 pb-10">
+            {/* Header */}
             <div>
-                <h1 className="text-2xl font-bold tracking-tight text-gray-900">Leave Management</h1>
-                <p className="text-gray-500">Manage your leave requests and balances.</p>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Leave Management</h1>
+                <p className="text-slate-500 mt-1">Manage your leave requests, approvals, and balances.</p>
             </div>
 
             {/* Balances Section */}
             <LeaveBalances />
 
             {/* Main Content Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-                <TabsList className="bg-gray-100/50 p-1 border border-gray-200">
-                    <TabsTrigger value="my-requests" className="flex items-center gap-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+                <TabsList className="bg-slate-100 p-1 border border-slate-200 w-full max-w-xl grid grid-cols-3">
+                    <TabsTrigger
+                        value="my-requests"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
+                    >
                         <FileText className="h-4 w-4" />
                         My Requests
                     </TabsTrigger>
-                    <TabsTrigger value="new-request" className="flex items-center gap-2">
+                    <TabsTrigger
+                        value="new-request"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
+                    >
                         <Plus className="h-4 w-4" />
                         New Request
                     </TabsTrigger>
                     {/* Show Approvals tab only for Managers/Admins */}
                     {user?.role !== 'employee' && (
-                        <TabsTrigger value="approvals" className="flex items-center gap-2">
+                        <TabsTrigger
+                            value="approvals"
+                            className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all flex items-center justify-center gap-2"
+                        >
                             <CheckCircle className="h-4 w-4" />
-                            Team Approvals
+                            Approvals
                         </TabsTrigger>
                     )}
                 </TabsList>

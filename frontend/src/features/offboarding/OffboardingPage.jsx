@@ -30,15 +30,15 @@ const OffboardingPage = () => {
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Offboarding & Exit</h1>
-                    <p className="text-gray-500">Manage resignation and exit process.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Offboarding & Exit</h1>
+                    <p className="text-slate-500 mt-1">Manage resignation requests and exit procedures.</p>
                 </div>
                 {!resignations?.length && (
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button variant="destructive" className="gap-2">
+                            <Button variant="destructive" className="gap-2 shadow-sm">
                                 <LogOut className="h-4 w-4" /> Submit Resignation
                             </Button>
                         </DialogTrigger>

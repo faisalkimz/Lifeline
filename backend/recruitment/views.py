@@ -2,14 +2,16 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Job, Candidate, Application, Interview
+from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost
 from .serializers import (
     JobSerializer, 
     CandidateSerializer, 
     ApplicationSerializer, 
-    InterviewSerializer
+    InterviewSerializer,
+    IntegrationSettingsSerializer
 )
 from django.utils import timezone
+import random # Mocking ID generation
 
 class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
@@ -27,10 +29,45 @@ class JobViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def publish(self, request, pk=None):
         job = self.get_object()
+        
+        # 1. Update internal status
         job.status = 'published'
         job.published_at = timezone.now()
         job.save()
-        return Response({'status': 'job published'})
+
+        # 2. Handle external posting if platforms requested
+        platforms = request.data.get('platforms', [])
+        results = []
+        
+        for platform_key in platforms:
+            # Check if integration exists
+            integration = IntegrationSettings.objects.filter(
+                company=request.user.company, 
+                platform=platform_key, 
+                is_active=True
+            ).first()
+
+            if integration:
+                # Mock External API Call
+                # In real life: adapter.post_job(job, integration.api_key)
+                mock_external_id = f"{platform_key.upper()}-{random.randint(1000, 9999)}"
+                mock_url = f"https://{platform_key}.com/jobs/{mock_external_id}"
+                
+                ExternalJobPost.objects.create(
+                    job=job,
+                    integration=integration,
+                    external_id=mock_external_id,
+                    url=mock_url,
+                    status='active'
+                )
+                results.append(f"Posted to {platform_key}")
+            else:
+                results.append(f"Skipped {platform_key}: No active integration")
+
+        return Response({
+            'status': 'job published',
+            'details': results
+        })
     
     @action(detail=True, methods=['post'])
     def close(self, request, pk=None):
@@ -108,3 +145,13 @@ class InterviewViewSet(viewsets.ModelViewSet):
                 queryset = queryset.filter(interviewer=user.employee)
         
         return queryset
+
+class IntegrationSettingsViewSet(viewsets.ModelViewSet):
+    serializer_class = IntegrationSettingsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return IntegrationSettings.objects.filter(company=self.request.user.company)
+    
+    def perform_create(self, serializer):
+        serializer.save(company=self.request.user.company)

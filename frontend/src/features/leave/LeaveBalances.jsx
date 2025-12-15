@@ -25,13 +25,14 @@ const LeaveBalances = () => {
         );
     }
 
+
     // Gradient map for different leave types
     const gradients = [
+        'from-teal-500 to-teal-600',
         'from-blue-500 to-blue-600',
-        'from-purple-500 to-purple-600',
-        'from-emerald-500 to-emerald-600',
         'from-orange-500 to-orange-600',
-        'from-pink-500 to-pink-600',
+        'from-violet-500 to-violet-600',
+        'from-rose-500 to-rose-600',
     ];
 
     return (

@@ -48,10 +48,10 @@ const PipelinePage = () => {
     return (
         <div className="h-full flex flex-col overflow-hidden pb-4">
             <div className="flex items-center gap-4 mb-6 px-1">
-                <Link to="/recruitment" className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+                <Link to="/recruitment" className="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors">
                     <ArrowLeft className="h-5 w-5" />
                 </Link>
-                <h1 className="text-2xl font-bold text-gray-900">Candidate Pipeline</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Candidate Pipeline</h1>
             </div>
 
             <DragDropContext onDragEnd={onDragEnd}>

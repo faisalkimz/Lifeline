@@ -20,6 +20,7 @@ import AttendancePage from './features/attendance/AttendancePage';
 import PerformancePage from './features/performance/PerformancePage';
 import JobListPage from './features/recruitment/JobListPage';
 import PipelinePage from './features/recruitment/PipelinePage';
+import IntegrationsPage from './features/recruitment/IntegrationsPage';
 import TrainingPage from './features/training/TrainingPage';
 import BenefitsPage from './features/benefits/BenefitsPage';
 import DocumentsPage from './features/documents/DocumentsPage';
@@ -60,6 +61,7 @@ function App() {
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/recruitment" element={<JobListPage />} />
         <Route path="/recruitment/pipeline" element={<PipelinePage />} />
+        <Route path="/recruitment/integrations" element={<IntegrationsPage />} />
         <Route path="/training" element={<TrainingPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/documents" element={<DocumentsPage />} />

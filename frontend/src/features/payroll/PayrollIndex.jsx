@@ -13,51 +13,52 @@ const PayrollIndex = () => {
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <div className="flex items-center gap-3">
-                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                        <DollarSign className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Payroll Management System</h1>
-                        <p className="text-gray-600">Complete payroll processing, salary management, and compliance</p>
-                    </div>
-                </div>
+                <h1 className="text-2xl font-bold text-slate-900">Payroll Management</h1>
+                <p className="text-slate-500 mt-1">Complete payroll processing, salary management, and compliance.</p>
             </div>
 
             {/* Navigation Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-4">
-                    <TabsTrigger value="dashboard" className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4" />
-                        <span className="hidden sm:inline">Dashboard</span>
+                <TabsList className="bg-slate-100 p-1 rounded-lg w-full max-w-2xl grid grid-cols-4 mb-8">
+                    <TabsTrigger
+                        value="dashboard"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
+                    >
+                        Dashboard
                     </TabsTrigger>
-                    <TabsTrigger value="payslips" className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
-                        <span className="hidden sm:inline">Payslips</span>
+                    <TabsTrigger
+                        value="payslips"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
+                    >
+                        Payslips
                     </TabsTrigger>
-                    <TabsTrigger value="salaries" className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        <span className="hidden sm:inline">Salaries</span>
+                    <TabsTrigger
+                        value="salaries"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
+                    >
+                        Salaries
                     </TabsTrigger>
-                    <TabsTrigger value="loans" className="flex items-center gap-2">
-                        <Briefcase className="h-4 w-4" />
-                        <span className="hidden sm:inline">Loans</span>
+                    <TabsTrigger
+                        value="loans"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
+                    >
+                        Loans
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="dashboard">
+                <TabsContent value="dashboard" className="mt-0">
                     <PayrollDashboard />
                 </TabsContent>
 
-                <TabsContent value="payslips">
+                <TabsContent value="payslips" className="mt-0">
                     <PayslipPage />
                 </TabsContent>
 
-                <TabsContent value="salaries">
+                <TabsContent value="salaries" className="mt-0">
                     <SalaryStructurePage />
                 </TabsContent>
 
-                <TabsContent value="loans">
+                <TabsContent value="loans" className="mt-0">
                     <LoanManagementPage />
                 </TabsContent>
             </Tabs>

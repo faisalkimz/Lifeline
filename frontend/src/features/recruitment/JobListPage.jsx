@@ -40,18 +40,23 @@ const JobListPage = () => {
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Recruitment</h1>
-                    <p className="text-gray-500">Manage job postings and candidates.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Recruitment</h1>
+                    <p className="text-slate-500 mt-1">Manage job postings and candidates.</p>
                 </div>
                 <div className="flex gap-2">
+                    <Link to="/recruitment/integrations">
+                        <Button variant="outline" className="gap-2 bg-white hover:bg-slate-50 shadow-sm">
+                            <Globe className="h-4 w-4" /> Integrations
+                        </Button>
+                    </Link>
                     <Link to="/recruitment/pipeline">
-                        <Button variant="outline">View Pipeline</Button>
+                        <Button variant="outline" className="bg-white hover:bg-slate-50 shadow-sm">View Pipeline</Button>
                     </Link>
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700">
+                            <Button className="gap-2 bg-primary-600 hover:bg-primary-700 shadow-sm">
                                 <Plus className="h-4 w-4" /> Post Job
                             </Button>
                         </DialogTrigger>
@@ -155,14 +160,32 @@ const JobListPage = () => {
 };
 
 const JobCard = ({ job }) => {
-    const [updateJob] = useUpdateJobMutation();
+    const [publishJob] = usePublishJobMutation();
+    const { data: integrations } = useGetRecruitmentIntegrationsQuery();
+    const [isPublishOpen, setIsPublishOpen] = useState(false);
+    const [selectedPlatforms, setSelectedPlatforms] = useState([]);
 
     const handlePublish = async () => {
         try {
-            await updateJob({ id: job.id, status: 'published' }).unwrap();
-            toast.success("Job published!");
+            const res = await publishJob({
+                id: job.id,
+                platforms: selectedPlatforms
+            }).unwrap();
+            toast.success("Job published successfully!");
+            if (res.details && res.details.length) {
+                res.details.forEach(msg => toast(msg, { icon: '📢' }));
+            }
+            setIsPublishOpen(false);
         } catch (e) {
             toast.error("Failed to publish");
+        }
+    };
+
+    const togglePlatform = (id) => {
+        if (selectedPlatforms.includes(id)) {
+            setSelectedPlatforms(selectedPlatforms.filter(p => p !== id));
+        } else {
+            setSelectedPlatforms([...selectedPlatforms, id]);
         }
     };
 
@@ -174,8 +197,8 @@ const JobCard = ({ job }) => {
                         <Briefcase className="h-6 w-6" />
                     </div>
                     <span className={`px-2 py-1 rounded text-xs uppercase font-bold tracking-wide ${job.status === 'published' ? 'bg-green-100 text-green-700' :
-                            job.status === 'draft' ? 'bg-amber-100 text-amber-700' :
-                                'bg-red-100 text-red-700'
+                        job.status === 'draft' ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
                         }`}>
                         {job.status}
                     </span>
@@ -192,6 +215,17 @@ const JobCard = ({ job }) => {
                     <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" /> {job.employment_type.replace('_', ' ')}
                     </div>
+
+                    {/* External Posts Status */}
+                    {job.external_posts?.length > 0 && (
+                        <div className="flex gap-1 mt-2 flex-wrap">
+                            {job.external_posts.map(post => (
+                                <span key={post.id} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded border border-blue-100 font-medium">
+                                    {post.platform}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100">
@@ -200,9 +234,55 @@ const JobCard = ({ job }) => {
                         <span className="text-gray-500 ml-1">applicants</span>
                     </div>
                     {job.status === 'draft' && (
-                        <Button variant="ghost" size="sm" onClick={handlePublish} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
-                            Publish Now
-                        </Button>
+                        <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+                                    Publish Now
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Publish & Distribute</DialogTitle>
+                                </DialogHeader>
+                                <div className="space-y-4 pt-4">
+                                    <p className="text-sm text-gray-600">Select where you want to post this job:</p>
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2 p-3 border rounded bg-gray-50 opacity-100">
+                                            <CheckCircle className="h-4 w-4 text-green-600" />
+                                            <span className="font-medium">Company Career Page</span>
+                                        </div>
+                                        {integrations?.filter(i => i.is_active).map(integration => (
+                                            <div
+                                                key={integration.id}
+                                                onClick={() => togglePlatform(integration.platform)}
+                                                className={`flex items-center gap-2 p-3 border rounded cursor-pointer transition-colors ${selectedPlatforms.includes(integration.platform)
+                                                    ? 'bg-indigo-50 border-indigo-200 shadow-sm'
+                                                    : 'hover:bg-gray-50'
+                                                    }`}
+                                            >
+                                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${selectedPlatforms.includes(integration.platform)
+                                                    ? 'bg-indigo-600 border-indigo-600'
+                                                    : 'border-gray-300'
+                                                    }`}>
+                                                    {selectedPlatforms.includes(integration.platform) && (
+                                                        <CheckCircle className="h-3 w-3 text-white" />
+                                                    )}
+                                                </div>
+                                                <span className="capitalize">{integration.platform}</span>
+                                            </div>
+                                        ))}
+                                        {!integrations?.some(i => i.is_active) && (
+                                            <p className="text-xs text-amber-600">
+                                                No external integrations active. <Link to="/recruitment/integrations" className="underline">Configure here</Link>.
+                                            </p>
+                                        )}
+                                    </div>
+                                    <Button onClick={handlePublish} className="w-full">
+                                        Publish to Selected Channels
+                                    </Button>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     )}
                 </div>
             </CardContent>

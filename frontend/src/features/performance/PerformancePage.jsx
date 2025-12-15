@@ -22,10 +22,10 @@ const PerformancePage = () => {
     return (
         <div className="space-y-6 pb-10">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Performance Management</h1>
-                    <p className="text-gray-500">Track goals, reviews, and professional growth.</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Performance Management</h1>
+                    <p className="text-slate-500 mt-1">Track goals, reviews, and professional growth.</p>
                 </div>
             </div>
 
@@ -34,45 +34,51 @@ const PerformancePage = () => {
                 <StatCard
                     title="Average Rating"
                     value={stats?.average_rating || 'N/A'}
-                    icon={<BarChart className="h-5 w-5 text-blue-500" />}
-                    color="bg-blue-50"
+                    icon={<BarChart className="h-5 w-5 text-blue-600" />}
+                    color="bg-blue-50 text-blue-600"
                 />
                 <StatCard
                     title="Active Goals"
                     value={stats?.active_goals || '3'}
-                    icon={<Target className="h-5 w-5 text-purple-500" />}
-                    color="bg-purple-50"
+                    icon={<Target className="h-5 w-5 text-purple-600" />}
+                    color="bg-purple-50 text-purple-600"
                 />
                 <StatCard
                     title="Reviews Completed"
                     value={stats?.completed_reviews || '0'}
-                    icon={<FileText className="h-5 w-5 text-green-500" />}
-                    color="bg-green-50"
+                    icon={<FileText className="h-5 w-5 text-teal-600" />}
+                    color="bg-teal-50 text-teal-600"
                 />
                 <StatCard
                     title="Pending Reviews"
                     value={stats?.pending_reviews || '0'}
-                    icon={<Clock className="h-5 w-5 text-orange-500" />}
-                    color="bg-orange-50"
+                    icon={<Clock className="h-5 w-5 text-orange-600" />}
+                    color="bg-orange-50 text-orange-600"
                 />
             </div>
 
             {/* Tabs */}
             <Tabs defaultValue="goals" className="space-y-6">
-                <TabsList>
-                    <TabsTrigger value="goals" className="gap-2">
+                <TabsList className="bg-slate-100 p-1 w-full max-w-md grid grid-cols-2">
+                    <TabsTrigger
+                        value="goals"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <Target className="h-4 w-4" /> My Goals
                     </TabsTrigger>
-                    <TabsTrigger value="reviews" className="gap-2">
+                    <TabsTrigger
+                        value="reviews"
+                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 flex items-center justify-center gap-2"
+                    >
                         <FileText className="h-4 w-4" /> Performance Reviews
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="goals">
+                <TabsContent value="goals" className="mt-0">
                     <GoalsSection user={user} />
                 </TabsContent>
 
-                <TabsContent value="reviews">
+                <TabsContent value="reviews" className="mt-0">
                     <ReviewsSection user={user} />
                 </TabsContent>
             </Tabs>
@@ -230,7 +236,7 @@ const GoalCard = ({ goal }) => {
                                 {goal.title}
                             </h4>
                             <span className={`px-2 py-0.5 text-xs rounded-full capitalize ${goal.priority === 'high' ? 'bg-red-100 text-red-700' :
-                                    goal.priority === 'medium' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'
+                                goal.priority === 'medium' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100'
                                 }`}>
                                 {goal.priority}
                             </span>
@@ -310,8 +316,8 @@ const ReviewsSection = ({ user }) => {
                         </div>
                         <div className="mt-4 pt-4 border-t flex justify-between items-center">
                             <div className={`px-3 py-1 rounded-full text-sm inline-block capitalize ${review.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
-                                    review.status === 'submitted' ? 'bg-purple-100 text-purple-700' :
-                                        'bg-gray-100'
+                                review.status === 'submitted' ? 'bg-purple-100 text-purple-700' :
+                                    'bg-gray-100'
                                 }`}>
                                 {review.status.replace('_', ' ')}
                             </div>

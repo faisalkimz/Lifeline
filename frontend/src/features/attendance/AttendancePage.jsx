@@ -22,10 +22,35 @@ const AttendancePage = () => {
     const [notes, setNotes] = useState('');
     const [currentTime, setCurrentTime] = useState(new Date());
 
+    const [elapsed, setElapsed] = useState('00:00:00');
+
     useEffect(() => {
+        // Clock timer
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        return () => clearInterval(timer);
-    }, []);
+
+        // Shift Duration Timer
+        let durationTimer;
+        if (todayStatus?.clock_in && !todayStatus.clock_out) {
+            const start = new Date(todayStatus.clock_in).getTime();
+            durationTimer = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = now - start;
+                const h = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                const s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
+                setElapsed(`${h}:${m}:${s}`);
+            }, 1000);
+        } else if (todayStatus?.hours_worked) {
+            setElapsed(`${todayStatus.hours_worked}h`);
+        } else {
+            setElapsed('00:00:00');
+        }
+
+        return () => {
+            clearInterval(timer);
+            if (durationTimer) clearInterval(durationTimer);
+        };
+    }, [todayStatus]);
 
     const handleClockIn = async () => {
         try {
@@ -67,8 +92,9 @@ const AttendancePage = () => {
                         </div>
                     </div>
                     <div className="text-right bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
-                        <div className="text-3xl font-mono font-bold tracking-wider">
+                        <div className="text-3xl font-mono font-bold tracking-wider flex items-center justify-end gap-3">
                             {currentTime.toLocaleTimeString()}
+                            <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.6)]"></div>
                         </div>
                         <div className="text-sm text-indigo-100 uppercase tracking-widest font-semibold">
                             {currentTime.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -142,7 +168,11 @@ const AttendancePage = () => {
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                                         <span className="text-gray-500">Status</span>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${isClockedIn ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                        <span className={`px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2 ${isClockedIn ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+                                            {isClockedIn && <span className="relative flex h-3 w-3">
+                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                            </span>}
                                             {isClockedIn ? 'ACTIVE' : 'OFF DUTY'}
                                         </span>
                                     </div>
@@ -166,8 +196,8 @@ const AttendancePage = () => {
 
                                             <div className="p-4 border border-dashed border-gray-200 rounded-lg">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-gray-500 text-sm">Total Duration</span>
-                                                    <span className="text-2xl font-bold text-gray-900">{todayStatus.hours_worked || 0}h</span>
+                                                    <span className="text-gray-500 text-sm">Session Duration</span>
+                                                    <span className="text-2xl font-mono font-bold text-gray-900">{elapsed}</span>
                                                 </div>
                                                 <div className="w-full bg-gray-100 rounded-full h-2">
                                                     <div
@@ -241,8 +271,8 @@ const MyAttendanceHistory = () => {
                                     </td>
                                     <td className="px-4 py-3">
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${record.status === 'present' ? 'bg-green-100 text-green-700' :
-                                                record.status === 'absent' ? 'bg-red-100 text-red-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            record.status === 'absent' ? 'bg-red-100 text-red-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {record.status.toUpperCase()}
                                         </span>
@@ -292,7 +322,7 @@ const TeamAttendanceStatus = () => {
                             </div>
                             <div>
                                 <span className={`px-2 py-1 rounded-lg text-xs font-bold ${member.is_clocked_in ? 'bg-green-100 text-green-700 border border-green-200' :
-                                        'bg-gray-100 text-gray-500 border border-gray-200'
+                                    'bg-gray-100 text-gray-500 border border-gray-200'
                                     }`}>
                                     {member.is_clocked_in ? 'ONLINE' : 'OFFLINE'}
                                 </span>

@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
     User, Briefcase, FileText, CreditCard,
-    Save, ArrowLeft, Upload, X
+    Save, ArrowLeft, Upload, X, Wallet
 } from 'lucide-react';
 import {
     useCreateEmployeeMutation,
@@ -13,7 +13,9 @@ import {
     useGetEmployeeQuery,
     useGetDepartmentsQuery,
     useGetEmployeesQuery,
-    useDeleteEmployeeMutation
+    useDeleteEmployeeMutation,
+    useCreateSalaryStructureMutation,
+    useUpdateSalaryStructureMutation
 } from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -60,6 +62,14 @@ const employeeSchema = z.object({
     emergency_contact_relationship: z.string().optional(),
 
     notes: z.string().optional(),
+
+    // Compensation
+    basic_salary: z.coerce.number().min(0, "Must be positive").optional().or(z.literal('')),
+    housing_allowance: z.coerce.number().min(0).optional().or(z.literal('')),
+    transport_allowance: z.coerce.number().min(0).optional().or(z.literal('')),
+    medical_allowance: z.coerce.number().min(0).optional().or(z.literal('')),
+    lunch_allowance: z.coerce.number().min(0).optional().or(z.literal('')),
+    other_allowances: z.coerce.number().min(0).optional().or(z.literal('')),
 });
 
 const FormField = ({ label, error, children, required }) => (
@@ -130,6 +140,8 @@ const EmployeeFormPage = () => {
     const [updateEmployee, { isLoading: isUpdating }] = useUpdateEmployeeMutation();
 
     const [deleteEmployee, { isLoading: isDeleting }] = useDeleteEmployeeMutation();
+    const [createSalaryStructure] = useCreateSalaryStructureMutation();
+    const [updateSalaryStructure] = useUpdateSalaryStructureMutation();
 
     const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm({
         resolver: zodResolver(employeeSchema),
@@ -155,6 +167,17 @@ const EmployeeFormPage = () => {
             // Ensure department and manager are IDs
             formData.department = employeeData.department?.toString();
             formData.manager = employeeData.manager?.toString();
+
+            // Map Salary Structure if exists
+            if (employeeData.salary_structure) {
+                formData.basic_salary = employeeData.salary_structure.basic_salary;
+                formData.housing_allowance = employeeData.salary_structure.housing_allowance;
+                formData.transport_allowance = employeeData.salary_structure.transport_allowance;
+                formData.medical_allowance = employeeData.salary_structure.medical_allowance;
+                formData.lunch_allowance = employeeData.salary_structure.lunch_allowance;
+                formData.other_allowances = employeeData.salary_structure.other_allowances;
+            }
+
             reset(formData);
             if (employeeData.photo) setPreviewImage(employeeData.photo);
         }
@@ -183,12 +206,36 @@ const EmployeeFormPage = () => {
                 // ignore
             }
 
+            let employeeId = id;
             if (isEditMode) {
                 // updateEmployee expects an object; we use formData to allow uploads
                 await updateEmployee({ id, formData }).unwrap();
             } else {
-                await createEmployee(formData).unwrap();
+                const res = await createEmployee(formData).unwrap();
+                employeeId = res.id;
             }
+
+            // Save Salary Structure
+            // We strip empty strings to avoid sending invalid data if coerced logic allows it
+            const salaryData = {
+                basic_salary: data.basic_salary || 0,
+                housing_allowance: data.housing_allowance || 0,
+                transport_allowance: data.transport_allowance || 0,
+                medical_allowance: data.medical_allowance || 0,
+                lunch_allowance: data.lunch_allowance || 0,
+                other_allowances: data.other_allowances || 0,
+                effective_date: new Date().toISOString().split('T')[0] // Default to today
+            };
+
+            // Only create/update structure if basic_salary is provided
+            if (data.basic_salary > 0) {
+                if (isEditMode && employeeData?.salary_structure?.id) {
+                    await updateSalaryStructure({ id: employeeData.salary_structure.id, ...salaryData });
+                } else {
+                    await createSalaryStructure({ employee: employeeId, ...salaryData });
+                }
+            }
+
             navigate('/employees');
         } catch (error) {
             // RTK Query throws an object; try to log useful fields and stringify response
@@ -313,6 +360,7 @@ const EmployeeFormPage = () => {
                                         <TabsList className="flex gap-2 bg-transparent p-0">
                                             <TabsTrigger value="personal" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <User className="h-4 w-4 mr-2 inline" /> Personal</TabsTrigger>
                                             <TabsTrigger value="employment" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Briefcase className="h-4 w-4 mr-2 inline" /> Employment</TabsTrigger>
+                                            <TabsTrigger value="compensation" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <Wallet className="h-4 w-4 mr-2 inline" /> Compensation</TabsTrigger>
                                             <TabsTrigger value="documents" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <FileText className="h-4 w-4 mr-2 inline" /> Documents</TabsTrigger>
                                             <TabsTrigger value="other" className="px-3 py-2 rounded-md data-[state=active]:bg-primary-50 data-[state=active]:text-primary-600"> <CreditCard className="h-4 w-4 mr-2 inline" /> Bank & Other</TabsTrigger>
                                         </TabsList>
@@ -432,6 +480,33 @@ const EmployeeFormPage = () => {
                                                     <option value="terminated">Terminated</option>
                                                     <option value="resigned">Resigned</option>
                                                 </select>
+                                            </FormField>
+                                        </div>
+                                    </TabsContent>
+
+                                    {/* Compensation Tab */}
+                                    <TabsContent value="compensation" className="space-y-6">
+                                        <div className="bg-blue-50 p-4 rounded-lg mb-6 text-blue-800 text-sm">
+                                            Define the salary structure for this employee. This will be used to automatically calculate payslips during payroll processing.
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <FormField label="Basic Salary (Gross)" error={errors.basic_salary} required>
+                                                <Input type="number" {...register('basic_salary')} placeholder="e.g. 2000000" />
+                                            </FormField>
+                                            <FormField label="Housing Allowance" error={errors.housing_allowance}>
+                                                <Input type="number" {...register('housing_allowance')} placeholder="0" />
+                                            </FormField>
+                                            <FormField label="Transport Allowance" error={errors.transport_allowance}>
+                                                <Input type="number" {...register('transport_allowance')} placeholder="0" />
+                                            </FormField>
+                                            <FormField label="Medical Allowance" error={errors.medical_allowance}>
+                                                <Input type="number" {...register('medical_allowance')} placeholder="0" />
+                                            </FormField>
+                                            <FormField label="Lunch Allowance" error={errors.lunch_allowance}>
+                                                <Input type="number" {...register('lunch_allowance')} placeholder="0" />
+                                            </FormField>
+                                            <FormField label="Other Allowances" error={errors.other_allowances}>
+                                                <Input type="number" {...register('other_allowances')} placeholder="0" />
                                             </FormField>
                                         </div>
                                     </TabsContent>

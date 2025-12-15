@@ -75,6 +75,7 @@ class Enrollment(models.Model):
 
     class Meta:
         unique_together = ['session', 'employee']
+        ordering = ['-enrolled_at']
 
     def __str__(self):
         return f"{self.employee.full_name} -> {self.session.course.title}"

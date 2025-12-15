@@ -3,17 +3,32 @@ import { cn } from '../../utils/cn';
 
 const TabsContext = React.createContext();
 
-export const Tabs = React.forwardRef(({ className, value, onValueChange, children, ...props }, ref) => (
-    <TabsContext.Provider value={{ value, onValueChange }}>
-        <div
-            ref={ref}
-            className={cn("w-full", className)}
-            {...props}
-        >
-            {children}
-        </div>
-    </TabsContext.Provider>
-));
+export const Tabs = React.forwardRef(({ className, value, defaultValue, onValueChange, children, ...props }, ref) => {
+    const [internalValue, setInternalValue] = React.useState(defaultValue);
+    const isControlled = value !== undefined;
+    const activeValue = isControlled ? value : internalValue;
+
+    const handleValueChange = (newValue) => {
+        if (!isControlled) {
+            setInternalValue(newValue);
+        }
+        if (onValueChange) {
+            onValueChange(newValue);
+        }
+    };
+
+    return (
+        <TabsContext.Provider value={{ value: activeValue, onValueChange: handleValueChange }}>
+            <div
+                ref={ref}
+                className={cn("w-full", className)}
+                {...props}
+            >
+                {children}
+            </div>
+        </TabsContext.Provider>
+    );
+});
 Tabs.displayName = "Tabs";
 
 export const TabsList = React.forwardRef(({ className, ...props }, ref) => (

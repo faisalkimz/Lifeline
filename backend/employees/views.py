@@ -143,7 +143,14 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             queryset = Employee.objects.filter(company=user.company)
         
         # Optimize queries
-        return queryset.select_related('company', 'department', 'manager')
+        queryset = queryset.select_related('company', 'department', 'manager')
+
+        # Robust Manual Filtering for critical params (in case filter backend fails)
+        status_param = self.request.query_params.get('employment_status')
+        if status_param:
+            queryset = queryset.filter(employment_status=status_param)
+
+        return queryset
     
     def get_serializer_class(self):
         """Use appropriate serializer based on action"""

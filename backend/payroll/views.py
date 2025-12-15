@@ -10,8 +10,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 from django.utils import timezone
 
-from accounts.permissions import IsCompanyUser  # ← You already have this
+from accounts.permissions import IsCompanyUser
+from employees.models import Employee
+from django.core.exceptions import ObjectDoesNotExist
+import logging
 from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance
+logger = logging.getLogger(__name__)
 from .serializers import (
     SalaryStructureSerializer, PayrollRunSerializer,
     PayslipSerializer, PayslipDetailSerializer,
@@ -78,11 +82,120 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(company=self.request.user.company)
     
     def perform_create(self, serializer):
-        """Auto-assign company from logged-in user"""
-        serializer.save(
-            company=self.request.user.company,
-            processed_by=self.request.user
+        """Auto-assign company and process specific employees if selected"""
+        from django.db import IntegrityError
+        from rest_framework.exceptions import ValidationError
+
+        try:
+            instance = serializer.save(
+                company=self.request.user.company,
+                processed_by=self.request.user,
+                status='draft'
+            )
+        except IntegrityError:
+            raise ValidationError({
+                "non_field_errors": ["A payroll run for this month and year already exists."]
+            })
+        
+        # If employees were selected in the modal (passed via serializer hack)
+        if hasattr(instance, '_employee_ids_to_process'):
+            ids = instance._employee_ids_to_process
+            # Explicitly filter on Employee model to avoid any related manager confusion/errors
+            employees = Employee.objects.filter(company=instance.company, id__in=ids)
+            self._process_employees(instance, employees)
+        else:
+            # Default: Process ALL active employees immediately
+            employees = instance.company.employees.filter(employment_status='active')
+            self._process_employees(instance, employees)
+            
+    def _process_employees(self, payroll_run, employees):
+        """Helper to calculate and create payslips for given employees"""
+        total_gross = Decimal('0.00')
+        total_paye = Decimal('0.00')
+        total_nssf_employee = Decimal('0.00')
+        total_nssf_employer = Decimal('0.00')
+        total_net = Decimal('0.00')
+        total_deductions = Decimal('0.00')
+        
+        count = 0
+        
+        # Clear existing payslips for these employees to avoid duplicates
+        # (Needed if reprocessing subset)
+        Payslip.objects.filter(payroll_run=payroll_run, employee__in=employees).delete()
+
+        for employee in employees:
+            try:
+                # Safe access to salary structure (Reverse OneToOne can raise error even with hasattr in some cases)
+                try:
+                    structure = employee.salary_structure
+                except (ObjectDoesNotExist, AttributeError):
+                    continue
+                    
+                gross = structure.gross_salary
+                
+                calculations = calculate_net_salary(gross)
+                
+                Payslip.objects.create(
+                    payroll_run=payroll_run,
+                    employee=employee,
+                    basic_salary=structure.basic_salary,
+                    housing_allowance=structure.housing_allowance,
+                    transport_allowance=structure.transport_allowance,
+                    medical_allowance=structure.medical_allowance,
+                    lunch_allowance=structure.lunch_allowance,
+                    other_allowances=structure.other_allowances,
+                    gross_salary=gross,
+                    paye_tax=calculations['paye_tax'],
+                    nssf_employee=calculations['nssf_employee'],
+                    nssf_employer=calculations['nssf_employer'],
+                    total_deductions=calculations['total_deductions'],
+                    net_salary=calculations['net_salary'],
+                    payment_status='pending'
+                )
+                
+                total_gross += gross
+                total_paye += calculations['paye_tax']
+                total_nssf_employee += calculations['nssf_employee']
+                total_nssf_employer += calculations['nssf_employer']
+                total_deductions += calculations['total_deductions']
+                total_net += calculations['net_salary']
+                count += 1
+            except Exception as e:
+                logger.error(f"Error processing payroll for employee {employee.id}: {str(e)}")
+                # Continue to next employee instead of crashing entire run? 
+                # Or re-raise? Default behavior implies partial failure is bad.
+                # But for now, lets log and continue to see if we get partial success.
+                continue
+            
+        # Update Run Totals (Add to existing or Set? Set is safer usually, but partial update?)
+        # If processing subset, we should query ALL payslips to get accurate total.
+        # So ignore the running totals above and aggregate from DB.
+        self._update_run_totals(payroll_run)
+        return count
+
+    def _update_run_totals(self, payroll_run):
+        """Aggregate totals from all payslips"""
+        from django.db.models import Sum
+        agg = payroll_run.payslips.aggregate(
+            t_gross=Sum('gross_salary'),
+            t_paye=Sum('paye_tax'),
+            t_nssf_e=Sum('nssf_employee'),
+            t_nssf_r=Sum('nssf_employer'),
+            t_ded=Sum('total_deductions'),
+            t_net=Sum('net_salary')
         )
+        
+        payroll_run.total_gross = agg['t_gross'] or 0
+        payroll_run.total_paye = agg['t_paye'] or 0
+        payroll_run.total_nssf_employee = agg['t_nssf_e'] or 0
+        payroll_run.total_nssf_employer = agg['t_nssf_r'] or 0
+        payroll_run.total_deductions = agg['t_ded'] or 0
+        payroll_run.total_net = agg['t_net'] or 0
+        
+        if payroll_run.status == 'draft' and payroll_run.payslips.exists():
+             payroll_run.status = 'processing'
+             
+        payroll_run.save()
 
     @action(detail=True, methods=['post'])
     def process_payroll(self, request, pk=None):
@@ -100,67 +213,20 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Clear existing payslips if reprocessing
-        payroll_run.payslips.all().delete()
+        # Determine employees to process
+        reset = request.query_params.get('reset') == 'true'
         
-        employees = payroll_run.company.employees.filter(is_active=True)
+        if reset or not payroll_run.payslips.exists():
+            # Process ALL active employees
+            if reset:
+                payroll_run.payslips.all().delete()
+            employees = payroll_run.company.employees.filter(is_active=True)
+        else:
+            # Re-process existing employees (keep selection)
+            employees = Employee.objects.filter(payslips__payroll_run=payroll_run)
+
+        processed_count = self._process_employees(payroll_run, employees)
         
-        total_gross = Decimal('0.00')
-        total_paye = Decimal('0.00')
-        total_nssf_employee = Decimal('0.00')
-        total_nssf_employer = Decimal('0.00')
-        total_net = Decimal('0.00')
-        total_deductions = Decimal('0.00')
-        
-        processed_count = 0
-        
-        for employee in employees:
-            if not hasattr(employee, 'salary_structure'):
-                continue
-                
-            structure = employee.salary_structure
-            gross = structure.gross_salary
-            
-            # Calculate net salary and deductions
-            # TODO: Integrate valid salary advances/loans here in future
-            calculations = calculate_net_salary(gross)
-            
-            # Create Payslip
-            Payslip.objects.create(
-                payroll_run=payroll_run,
-                employee=employee,
-                basic_salary=structure.basic_salary,
-                housing_allowance=structure.housing_allowance,
-                transport_allowance=structure.transport_allowance,
-                medical_allowance=structure.medical_allowance,
-                lunch_allowance=structure.lunch_allowance,
-                other_allowances=structure.other_allowances,
-                gross_salary=gross,
-                paye_tax=calculations['paye_tax'],
-                nssf_employee=calculations['nssf_employee'],
-                nssf_employer=calculations['nssf_employer'],
-                total_deductions=calculations['total_deductions'],
-                net_salary=calculations['net_salary'],
-                payment_status='pending'
-            )
-            
-            # Aggregate totals
-            total_gross += gross
-            total_paye += calculations['paye_tax']
-            total_nssf_employee += calculations['nssf_employee']
-            total_nssf_employer += calculations['nssf_employer']
-            total_deductions += calculations['total_deductions']
-            total_net += calculations['net_salary']
-            
-            processed_count += 1
-            
-        # Update Payroll Run
-        payroll_run.total_gross = total_gross
-        payroll_run.total_paye = total_paye
-        payroll_run.total_nssf_employee = total_nssf_employee
-        payroll_run.total_nssf_employer = total_nssf_employer
-        payroll_run.total_deductions = total_deductions
-        payroll_run.total_net = total_net
         payroll_run.status = 'processing'
         payroll_run.processed_at = timezone.now()
         payroll_run.processed_by = request.user

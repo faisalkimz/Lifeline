@@ -46,7 +46,8 @@ const BenefitsPage = () => {
 };
 
 const MyBenefitsList = () => {
-    const { data: benefits, isLoading } = useGetEmployeeBenefitsQuery({ my_benefits: true });
+    const { data: benefitsData, isLoading } = useGetEmployeeBenefitsQuery({ my_benefits: true });
+    const benefits = benefitsData?.results || benefitsData || [];
 
     if (isLoading) return <div>Loading benefits...</div>;
 
@@ -115,7 +116,8 @@ const BenefitCard = ({ benefit }) => {
 };
 
 const AvailableBenefitsList = () => {
-    const { data: types, isLoading } = useGetBenefitTypesQuery();
+    const { data: typesData, isLoading } = useGetBenefitTypesQuery();
+    const types = typesData?.results || typesData || [];
 
     if (isLoading) return <div>Loading...</div>;
 

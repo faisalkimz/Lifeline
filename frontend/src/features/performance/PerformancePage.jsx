@@ -102,7 +102,8 @@ const StatCard = ({ title, value, icon, color }) => (
 
 const GoalsSection = ({ user }) => {
     // Only fetch MY goals by default
-    const { data: goals, isLoading } = useGetGoalsQuery({ my_goals: true });
+    const { data: goalsData, isLoading } = useGetGoalsQuery({ my_goals: true });
+    const goals = goalsData?.results || goalsData || [];
     const [createGoal] = useCreateGoalMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -285,7 +286,8 @@ const GoalCard = ({ goal }) => {
 };
 
 const ReviewsSection = ({ user }) => {
-    const { data: reviews, isLoading } = useGetReviewsQuery({ my_reviews: true });
+    const { data: reviewsData, isLoading } = useGetReviewsQuery({ my_reviews: true });
+    const reviews = reviewsData?.results || reviewsData || [];
 
     if (isLoading) return <div>Loading reviews...</div>;
 

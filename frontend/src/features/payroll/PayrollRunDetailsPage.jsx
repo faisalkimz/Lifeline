@@ -25,9 +25,9 @@ const PayrollRunDetailsPage = () => {
     // Fetch Run Details
     const { data: run, isLoading: isLoadingRun } = useGetPayrollRunQuery(id);
 
-    // Fetch Payslips
-    // We strictly filter by payroll_run=id.
-    const { data: payslips = [], isLoading: isLoadingPayslips } = useGetPayslipsQuery({ payroll_run: id });
+    // Fetch Payslips (Handle Pagination)
+    const { data: payslipsData, isLoading: isLoadingPayslips } = useGetPayslipsQuery({ payroll_run: id });
+    const payslips = payslipsData?.results || [];
 
     const [updatePayslip, { isLoading: isUpdating }] = useUpdatePayslipMutation();
     const [processPayroll, { isLoading: isProcessing }] = useProcessPayrollMutation();
@@ -54,7 +54,7 @@ const PayrollRunDetailsPage = () => {
     const handleEdit = (payslip) => {
         setEditingId(payslip.id);
         setEditValues({
-            bonuses: payslip.bonuses,
+            bonus: payslip.bonus,
             other_deductions: payslip.other_deductions,
             loan_deduction: payslip.loan_deduction,
             advance_deduction: payslip.advance_deduction
@@ -70,7 +70,7 @@ const PayrollRunDetailsPage = () => {
         try {
             await updatePayslip({
                 id,
-                bonuses: parseFloat(editValues.bonuses) || 0,
+                bonus: parseFloat(editValues.bonus) || 0,
                 other_deductions: parseFloat(editValues.other_deductions) || 0,
                 loan_deduction: parseFloat(editValues.loan_deduction) || 0,
                 advance_deduction: parseFloat(editValues.advance_deduction) || 0
@@ -217,20 +217,20 @@ const PayrollRunDetailsPage = () => {
                                             <div className="text-xs text-slate-500">{payslip.department}</div>
                                         </TableCell>
                                         <TableCell className="text-right text-slate-600">{formatCurrency(payslip.basic_salary)}</TableCell>
-                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.allowances)}</TableCell>
+                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.total_allowances)}</TableCell>
 
                                         {/* Editable Columns */}
                                         <TableCell className="text-right">
                                             {editingId === payslip.id ? (
                                                 <Input
                                                     type="number"
-                                                    value={editValues.bonuses}
-                                                    onChange={(e) => setEditValues({ ...editValues, bonuses: e.target.value })}
+                                                    value={editValues.bonus}
+                                                    onChange={(e) => setEditValues({ ...editValues, bonus: e.target.value })}
                                                     className="w-24 h-8 text-right p-1"
                                                 />
                                             ) : (
-                                                <span className={payslip.bonuses > 0 ? "text-green-600 font-medium" : "text-slate-400"}>
-                                                    {formatCurrency(payslip.bonuses)}
+                                                <span className={payslip.bonus > 0 ? "text-green-600 font-medium" : "text-slate-400"}>
+                                                    {formatCurrency(payslip.bonus)}
                                                 </span>
                                             )}
                                         </TableCell>

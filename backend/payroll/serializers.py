@@ -60,14 +60,35 @@ class PayrollRunSerializer(serializers.ModelSerializer):
     """Serializer for PayrollRun model"""
 
     company_name = serializers.CharField(source='company.name', read_only=True)
-    processed_by_name = serializers.CharField(source='processed_by.get_full_name', read_only=True)
-    approved_by_name = serializers.CharField(source='approved_by.get_full_name', read_only=True)
+    processed_by_name = serializers.SerializerMethodField()
+    approved_by_name = serializers.SerializerMethodField()
     payslip_count = serializers.SerializerMethodField()
+    employee_ids = serializers.ListField(
+        child=serializers.IntegerField(), write_only=True, required=False
+    )
     
     def create(self, validated_data):
-        # Company and processed_by are set in the view's perform_create
-        # No validation needed here
-        return super().create(validated_data)
+        # Remove employee_ids from validated_data so it doesn't break model creation
+        # We'll access it in the view's perform_create via serializer.initial_data OR 
+        # pop it here if we handled it here (but view has company context better)
+        # Actually ModelSerializer.create will fail if employee_ids is in validated_data and not on model.
+        # So we MUST pop it.
+        employee_ids = validated_data.pop('employee_ids', None)
+        instance = super().create(validated_data)
+        # We can't easily trigger view logic here. 
+        # Better to let view handle it via serializer.validated_data (Wait, pop removes it from there too? Yes)
+        # So we attach it to instance temporarily? No.
+        # We'll rely on ViewSet.perform_create accessing serializer.validated_data BEFORE calling save?
+        # Or standard DRF: perform_create calls serializer.save(). 
+        # serializer.save() calls create(). 
+        # create() returns instance. 
+        # perform_create has instance.
+        # But where is employee_ids? 
+        # If we pop it here, it's gone.
+        # We should store it on the instance as a non-persistent attribute?
+        if employee_ids:
+            instance._employee_ids_to_process = employee_ids
+        return instance
 
     class Meta:
         model = PayrollRun
@@ -76,7 +97,7 @@ class PayrollRunSerializer(serializers.ModelSerializer):
             'start_date', 'end_date', 'payment_date', 'description',
             'total_gross', 'total_deductions', 'total_net',
             'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
-            'approved_by', 'approved_by_name', 'approved_at'
+            'approved_by', 'approved_by_name', 'approved_at', 'employee_ids'
         ]
         read_only_fields = [
             'id', 'payslip_count', 'company', 'processed_by', 'processed_at',
@@ -88,6 +109,12 @@ class PayrollRunSerializer(serializers.ModelSerializer):
         """Get count of payslips in this payroll run"""
         return obj.payslips.count()
 
+    def get_processed_by_name(self, obj):
+        return obj.processed_by.get_full_name() if obj.processed_by else None
+
+    def get_approved_by_name(self, obj):
+        return obj.approved_by.get_full_name() if obj.approved_by else None
+
 
 class PayslipSerializer(serializers.ModelSerializer):
     """Serializer for Payslip model"""
@@ -96,22 +123,32 @@ class PayslipSerializer(serializers.ModelSerializer):
     employee_number = serializers.CharField(source='employee.employee_number', read_only=True)
     department = serializers.CharField(source='employee.department.name', read_only=True)
     payroll_period = serializers.SerializerMethodField()
+    total_allowances = serializers.SerializerMethodField()
 
     class Meta:
         model = Payslip
         fields = [
             'id', 'payroll_run', 'payroll_period', 'employee', 'employee_name',
-            'employee_number', 'department', 'basic_salary', 'allowances', 'bonuses',
+            'employee_number', 'department', 'basic_salary', 'housing_allowance',
+            'transport_allowance', 'medical_allowance', 'lunch_allowance', 
+            'other_allowances', 'total_allowances', 'bonus',
             'gross_salary', 'paye_tax', 'nssf_employee', 'nssf_employer',
             'loan_deduction', 'advance_deduction', 'other_deductions',
             'total_deductions', 'net_salary', 'payment_method', 'payment_status',
-            'payment_date', 'payment_reference', 'payslip_file'
+            'payment_date', 'payment_reference'
         ]
-        read_only_fields = ['id', 'total_deductions']
+        read_only_fields = ['id', 'total_deductions', 'total_allowances']
 
     def get_payroll_period(self, obj):
         """Format payroll period as MM/YYYY"""
-        return "02d"
+        return f"{obj.payroll_run.month:02d}/{obj.payroll_run.year}"
+
+    def get_total_allowances(self, obj):
+        return (
+            obj.housing_allowance + obj.transport_allowance +
+            obj.medical_allowance + obj.lunch_allowance +
+            obj.other_allowances
+        )
 
     def create(self, validated_data):
         """Auto-calculate deductions and net salary"""
@@ -128,10 +165,11 @@ class PayslipSerializer(serializers.ModelSerializer):
             validated_data['medical_allowance'] = salary_structure.medical_allowance
             validated_data['lunch_allowance'] = salary_structure.lunch_allowance
             validated_data['other_allowances'] = salary_structure.other_allowances
-            validated_data['allowances'] = salary_structure.total_allowances
+            # 'allowances' total is not stored on Payslip model, only individual components
+
             
             # Initial gross without bonus
-            gross = salary_structure.gross_salary + validated_data.get('bonuses', 0)
+            gross = salary_structure.gross_salary + validated_data.get('bonus', 0)
             validated_data['gross_salary'] = gross
             
             # Calculate tax and deductions
@@ -157,18 +195,18 @@ class PayslipSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Recalculate salary when updating bonuses or deductions"""
         # Update allowed fields
-        instance.bonuses = validated_data.get('bonuses', instance.bonuses)
+        instance.bonus = validated_data.get('bonus', instance.bonus)
         instance.other_deductions = validated_data.get('other_deductions', instance.other_deductions)
         instance.loan_deduction = validated_data.get('loan_deduction', instance.loan_deduction)
         instance.advance_deduction = validated_data.get('advance_deduction', instance.advance_deduction)
         
-        # Recalculate Gross (Basic + Allowances + Bonuses)
+        # Recalculate Gross (Basic + Allowances + Bonus)
         total_allowances = (
             instance.housing_allowance + instance.transport_allowance + 
             instance.medical_allowance + instance.lunch_allowance + 
             instance.other_allowances
         )
-        instance.gross_salary = instance.basic_salary + total_allowances + instance.bonuses
+        instance.gross_salary = instance.basic_salary + total_allowances + instance.bonus
         
         # Calculate new deductions/net
         calculations = calculate_net_salary(
@@ -206,7 +244,7 @@ class PayslipDetailSerializer(PayslipSerializer):
 class SalaryAdvanceSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_number = serializers.CharField(source='employee.employee_number', read_only=True)
-    approved_by_name = serializers.CharField(source='approved_by.get_full_name', read_only=True)
+    approved_by_name = serializers.SerializerMethodField()
     is_overdue = serializers.BooleanField(read_only=True)
     balance = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
     monthly_deduction = serializers.DecimalField(max_digits=15, decimal_places=2, read_only=True)
@@ -222,6 +260,9 @@ class SalaryAdvanceSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = ['id', 'balance', 'is_overdue', 'approved_at', 'completed_at']
+
+    def get_approved_by_name(self, obj):
+        return obj.approved_by.get_full_name() if obj.approved_by else None
 
     def create(self, validated_data):
         """Auto-calculate monthly deduction if not provided"""

@@ -85,6 +85,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
     years_of_service = serializers.ReadOnlyField()
     is_on_probation = serializers.ReadOnlyField()
+    salary_structure = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -111,12 +112,29 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'marital_status', 'number_of_dependents',
             # Additional
             'notes', 'years_of_service', 'is_on_probation',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'salary_structure'
         ]
         read_only_fields = [
             'id', 'employee_number', 'full_name', 'years_of_service', 
-            'is_on_probation', 'created_at', 'updated_at'
+            'is_on_probation', 'created_at', 'updated_at', 'salary_structure'
         ]
+    
+    def get_salary_structure(self, obj):
+        """Get salary structure details"""
+        if hasattr(obj, 'salary_structure'):
+            ss = obj.salary_structure
+            return {
+                "id": ss.id,
+                "basic_salary": ss.basic_salary,
+                "housing_allowance": ss.housing_allowance,
+                "transport_allowance": ss.transport_allowance,
+                "medical_allowance": ss.medical_allowance,
+                "lunch_allowance": ss.lunch_allowance,
+                "other_allowances": ss.other_allowances,
+                "gross_salary": ss.gross_salary,
+                "effective_date": ss.effective_date
+            }
+        return None
     
     def get_manager_name(self, obj):
         """Get manager's full name"""

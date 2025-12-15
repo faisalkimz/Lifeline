@@ -17,6 +17,13 @@ import PayrollIndex from './features/payroll/PayrollIndex';
 import LeaveRequestsPage from './features/leave/LeaveRequestsPage';
 
 import AttendancePage from './features/attendance/AttendancePage';
+import PerformancePage from './features/performance/PerformancePage';
+import JobListPage from './features/recruitment/JobListPage';
+import PipelinePage from './features/recruitment/PipelinePage';
+import TrainingPage from './features/training/TrainingPage';
+import BenefitsPage from './features/benefits/BenefitsPage';
+import DocumentsPage from './features/documents/DocumentsPage';
+import OffboardingPage from './features/offboarding/OffboardingPage';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -50,6 +57,13 @@ function App() {
         <Route path="/leave" element={<LeaveRequestsPage />} />
         <Route path="/leave/approvals" element={<Navigate to="/leave" replace />} />
         <Route path="/attendance" element={<AttendancePage />} />
+        <Route path="/performance" element={<PerformancePage />} />
+        <Route path="/recruitment" element={<JobListPage />} />
+        <Route path="/recruitment/pipeline" element={<PipelinePage />} />
+        <Route path="/training" element={<TrainingPage />} />
+        <Route path="/benefits" element={<BenefitsPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/offboarding" element={<OffboardingPage />} />
 
         <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
       </Route>

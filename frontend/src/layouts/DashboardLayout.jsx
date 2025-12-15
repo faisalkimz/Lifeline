@@ -3,7 +3,7 @@ import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../store/api';
-import { LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell, TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell, TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck, Briefcase, BookOpen, Shield, FileText } from 'lucide-react';
 import { cn } from '../utils/cn';
 
 const DashboardLayout = () => {
@@ -39,6 +39,12 @@ const DashboardLayout = () => {
     // Show Approvals for non-employees (managers, admins)
     ...(user.role !== 'employee' ? [{ name: 'Leave Approvals', href: '/leave/approvals', icon: ClipboardCheck }] : []),
     { name: 'Attendance', href: '/attendance', icon: Clock },
+    { name: 'Performance', href: '/performance', icon: TrendingUp },
+    { name: 'Recruitment', href: '/recruitment', icon: Briefcase },
+    { name: 'Training', href: '/training', icon: BookOpen },
+    { name: 'Benefits', href: '/benefits', icon: Shield },
+    { name: 'Documents', href: '/documents', icon: FileText },
+    { name: 'Offboarding', href: '/offboarding', icon: LogOut },
     { name: 'Settings', href: '/settings', icon: Settings },
   ];
 

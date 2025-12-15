@@ -56,7 +56,13 @@ INSTALLED_APPS = [
     "employees",
     "payroll",
     "leave",  # Leave Management
-    "attendance",  # NEW: Attendance & Time Tracking
+    "attendance",  # Attendance & Time Tracking
+    "performance", # Performance Management (Reviews, Goals)
+    "recruitment", # Recruitment & ATS
+    "training",    # Training & Development
+    "benefits",    # Benefits Administration
+    "documents",   # Document Management
+    "offboarding", # Offboarding & Exit
 ]
 
 

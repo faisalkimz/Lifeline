@@ -1,0 +1,152 @@
+from django.db import models
+from accounts.models import Company, User
+from employees.models import Employee, Department
+from django.utils import timezone
+
+class Job(models.Model):
+    """Job Requisition / Posting"""
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+        ('internal', 'Internal Only'),
+        ('closed', 'Closed'),
+    ]
+    
+    EMPLOYMENT_TYPE_CHOICES = [
+        ('full_time', 'Full Time'),
+        ('part_time', 'Part Time'),
+        ('contract', 'Contract'),
+        ('internship', 'Internship'),
+        ('freelance', 'Freelance'),
+    ]
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='jobs')
+    title = models.CharField(max_length=255)
+    department = models.ForeignKey(Department, on_delete=models.SET_NULL, null=True, blank=True)
+    hiring_manager = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='hiring_jobs')
+    
+    description = models.TextField()
+    requirements = models.TextField()
+    benefits = models.TextField(blank=True)
+    
+    location = models.CharField(max_length=100, default='Headquarters')
+    is_remote = models.BooleanField(default=False)
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, default='full_time')
+    
+    salary_min = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    salary_max = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    currency = models.CharField(max_length=3, default='UGX')
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    published_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+    
+    # External Board Links (optional JSON)
+    external_links = models.JSONField(default=dict, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.title} - {self.company.name}"
+
+
+class Candidate(models.Model):
+    """Potential Employee"""
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='candidates')
+    
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=30, blank=True)
+    
+    linkedin_url = models.URLField(blank=True)
+    portfolio_url = models.URLField(blank=True)
+    
+    resume = models.FileField(upload_to='resumes/', null=True, blank=True)
+    summary = models.TextField(blank=True)
+    skills = models.TextField(blank=True, help_text="Comma separated skills")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['company', 'email'] # Prevent duplicates per company
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.full_name
+
+
+class Application(models.Model):
+    """Link between Candidate and Job"""
+    STAGE_CHOICES = [
+        ('applied', 'Applied'),
+        ('screening', 'Screening'),
+        ('interview', 'Interview'),
+        ('offer', 'Offer'),
+        ('hired', 'Hired'),
+        ('rejected', 'Rejected'),
+        ('withdrawn', 'Withdrawn'),
+    ]
+
+    job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='applications')
+    candidate = models.ForeignKey(Candidate, on_delete=models.CASCADE, related_name='applications')
+    
+    stage = models.CharField(max_length=20, choices=STAGE_CHOICES, default='applied')
+    score = models.IntegerField(default=0, help_text="AI or Manual Score (0-100)")
+    
+    applied_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    notes = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = ['job', 'candidate']
+        ordering = ['-applied_at']
+
+    def __str__(self):
+        return f"{self.candidate.full_name} for {self.job.title}"
+
+
+class Interview(models.Model):
+    """Scheduled Interview"""
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('no_show', 'No Show'),
+    ]
+    
+    TYPE_CHOICES = [
+        ('phone', 'Phone Screen'),
+        ('video', 'Video Call'),
+        ('onsite', 'On-site'),
+    ]
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='interviews')
+    interviewer = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='interviews_conducting')
+    
+    date_time = models.DateTimeField()
+    duration_minutes = models.IntegerField(default=30)
+    interview_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='video')
+    location = models.CharField(max_length=255, blank=True, help_text="Meeting link or physical address")
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    feedback = models.TextField(blank=True)
+    rating = models.IntegerField(default=0, help_text="Rating 1-5")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['date_time']
+
+    def __str__(self):
+        return f"Interview: {self.application.candidate.full_name} with {self.interviewer}"

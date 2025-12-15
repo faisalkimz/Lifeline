@@ -31,6 +31,12 @@ urlpatterns = [
     path('api/payroll/', include('payroll.urls')),  # Payroll management
     path('api/leave/', include('leave.urls')),  # Leave Management
     path('api/attendance/', include('attendance.urls')),  # Attendance & Time Tracking
+    path('api/performance/', include('performance.urls')),  # Performance Management
+    path('api/recruitment/', include('recruitment.urls')),  # Recruitment & ATS
+    path('api/training/', include('training.urls')),  # Training
+    path('api/benefits/', include('benefits.urls')),  # Benefits
+    path('api/documents/', include('documents.urls')),  # Documents
+    path('api/offboarding/', include('offboarding.urls')),  # Offboarding
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

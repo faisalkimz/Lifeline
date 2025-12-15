@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'Candidate', 'Application', 'Interview', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -359,6 +359,259 @@ export const api = createApi({
     getTeamAttendance: builder.query({
       query: () => '/attendance/records/team_attendance/',
       providesTags: ['Attendance']
+    }),
+
+    // ========== PERFORMANCE MANAGEMENT ==========
+    getPerformanceCycles: builder.query({
+      query: () => '/performance/cycles/',
+      providesTags: ['PerformanceCycle']
+    }),
+
+    // Goals
+    getGoals: builder.query({
+      query: (params) => ({
+        url: '/performance/goals/',
+        params
+      }),
+      providesTags: (result) =>
+        result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
+    }),
+    createGoal: builder.mutation({
+      query: (body) => ({
+        url: '/performance/goals/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: [{ type: 'Goal', id: 'LIST' }]
+    }),
+    updateGoal: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/performance/goals/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Goal', id }, { type: 'Goal', id: 'LIST' }]
+    }),
+    deleteGoal: builder.mutation({
+      query: (id) => ({
+        url: `/performance/goals/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: [{ type: 'Goal', id: 'LIST' }]
+    }),
+
+    // Reviews
+    getReviews: builder.query({
+      query: (params) => ({
+        url: '/performance/reviews/',
+        params
+      }),
+      providesTags: ['PerformanceReview']
+    }),
+    getReviewStats: builder.query({
+      query: () => '/performance/reviews/stats/',
+      providesTags: ['PerformanceReview']
+    }),
+    createReview: builder.mutation({
+      query: (body) => ({
+        url: '/performance/reviews/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['PerformanceReview']
+    }),
+    updateReview: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/performance/reviews/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['PerformanceReview']
+    }),
+
+    // ========== RECRUITMENT (ATS) ==========
+    getJobs: builder.query({
+      query: (params) => ({
+        url: '/recruitment/jobs/',
+        params
+      }),
+      providesTags: ['Job']
+    }),
+    createJob: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/jobs/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Job']
+    }),
+    updateJob: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/recruitment/jobs/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Job']
+    }),
+    getCandidates: builder.query({
+      query: (params) => ({
+        url: '/recruitment/candidates/',
+        params
+      }),
+      providesTags: ['Candidate']
+    }),
+    createCandidate: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/candidates/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Candidate']
+    }),
+    getApplications: builder.query({
+      query: (params) => ({
+        url: '/recruitment/applications/',
+        params
+      }),
+      providesTags: ['Application']
+    }),
+    createApplication: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/applications/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Application']
+    }),
+    moveApplicationStage: builder.mutation({
+      query: ({ id, stage }) => ({
+        url: `/recruitment/applications/${id}/move_stage/`,
+        method: 'PATCH',
+        body: { stage }
+      }),
+      invalidatesTags: ['Application']
+    }),
+    getInterviews: builder.query({
+      query: (params) => ({
+        url: '/recruitment/interviews/',
+        params
+      }),
+      providesTags: ['Interview']
+    }),
+
+    // ========== TRAINING & DEVELOPMENT ==========
+    getCourses: builder.query({
+      query: () => '/training/courses/',
+      providesTags: ['Course']
+    }),
+    createCourse: builder.mutation({
+      query: (body) => ({
+        url: '/training/courses/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Course']
+    }),
+    getTrainingSessions: builder.query({
+      query: () => '/training/sessions/',
+      providesTags: ['TrainingSession']
+    }),
+    createTrainingSession: builder.mutation({
+      query: (body) => ({
+        url: '/training/sessions/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['TrainingSession']
+    }),
+    getEnrollments: builder.query({
+      query: (params) => ({
+        url: '/training/enrollments/',
+        params
+      }),
+      providesTags: ['Enrollment']
+    }),
+    enrollInTraining: builder.mutation({
+      query: (body) => ({
+        url: '/training/enrollments/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Enrollment']
+    }),
+
+    // ========== BENEFITS ADMINISTRATION ==========
+    getBenefitTypes: builder.query({
+      query: () => '/benefits/types/',
+      providesTags: ['BenefitType']
+    }),
+    createBenefitType: builder.mutation({
+      query: (body) => ({
+        url: '/benefits/types/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['BenefitType']
+    }),
+    getEmployeeBenefits: builder.query({
+      query: (params) => ({
+        url: '/benefits/enrollments/',
+        params
+      }),
+      providesTags: ['EmployeeBenefit']
+    }),
+
+    // ========== DOCUMENT MANAGEMENT ==========
+    getDocuments: builder.query({
+      query: (params) => ({
+        url: '/documents/company/',
+        params
+      }),
+      providesTags: ['Document']
+    }),
+    createDocument: builder.mutation({
+      query: (body) => ({
+        url: '/documents/company/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Document']
+    }),
+    getEmployeeDocuments: builder.query({
+      query: (params) => ({
+        url: '/documents/employee/',
+        params
+      }),
+      providesTags: ['EmployeeDocument']
+    }),
+    createEmployeeDocument: builder.mutation({
+      query: (body) => ({
+        url: '/documents/employee/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['EmployeeDocument']
+    }),
+
+    // ========== OFFBOARDING & EXIT ==========
+    getResignations: builder.query({
+      query: (params) => ({
+        url: '/offboarding/resignations/',
+        params
+      }),
+      providesTags: ['Resignation']
+    }),
+    createResignation: builder.mutation({
+      query: (body) => ({
+        url: '/offboarding/resignations/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Resignation']
+    }),
+    getExitInterviews: builder.query({
+      query: () => '/offboarding/interviews/',
+      providesTags: ['ExitInterview']
     })
   })
 });
@@ -409,5 +662,45 @@ export const {
   useGetTodayAttendanceQuery,
   useGetMyAttendanceQuery,
   useGetTeamAttendanceQuery,
+  // Performance
+  useGetPerformanceCyclesQuery,
+  useGetGoalsQuery,
+  useCreateGoalMutation,
+  useUpdateGoalMutation,
+  useDeleteGoalMutation,
+  useGetReviewsQuery,
+  useGetReviewStatsQuery,
+  useCreateReviewMutation,
+  useUpdateReviewMutation,
+  // Recruitment
+  useGetJobsQuery,
+  useCreateJobMutation,
+  useUpdateJobMutation,
+  useGetCandidatesQuery,
+  useCreateCandidateMutation,
+  useGetApplicationsQuery,
+  useCreateApplicationMutation,
+  useMoveApplicationStageMutation,
+  useGetInterviewsQuery,
+  // Training
+  useGetCoursesQuery,
+  useCreateCourseMutation,
+  useGetTrainingSessionsQuery,
+  useCreateTrainingSessionMutation,
+  useGetEnrollmentsQuery,
+  useEnrollInTrainingMutation,
+  // Benefits
+  useGetBenefitTypesQuery,
+  useCreateBenefitTypeMutation,
+  useGetEmployeeBenefitsQuery,
+  // Documents
+  useGetDocumentsQuery,
+  useCreateDocumentMutation,
+  useGetEmployeeDocumentsQuery,
+  useCreateEmployeeDocumentMutation,
+  // Offboarding
+  useGetResignationsQuery,
+  useCreateResignationMutation,
+  useGetExitInterviewsQuery,
 } = api;
 export default api;

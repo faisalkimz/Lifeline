@@ -297,7 +297,7 @@ export const api = createApi({
       query: ({ url, body }) => ({
         url: url || '/leave/requests/',
         method: 'POST',
-        body
+        body: body,
       }),
       invalidatesTags: ['LeaveRequest']
     }),
@@ -348,6 +348,17 @@ export const api = createApi({
     getTodayAttendance: builder.query({
       query: () => '/attendance/records/today_status/',
       providesTags: ['Attendance']
+    }),
+    getMyAttendance: builder.query({
+      query: (params) => ({
+        url: '/attendance/records/my_attendance/',
+        params
+      }),
+      providesTags: ['Attendance']
+    }),
+    getTeamAttendance: builder.query({
+      query: () => '/attendance/records/team_attendance/',
+      providesTags: ['Attendance']
     })
   })
 });
@@ -396,5 +407,7 @@ export const {
   useClockInMutation,
   useClockOutMutation,
   useGetTodayAttendanceQuery,
+  useGetMyAttendanceQuery,
+  useGetTeamAttendanceQuery,
 } = api;
 export default api;

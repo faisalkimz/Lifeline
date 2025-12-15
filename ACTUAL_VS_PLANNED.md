@@ -222,15 +222,15 @@ Overall ATS Completion: 25%
 ✅ Employee Records      100%
 ✅ Departments          100%
 ✅ Payroll Processing    90%
-❌ Leave Management       0%
-❌ Attendance             0%
+✅ Leave Management       100%
+✅ Attendance             100%
 ❌ Performance Reviews    0%
 ❌ Training               0%
 ❌ Benefits Admin         0%
 ❌ Document Management    0%
 ❌ Offboarding            0%
 
-Overall HRMS Completion: 29% (3 of 10 modules)
+Overall HRMS Completion: 50% (5 of 10 modules)
 ```
 
 ### Infrastructure & Foundation

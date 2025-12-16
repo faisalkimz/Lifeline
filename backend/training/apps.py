@@ -1,5 +1,16 @@
 from django.apps import AppConfig
 
+
 class TrainingConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'training'
+    verbose_name = 'Training & Development'
+
+    def ready(self):
+        """
+        Import signals and register scheduled tasks when app is ready.
+        """
+        try:
+            import training.signals  # Import signals if you create them
+        except ImportError:
+            pass

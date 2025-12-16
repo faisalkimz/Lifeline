@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/Button';
 import {
     Calendar, Wallet, FileText, ArrowRight,
     CreditCard, Banknote, Clock, Award,
-    Users, FileStack, Network, Bell, CheckCircle
+    Users, FileStack, Network, Bell, CheckCircle, Heart
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -120,6 +120,13 @@ const DashboardPage = () => {
                             color="bg-orange-500"
                         />
                         <StatCard
+                            icon={Calendar}
+                            label="Leave Calendar"
+                            subLabel="Team leave calendar."
+                            link="/leave/calendar"
+                            color="bg-blue-500"
+                        />
+                        <StatCard
                             icon={CreditCard}
                             label="Expenses"
                             subLabel="View your expenses."
@@ -151,10 +158,12 @@ const DashboardPage = () => {
                             { name: 'Disciplinary', icon: Award, link: '/disciplinary' },
                             { name: 'Salary Advance', icon: FileStack, link: '/payroll/advances' },
                             { name: 'Overtime', icon: Clock, link: '/attendance/overtime' },
+                            { name: 'Interview Scheduling', icon: Calendar, link: '/recruitment/interviews' },
                             { name: 'Trainings', icon: Award, link: '/training' },
                             { name: 'Performance', icon: Network, link: '/performance' },
                             { name: 'Documents', icon: FileText, link: '/documents' },
                             { name: 'Org. Structure', icon: Users, link: '/organization' },
+                            { name: 'Benefits Admin', icon: Heart, link: '/benefits/admin' },
                             { name: 'Settings', icon: Users, link: '/settings' },
                         ].map((item) => (
                             <Link key={item.name} to={item.link}>

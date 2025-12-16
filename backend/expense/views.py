@@ -42,12 +42,12 @@ class ExpenseClaimViewSet(viewsets.ModelViewSet):
         
         # My claims (as employee)
         if self.request.query_params.get('my_claims'):
-            if hasattr(user, 'employee'):
+            if hasattr(user, 'employee') and user.employee:
                 queryset = queryset.filter(employee=user.employee)
-        
+
         # Pending approvals (as manager)
         if self.request.query_params.get('pending_approvals'):
-            if hasattr(user, 'employee'):
+            if hasattr(user, 'employee') and user.employee:
                 # Get claims from employees I manage
                 queryset = queryset.filter(
                     employee__manager=user.employee,
@@ -58,7 +58,7 @@ class ExpenseClaimViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         # Auto-assign employee if user is an employee
-        if hasattr(self.request.user, 'employee'):
+        if hasattr(self.request.user, 'employee') and self.request.user.employee:
             serializer.save(
                 company=self.request.user.company,
                 employee=self.request.user.employee
@@ -96,7 +96,7 @@ class ExpenseClaimViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        if hasattr(request.user, 'employee'):
+        if hasattr(request.user, 'employee') and request.user.employee:
             claim.status = 'approved'
             claim.approved_by = request.user.employee
             claim.approved_at = timezone.now()
@@ -125,7 +125,7 @@ class ExpenseClaimViewSet(viewsets.ModelViewSet):
         
         reason = request.data.get('reason', '')
         
-        if hasattr(request.user, 'employee'):
+        if hasattr(request.user, 'employee') and request.user.employee:
             claim.status = 'rejected'
             claim.approved_by = request.user.employee
             claim.approved_at = timezone.now()
@@ -188,7 +188,7 @@ class ExpenseReimbursementViewSet(viewsets.ModelViewSet):
         return ExpenseReimbursement.objects.filter(company=self.request.user.company)
     
     def perform_create(self, serializer):
-        if hasattr(self.request.user, 'employee'):
+        if hasattr(self.request.user, 'employee') and self.request.user.employee:
             serializer.save(
                 company=self.request.user.company,
                 created_by=self.request.user.employee

@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import {
     useGetJobsQuery,
     useCreateJobMutation,
-    useUpdateJobMutation
+    useUpdateJobMutation,
+    usePublishJobMutation,
+    useGetRecruitmentIntegrationsQuery,
 } from '../../store/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -170,6 +172,12 @@ const JobCard = ({ job }) => {
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [selectedPlatforms, setSelectedPlatforms] = useState([]);
 
+    const integrationList = Array.isArray(integrations?.results)
+        ? integrations.results
+        : Array.isArray(integrations)
+            ? integrations
+            : [];
+
     const handlePublish = async () => {
         try {
             const res = await publishJob({
@@ -256,7 +264,7 @@ const JobCard = ({ job }) => {
                                             <CheckCircle className="h-4 w-4 text-green-600" />
                                             <span className="font-medium">Company Career Page</span>
                                         </div>
-                                        {integrations?.filter(i => i.is_active).map(integration => (
+                                        {integrationList.filter(i => i.is_active).map(integration => (
                                             <div
                                                 key={integration.id}
                                                 onClick={() => togglePlatform(integration.platform)}
@@ -276,7 +284,7 @@ const JobCard = ({ job }) => {
                                                 <span className="capitalize">{integration.platform}</span>
                                             </div>
                                         ))}
-                                        {!integrations?.some(i => i.is_active) && (
+                                        {!integrationList.some(i => i.is_active) && (
                                             <p className="text-xs text-amber-600">
                                                 No external integrations active. <Link to="/recruitment/integrations" className="underline">Configure here</Link>.
                                             </p>

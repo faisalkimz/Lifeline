@@ -87,12 +87,12 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def my_requests(self, request):
         """Get current user's leave requests"""
-        if not hasattr(request.user, 'employee'):
+        if not hasattr(request.user, 'employee') or not request.user.employee:
             return Response(
                 {"error": "User does not have an employee record"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         requests = LeaveRequest.objects.filter(
             employee=request.user.employee
         ).select_related('leave_type', 'approved_by')
@@ -106,7 +106,7 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         user = request.user
         
         # Get requests where user is the manager or is HR
-        if hasattr(user, 'employee'):
+        if hasattr(user, 'employee') and user.employee:
             queryset = LeaveRequest.objects.filter(
                 employee__company=user.company,
                 status='pending'

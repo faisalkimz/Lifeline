@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, User, Mail, Phone, Linkedin, Globe, FileText, Search, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { CandidateCard } from './CandidateCard';
 
 const CandidatePage = () => {
     const { data: candidates, isLoading } = useGetCandidatesQuery();
@@ -52,13 +53,16 @@ const CandidatePage = () => {
         }
     };
 
-    const filteredCandidates = candidates?.filter(candidate => {
-        const matchesSearch = candidate.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            candidate.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesSource = filterSource === 'all' || candidate.source === filterSource;
-        return matchesSearch && matchesSource;
-    });
+    const filteredCandidates = Array.isArray(candidates)
+        ? candidates.filter(candidate => {
+            const matchesSearch =
+                candidate.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                candidate.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                candidate.email.toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesSource = filterSource === 'all' || candidate.source === filterSource;
+            return matchesSearch && matchesSource;
+        })
+        : [];
 
     return (
         <div className="space-y-6 pb-10">
@@ -235,98 +239,6 @@ const CandidatePage = () => {
                 </div>
             )}
         </div>
-    );
-};
-
-const CandidateCard = ({ candidate }) => {
-    const sourceColors = {
-        career_page: 'bg-blue-100 text-blue-700',
-        linkedin: 'bg-indigo-100 text-indigo-700',
-        indeed: 'bg-green-100 text-green-700',
-        referral: 'bg-purple-100 text-purple-700',
-        agency: 'bg-orange-100 text-orange-700',
-        other: 'bg-gray-100 text-gray-700',
-    };
-
-    const applicationCount = candidate.applications?.length || 0;
-
-    return (
-        <Card className="hover:shadow-lg transition-all group border-none shadow-sm">
-            <CardContent className="p-6 flex flex-col h-full">
-                {/* Header with avatar */}
-                <div className="flex items-start gap-4 mb-4">
-                    <div className="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-lg">
-                        {candidate.first_name[0]}{candidate.last_name[0]}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-bold text-gray-900 truncate">
-                            {candidate.first_name} {candidate.last_name}
-                        </h3>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Mail className="h-3 w-3" />
-                            <span className="truncate">{candidate.email}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Contact Info */}
-                <div className="space-y-2 text-sm text-gray-600 mb-4 flex-1">
-                    {candidate.phone && (
-                        <div className="flex items-center gap-2">
-                            <Phone className="h-4 w-4" />
-                            {candidate.phone}
-                        </div>
-                    )}
-                    {candidate.linkedin_url && (
-                        <a href={candidate.linkedin_url} target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-primary-600 hover:underline">
-                            <Linkedin className="h-4 w-4" />
-                            LinkedIn Profile
-                        </a>
-                    )}
-                    {candidate.portfolio_url && (
-                        <a href={candidate.portfolio_url} target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-primary-600 hover:underline">
-                            <Globe className="h-4 w-4" />
-                            Portfolio
-                        </a>
-                    )}
-                </div>
-
-                {/* Skills Pills */}
-                {candidate.skills && (
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                        {candidate.skills.split(', ').slice(0, 3).map((skill, i) => (
-                            <span key={i} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-xs rounded-full">
-                                {skill}
-                            </span>
-                        ))}
-                        {candidate.skills.split(', ').length > 3 && (
-                            <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-xs rounded-full">
-                                +{candidate.skills.split(', ').length - 3}
-                            </span>
-                        )}
-                    </div>
-                )}
-
-                {/* Footer */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <span className={`px-2 py-1 rounded text-xs font-medium uppercase ${sourceColors[candidate.source] || sourceColors.other}`}>
-                        {candidate.source.replace('_', ' ')}
-                    </span>
-                    <div className="text-sm text-gray-600">
-                        <span className="font-medium">{applicationCount}</span> {applicationCount === 1 ? 'Application' : 'Applications'}
-                    </div>
-                </div>
-
-                {/* View Details Button */}
-                <Link to={`/recruitment/candidates/${candidate.id}`}>
-                    <Button variant="ghost" size="sm" className="w-full mt-3 text-primary-600 hover:text-primary-700 hover:bg-primary-50">
-                        View Profile
-                    </Button>
-                </Link>
-            </CardContent>
-        </Card>
     );
 };
 

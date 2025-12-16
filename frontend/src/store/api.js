@@ -351,10 +351,12 @@ export const api = createApi({
     // ========== LEAVE MANAGEMENT ==========
     getLeaveRequests: builder.query({
       query: (url) => url || '/leave/requests/',
-      transformResponse: (response) => {
+      transformResponse: (response, meta, arg) => {
+        // Handle error responses
+        if (response?.error) return [];
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: ['LeaveRequest']
     }),
@@ -391,6 +393,13 @@ export const api = createApi({
         method: 'POST'
       }),
       invalidatesTags: ['LeaveRequest']
+    }),
+    getPublicHolidays: builder.query({
+      query: (params) => ({
+        url: '/leave/holidays/',
+        params
+      }),
+      providesTags: ['PublicHoliday']
     }),
 
     // ========== ATTENDANCE ==========
@@ -438,6 +447,11 @@ export const api = createApi({
         url: '/performance/goals/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || [];
+      },
       providesTags: (result) =>
         result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
     }),
@@ -571,6 +585,14 @@ export const api = createApi({
       }),
       providesTags: ['Interview']
     }),
+    createInterview: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/interviews/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Interview']
+    }),
     getRecruitmentIntegrations: builder.query({
       query: () => '/recruitment/integrations/',
       providesTags: ['RecruitmentIntegration']
@@ -591,6 +613,21 @@ export const api = createApi({
       }),
       invalidatesTags: ['RecruitmentIntegration']
     }),
+    getPublicJobs: builder.query({
+      query: (params) => ({
+        url: '/recruitment/public/jobs/',
+        params
+      }),
+      providesTags: ['PublicJob']
+    }),
+    submitJobApplication: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/applications/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Application']
+    }),
     publishJob: builder.mutation({
       query: ({ id, platforms }) => ({
         url: `/recruitment/jobs/${id}/publish/`,
@@ -601,20 +638,23 @@ export const api = createApi({
     }),
 
     // ========== TRAINING & DEVELOPMENT ==========
-    getCourses: builder.query({
-      query: () => '/training/courses/',
-      providesTags: ['Course']
+    getTrainingPrograms: builder.query({
+      query: () => '/training/programs/',
+      providesTags: ['TrainingProgram']
     }),
-    createCourse: builder.mutation({
+    createTrainingProgram: builder.mutation({
       query: (body) => ({
-        url: '/training/courses/',
+        url: '/training/programs/',
         method: 'POST',
         body
       }),
-      invalidatesTags: ['Course']
+      invalidatesTags: ['TrainingProgram']
     }),
     getTrainingSessions: builder.query({
-      query: () => '/training/sessions/',
+      query: (params) => ({
+        url: '/training/sessions/',
+        params
+      }),
       providesTags: ['TrainingSession']
     }),
     createTrainingSession: builder.mutation({
@@ -640,6 +680,44 @@ export const api = createApi({
       }),
       invalidatesTags: ['Enrollment']
     }),
+    updateProgress: builder.mutation({
+      query: ({ id, progress_percentage }) => ({
+        url: `/training/enrollments/${id}/progress/`,
+        method: 'POST',
+        body: { progress_percentage }
+      }),
+      invalidatesTags: ['Enrollment']
+    }),
+    completeEnrollment: builder.mutation({
+      query: (id) => ({
+        url: `/training/enrollments/${id}/complete/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Enrollment']
+    }),
+    submitFeedback: builder.mutation({
+      query: ({ id, feedback_text, feedback_rating }) => ({
+        url: `/training/enrollments/${id}/feedback/`,
+        method: 'POST',
+        body: { feedback_text, feedback_rating }
+      }),
+      invalidatesTags: ['Enrollment']
+    }),
+    withdrawEnrollment: builder.mutation({
+      query: (id) => ({
+        url: `/training/enrollments/${id}/withdraw/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Enrollment']
+    }),
+    getMyStats: builder.query({
+      query: () => '/training/dashboard/my_stats/',
+      providesTags: ['TrainingStats']
+    }),
+    getMyCompliance: builder.query({
+      query: () => '/training/dashboard/my_compliance/',
+      providesTags: ['Compliance']
+    }),
 
     // ========== BENEFITS ADMINISTRATION ==========
     getBenefitTypes: builder.query({
@@ -654,12 +732,50 @@ export const api = createApi({
       }),
       invalidatesTags: ['BenefitType']
     }),
+    updateBenefitType: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/benefits/types/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['BenefitType']
+    }),
+    deleteBenefitType: builder.mutation({
+      query: (id) => ({
+        url: `/benefits/types/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['BenefitType']
+    }),
     getEmployeeBenefits: builder.query({
       query: (params) => ({
         url: '/benefits/enrollments/',
         params
       }),
       providesTags: ['EmployeeBenefit']
+    }),
+    createEmployeeBenefit: builder.mutation({
+      query: (body) => ({
+        url: '/benefits/enrollments/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['EmployeeBenefit']
+    }),
+    updateEmployeeBenefit: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/benefits/enrollments/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['EmployeeBenefit']
+    }),
+    deleteEmployeeBenefit: builder.mutation({
+      query: (id) => ({
+        url: `/benefits/enrollments/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['EmployeeBenefit']
     }),
 
     // ========== DOCUMENT MANAGEMENT ==========
@@ -763,6 +879,7 @@ export const {
   useGetLeaveTypesQuery,
   useApproveLeaveRequestMutation,
   useRejectLeaveRequestMutation,
+  useGetPublicHolidaysQuery,
   // attendance hooks
   useClockInMutation,
   useClockOutMutation,
@@ -790,21 +907,35 @@ export const {
   useCreateApplicationMutation,
   useMoveApplicationStageMutation,
   useGetInterviewsQuery,
+  useCreateInterviewMutation,
   useGetRecruitmentIntegrationsQuery,
   useCreateRecruitmentIntegrationMutation,
   useUpdateRecruitmentIntegrationMutation,
   usePublishJobMutation,
+  useGetPublicJobsQuery,
+  useSubmitJobApplicationMutation,
   // Training
-  useGetCoursesQuery,
-  useCreateCourseMutation,
+  useGetTrainingProgramsQuery,
+  useCreateTrainingProgramMutation,
   useGetTrainingSessionsQuery,
   useCreateTrainingSessionMutation,
   useGetEnrollmentsQuery,
   useEnrollInTrainingMutation,
+  useUpdateProgressMutation,
+  useCompleteEnrollmentMutation,
+  useSubmitFeedbackMutation,
+  useWithdrawEnrollmentMutation,
+  useGetMyStatsQuery,
+  useGetMyComplianceQuery,
   // Benefits
   useGetBenefitTypesQuery,
   useCreateBenefitTypeMutation,
+  useUpdateBenefitTypeMutation,
+  useDeleteBenefitTypeMutation,
   useGetEmployeeBenefitsQuery,
+  useCreateEmployeeBenefitMutation,
+  useUpdateEmployeeBenefitMutation,
+  useDeleteEmployeeBenefitMutation,
   // Documents
   useGetDocumentsQuery,
   useCreateDocumentMutation,
@@ -815,4 +946,5 @@ export const {
   useCreateResignationMutation,
   useGetExitInterviewsQuery,
 } = api;
+
 export default api;

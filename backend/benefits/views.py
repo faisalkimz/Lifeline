@@ -22,7 +22,7 @@ class EmployeeBenefitViewSet(viewsets.ModelViewSet):
         queryset = EmployeeBenefit.objects.filter(benefit_type__company=user.company)
         
         if self.request.query_params.get('my_benefits'):
-            if hasattr(user, 'employee'):
+            if hasattr(user, 'employee') and user.employee:
                 queryset = queryset.filter(employee=user.employee)
         
         return queryset

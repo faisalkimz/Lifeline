@@ -41,7 +41,9 @@ const PipelinePage = () => {
 
     // Group applications by stage
     const columns = Object.keys(stages).reduce((acc, stage) => {
-        acc[stage] = applications?.filter(app => app.stage === stage) || [];
+        acc[stage] = Array.isArray(applications)
+    ? applications.filter(app => app.stage === stage)
+    : [];
         return acc;
     }, {});
 
@@ -67,7 +69,12 @@ const PipelinePage = () => {
                                 </div>
                             </div>
 
-                            <Droppable droppableId={stageId}>
+                            <Droppable
+                                droppableId={stageId}
+                                isDropDisabled={false}
+                                isCombineEnabled={false}
+                                ignoreContainerClipping={false}
+                            >
                                 {(provided, snapshot) => (
                                     <div
                                         {...provided.droppableProps}

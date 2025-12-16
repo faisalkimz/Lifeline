@@ -60,6 +60,13 @@ const IntegrationsPage = () => {
 
     if (isLoading) return <div>Loading...</div>;
 
+    // normalize integrations to an array (API may return object or results wrapper)
+    const integrationList = Array.isArray(integrations?.results)
+        ? integrations.results
+        : Array.isArray(integrations)
+            ? integrations
+            : [];
+
     return (
         <div className="space-y-6 pb-10">
             <div className="flex justify-between items-end">
@@ -115,7 +122,7 @@ const IntegrationsPage = () => {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {platforms.map(platform => {
-                    const integration = integrations?.find(i => i.platform === platform.id);
+                    const integration = integrationList.find(i => i.platform === platform.id) || null;
                     const isConnected = !!integration;
                     const Icon = platform.icon;
 

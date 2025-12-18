@@ -593,6 +593,21 @@ export const api = createApi({
       }),
       invalidatesTags: ['Interview']
     }),
+    updateInterview: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/recruitment/interviews/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Interview']
+    }),
+    deleteInterview: builder.mutation({
+      query: (id) => ({
+        url: `/recruitment/interviews/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Interview']
+    }),
     getRecruitmentIntegrations: builder.query({
       query: () => '/recruitment/integrations/',
       providesTags: ['RecruitmentIntegration']
@@ -908,6 +923,8 @@ export const {
   useMoveApplicationStageMutation,
   useGetInterviewsQuery,
   useCreateInterviewMutation,
+  useUpdateInterviewMutation,
+  useDeleteInterviewMutation,
   useGetRecruitmentIntegrationsQuery,
   useCreateRecruitmentIntegrationMutation,
   useUpdateRecruitmentIntegrationMutation,

@@ -166,7 +166,12 @@ const DashboardPage = () => {
                             { name: 'Benefits Admin', icon: Heart, link: '/benefits/admin' },
                             { name: 'Settings', icon: Users, link: '/settings' },
                         ].map((item) => (
-                            <Link key={item.name} to={item.link}>
+                            <Link
+                                key={item.name}
+                                to={item.link}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-neutral-100 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                                aria-label={`Navigate to ${item.name}`}
+                            >
                                 <div className="bg-white p-4 rounded-xl border border-slate-100 hover:border-primary-200 hover:shadow-md transition-all flex flex-col items-center justify-center text-center gap-2 group h-full">
                                     <div className="p-2 rounded-full bg-slate-50 text-slate-500 group-hover:bg-primary-50 group-hover:text-primary-600 transition-colors">
                                         <item.icon className="h-5 w-5" />

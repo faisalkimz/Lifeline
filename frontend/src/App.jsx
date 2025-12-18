@@ -16,6 +16,7 @@ import ManagerManagementPage from './features/managers/ManagerManagementPage';
 import PayrollIndex from './features/payroll/PayrollIndex';
 import PayrollRunDetailsPage from './features/payroll/PayrollRunDetailsPage';
 import LeaveRequestsPage from './features/leave/LeaveRequestsPage';
+import LeaveApprovalPage from './features/leave/LeaveApprovalPage';
 import LeaveCalendar from './features/leave/LeaveCalendar';
 
 import AttendancePage from './features/attendance/AttendancePage';
@@ -74,7 +75,7 @@ function App() {
 
         <Route path="/leave" element={<LeaveRequestsPage />} />
         <Route path="/leave/calendar" element={<LeaveCalendar />} />
-        <Route path="/leave/approvals" element={<Navigate to="/leave" replace />} />
+        <Route path="/leave/approvals" element={<LeaveApprovalPage />} />
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/attendance/overtime" element={<OvertimePage />} />
         <Route path="/performance" element={<PerformancePage />} />

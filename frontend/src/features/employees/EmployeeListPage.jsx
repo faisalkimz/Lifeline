@@ -181,54 +181,140 @@ const EmployeeListPage = () => {
                 </CardContent>
             </Card>
 
-            {/* Enhanced Employees Table */}
-            <Card className="border-0 shadow-xl overflow-hidden">
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader className="bg-slate-50">
-                            <TableRow className="border-b border-gray-100">
-                                <TableHead className="font-semibold text-slate-600">Employee</TableHead>
-                                <TableHead className="font-semibold text-slate-600">Role & Department</TableHead>
-                                <TableHead className="font-semibold text-slate-600">Status</TableHead>
-                                <TableHead className="font-semibold text-slate-600">Contact</TableHead>
-                                <TableHead className="font-semibold text-slate-600">Joined</TableHead>
-                                <TableHead className="text-right font-semibold text-slate-600">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
+            {/* Responsive Employee List - Cards on mobile, table on desktop */}
                             {isLoading ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-12">
+                <Card className="border-0 shadow-xl">
+                    <CardContent className="py-12">
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-500 border-t-transparent"></div>
+                            <p className="text-text-secondary font-medium">Loading your team...</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            ) : employees?.length === 0 ? (
+                <Card className="border-0 shadow-xl">
+                    <CardContent className="py-12">
                                         <div className="flex flex-col items-center gap-3">
-                                            <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-500 border-t-transparent"></div>
-                                            <p className="text-gray-500 font-medium">Loading your team...</p>
+                            <div className="h-20 w-20 bg-neutral-100 rounded-full flex items-center justify-center">
+                                <Users className="h-10 w-10 text-neutral-400" />
+                            </div>
+                            <div className="text-center">
+                                <p className="text-text-primary font-semibold text-lg">No team members yet</p>
+                                <p className="text-text-secondary">Add your first employee to get started!</p>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            ) : (
+                <>
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-4" role="list" aria-label="Employee list">
+                        {employees.map((employee) => (
+                            <Card
+                                key={employee.id}
+                                className="border-0 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+                                onClick={() => navigate(`/employees/${employee.id}/edit`)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        navigate(`/employees/${employee.id}/edit`);
+                                    }
+                                }}
+                                tabIndex={0}
+                                role="listitem"
+                                aria-label={`View details for ${employee.full_name}`}
+                            >
+                                <CardContent className="p-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="relative h-14 w-14 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden ring-4 ring-primary-50 shrink-0">
+                                            {employee.photo ? (
+                                                <img
+                                                    src={getImageUrl(employee.photo)}
+                                                    alt={employee.full_name}
+                                                    className="h-full w-full object-cover"
+                                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                                />
+                                            ) : (
+                                                <span>{employee.first_name[0]}{employee.last_name[0]}</span>
+                                            )}
+                                            {employee.employment_status === 'active' && (
+                                                <div className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-success-400 border-2 border-white rounded-full"></div>
+                                            )}
                                         </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : employees?.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-12">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <div className="h-20 w-20 bg-gray-100 rounded-full flex items-center justify-center">
-                                                <Users className="h-10 w-10 text-gray-400" />
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <h3 className="font-semibold text-text-primary text-lg">{employee.full_name}</h3>
+                                                    <p className="text-sm text-text-secondary font-mono">{employee.employee_number}</p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className="text-sm font-medium text-text-primary">{employee.job_title || 'N/A'}</span>
+                                                        <span className="text-sm text-text-secondary">•</span>
+                                                        <span className="text-sm text-text-secondary">{employee.department_name || 'No Department'}</span>
+                                                    </div>
+                                                </div>
+                                                <StatusBadge status={employee.employment_status} />
                                             </div>
-                                            <div>
-                                                <p className="text-gray-900 font-semibold text-lg">No team members yet</p>
-                                                <p className="text-gray-500">Add your first employee to get started!</p>
+
+                                            <div className="mt-3 space-y-2">
+                                                <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                                    <Mail className="h-4 w-4" />
+                                                    <span className="truncate">{employee.email}</span>
+                                                </div>
+                                                {employee.phone && (
+                                                    <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                                        <Phone className="h-4 w-4" />
+                                                        <span>{employee.phone}</span>
+                                                    </div>
+                                                )}
+                                                <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                                    <Calendar className="h-4 w-4" />
+                                                    <span>Joined {new Date(employee.join_date).toLocaleDateString('en-US', {
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                        year: 'numeric'
+                                                    })}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </TableCell>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    {/* Desktop Table View */}
+                    <div className="hidden md:block">
+                        <Card className="border-0 shadow-xl overflow-hidden">
+                            <div className="overflow-x-auto">
+                                <Table aria-label="Employee management table">
+                                    <TableHeader className="bg-neutral-50">
+                                        <TableRow className="border-b border-neutral-200">
+                                            <TableHead className="font-semibold text-neutral-600" scope="col">Employee</TableHead>
+                                            <TableHead className="font-semibold text-neutral-600" scope="col">Role & Department</TableHead>
+                                            <TableHead className="font-semibold text-neutral-600" scope="col">Status</TableHead>
+                                            <TableHead className="font-semibold text-neutral-600" scope="col">Contact</TableHead>
+                                            <TableHead className="font-semibold text-neutral-600" scope="col">Joined</TableHead>
+                                            <TableHead className="text-right font-semibold text-neutral-600" scope="col">Actions</TableHead>
                                 </TableRow>
-                            ) : (
-                                employees.map((employee) => (
+                                    </TableHeader>
+                                    <TableBody>
+                                        {employees.map((employee) => (
                                     <TableRow
                                         key={employee.id}
-                                        className="cursor-pointer hover:bg-blue-50/50 transition-colors border-b border-gray-100"
+                                                className="cursor-pointer hover:bg-primary-50/50 transition-colors border-b border-neutral-100"
                                         onClick={() => navigate(`/employees/${employee.id}/edit`)}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' || e.key === ' ') {
+                                                        e.preventDefault();
+                                                        navigate(`/employees/${employee.id}/edit`);
+                                                    }
+                                                }}
+                                                tabIndex={0}
+                                                aria-label={`View details for ${employee.full_name}`}
                                     >
                                         <TableCell>
                                             <div className="flex items-center gap-4">
-                                                <div className="relative h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-lg overflow-hidden ring-4 ring-blue-50 shrink-0">
+                                                        <div className="relative h-12 w-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden ring-4 ring-primary-50 shrink-0">
                                                     {employee.photo ? (
                                                         <img
                                                             src={getImageUrl(employee.photo)}
@@ -240,18 +326,18 @@ const EmployeeListPage = () => {
                                                         <span>{employee.first_name[0]}{employee.last_name[0]}</span>
                                                     )}
                                                     {employee.employment_status === 'active' && (
-                                                        <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-400 border-2 border-white rounded-full"></div>
+                                                                <div className="absolute bottom-0 right-0 h-3 w-3 bg-success-400 border-2 border-white rounded-full"></div>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-semibold text-gray-900 text-base">{employee.full_name}</div>
-                                                    <div className="text-xs text-gray-500 font-mono">{employee.employee_number}</div>
+                                                            <div className="font-semibold text-text-primary text-base">{employee.full_name}</div>
+                                                            <div className="text-xs text-text-secondary font-mono">{employee.employee_number}</div>
                                                 </div>
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="font-medium text-gray-900">{employee.job_title}</div>
-                                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                                                    <div className="font-medium text-text-primary">{employee.job_title}</div>
+                                                    <div className="flex items-center gap-1.5 text-xs text-text-secondary mt-1">
                                                 <Building2 className="h-3 w-3" />
                                                 {employee.department_name}
                                             </div>
@@ -261,21 +347,21 @@ const EmployeeListPage = () => {
                                         </TableCell>
                                         <TableCell>
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                                        <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                                            <Mail className="h-3.5 w-3.5 text-neutral-400" />
                                                     <span className="truncate max-w-[180px]">{employee.email}</span>
                                                 </div>
                                                 {employee.phone && (
-                                                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                                                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                                            <div className="flex items-center gap-2 text-sm text-text-secondary">
+                                                                <Phone className="h-3.5 w-3.5 text-neutral-400" />
                                                         {employee.phone}
                                                     </div>
                                                 )}
                                             </div>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                <Calendar className="h-4 w-4 text-gray-400" />
+                                                    <div className="flex items-center gap-2 text-sm text-text-primary">
+                                                        <Calendar className="h-4 w-4 text-neutral-400" />
                                                 {new Date(employee.join_date).toLocaleDateString('en-US', {
                                                     month: 'short',
                                                     day: 'numeric',
@@ -286,18 +372,20 @@ const EmployeeListPage = () => {
                                         <TableCell className="text-right">
                                             <Button
                                                 variant="ghost"
-                                                className="h-9 w-9 p-0 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                                                        className="h-9 w-9 p-0 hover:bg-primary-50 hover:text-primary-600 transition-colors"
                                             >
                                                 <MoreVertical className="h-5 w-5" />
                                             </Button>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            )}
+                                        ))}
                         </TableBody>
                     </Table>
                 </div>
             </Card>
+                    </div>
+                </>
+            )}
         </div>
     );
 };

@@ -7,12 +7,16 @@ import {
     useApproveLeaveRequestMutation,
     useRejectLeaveRequestMutation,
 } from '../../store/api';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
+import { Badge } from '../../components/ui/Badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
 import {
     Plus, Search, ChevronLeft, ChevronRight, Filter, Download,
-    FileText, CheckCircle, XCircle, Clock
+    FileText, CheckCircle, XCircle, Clock, Calendar, User,
+    AlertTriangle, Upload, X, PieChart, TrendingUp, BarChart3
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
@@ -65,6 +69,17 @@ const LeaveRequestsPage = () => {
         }
     };
 
+    const calculateDays = (startDate, endDate) => {
+        if (!startDate || !endDate) return 0;
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+        return diffDays;
+    };
+
+    const daysRequested = calculateDays(formData.start_date, formData.end_date);
+
     return (
         <div className="space-y-8 pb-10 font-sans text-slate-900">
             {/* Header Section */}
@@ -76,6 +91,144 @@ const LeaveRequestsPage = () => {
                     <h1 className="text-2xl font-bold text-slate-800">{user?.company_name || 'Company Name'}</h1>
                     <p className="text-slate-500 font-medium">{user.first_name || user.last_name}</p>
                 </div>
+            </div>
+
+            {/* Leave Balance Dashboard */}
+            <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-text-primary flex items-center gap-2">
+                    <PieChart className="h-5 w-5 text-primary-600" />
+                    Leave Balance Overview
+                </h2>
+
+                {/* Balance Cards */}
+                {leaveBalances && leaveBalances.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {leaveBalances.map((balance, index) => {
+                            const usedPercentage = balance.total_days > 0 ? (balance.used_days / balance.total_days) * 100 : 0;
+                            const remainingDays = balance.total_days - balance.used_days;
+                            const isLowBalance = remainingDays <= 5;
+
+                            return (
+                                <Card key={balance.id} className="hover:shadow-lg transition-shadow">
+                                    <CardContent className="p-6">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-10 w-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                                    <Calendar className="h-5 w-5 text-primary-600" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-text-primary">{balance.leave_type_name}</h3>
+                                                    <p className="text-sm text-text-secondary">Leave Type</p>
+                                                </div>
+                                            </div>
+                                            {isLowBalance && (
+                                                <Badge variant="warning" size="sm">
+                                                    <AlertTriangle className="h-3 w-3 mr-1" />
+                                                    Low
+                                                </Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-text-primary">Total Days</span>
+                                                <span className="text-lg font-bold text-text-primary">{balance.total_days}</span>
+                                            </div>
+
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-text-primary">Used</span>
+                                                <span className="text-sm text-error-600">{balance.used_days} days</span>
+                                            </div>
+
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-medium text-text-primary">Remaining</span>
+                                                <span className={`text-sm font-semibold ${remainingDays <= 5 ? 'text-warning-600' : 'text-success-600'}`}>
+                                                    {remainingDays} days
+                                                </span>
+                                            </div>
+
+                                            {/* Progress Bar */}
+                                            <div className="mt-4">
+                                                <div className="flex justify-between text-xs text-text-secondary mb-1">
+                                                    <span>Usage</span>
+                                                    <span>{Math.round(usedPercentage)}%</span>
+                                                </div>
+                                                <div className="w-full bg-neutral-200 rounded-full h-2">
+                                                    <div
+                                                        className={`h-2 rounded-full transition-all duration-300 ${
+                                                            usedPercentage > 80 ? 'bg-error-500' :
+                                                            usedPercentage > 60 ? 'bg-warning-500' : 'bg-success-500'
+                                                        }`}
+                                                        style={{ width: `${Math.min(usedPercentage, 100)}%` }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <Card>
+                        <CardContent className="py-12">
+                            <div className="flex flex-col items-center gap-3">
+                                <PieChart className="h-16 w-16 text-neutral-400" />
+                                <div className="text-center">
+                                    <p className="text-text-primary font-semibold text-lg">No leave balances</p>
+                                    <p className="text-text-secondary">Leave balances will appear here once assigned by HR.</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
+
+                {/* Quick Stats */}
+                {leaveBalances && leaveBalances.length > 0 && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-text-secondary">Total Leave Days</p>
+                                        <p className="text-2xl font-bold text-text-primary">
+                                            {leaveBalances.reduce((sum, balance) => sum + balance.total_days, 0)}
+                                        </p>
+                                    </div>
+                                    <BarChart3 className="h-8 w-8 text-primary-600" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-text-secondary">Days Used</p>
+                                        <p className="text-2xl font-bold text-text-primary">
+                                            {leaveBalances.reduce((sum, balance) => sum + balance.used_days, 0)}
+                                        </p>
+                                    </div>
+                                    <TrendingUp className="h-8 w-8 text-warning-600" />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <p className="text-sm font-medium text-text-secondary">Days Remaining</p>
+                                        <p className="text-2xl font-bold text-text-primary">
+                                            {leaveBalances.reduce((sum, balance) => sum + (balance.total_days - balance.used_days), 0)}
+                                        </p>
+                                    </div>
+                                    <CheckCircle className="h-8 w-8 text-success-600" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )}
             </div>
 
             {/* Leave Requests Header & Tabs */}
@@ -92,12 +245,14 @@ const LeaveRequestsPage = () => {
                             <DialogHeader>
                                 <DialogTitle>Request Leave</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-medium mb-1">Leave Type</label>
+                            <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+                                {/* Leave Type Selection */}
+                                <div>
+                                    <label className="block text-sm font-medium text-text-primary mb-2">
+                                        Leave Type <span className="text-error-500">*</span>
+                                    </label>
                                         <select
-                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                        className="w-full h-11 px-4 py-3 border border-border-medium rounded-lg bg-background-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
                                             value={formData.leave_type}
                                             onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
                                             required
@@ -108,39 +263,123 @@ const LeaveRequestsPage = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Start Date</label>
-                                        <input
+
+                                {/* Date Range */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input
+                                        label="Start Date"
                                             type="date"
-                                            className="w-full border rounded-md p-2 bg-slate-50"
                                             value={formData.start_date}
                                             onChange={e => setFormData({ ...formData, start_date: e.target.value })}
                                             required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">End Date</label>
-                                        <input
+                                        min={new Date().toISOString().split('T')[0]}
+                                    />
+                                    <Input
+                                        label="End Date"
                                             type="date"
-                                            className="w-full border rounded-md p-2 bg-slate-50"
                                             value={formData.end_date}
                                             onChange={e => setFormData({ ...formData, end_date: e.target.value })}
                                             required
-                                        />
+                                        min={formData.start_date || new Date().toISOString().split('T')[0]}
+                                    />
+                                </div>
+
+                                {/* Days Calculation */}
+                                {daysRequested > 0 && (
+                                    <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Calendar className="h-4 w-4 text-primary-600" />
+                                                <span className="text-sm font-medium text-primary-900">
+                                                    Duration: {daysRequested} day{daysRequested !== 1 ? 's' : ''}
+                                                </span>
+                                            </div>
+                                            <Badge variant="primary" size="sm">
+                                                {daysRequested} day{daysRequested !== 1 ? 's' : ''}
+                                            </Badge>
+                                        </div>
                                     </div>
-                                    <div className="col-span-2">
-                                        <label className="block text-sm font-medium mb-1">Reason</label>
+                                )}
+
+                                {/* Reason */}
+                                <div>
+                                    <label className="block text-sm font-medium text-text-primary mb-2">
+                                        Reason for Leave <span className="text-error-500">*</span>
+                                    </label>
                                         <textarea
-                                            className="w-full border rounded-md p-2 bg-slate-50"
+                                        className="w-full min-h-24 px-4 py-3 border border-border-medium rounded-lg bg-background-primary text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 resize-none"
                                             value={formData.reason}
                                             onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                            rows="3"
-                                            placeholder="Reason for leave..."
+                                        placeholder="Please provide a detailed reason for your leave request..."
                                             required
+                                    />
+                                    <p className="text-xs text-text-secondary mt-1">
+                                        Provide specific details to help your manager understand your request.
+                                    </p>
+                                </div>
+
+                                {/* File Upload */}
+                                <div>
+                                    <label className="block text-sm font-medium text-text-primary mb-2">
+                                        Supporting Document (Optional)
+                                    </label>
+                                    <div className="border-2 border-dashed border-border-light rounded-lg p-4 hover:border-primary-400 transition-colors">
+                                        <input
+                                            type="file"
+                                            id="document-upload"
+                                            className="hidden"
+                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                            onChange={e => setFormData({ ...formData, document: e.target.files[0] })}
                                         />
+                                        <label
+                                            htmlFor="document-upload"
+                                            className="flex flex-col items-center justify-center cursor-pointer"
+                                        >
+                                            <Upload className="h-8 w-8 text-text-tertiary mb-2" />
+                                            <p className="text-sm text-text-secondary text-center">
+                                                {formData.document ? formData.document.name : 'Click to upload supporting document'}
+                                            </p>
+                                            <p className="text-xs text-text-tertiary mt-1">
+                                                PDF, DOC, DOCX, JPG, PNG up to 10MB
+                                            </p>
+                                        </label>
+                                        {formData.document && (
+                                            <div className="flex items-center justify-between mt-3 p-2 bg-neutral-50 rounded-md">
+                                                <div className="flex items-center gap-2">
+                                                    <FileText className="h-4 w-4 text-primary-600" />
+                                                    <span className="text-sm text-text-primary">{formData.document.name}</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setFormData({ ...formData, document: null })}
+                                                    className="text-neutral-400 hover:text-error-500"
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                <Button type="submit" className="w-full">Submit Request</Button>
+
+                                {/* Form Actions */}
+                                <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-border-light">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => setIsDialogOpen(false)}
+                                        className="w-full sm:w-auto"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="w-full sm:w-auto"
+                                        disabled={!formData.leave_type || !formData.start_date || !formData.end_date || !formData.reason}
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Submit Request
+                                    </Button>
+                                </div>
                             </form>
                         </DialogContent>
                     </Dialog>

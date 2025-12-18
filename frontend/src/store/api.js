@@ -152,30 +152,6 @@ export const api = createApi({
       }),
       invalidatesTags: [{ type: 'Department', id: 'LIST' }]
     }),
-    // --- Payroll Runs (NEW) ---
-    getPayrollRuns: builder.query({
-      query: () => '/payroll/payroll-runs/',
-      transformResponse: (response) => {
-        if (Array.isArray(response)) return response;
-        if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
-      },
-      providesTags: (result) =>
-        result && Array.isArray(result)
-          ? [
-            ...result.map(({ id }) => ({ type: 'PayrollRun', id })),
-            { type: 'PayrollRun', id: 'LIST' }
-          ]
-          : [{ type: 'PayrollRun', id: 'LIST' }]
-    }),
-    createPayrollRun: builder.mutation({
-      query: (data) => ({
-        url: '/payroll/payroll-runs/',
-        method: 'POST',
-        body: data
-      }),
-      invalidatesTags: [{ type: 'PayrollRun', id: 'LIST' }]
-    }),
     // --- Salary Structures (NEW) ---
     getSalaryStructures: builder.query({
       query: () => '/payroll/salary-structures/',
@@ -265,6 +241,12 @@ export const api = createApi({
       }),
       invalidatesTags: ['PayrollRun']
     }),
+    downloadTaxSheet: builder.query({
+      query: (id) => ({
+        url: `/payroll/payroll-runs/${id}/download_tax_sheet/`,
+        responseHandler: (response) => response.text(),
+      }),
+    }),
 
     // ========== PAYSLIPS ==========
     getPayslips: builder.query({
@@ -292,47 +274,57 @@ export const api = createApi({
       query: () => '/employees/managers/',
       providesTags: ['Employee']
     }),
-    // --- FIXED: Salary Advances ---
-    getSalaryAdvances: builder.query({
-      query: () => '/payroll/salary-advances/',
-      // FIXED: Better transform with logging
-      transformResponse: (response) => {
-        console.log('[API] Raw salary-advances response:', response);
-        if (response?.results && Array.isArray(response.results)) {
-          console.log('[API] Using paginated results:', response.results.length);
-          return response.results;
-        }
-        if (Array.isArray(response)) {
-          console.log('[API] Using direct array:', response.length);
-          return response;
-        }
-        console.warn('[API] Unexpected response format, returning empty:', response);
-        return [];
-      },
-      providesTags: (result = []) => [
-        ...result.map(({ id }) => ({ type: 'SalaryAdvance', id })),
-        { type: 'SalaryAdvance', id: 'LIST' }
-      ]
-    }),
-    createSalaryAdvance: builder.mutation({
-      query: (data) => ({
-        url: '/payroll/salary-advances/',
-        method: 'POST',
-        body: data
-      }),
-      invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]  // FIXED: Now works with tagTypes
-    }),
-    updateSalaryAdvance: builder.mutation({
-      query: ({ id, ...patch }) => ({
-        url: `/payroll/salary-advances/${id}/`,
-        method: 'PATCH',
-        body: patch
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: 'SalaryAdvance', id },
-        { type: 'SalaryAdvance', id: 'LIST' }
-      ]
-    }),
+   // ========== SALARY ADVANCES ==========
+getSalaryAdvances: builder.query({
+  query: (params) => ({
+    url: '/payroll/salary-advances/',
+    params
+  }),
+  transformResponse: (response) => {
+    if (response?.results) return response.results
+    if (Array.isArray(response)) return response
+    return []
+  },
+  providesTags: (result = []) => [
+    ...result.map(({ id }) => ({ type: 'SalaryAdvance', id })),
+    { type: 'SalaryAdvance', id: 'LIST' }
+  ]
+}),
+
+createSalaryAdvance: builder.mutation({
+  query: (body) => ({
+    url: '/payroll/salary-advances/',
+    method: 'POST',
+    body
+  }),
+  invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
+}),
+
+updateSalaryAdvance: builder.mutation({
+  query: ({ id, ...body }) => ({
+    url: `/payroll/salary-advances/${id}/`,
+    method: 'PATCH',
+    body
+  }),
+  invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
+}),
+
+approveSalaryAdvance: builder.mutation({
+  query: (id) => ({
+    url: `/payroll/salary-advances/${id}/approve/`,
+    method: 'PATCH'
+  }),
+  invalidatesTags: ['SalaryAdvance']
+}),
+
+rejectSalaryAdvance: builder.mutation({
+  query: (id) => ({
+    url: `/payroll/salary-advances/${id}/reject/`,
+    method: 'PATCH'
+  }),
+  invalidatesTags: ['SalaryAdvance']
+}),
+
     // --- My Profile ---
     getMyProfile: builder.query({
       query: () => '/employees/me/',
@@ -437,8 +429,43 @@ export const api = createApi({
 
     // ========== PERFORMANCE MANAGEMENT ==========
     getPerformanceCycles: builder.query({
-      query: () => '/performance/cycles/',
+      query: (params) => ({
+        url: '/performance/cycles/',
+        params
+      }),
       providesTags: ['PerformanceCycle']
+    }),
+    createPerformanceCycle: builder.mutation({
+      query: (body) => ({
+        url: '/performance/cycles/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['PerformanceCycle']
+    }),
+    updatePerformanceCycle: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/performance/cycles/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['PerformanceCycle']
+    }),
+    deletePerformanceCycle: builder.mutation({
+      query: (id) => ({
+        url: `/performance/cycles/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['PerformanceCycle']
+    }),
+
+    request360: builder.mutation({
+      query: (data) => ({
+        url: '/performance/reviews/request_360/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['PerformanceCycle']
     }),
 
     // Goals
@@ -452,6 +479,11 @@ export const api = createApi({
         if (response?.results && Array.isArray(response.results)) return response.results;
         return response || [];
       },
+      providesTags: (result) =>
+        result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
+    }),
+    getTeamGoals: builder.query({
+      query: () => '/performance/goals/team_goals/',
       providesTags: (result) =>
         result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
     }),
@@ -554,6 +586,13 @@ export const api = createApi({
         body
       }),
       invalidatesTags: ['Candidate']
+    }),
+    parseResume: builder.mutation({
+      query: (formData) => ({
+        url: '/recruitment/candidates/parse_resume/',
+        method: 'POST',
+        body: formData,
+      }),
     }),
     getApplications: builder.query({
       query: (params) => ({
@@ -841,10 +880,69 @@ export const api = createApi({
       }),
       invalidatesTags: ['Resignation']
     }),
+    updateResignation: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/offboarding/resignations/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Resignation']
+    }),
     getExitInterviews: builder.query({
       query: () => '/offboarding/interviews/',
       providesTags: ['ExitInterview']
-    })
+    }),
+
+    // ========== DISCIPLINARY ==========
+    getDisciplinaryActions: builder.query({
+      query: (params) => ({
+        url: '/disciplinary/actions/',
+        params
+      }),
+      providesTags: ['DisciplinaryAction']
+    }),
+    createDisciplinaryAction: builder.mutation({
+      query: (body) => ({
+        url: '/disciplinary/actions/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['DisciplinaryAction']
+    }),
+    updateDisciplinaryAction: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/disciplinary/actions/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['DisciplinaryAction']
+    }),
+    submitDisciplinaryStatement: builder.mutation({
+      query: ({ id, statement }) => ({
+        url: `/disciplinary/actions/${id}/submit_statement/`,
+        method: 'POST',
+        body: { statement }
+      }),
+      invalidatesTags: ['DisciplinaryAction']
+    }),
+
+    // --- Accounts / Settings ---
+    getUsers: builder.query({
+      query: () => '/users/',
+      providesTags: ['User'],
+    }),
+    getCompany: builder.query({
+      query: (id) => `/companies/${id}/`,
+      providesTags: ['Company'],
+    }),
+    updateCompany: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/companies/${id}/`,
+        method: 'PATCH',
+        body: data,
+      }),
+      invalidatesTags: ['Company'],
+    }),
   })
 });
 
@@ -871,6 +969,7 @@ export const {
   useProcessPayrollMutation, // Added
   useApprovePayrollMutation, // Added
   useMarkPayrollPaidMutation, // Added
+  useLazyDownloadTaxSheetQuery, // Added
   useGetPayslipsQuery, // Added
   useUpdatePayslipMutation, // Added
   useGetSalaryStructuresQuery,
@@ -879,13 +978,11 @@ export const {
   useDeleteSalaryStructureMutation,
   // employee stats and managers hooks
   useGetEmployeeStatsQuery,
-  useGetManagersQuery,
-  // my profile hook
+
   useGetMyProfileQuery,
   // promote to manager hook
   usePromoteToManagerMutation,
   useGetSalaryAdvancesQuery,
-  useCreateSalaryAdvanceMutation,
   useUpdateSalaryAdvanceMutation,
   // leave hooks
   useGetLeaveRequestsQuery,
@@ -903,10 +1000,15 @@ export const {
   useGetTeamAttendanceQuery,
   // Performance
   useGetPerformanceCyclesQuery,
+  useCreatePerformanceCycleMutation,
+  useUpdatePerformanceCycleMutation,
+  useDeletePerformanceCycleMutation,
+  useRequest360Mutation,
   useGetGoalsQuery,
+  useDeleteGoalMutation,
   useCreateGoalMutation,
   useUpdateGoalMutation,
-  useDeleteGoalMutation,
+  useGetTeamGoalsQuery,
   useGetReviewsQuery,
   useGetReviewStatsQuery,
   useCreateReviewMutation,
@@ -918,6 +1020,7 @@ export const {
   useGetCandidatesQuery,
   useCreateCandidateMutation,
   useUpdateCandidateMutation,
+  useParseResumeMutation,
   useGetApplicationsQuery,
   useCreateApplicationMutation,
   useMoveApplicationStageMutation,
@@ -961,7 +1064,22 @@ export const {
   // Offboarding
   useGetResignationsQuery,
   useCreateResignationMutation,
+  useUpdateResignationMutation,
   useGetExitInterviewsQuery,
+  // Disciplinary
+  useGetDisciplinaryActionsQuery,
+  useCreateDisciplinaryActionMutation,
+  useUpdateDisciplinaryActionMutation,
+  useSubmitDisciplinaryStatementMutation,
+  useGetUsersQuery,
+  useGetCompanyQuery,
+  useUpdateCompanyMutation,
+  // Salary Advances
+  useCreateSalaryAdvanceMutation,
+  useApproveSalaryAdvanceMutation,
+  useRejectSalaryAdvanceMutation,
+  // Org Structure
+  useGetManagersQuery,
 } = api;
 
 export default api;

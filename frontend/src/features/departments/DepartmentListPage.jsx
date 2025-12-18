@@ -61,43 +61,12 @@ const DepartmentListPage = () => {
     });
     const [deleteDepartment] = useDeleteDepartmentMutation();
 
-    const mockDepartments = [
-        {
-            id: 1,
-            name: 'Engineering',
-            code: 'ENG',
-            description: 'Software development and technical innovation',
-            manager_name: 'John Doe',
-            employee_count: 12,
-            is_active: true,
-            created_at: '2024-01-15T00:00:00Z'
-        },
-        {
-            id: 2,
-            name: 'Human Resources',
-            code: 'HR',
-            description: 'People operations and talent management',
-            manager_name: 'Jane Smith',
-            employee_count: 5,
-            is_active: true,
-            created_at: '2024-02-01T00:00:00Z'
-        },
-        {
-            id: 3,
-            name: 'Marketing',
-            code: 'MKT',
-            description: 'Brand strategy and customer engagement',
-            manager_name: null,
-            employee_count: 8,
-            is_active: true,
-            created_at: '2024-03-10T00:00:00Z'
-        }
-    ];
 
-    let departmentsArray = mockDepartments;
-    if (Array.isArray(departments) && departments.length > 0) {
+
+    let departmentsArray = [];
+    if (Array.isArray(departments)) {
         departmentsArray = departments;
-    } else if (departments && typeof departments === 'object' && Array.isArray(departments.results) && departments.results.length > 0) {
+    } else if (departments && typeof departments === 'object' && Array.isArray(departments.results)) {
         departmentsArray = departments.results;
     }
 

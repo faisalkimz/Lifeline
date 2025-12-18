@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 from .models import Department, Employee
 from .serializers import (
@@ -132,15 +133,36 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     ordering = ['employee_number']
     
     def get_queryset(self):
-        """Filter employees by company"""
+        """Filter employees by company and role-based access"""
         user = self.request.user
         
         # Super admins see all employees
         if user.role == 'super_admin':
             queryset = Employee.objects.all()
         else:
-            # Regular users only see employees from their company
+            # Base queryset: All employees in the user's company
             queryset = Employee.objects.filter(company=user.company)
+            
+            # Role-Based Restrictions
+            if user.role in ['company_admin', 'hr_manager']:
+                # They see everyone in the company (no further filtering needed)
+                pass
+            
+            elif user.role == 'manager':
+                # See themselves AND their subordinates
+                if hasattr(user, 'employee') and user.employee:
+                    queryset = queryset.filter(
+                        Q(id=user.employee.id) | Q(manager=user.employee)
+                    )
+                else:
+                    queryset = queryset.none()
+            
+            else: # 'employee' role
+                # See ONLY themselves
+                if hasattr(user, 'employee') and user.employee:
+                    queryset = queryset.filter(id=user.employee.id)
+                else:
+                    queryset = queryset.none()
         
         # Optimize queries
         queryset = queryset.select_related('company', 'department', 'manager')
@@ -210,8 +232,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def me(self, request):
         """Get current user's employee record"""
-        print(f"DEBUG: me action called for user: {request.user}, authenticated: {request.user.is_authenticated}")
-
         if not request.user.is_authenticated:
             return Response(
                 {'error': 'Authentication required.'},
@@ -224,11 +244,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
                 company=request.user.company,
                 email=request.user.email
             )
-            print(f"DEBUG: Found employee: {employee}")
             serializer = EmployeeSerializer(employee)
             return Response(serializer.data)
         except Employee.DoesNotExist:
-            print(f"DEBUG: No employee found for email: {request.user.email}, company: {request.user.company}")
             return Response(
                 {'error': 'No employee record found for this user.'},
                 status=status.HTTP_404_NOT_FOUND
@@ -265,6 +283,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         """Get employee count grouped by department"""
         from django.db.models import Count
         
+        if request.user.role not in ['company_admin', 'hr_manager', 'super_admin']:
+             return Response([]) # Others don't need this aggregation
+
         departments = Department.objects.filter(
             company=request.user.company
         ).annotate(
@@ -290,6 +311,10 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def promote_to_manager(self, request):
         """Promote employees to managerial positions"""
+        # Admin/HR only
+        if request.user.role not in ['company_admin', 'hr_manager', 'super_admin']:
+            return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+
         from .models import Department
 
         employee_ids = request.data.get('employee_ids', [])
@@ -362,7 +387,15 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def stats(self, request):
-        """Get employee statistics"""
+        """Get employee statistics - Restricted to dashboard view mostly"""
+        # Only HR/Admins really need full stats. But let's check role.
+        if request.user.role not in ['company_admin', 'hr_manager', 'super_admin']:
+             # Return limited stats for regular employees or just empty
+             return Response({
+                 'total': 1, 'active': 1, 'on_leave': 0, 
+                 'upcoming_events': [], 'next_events': []
+             })
+
         queryset = self.get_queryset()
         
         from django.utils import timezone
@@ -377,10 +410,6 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         today = timezone.now().date()
         next_30_days = today + timedelta(days=30)
         
-        # Birthdays logic (ignoring year)
-        # This is tricky in standard SQL/ORM across years. 
-        # For simplicity in this phase, we'll fetch active employees and filter in python 
-        # or use a raw query if performance matters. 
         # Python filter for MVP:
         active_employees = queryset.filter(employment_status='active')
         upcoming_birthdays = []
@@ -403,24 +432,7 @@ class EmployeeViewSet(viewsets.ModelViewSet):
                             'original_date': emp.date_of_birth
                         })
                 except ValueError:
-                    # Handle leap year birthdays (Feb 29) in non-leap years
-                    # Use March 1st as fallback
-                    try:
-                        fallback_date = emp.date_of_birth.replace(year=today.year, month=3, day=1)
-                        if fallback_date < today:
-                            fallback_date = fallback_date.replace(year=today.year + 1)
-
-                        if today <= fallback_date <= next_30_days:
-                            upcoming_birthdays.append({
-                                'id': emp.id,
-                                'name': emp.full_name,
-                                'date': fallback_date,
-                                'type': 'Birthday (Mar 1)',
-                                'original_date': emp.date_of_birth
-                            })
-                    except ValueError:
-                        # Skip if even March 1st causes issues
-                        pass
+                    pass
 
             # Anniversary check
             if emp.join_date:
@@ -440,96 +452,37 @@ class EmployeeViewSet(viewsets.ModelViewSet):
                                 'years': years
                             })
                 except ValueError:
-                    # Skip anniversaries with invalid dates
                     pass
         
         # Sort events by date
         upcoming_events = sorted(upcoming_birthdays + upcoming_anniversaries, key=lambda x: x['date'])[:5]
+        next_events = [] # Simplified for now
 
-        # If there are no events in the next 30 days, compute a nearest-events fallback
-        next_events = []
-        if not upcoming_events:
-            for emp in active_employees:
-                # next birthday
-                if emp.date_of_birth:
-                    try:
-                        nb = emp.date_of_birth.replace(year=today.year)
-                        if nb < today:
-                            nb = nb.replace(year=today.year + 1)
-                        days_until = (nb - today).days
-                        next_events.append({
-                            'id': emp.id,
-                            'name': emp.full_name,
-                            'date': nb,
-                            'type': 'Birthday',
-                            'original_date': emp.date_of_birth,
-                            'days_until': days_until
-                        })
-                    except ValueError:
-                        # Leap year fallback to March 1st
-                        try:
-                            fb = emp.date_of_birth.replace(year=today.year, month=3, day=1)
-                            if fb < today:
-                                fb = fb.replace(year=today.year + 1)
-                            days_until = (fb - today).days
-                            next_events.append({
-                                'id': emp.id,
-                                'name': emp.full_name,
-                                'date': fb,
-                                'type': 'Birthday (Mar 1)',
-                                'original_date': emp.date_of_birth,
-                                'days_until': days_until
-                            })
-                        except Exception:
-                            pass
+        total_count = queryset.count()
+        new_hires_count = queryset.filter(join_date__gte=thirty_days_ago).count()
+        prev_month_count = total_count - new_hires_count
+        growth_percentage = 0
+        if prev_month_count > 0:
+            growth_percentage = round((new_hires_count / prev_month_count) * 100, 1)
 
-                # next anniversary
-                if emp.join_date:
-                    try:
-                        na = emp.join_date.replace(year=today.year)
-                        if na < today:
-                            na = na.replace(year=today.year + 1)
-                        years = na.year - emp.join_date.year
-                        days_until = (na - today).days
-                        # Only include anniversaries that have at least 1 year
-                        next_events.append({
-                            'id': emp.id,
-                            'name': emp.full_name,
-                            'date': na,
-                            'type': 'Work Anniversary',
-                            'years': years if years > 0 else None,
-                            'days_until': days_until
-                        })
-                    except Exception:
-                        pass
-
-            # Keep the nearest 5 upcoming by days_until
-            next_events = sorted([e for e in next_events if e.get('days_until') is not None], key=lambda x: x['days_until'])[:5]
+        active_count = queryset.filter(employment_status='active').count()
+        on_leave_count = queryset.filter(employment_status='on_leave').count()
 
         stats = {
-            'total': queryset.count(),
-            'active': queryset.filter(employment_status='active').count(),
-            'on_leave': queryset.filter(employment_status='on_leave').count(),
+            'total': total_count,
+            'active': active_count,
+            'active_now': active_count,
+            'working_today': active_count - on_leave_count,
+            'on_leave': on_leave_count,
             'suspended': queryset.filter(employment_status='suspended').count(),
             'terminated': queryset.filter(employment_status='terminated').count(),
             'resigned': queryset.filter(employment_status='resigned').count(),
-            'new_hires': queryset.filter(join_date__gte=thirty_days_ago).count(),
+            'new_hires': new_hires_count,
+            'growth_percentage': growth_percentage,
             'departments_count': Department.objects.filter(company=request.user.company).count(),
             'recent_hires_list': EmployeeListSerializer(recent_hires_list, many=True, context={'request': request}).data,
             'upcoming_events': upcoming_events,
             'next_events': next_events,
-            'by_type': {
-                'full_time': queryset.filter(employment_type='full_time').count(),
-                'part_time': queryset.filter(employment_type='part_time').count(),
-                'contract': queryset.filter(employment_type='contract').count(),
-                'intern': queryset.filter(employment_type='intern').count(),
-                'casual': queryset.filter(employment_type='casual').count(),
-            },
-            'by_gender': {
-                'male': queryset.filter(gender='male').count(),
-                'female': queryset.filter(gender='female').count(),
-                'other': queryset.filter(gender='other').count(),
-            }
         }
         
         return Response(stats)

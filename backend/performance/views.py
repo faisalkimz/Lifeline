@@ -119,3 +119,50 @@ class PerformanceReviewViewSet(viewsets.ModelViewSet):
             "average_rating": round(avg_rating, 2),
             "active_goals": active_goals
         })
+
+    @action(detail=False, methods=['post'])
+    def request_360(self, request):
+        """Initiate 360 feedback requests for an employee"""
+        user = request.user
+        cycle_id = request.data.get('cycle')
+        employee_id = request.data.get('employee')
+        reviewer_ids = request.data.get('reviewers', [])
+
+        if not cycle_id or not employee_id or not reviewer_ids:
+            return Response({"error": "cycle, employee, and reviewers are required"}, status=400)
+
+        # Bulk create reviews
+        created_count = 0
+        for reviewer_id in reviewer_ids:
+            # Determine review type based on relationship
+            # Simple logic: if reviewer is also a manager of the subject, it's a manager review.
+            # But here we assume these are Peers or Subordinates as requested by the UI.
+            # We'll just use 'peer' as default or look at hierarchy.
+            
+            from employees.models import Employee
+            try:
+                emp = Employee.objects.get(id=employee_id, company=user.company)
+                rev = Employee.objects.get(id=reviewer_id, company=user.company)
+                
+                # Basic hierarchy check
+                rtype = 'peer'
+                if rev.manager == emp: # Subordinate reviewing manager
+                    rtype = 'subordinate'
+                elif emp.manager == rev: # Manager reviewing subordinate
+                    rtype = 'manager'
+                                
+                PerformanceReview.objects.get_or_create(
+                    cycle_id=cycle_id,
+                    employee_id=employee_id,
+                    reviewer_id=reviewer_id,
+                    defaults={
+                        'review_type': rtype,
+                        'status': 'scheduled',
+                        'is_360_request': True
+                    }
+                )
+                created_count += 1
+            except Exception as e:
+                continue
+
+        return Response({"message": f"Successfully requested {created_count} feedback reviews."}, status=201)

@@ -1,72 +1,81 @@
 import React, { useState } from 'react';
+import {
+    useGetSalaryAdvancesQuery,
+    useCreateSalaryAdvanceMutation,
+    useApproveSalaryAdvanceMutation,
+    useRejectSalaryAdvanceMutation,
+    useGetEmployeesQuery
+} from '../../store/api';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, Clock } from 'lucide-react';
+import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, Clock, Zap } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { cn } from '../../utils/cn';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../auth/authSlice';
 
 const SalaryAdvancesPage = () => {
+    const user = useSelector(selectCurrentUser);
+    const isAdmin = user?.role !== 'employee';
+    const { data: advancesData, isLoading } = useGetSalaryAdvancesQuery();
+    const { data: employees } = useGetEmployeesQuery();
+    const [createAdvance, { isLoading: isCreating }] = useCreateSalaryAdvanceMutation();
+    const [approveAdvance] = useApproveSalaryAdvanceMutation();
+    const [rejectAdvance] = useRejectSalaryAdvanceMutation();
+
+    const advances = Array.isArray(advancesData) ? advancesData : (advancesData?.results || []);
+
     const [showForm, setShowForm] = useState(false);
     const [selectedAdvance, setSelectedAdvance] = useState(null);
 
     const [formData, setFormData] = useState({
+        employee: user?.employee || '',
         amount: '',
-        purpose: '',
+        loan_purpose: '',
         repayment_period_months: '1'
     });
-
-    // Mock salary advances data
-    const advances = [
-        {
-            id: 1,
-            amount: 500000,
-            purpose: 'Medical emergency',
-            repayment_period_months: 2,
-            monthly_deduction: 250000,
-            status: 'approved',
-            requested_date: '2025-12-10',
-            approved_date: '2025-12-12',
-            start_deduction_date: '2026-01-25'
-        },
-        {
-            id: 2,
-            amount: 300000,
-            purpose: 'Home repairs',
-            repayment_period_months: 1,
-            monthly_deduction: 300000,
-            status: 'pending',
-            requested_date: '2025-12-15'
-        },
-        {
-            id: 3,
-            amount: 750000,
-            purpose: 'Education fees',
-            repayment_period_months: 3,
-            monthly_deduction: 250000,
-            status: 'rejected',
-            requested_date: '2025-11-20',
-            rejected_date: '2025-11-22',
-            rejection_reason: 'Exceeds maximum advance limit'
-        }
-    ];
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Here you would submit to API
-        console.log('Submitting advance request:', formData);
-        setShowForm(false);
-        setFormData({
-            amount: '',
-            purpose: '',
-            repayment_period_months: '1'
-        });
+        try {
+            await createAdvance(formData).unwrap();
+            toast.success('Disbursement request submitted.');
+            setShowForm(false);
+            setFormData({
+                employee: user?.employee || '',
+                amount: '',
+                loan_purpose: '',
+                repayment_period_months: '1'
+            });
+        } catch (error) {
+            toast.error(error?.data?.error || 'Failed to submit request');
+        }
+    };
+
+    const handleApprove = async (id) => {
+        try {
+            await approveAdvance(id).unwrap();
+            toast.success('Advance approved & activated.');
+        } catch (error) {
+            toast.error('Approval failed.');
+        }
+    };
+
+    const handleReject = async (id) => {
+        try {
+            await rejectAdvance(id).unwrap();
+            toast.success('Advance request cancelled.');
+        } catch (error) {
+            toast.error('Rejection failed.');
+        }
     };
 
     const calculateMonthlyDeduction = () => {
@@ -209,57 +218,65 @@ const SalaryAdvancesPage = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card>
+                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 rounded-lg">
-                                <DollarSign className="h-6 w-6 text-blue-600" />
+                            <div className="p-3 bg-slate-900 rounded-xl text-white">
+                                <DollarSign className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Total Requested</p>
-                                <p className="text-2xl font-bold">{formatCurrency(1550000)}</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Liquidated</p>
+                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
+                                    {formatCurrency(advances.filter(a => a.status === 'active' || a.status === 'completed').reduce((acc, curr) => acc + parseFloat(curr.amount), 0))}
+                                </p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <CheckCircle className="h-6 w-6 text-green-600" />
+                            <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600 border border-emerald-100">
+                                <CheckCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Approved</p>
-                                <p className="text-2xl font-bold text-green-600">1</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Credits</p>
+                                <p className="text-2xl font-black text-emerald-600 tracking-tighter">
+                                    {advances.filter(a => a.status === 'active').length}
+                                </p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-yellow-100 rounded-lg">
-                                <Clock className="h-6 w-6 text-yellow-600" />
+                            <div className="p-3 bg-orange-50 rounded-xl text-orange-600 border border-orange-100">
+                                <Clock className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Pending</p>
-                                <p className="text-2xl font-bold text-yellow-600">1</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Audit</p>
+                                <p className="text-2xl font-black text-orange-600 tracking-tighter">
+                                    {advances.filter(a => a.status === 'pending').length}
+                                </p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-red-100 rounded-lg">
-                                <XCircle className="h-6 w-6 text-red-600" />
+                            <div className="p-3 bg-slate-50 rounded-xl text-slate-400 border border-slate-100">
+                                <XCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Rejected</p>
-                                <p className="text-2xl font-bold text-red-600">1</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revoked / Settled</p>
+                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
+                                    {advances.filter(a => a.status === 'cancelled' || a.status === 'completed').length}
+                                </p>
                             </div>
                         </div>
                     </CardContent>
@@ -267,68 +284,118 @@ const SalaryAdvancesPage = () => {
             </div>
 
             {/* Advances Table */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>My Salary Advances</CardTitle>
+            <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
+                <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Disbursement Ledger</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Purpose</TableHead>
-                                <TableHead>Repayment</TableHead>
-                                <TableHead>Monthly Deduction</TableHead>
-                                <TableHead>Requested</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {advances.map((advance) => (
-                                <TableRow key={advance.id} className="hover:bg-gray-50">
-                                    <TableCell className="font-semibold text-blue-600">
-                                        {formatCurrency(advance.amount)}
-                                    </TableCell>
-                                    <TableCell className="max-w-xs truncate">{advance.purpose}</TableCell>
-                                    <TableCell>{advance.repayment_period_months} month{advance.repayment_period_months > 1 ? 's' : ''}</TableCell>
-                                    <TableCell className="text-orange-600 font-semibold">
-                                        {formatCurrency(advance.monthly_deduction)}
-                                    </TableCell>
-                                    <TableCell>{new Date(advance.requested_date).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Badge className={getStatusColor(advance.status)}>
-                                            {advance.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setSelectedAdvance(advance)}
-                                            className="flex items-center gap-1"
-                                        >
-                                            <Eye className="h-4 w-4" />
-                                            View
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left">
+                            <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <tr>
+                                    <th className="px-8 py-5">Personnel</th>
+                                    <th className="px-8 py-5">Quantum</th>
+                                    <th className="px-8 py-5">Objective</th>
+                                    <th className="px-8 py-5">Repayment Matrix</th>
+                                    <th className="px-8 py-5">Status</th>
+                                    <th className="px-8 py-5 text-right">Operational Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-50">
+                                {isLoading ? (
+                                    [1, 2, 3].map(i => <tr key={i} className="animate-pulse h-20 bg-white"></tr>)
+                                ) : advances.length > 0 ? (
+                                    advances.map((advance) => (
+                                        <tr key={advance.id} className="hover:bg-slate-50/50 transition-all group">
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <span className="font-black text-slate-900 text-sm">{advance.employee_name}</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{advance.employee_number}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <span className="font-black text-slate-900">{formatCurrency(advance.amount)}</span>
+                                                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight mt-0.5">Liquidated Asset</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <span className="text-xs font-medium text-slate-600 truncate max-w-[150px] inline-block">{advance.loan_purpose}</span>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col">
+                                                    <span className="text-xs font-black text-slate-700">{advance.repayment_period_months} Cycles</span>
+                                                    <span className="text-[10px] font-bold text-orange-500 uppercase mt-0.5">-{formatCurrency(advance.monthly_deduction)}/MO</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <Badge className={cn("rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border", getStatusColor(advance.status))}>
+                                                    {advance.status.replace('_', ' ')}
+                                                </Badge>
+                                            </td>
+                                            <td className="px-8 py-6 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Button variant="ghost" size="sm" onClick={() => setSelectedAdvance(advance)} className="h-10 w-10 text-slate-300 hover:text-slate-900 hover:bg-slate-100 rounded-xl">
+                                                        <Eye className="h-5 w-5" />
+                                                    </Button>
+                                                    {isAdmin && advance.status === 'pending' && (
+                                                        <>
+                                                            <Button variant="ghost" size="sm" onClick={() => handleApprove(advance.id)} className="h-10 w-10 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl">
+                                                                <CheckCircle className="h-5 w-5" />
+                                                            </Button>
+                                                            <Button variant="ghost" size="sm" onClick={() => handleReject(advance.id)} className="h-10 w-10 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl">
+                                                                <XCircle className="h-5 w-5" />
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="6" className="px-8 py-20 text-center">
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Settled Balance Sheet</p>
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </CardContent>
             </Card>
 
             {/* Request Advance Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle>Request Salary Advance</DialogTitle>
+                <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white">
+                    <DialogHeader className="bg-slate-900 p-10 text-white">
+                        <DialogTitle className="text-2xl font-black tracking-tight uppercase italic flex items-center gap-3">
+                            <Zap className="h-6 w-6 text-primary-400" /> Disbursement Logic
+                        </DialogTitle>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Configure your early wage access parameters.</p>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium">Amount (UGX) *</label>
+                    <form onSubmit={handleSubmit} className="p-10 space-y-8">
+                        {isAdmin && (
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject Personnel</label>
+                                <select
+                                    name="employee"
+                                    value={formData.employee}
+                                    onChange={handleInputChange}
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
+                                    required
+                                >
+                                    <option value="">Select Target Employee</option>
+                                    {employees?.map(emp => (
+                                        <option key={emp.id} value={emp.id}>{emp.full_name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Quantum (UGX)</label>
                                 <Input
                                     name="amount"
                                     type="number"
@@ -336,63 +403,62 @@ const SalaryAdvancesPage = () => {
                                     onChange={handleInputChange}
                                     placeholder="500000"
                                     required
+                                    className="h-14 border-2 border-slate-100 rounded-2xl bg-slate-50 font-black text-slate-900 px-6"
                                 />
                             </div>
-                            <div>
-                                <label className="text-sm font-medium">Repayment Period *</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Repayment Cycles</label>
                                 <select
                                     name="repayment_period_months"
                                     value={formData.repayment_period_months}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
                                     required
                                 >
-                                    <option value="1">1 Month</option>
-                                    <option value="2">2 Months</option>
-                                    <option value="3">3 Months</option>
+                                    <option value="1">1 Cycle (Next Payroll)</option>
+                                    <option value="2">2 Cycles</option>
+                                    <option value="3">3 Cycles</option>
+                                    <option value="6">6 Cycles</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="text-sm font-medium">Purpose *</label>
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Disbursement Objective</label>
                             <textarea
-                                name="purpose"
-                                value={formData.purpose}
+                                name="loan_purpose"
+                                value={formData.loan_purpose}
                                 onChange={handleInputChange}
                                 rows="3"
-                                className="w-full p-2 border rounded-md"
-                                placeholder="Please explain why you need this advance..."
+                                className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-[2rem] font-medium text-slate-700 focus:bg-white outline-none resize-none"
+                                placeholder="State the tactical reason for this liquidity request..."
                                 required
                             />
                         </div>
 
                         {formData.amount && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h4 className="font-medium text-blue-900 mb-2">Repayment Summary</h4>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span className="text-blue-700">Monthly Deduction:</span>
-                                        <span className="font-semibold ml-2 text-blue-900">
-                                            {formatCurrency(calculateMonthlyDeduction())}
-                                        </span>
+                            <div className="bg-slate-900 p-8 rounded-[2rem] text-white">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-400 italic">Net Impact Summary</h4>
+                                    <Badge className="bg-primary-600 text-[9px] font-black">0% INTEREST</Badge>
+                                </div>
+                                <div className="grid grid-cols-2 gap-8">
+                                    <div className="space-y-1">
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Monthly Deduction</p>
+                                        <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(calculateMonthlyDeduction())}</p>
                                     </div>
-                                    <div>
-                                        <span className="text-blue-700">Total Repayment:</span>
-                                        <span className="font-semibold ml-2 text-blue-900">
-                                            {formatCurrency(parseFloat(formData.amount) || 0)}
-                                        </span>
+                                    <div className="space-y-1">
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Total Liquidated</p>
+                                        <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(parseFloat(formData.amount) || 0)}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                                Cancel
-                            </Button>
-                            <Button type="submit">
-                                Submit Request
+                        <DialogFooter className="gap-4">
+                            <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-14 font-black uppercase text-[10px] tracking-widest rounded-2xl px-8">Discard</Button>
+                            <Button type="submit" disabled={isCreating} className="h-14 bg-slate-900 shadow-2xl shadow-slate-900/20 rounded-2xl px-12 font-black uppercase text-[10px] tracking-widest">
+                                {isCreating ? 'Liquidating...' : 'Commit Request'}
                             </Button>
                         </DialogFooter>
                     </form>

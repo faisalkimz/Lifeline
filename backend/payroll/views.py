@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from decimal import Decimal
 from django.utils import timezone
+from django.db.models import Q
 
 from accounts.permissions import IsCompanyUser
 from employees.models import Employee
@@ -35,22 +36,43 @@ class SalaryAdvanceViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'loan_type', 'employee']
 
     def get_queryset(self):
-        """Only show loans for the user's company"""
-        return self.queryset.filter(company=self.request.user.company)
+        """Only show loans for the user's company and limit visibility by role"""
+        user = self.request.user
+        qs = self.queryset.filter(company=user.company)
+        
+        # Employees only see their own loans
+        if user.role == 'employee':
+            if hasattr(user, 'employee') and user.employee:
+                qs = qs.filter(employee=user.employee)
+            else:
+                qs = qs.none()
+        
+        return qs
 
     def perform_create(self, serializer):
         """Auto-assign company from logged-in user"""
+        user = self.request.user
         employee = serializer.validated_data['employee']
-        if employee.company != self.request.user.company:
+        
+        if employee.company != user.company:
             raise serializer.ValidationError("Cannot create loan for employee from another company.")
         
+        # Employees can only create loans for themselves
+        if user.role == 'employee':
+            if not hasattr(user, 'employee') or employee != user.employee:
+                 raise serializer.ValidationError("You can only request loans for yourself.")
+
         serializer.save(
-            company=self.request.user.company,
-            created_by=self.request.user
+            company=user.company,
+            created_by=user
         )
 
     @action(detail=True, methods=['patch'])
     def approve(self, request, pk=None):
+        # Restriction: Only HR/Admin/Manager can approve
+        if request.user.role not in ['hr_manager', 'company_admin', 'super_admin', 'manager']:
+            return Response({'error': 'Permission denied'}, status=403)
+
         advance = self.get_object()
         if advance.status != 'pending':
             return Response({'error': 'Only pending loans can be approved'}, status=400)
@@ -62,6 +84,10 @@ class SalaryAdvanceViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['patch'])
     def reject(self, request, pk=None):
+        # Restriction: Only HR/Admin/Manager can reject
+        if request.user.role not in ['hr_manager', 'company_admin', 'super_admin', 'manager']:
+            return Response({'error': 'Permission denied'}, status=403)
+
         advance = self.get_object()
         if advance.status != 'pending':
             return Response({'error': 'Only pending loans can be rejected'}, status=400)
@@ -79,10 +105,19 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
     filterset_fields = ['status', 'month', 'year']
 
     def get_queryset(self):
-        return self.queryset.filter(company=self.request.user.company)
+        # Employees/Managers should generally NOT see payroll runs, only HR/Admins
+        user = self.request.user
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             return self.queryset.none()
+        return self.queryset.filter(company=user.company)
     
     def perform_create(self, serializer):
         """Auto-assign company and process specific employees if selected"""
+        # Strictly restrict creation to HR/Admins
+        if self.request.user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only HR Managers or Admins can create payroll runs.")
+
         from django.db import IntegrityError
         from rest_framework.exceptions import ValidationError
 
@@ -100,7 +135,6 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         # If employees were selected in the modal (passed via serializer hack)
         if hasattr(instance, '_employee_ids_to_process'):
             ids = instance._employee_ids_to_process
-            # Explicitly filter on Employee model to avoid any related manager confusion/errors
             employees = Employee.objects.filter(company=instance.company, id__in=ids)
             self._process_employees(instance, employees)
         else:
@@ -120,19 +154,16 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         count = 0
         
         # Clear existing payslips for these employees to avoid duplicates
-        # (Needed if reprocessing subset)
         Payslip.objects.filter(payroll_run=payroll_run, employee__in=employees).delete()
 
         for employee in employees:
             try:
-                # Safe access to salary structure (Reverse OneToOne can raise error even with hasattr in some cases)
                 try:
                     structure = employee.salary_structure
                 except (ObjectDoesNotExist, AttributeError):
                     continue
                     
                 gross = structure.gross_salary
-                
                 calculations = calculate_net_salary(gross)
                 
                 Payslip.objects.create(
@@ -162,14 +193,8 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                 count += 1
             except Exception as e:
                 logger.error(f"Error processing payroll for employee {employee.id}: {str(e)}")
-                # Continue to next employee instead of crashing entire run? 
-                # Or re-raise? Default behavior implies partial failure is bad.
-                # But for now, lets log and continue to see if we get partial success.
                 continue
             
-        # Update Run Totals (Add to existing or Set? Set is safer usually, but partial update?)
-        # If processing subset, we should query ALL payslips to get accurate total.
-        # So ignore the running totals above and aggregate from DB.
         self._update_run_totals(payroll_run)
         return count
 
@@ -199,12 +224,9 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def process_payroll(self, request, pk=None):
-        """
-        Process payroll for the given run:
-        1. Calculate salary, tax, and NSSF for all employees
-        2. Generate payslips
-        3. Update payroll run totals
-        """
+        if request.user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             return Response({'error': 'Permission denied'}, status=403)
+
         payroll_run = self.get_object()
         
         if payroll_run.status not in ['draft', 'processing']:
@@ -213,16 +235,13 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Determine employees to process
         reset = request.query_params.get('reset') == 'true'
         
         if reset or not payroll_run.payslips.exists():
-            # Process ALL active employees
             if reset:
                 payroll_run.payslips.all().delete()
             employees = payroll_run.company.employees.filter(is_active=True)
         else:
-            # Re-process existing employees (keep selection)
             employees = Employee.objects.filter(payslips__payroll_run=payroll_run)
 
         processed_count = self._process_employees(payroll_run, employees)
@@ -240,7 +259,9 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def approve_payroll(self, request, pk=None):
-        """Approve the payroll run"""
+        if request.user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             return Response({'error': 'Permission denied'}, status=403)
+
         payroll_run = self.get_object()
         
         if payroll_run.status != 'processing':
@@ -258,7 +279,9 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def mark_paid(self, request, pk=None):
-        """Mark payroll run as Paid"""
+        if request.user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             return Response({'error': 'Permission denied'}, status=403)
+
         payroll_run = self.get_object()
         
         if payroll_run.status != 'approved':
@@ -269,11 +292,38 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
             
         payroll_run.status = 'paid'
         payroll_run.save()
-        
-        # Mark all payslips as paid
         payroll_run.payslips.update(payment_status='paid', payment_date=timezone.now().date())
         
         return Response({'message': 'Payroll marked as Paid'})
+
+    @action(detail=True, methods=['get'])
+    def download_tax_sheet(self, request, pk=None):
+        """Export Uganda Tax Sheet (PAYE, NSSF) as CSV"""
+        import csv
+        from django.http import HttpResponse
+        
+        payroll_run = self.get_object()
+        payslips = payroll_run.payslips.all().select_related('employee')
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="uganda_tax_sheet_{payroll_run.month}_{payroll_run.year}.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow(['Employee ID', 'Name', 'Gross Salary', 'PAYE Tax (UGX)', 'NSSF Employee (5%)', 'NSSF Employer (10%)', 'Total NSSF', 'Net Salary'])
+        
+        for p in payslips:
+            writer.writerow([
+                p.employee.employee_id,
+                p.employee.full_name,
+                p.gross_salary,
+                p.paye_tax,
+                p.nssf_employee,
+                p.nssf_employer,
+                p.nssf_employee + p.nssf_employer,
+                p.net_salary
+            ])
+            
+        return response
 
 
 # ────────────────────── PAYSLIPS ──────────────────────
@@ -288,7 +338,17 @@ class PayslipViewSet(viewsets.ModelViewSet):
     filterset_fields = ['payroll_run', 'employee', 'payment_status']
 
     def get_queryset(self):
-        return self.queryset.filter(employee__company=self.request.user.company)
+        # Employees see only their own payslips
+        user = self.request.user
+        qs = self.queryset.filter(employee__company=user.company)
+        
+        if user.role == 'employee':
+             if hasattr(user, 'employee') and user.employee:
+                 qs = qs.filter(employee=user.employee)
+             else:
+                 qs = qs.none()
+        
+        return qs
 
 
 # ────────────────────── SALARY STRUCTURES ──────────────────────
@@ -298,33 +358,57 @@ class SalaryStructureViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
-        return self.queryset.filter(employee__company=self.request.user.company)
+        # Employees see only their own salary structure (Read Only intent, reinforced by permissions)
+        user = self.request.user
+        qs = self.queryset.filter(employee__company=user.company)
+        
+        if user.role == 'employee':
+             if hasattr(user, 'employee') and user.employee:
+                 qs = qs.filter(employee=user.employee)
+             else:
+                 qs = qs.none()
+        elif user.role == 'manager':
+             # Managers might need to see subordinates' salaries?
+             # For now, let's allow it for subordinates
+             if hasattr(user, 'employee') and user.employee:
+                 qs = qs.filter(Q(employee=user.employee) | Q(employee__manager=user.employee))
+        
+        return qs
     
     def perform_create(self, serializer):
-        """Create salary structure with multi-tenant security validation"""
-        from rest_framework.exceptions import ValidationError
+        """Create salary structure - RESTRICTED"""
         user = self.request.user
+        
+        # Security: Employees cannot set their own salary
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to set salary structures.")
+
+        from rest_framework.exceptions import ValidationError
         employee = serializer.validated_data['employee']
         
-        # Security check: Validate employee belongs to user's company
         if employee.company != user.company:
             raise ValidationError({
                 'employee': 'Cannot create salary structure for employee from another company.'
             })
         
-        # Auto-assign company and creator
         serializer.save(
             company=user.company,
             created_by=user
         )
     
     def perform_update(self, serializer):
-        """Update salary structure with multi-tenant security validation"""
-        from rest_framework.exceptions import ValidationError
+        """Update salary structure - RESTRICTED"""
         user = self.request.user
+        
+        # Security: Employees cannot update their own salary
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             from rest_framework.exceptions import PermissionDenied
+             raise PermissionDenied("You do not have permission to update salary structures.")
+
+        from rest_framework.exceptions import ValidationError
         employee = serializer.validated_data.get('employee')
         
-        # Security check if employee is being changed
         if employee and employee.company != user.company:
             raise ValidationError({
                 'employee': 'Cannot update salary structure with employee from another company.'

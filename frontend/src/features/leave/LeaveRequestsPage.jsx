@@ -155,10 +155,9 @@ const LeaveRequestsPage = () => {
                                                 </div>
                                                 <div className="w-full bg-neutral-200 rounded-full h-2">
                                                     <div
-                                                        className={`h-2 rounded-full transition-all duration-300 ${
-                                                            usedPercentage > 80 ? 'bg-error-500' :
-                                                            usedPercentage > 60 ? 'bg-warning-500' : 'bg-success-500'
-                                                        }`}
+                                                        className={`h-2 rounded-full transition-all duration-300 ${usedPercentage > 80 ? 'bg-error-500' :
+                                                                usedPercentage > 60 ? 'bg-warning-500' : 'bg-success-500'
+                                                            }`}
                                                         style={{ width: `${Math.min(usedPercentage, 100)}%` }}
                                                     />
                                                 </div>
@@ -251,35 +250,35 @@ const LeaveRequestsPage = () => {
                                     <label className="block text-sm font-medium text-text-primary mb-2">
                                         Leave Type <span className="text-error-500">*</span>
                                     </label>
-                                        <select
+                                    <select
                                         className="w-full h-11 px-4 py-3 border border-border-medium rounded-lg bg-background-primary text-text-primary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200"
-                                            value={formData.leave_type}
-                                            onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                                            required
-                                        >
-                                            <option value="">Select leave type...</option>
-                                            {leaveTypes?.map(type => (
-                                                <option key={type.id} value={type.id}>{type.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                        value={formData.leave_type}
+                                        onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                        required
+                                    >
+                                        <option value="">Select leave type...</option>
+                                        {leaveTypes?.map(type => (
+                                            <option key={type.id} value={type.id}>{type.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
 
                                 {/* Date Range */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Input
                                         label="Start Date"
-                                            type="date"
-                                            value={formData.start_date}
-                                            onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                            required
+                                        type="date"
+                                        value={formData.start_date}
+                                        onChange={e => setFormData({ ...formData, start_date: e.target.value })}
+                                        required
                                         min={new Date().toISOString().split('T')[0]}
                                     />
                                     <Input
                                         label="End Date"
-                                            type="date"
-                                            value={formData.end_date}
-                                            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                            required
+                                        type="date"
+                                        value={formData.end_date}
+                                        onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+                                        required
                                         min={formData.start_date || new Date().toISOString().split('T')[0]}
                                     />
                                 </div>
@@ -306,12 +305,12 @@ const LeaveRequestsPage = () => {
                                     <label className="block text-sm font-medium text-text-primary mb-2">
                                         Reason for Leave <span className="text-error-500">*</span>
                                     </label>
-                                        <textarea
+                                    <textarea
                                         className="w-full min-h-24 px-4 py-3 border border-border-medium rounded-lg bg-background-primary text-text-primary placeholder-text-tertiary focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200 resize-none"
-                                            value={formData.reason}
-                                            onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                        value={formData.reason}
+                                        onChange={e => setFormData({ ...formData, reason: e.target.value })}
                                         placeholder="Please provide a detailed reason for your leave request..."
-                                            required
+                                        required
                                     />
                                     <p className="text-xs text-text-secondary mt-1">
                                         Provide specific details to help your manager understand your request.
@@ -430,13 +429,10 @@ const LeaveRequestsPage = () => {
                         </div>
                     ))
                 ) : (
-                    // Fallback Mock Data to match design if API is empty
-                    <>
-                        <BalanceCard title="Annual Leave" balance="21.00" taken="0" />
-                        <BalanceCard title="Bereavement leave" balance="30.00" taken="0" />
-                        <BalanceCard title="Sick Leave" balance="30.00" taken="0" />
-                        <BalanceCard title="Paternity Leave" balance="5.00" taken="0" />
-                    </>
+                    <div className="col-span-full py-12 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200">
+                        <PieChart className="h-10 w-10 text-slate-300 mx-auto mb-4" />
+                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">No leave balances available</p>
+                    </div>
                 )}
             </div>
 

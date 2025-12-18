@@ -37,6 +37,7 @@ urlpatterns = [
     path('api/benefits/', include('benefits.urls')),  # Benefits
     path('api/documents/', include('documents.urls')),  # Documents
     path('api/offboarding/', include('offboarding.urls')),  # Offboarding
+    path('api/disciplinary/', include('disciplinary.urls')),  # Disciplinary
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

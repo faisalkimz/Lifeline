@@ -21,6 +21,17 @@ class Resignation(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     
     manager_comment = models.TextField(blank=True)
+
+    # Offboarding Checklist
+    handover_completed = models.BooleanField(default=False)
+    exit_interview_completed = models.BooleanField(default=False)
+    assets_returned = models.BooleanField(default=False)
+    laptop_returned = models.BooleanField(default=False)
+    id_badge_returned = models.BooleanField(default=False)
+    keys_returned = models.BooleanField(default=False)
+    email_disabled = models.BooleanField(default=False)
+    access_revoked = models.BooleanField(default=False)
+    settlement_completed = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

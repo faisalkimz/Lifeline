@@ -66,6 +66,12 @@ class IntegrationSettings(models.Model):
     client_id = models.CharField(max_length=255, blank=True)
     client_secret = models.CharField(max_length=255, blank=True)
     api_key = models.CharField(max_length=255, blank=True)
+    
+    # OAuth tokens
+    access_token = models.TextField(blank=True)
+    refresh_token = models.TextField(blank=True)
+    token_expires_at = models.DateTimeField(null=True, blank=True)
+    
     is_active = models.BooleanField(default=True)
     
     class Meta:

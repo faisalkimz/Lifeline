@@ -6,158 +6,208 @@ import {
     usePublishJobMutation,
     useGetRecruitmentIntegrationsQuery,
 } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
-import { Plus, Briefcase, MapPin, Globe, Clock, CheckCircle, User } from 'lucide-react';
+import {
+    Plus, Briefcase, MapPin, Globe, Clock, CheckCircle,
+    User, Search, Target, Zap, ArrowUpRight, ChevronRight,
+    BarChart3, Users, LayoutDashboard, Settings2, Trash2,
+    Eye, MoreHorizontal, MousePointer2, Send, Activity
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { cn } from '../../utils/cn';
 
 const JobListPage = () => {
     const { data: jobs, isLoading } = useGetJobsQuery();
     const [createJob] = useCreateJobMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    // Form State
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         requirements: '',
-        location: 'Remote',
+        location: 'Kampala, Uganda',
         employment_type: 'full_time',
-        status: 'draft'
+        status: 'draft',
+        salary_min: '',
+        salary_max: '',
+        is_remote: false
     });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await createJob(formData).unwrap();
-            toast.success("Job created successfully");
+            toast.success("Job Requisition Deployed!");
             setIsDialogOpen(false);
-            setFormData({ title: '', description: '', requirements: '', location: 'Remote', employment_type: 'full_time', status: 'draft' });
+            setFormData({
+                title: '', description: '', requirements: '',
+                location: 'Kampala, Uganda', employment_type: 'full_time', status: 'draft',
+                salary_min: '', salary_max: '', is_remote: false
+            });
         } catch (error) {
-            toast.error("Failed to create job");
+            toast.error("Deployment failed check system logs.");
         }
     };
 
+    const filteredJobs = jobs?.filter(job =>
+        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.location.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="space-y-6 pb-10">
-            <div className="flex justify-between items-end">
+        <div className="space-y-8 pb-20 animate-fade-in font-sans">
+            {/* Premium Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-8">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Recruitment</h1>
-                    <p className="text-slate-500 mt-1">Manage job postings and candidates.</p>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
+                        <LayoutDashboard className="h-8 w-8 text-primary-600" />
+                        Requisition Terminal
+                    </h1>
+                    <p className="text-slate-500 mt-1 font-medium italic">Monitor and deploy job opportunities across the global ecosystem.</p>
                 </div>
-                <div className="flex gap-2">
-                    <Link to="/recruitment/candidates">
-                        <Button variant="outline" className="gap-2 bg-white hover:bg-slate-50 shadow-sm">
-                            <User className="h-4 w-4" /> Candidates
-                        </Button>
-                    </Link>
-                    <Link to="/recruitment/integrations">
-                        <Button variant="outline" className="gap-2 bg-white hover:bg-slate-50 shadow-sm">
-                            <Globe className="h-4 w-4" /> Integrations
-                        </Button>
-                    </Link>
+                <div className="flex gap-4">
                     <Link to="/recruitment/pipeline">
-                        <Button variant="outline" className="bg-white hover:bg-slate-50 shadow-sm">View Pipeline</Button>
+                        <Button variant="outline" className="rounded-2xl border-slate-200 font-black uppercase text-[10px] tracking-widest px-6 h-14 bg-white hover:bg-slate-50">
+                            <Activity className="h-4 w-4 mr-2" /> Live Pipeline
+                        </Button>
                     </Link>
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="gap-2 bg-primary-600 hover:bg-primary-700 shadow-sm">
-                                <Plus className="h-4 w-4" /> Post Job
+                            <Button className="rounded-2xl bg-slate-900 shadow-xl shadow-slate-900/20 font-black uppercase text-[10px] tracking-widest px-8 h-14">
+                                <Plus className="h-5 w-5 mr-2" /> Initialise Requisition
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                            <DialogHeader>
-                                <DialogTitle>Create New Job Posting</DialogTitle>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Job Title</label>
+                        <DialogContent className="rounded-[3rem] border-none shadow-2xl p-0 overflow-hidden max-w-2xl">
+                            <div className="bg-slate-900 p-10 text-white relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-8 opacity-10">
+                                    <Briefcase className="h-32 w-32" />
+                                </div>
+                                <DialogHeader>
+                                    <DialogTitle className="text-2xl font-black uppercase tracking-widest italic flex items-center gap-3">
+                                        Manual Requisition
+                                    </DialogTitle>
+                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Standardizing talent acquisition across the enterprise.</p>
+                                </DialogHeader>
+                            </div>
+                            <form onSubmit={handleSubmit} className="p-10 space-y-6 bg-white max-h-[70vh] overflow-y-auto">
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Job Title</label>
                                         <input
-                                            className="w-full border rounded-md p-2"
+                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
                                             value={formData.title}
                                             onChange={e => setFormData({ ...formData, title: e.target.value })}
                                             required
-                                            placeholder="e.g. Senior React Developer"
+                                            placeholder="e.g. Lead UI Systems Architect"
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Employment Type</label>
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Employment Matrix</label>
                                         <select
-                                            className="w-full border rounded-md p-2"
+                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold outline-none cursor-pointer"
                                             value={formData.employment_type}
                                             onChange={e => setFormData({ ...formData, employment_type: e.target.value })}
                                         >
-                                            <option value="full_time">Full Time</option>
-                                            <option value="part_time">Part Time</option>
-                                            <option value="contract">Contract</option>
-                                            <option value="internship">Internship</option>
+                                            <option value="full_time">Full Time (FT)</option>
+                                            <option value="part_time">Part Time (PT)</option>
+                                            <option value="contract">Contract (C)</option>
+                                            <option value="internship">Internship (I)</option>
                                         </select>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Location</label>
+
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Geo Location</label>
                                         <input
-                                            className="w-full border rounded-md p-2"
+                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
                                             value={formData.location}
                                             onChange={e => setFormData({ ...formData, location: e.target.value })}
                                             required
                                         />
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium mb-1">Initial Status</label>
-                                        <select
-                                            className="w-full border rounded-md p-2"
-                                            value={formData.status}
-                                            onChange={e => setFormData({ ...formData, status: e.target.value })}
-                                        >
-                                            <option value="draft">Draft</option>
-                                            <option value="published">Published</option>
-                                            <option value="internal">Internal Only</option>
-                                        </select>
+                                    <div className="space-y-2 flex items-center pt-6 px-2">
+                                        <input
+                                            type="checkbox"
+                                            id="is_remote"
+                                            className="h-5 w-5 text-primary-600 rounded-md border-slate-200"
+                                            checked={formData.is_remote}
+                                            onChange={e => setFormData({ ...formData, is_remote: e.target.checked })}
+                                        />
+                                        <label htmlFor="is_remote" className="ml-3 text-xs font-black uppercase text-slate-500 tracking-widest italic">Remote Protocol</label>
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Description</label>
+
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Mission Description</label>
                                     <textarea
-                                        className="w-full border rounded-md p-2"
+                                        className="w-full min-h-32 bg-slate-50 border border-slate-100 rounded-2xl p-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none resize-none"
                                         value={formData.description}
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                        rows="4"
                                         required
+                                        placeholder="What is the objective of this role?"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Requirements</label>
-                                    <textarea
-                                        className="w-full border rounded-md p-2"
-                                        value={formData.requirements}
-                                        onChange={e => setFormData({ ...formData, requirements: e.target.value })}
-                                        rows="3"
-                                        placeholder="- 3+ years experience..."
-                                    />
+
+                                <div className="pt-6 flex gap-4">
+                                    <Button type="button" onClick={() => setIsDialogOpen(false)} variant="ghost" className="flex-1 h-16 rounded-[2rem] font-black uppercase text-xs tracking-widest text-slate-400">Abort</Button>
+                                    <Button type="submit" className="flex-[2] h-16 rounded-[2rem] bg-slate-900 font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-900/20">Commit Requisition</Button>
                                 </div>
-                                <Button type="submit" className="w-full">Create Job Posting</Button>
                             </form>
                         </DialogContent>
                     </Dialog>
                 </div>
             </div>
 
+            {/* Tactical Navigation Bar */}
+            <div className="flex flex-col md:flex-row gap-6 items-center bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-50">
+                <div className="flex gap-2">
+                    <Link to="/recruitment/candidates">
+                        <Button variant="ghost" className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest italic group hover:bg-slate-50">
+                            <Users className="h-4 w-4 mr-2 text-slate-400 group-hover:text-primary-600" /> Registry
+                        </Button>
+                    </Link>
+                    <Link to="/recruitment/integrations">
+                        <Button variant="ghost" className="rounded-xl h-12 px-6 font-black uppercase text-[10px] tracking-widest italic group hover:bg-slate-50">
+                            <Globe className="h-4 w-4 mr-2 text-slate-400 group-hover:text-primary-600" /> Ecosystem
+                        </Button>
+                    </Link>
+                </div>
+                <div className="h-6 w-px bg-slate-100 hidden md:block"></div>
+                <div className="relative flex-1 group w-full">
+                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary-500 transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="Scan requisitions for titles, location, status..."
+                        className="w-full h-14 pl-14 pr-6 bg-slate-50 border-none rounded-2xl font-bold focus:ring-4 focus:ring-primary-500/10 transition-all outline-none italic"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            {/* Requisition Grid */}
             {isLoading ? (
-                <div className="text-center py-10">Loading jobs...</div>
-            ) : !jobs?.length ? (
-                <Card className="border-dashed">
-                    <CardContent className="py-10 text-center text-gray-500">
-                        No job postings found. Create one to get started!
-                    </CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {[1, 2, 3].map(i => <div key={i} className="h-80 bg-slate-50 rounded-[3rem] animate-pulse"></div>)}
+                </div>
+            ) : filteredJobs?.length === 0 ? (
+                <Card className="border-none shadow-xl shadow-slate-100 bg-white rounded-[4rem] p-24 text-center">
+                    <div className="inline-flex p-10 bg-slate-50 rounded-full mb-8">
+                        <Briefcase className="h-16 w-16 text-slate-200" />
+                    </div>
+                    <h4 className="text-3xl font-black text-slate-900 uppercase italic mb-3 tracking-tighter">No Active Requisitions</h4>
+                    <p className="text-slate-400 font-bold text-xs uppercase tracking-widest max-w-sm mx-auto leading-loose italic">
+                        The mission queue is currently empty. Initialise a new requisition to begin talent acquisition.
+                    </p>
                 </Card>
             ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {jobs.map(job => (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredJobs?.map(job => (
                         <JobCard key={job.id} job={job} />
                     ))}
                 </div>
@@ -172,11 +222,7 @@ const JobCard = ({ job }) => {
     const [isPublishOpen, setIsPublishOpen] = useState(false);
     const [selectedPlatforms, setSelectedPlatforms] = useState([]);
 
-    const integrationList = Array.isArray(integrations?.results)
-        ? integrations.results
-        : Array.isArray(integrations)
-            ? integrations
-            : [];
+    const integrationList = Array.isArray(integrations?.results) ? integrations.results : (Array.isArray(integrations) ? integrations : []);
 
     const handlePublish = async () => {
         try {
@@ -184,119 +230,144 @@ const JobCard = ({ job }) => {
                 id: job.id,
                 platforms: selectedPlatforms
             }).unwrap();
-            toast.success("Job published successfully!");
-            if (res.details && res.details.length) {
-                res.details.forEach(msg => toast(msg, { icon: '📢' }));
-            }
+            toast.success("Global Deployment Successful!");
             setIsPublishOpen(false);
         } catch (e) {
-            toast.error("Failed to publish");
+            toast.error("Deployment Interrupt Detected.");
         }
     };
 
-    const togglePlatform = (id) => {
-        if (selectedPlatforms.includes(id)) {
-            setSelectedPlatforms(selectedPlatforms.filter(p => p !== id));
-        } else {
-            setSelectedPlatforms([...selectedPlatforms, id]);
-        }
+    const togglePlatform = (platform) => {
+        setSelectedPlatforms(prev =>
+            prev.includes(platform) ? prev.filter(p => p !== platform) : [...prev, platform]
+        );
     };
 
     return (
-        <Card className="hover:shadow-lg transition-all group">
-            <CardContent className="p-6 flex flex-col h-full">
-                <div className="flex justify-between items-start mb-4">
-                    <div className={`p-3 rounded-lg ${job.status === 'published' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}>
-                        <Briefcase className="h-6 w-6" />
-                    </div>
-                    <span className={`px-2 py-1 rounded text-xs uppercase font-bold tracking-wide ${job.status === 'published' ? 'bg-green-100 text-green-700' :
-                        job.status === 'draft' ? 'bg-amber-100 text-amber-700' :
-                            'bg-red-100 text-red-700'
-                        }`}>
-                        {job.status}
-                    </span>
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors">
-                    {job.title}
-                </h3>
-
-                <div className="space-y-2 text-sm text-gray-500 mb-6 flex-1">
-                    <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" /> {job.location} {job.is_remote ? '(Remote)' : ''}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" /> {job.employment_type.replace('_', ' ')}
-                    </div>
-
-                    {/* External Posts Status */}
-                    {job.external_posts?.length > 0 && (
-                        <div className="flex gap-1 mt-2 flex-wrap">
-                            {job.external_posts.map(post => (
-                                <span key={post.id} className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[10px] rounded border border-blue-100 font-medium">
-                                    {post.platform}
-                                </span>
-                            ))}
+        <Card className="border-none shadow-2xl shadow-slate-200/40 rounded-[3rem] overflow-hidden group hover:-translate-y-2 transition-all duration-500 bg-white border-b-8 border-b-slate-50">
+            <CardContent className="p-0">
+                <div className="p-10 space-y-6">
+                    <div className="flex justify-between items-start">
+                        <div className="p-4 rounded-2xl bg-slate-900 text-white shadow-xl shadow-slate-900/20 group-hover:scale-110 transition-transform duration-500">
+                            <Briefcase className="h-6 w-6" />
                         </div>
-                    )}
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div className="text-sm font-medium">
-                        <span className="text-gray-900">{job.application_count || 0}</span>
-                        <span className="text-gray-500 ml-1">applicants</span>
+                        <Badge className={cn(
+                            "rounded-xl px-4 py-1.5 font-black text-[9px] uppercase tracking-widest border-none",
+                            job.status === 'published' ? 'bg-emerald-500 text-white' :
+                                job.status === 'draft' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white'
+                        )}>
+                            {job.status}
+                        </Badge>
                     </div>
-                    {job.status === 'draft' && (
-                        <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
-                            <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm" className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
-                                    Publish Now
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Publish & Distribute</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4 pt-4">
-                                    <p className="text-sm text-gray-600">Select where you want to post this job:</p>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 p-3 border rounded bg-gray-50 opacity-100">
-                                            <CheckCircle className="h-4 w-4 text-green-600" />
-                                            <span className="font-medium">Company Career Page</span>
-                                        </div>
-                                        {integrationList.filter(i => i.is_active).map(integration => (
-                                            <div
-                                                key={integration.id}
-                                                onClick={() => togglePlatform(integration.platform)}
-                                                className={`flex items-center gap-2 p-3 border rounded cursor-pointer transition-colors ${selectedPlatforms.includes(integration.platform)
-                                                    ? 'bg-indigo-50 border-indigo-200 shadow-sm'
-                                                    : 'hover:bg-gray-50'
-                                                    }`}
-                                            >
-                                                <div className={`h-4 w-4 rounded-full border flex items-center justify-center ${selectedPlatforms.includes(integration.platform)
-                                                    ? 'bg-indigo-600 border-indigo-600'
-                                                    : 'border-gray-300'
-                                                    }`}>
-                                                    {selectedPlatforms.includes(integration.platform) && (
-                                                        <CheckCircle className="h-3 w-3 text-white" />
-                                                    )}
-                                                </div>
-                                                <span className="capitalize">{integration.platform}</span>
-                                            </div>
-                                        ))}
-                                        {!integrationList.some(i => i.is_active) && (
-                                            <p className="text-xs text-amber-600">
-                                                No external integrations active. <Link to="/recruitment/integrations" className="underline">Configure here</Link>.
-                                            </p>
-                                        )}
-                                    </div>
-                                    <Button onClick={handlePublish} className="w-full">
-                                        Publish to Selected Channels
+
+                    <div className="space-y-1">
+                        <h3 className="text-xl font-black text-slate-900 italic tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis">
+                            {job.title}
+                        </h3>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <MapPin className="h-3 w-3" />
+                            <p className="text-[10px] font-bold uppercase tracking-widest">
+                                {job.location} {job.is_remote ? '• REMOTE' : ''}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Performance Telemetry */}
+                    <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div className="space-y-0.5">
+                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-tighter flex items-center gap-1">
+                                <Users className="h-3 w-3" /> Pipeline
+                            </p>
+                            <p className="text-sm font-black text-slate-900">{job.application_count || 0} Candidates</p>
+                        </div>
+                        <div className="space-y-0.5">
+                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-tighter flex items-center gap-1">
+                                <Activity className="h-3 w-3" /> Outreach
+                            </p>
+                            <p className="text-sm font-black text-slate-900">{job.external_posts?.length || 0} Channels</p>
+                        </div>
+                    </div>
+
+                    <div className="pt-6 flex gap-3">
+                        {job.status === 'draft' ? (
+                            <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
+                                <DialogTrigger asChild>
+                                    <Button className="flex-1 rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-widest h-14 group/btn shadow-xl shadow-slate-900/10">
+                                        Deploy Now <Send className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                                     </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    )}
+                                </DialogTrigger>
+                                <DialogContent className="rounded-[3rem] border-none shadow-2xl p-0 overflow-hidden max-w-lg">
+                                    <div className="bg-slate-900 p-8 text-white">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-xl font-black uppercase tracking-widest italic">Global Distribution</DialogTitle>
+                                            <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1">Select broadcast channels for this requisition.</p>
+                                        </DialogHeader>
+                                    </div>
+                                    <div className="p-8 space-y-6 bg-white">
+                                        <div className="space-y-3">
+                                            {/* Native Channel */}
+                                            <div className="flex items-center gap-4 p-4 border border-slate-100 rounded-2xl bg-emerald-50/30">
+                                                <div className="h-10 w-10 flex items-center justify-center bg-emerald-500 text-white rounded-xl">
+                                                    <CheckCircle className="h-5 w-5" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">Internal Portal</p>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase italic">Native Career Page</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Integrated Channels */}
+                                            {integrationList.filter(i => i.is_active).map(integration => (
+                                                <div
+                                                    key={integration.id}
+                                                    onClick={() => togglePlatform(integration.platform)}
+                                                    className={cn(
+                                                        "flex items-center gap-4 p-4 border rounded-2xl cursor-pointer transition-all",
+                                                        selectedPlatforms.includes(integration.platform) ? 'border-primary-500 bg-primary-50/20' : 'border-slate-100 hover:bg-slate-50'
+                                                    )}
+                                                >
+                                                    <div className={cn(
+                                                        "h-10 w-10 flex items-center justify-center rounded-xl transition-colors",
+                                                        selectedPlatforms.includes(integration.platform) ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-400'
+                                                    )}>
+                                                        <Globe className="h-5 w-5" />
+                                                    </div>
+                                                    <div className="flex-1 text-left">
+                                                        <p className="text-[10px] font-black uppercase text-slate-900 tracking-widest">{integration.platform}</p>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase italic tracking-widest">External Provider</p>
+                                                    </div>
+                                                    {selectedPlatforms.includes(integration.platform) && <CheckCircle className="h-5 w-5 text-primary-600" />}
+                                                </div>
+                                            ))}
+
+                                            {integrationList.filter(i => i.is_active).length === 0 && (
+                                                <div className="p-6 border border-dashed border-slate-200 rounded-2xl text-center space-y-2">
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic">No External Channels Connected</p>
+                                                    <Link to="/recruitment/integrations" className="text-[9px] font-black text-primary-600 uppercase tracking-widest hover:underline">Connect Providers <ArrowUpRight className="h-3 w-3 inline ml-1" /></Link>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <Button
+                                            onClick={handlePublish}
+                                            disabled={selectedPlatforms.length === 0}
+                                            className="w-full h-14 rounded-2xl bg-slate-900 font-black uppercase text-xs tracking-widest"
+                                        >
+                                            Transmit Broadcast
+                                        </Button>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        ) : (
+                            <Link to={`/recruitment/jobs/${job.id}`} className="flex-1">
+                                <Button className="w-full rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-widest h-14 group/btn">
+                                    Analytics <Activity className="h-4 w-4 ml-2 group-hover/btn:scale-125 transition-transform" />
+                                </Button>
+                            </Link>
+                        )}
+                        <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-slate-50 hover:bg-slate-100 p-0 text-slate-400">
+                            <Settings2 className="h-5 w-5" />
+                        </Button>
+                    </div>
                 </div>
             </CardContent>
         </Card>

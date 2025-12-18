@@ -24,7 +24,33 @@ class BaseJobPublisher(ABC):
         self.api_key = integration_settings.api_key
         self.client_id = integration_settings.client_id
         self.client_secret = integration_settings.client_secret
+        
+        # OAuth state
+        self.access_token = integration_settings.access_token
+        self.refresh_token_str = integration_settings.refresh_token
+        self.token_expires_at = integration_settings.token_expires_at
+        
         self.is_active = integration_settings.is_active
+
+    def ensure_valid_token(self):
+        """Check token expiry and refresh if needed"""
+        from django.utils import timezone
+        import datetime
+        
+        if not self.access_token:
+            return False
+            
+        if self.token_expires_at and self.token_expires_at < timezone.now() + datetime.timedelta(minutes=5):
+            return self.refresh_token()
+            
+        return True
+
+    def refresh_token(self) -> bool:
+        """
+        Refresh the OAuth access token. 
+        Subclasses should implement the specific refresh logic.
+        """
+        return False
     
     @abstractmethod
     def publish_job(self, job) -> Dict[str, Any]:

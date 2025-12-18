@@ -11,11 +11,24 @@ class ResignationViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = Resignation.objects.filter(company=user.company)
         
-        if self.request.query_params.get('my_resignations'):
-            if hasattr(user, 'employee'):
-                queryset = queryset.filter(employee=user.employee)
+        # Employees/Managers only see their own resignations or subordinates
+        if user.role == 'employee':
+             queryset = queryset.filter(employee=user.employee) if hasattr(user, 'employee') else queryset.none()
+        elif user.role == 'manager':
+             # Managers see their own and their subordinates
+             if hasattr(user, 'employee'):
+                from django.db.models import Q
+                queryset = queryset.filter(Q(employee=user.employee) | Q(employee__manager=user.employee))
+             else:
+                queryset = queryset.none()
                 
         return queryset
+
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'destroy']:
+            from accounts.permissions import IsHRManagerOrAdmin
+            return [IsAuthenticated(), IsHRManagerOrAdmin()]
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         if hasattr(self.request.user, 'employee'):
@@ -26,4 +39,8 @@ class ExitInterviewViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return ExitInterview.objects.filter(resignation__company=self.request.user.company)
+        user = self.request.user
+        queryset = ExitInterview.objects.filter(resignation__company=user.company)
+        if user.role == 'employee':
+             queryset = queryset.filter(resignation__employee=user.employee) if hasattr(user, 'employee') else queryset.none()
+        return queryset

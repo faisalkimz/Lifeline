@@ -35,7 +35,8 @@ const LoginPage = () => {
             const result = await login(data).unwrap();
             dispatch(setCredentials({
                 user: result.user,
-                token: result.tokens.access
+                token: result.tokens.access,
+                refresh: result.tokens.refresh
             }));
             navigate('/dashboard');
         } catch (err) {

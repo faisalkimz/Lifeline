@@ -2,6 +2,7 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from accounts.permissions import IsCompanyUser, IsHRManagerOrAdmin, IsCompanyAdmin
 from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost
 from .serializers import (
     JobSerializer, 
@@ -15,60 +16,51 @@ import random # Mocking ID generation
 
 class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'department__name']
     ordering_fields = ['created_at', 'status']
 
     def get_queryset(self):
-        return Job.objects.filter(company=self.request.user.company)
+        user = self.request.user
+        queryset = Job.objects.filter(company=user.company)
+        
+        # Managers only see jobs in their department
+        if user.role == 'manager':
+             if hasattr(user, 'employee'):
+                 queryset = queryset.filter(department=user.employee.department)
+             else:
+                 queryset = queryset.none()
+        elif user.role == 'employee':
+             queryset = queryset.none()
+             
+        return queryset
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy', 'publish', 'close']:
+            return [IsAuthenticated(), IsHRManagerOrAdmin()]
+        return super().get_permissions()
 
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
 
     @action(detail=True, methods=['post'])
     def publish(self, request, pk=None):
-        """
-        Publish job to multiple platforms
-        
-        Expected payload:
-        {
-            "platforms": ["linkedin", "indeed", "fuzu", "brightermonday"]
-        }
-        """
         job = self.get_object()
         platforms = request.data.get('platforms', [])
-        
-        # Import here to avoid circular imports
         from .services.publishing_service import JobPublishingService
-        
-        # Publish to platforms
         results = JobPublishingService.publish_to_platforms(job, platforms)
         
         if results['success']:
-            return Response({
-                'status': 'published',
-                'message': f"Job published to {len([p for p, r in results['platforms'].items() if r.get('success')])} platform(s)",
-                'results': results
-            }, status=status.HTTP_200_OK)
+            return Response({'status': 'published', 'message': f"Job published to {len([p for p, r in results['platforms'].items() if r.get('success')])} platform(s)", 'results': results}, status=status.HTTP_200_OK)
         else:
-            return Response({
-                'status': 'partial_failure',
-                'message': 'Some platforms failed to publish',
-                'results': results
-            }, status=status.HTTP_207_MULTI_STATUS)
+            return Response({'status': 'partial_failure', 'message': 'Some platforms failed to publish', 'results': results}, status=status.HTTP_207_MULTI_STATUS)
     
     @action(detail=True, methods=['get'])
     def analytics(self, request, pk=None):
-        """
-        Get job analytics from all platforms where it's posted
-        """
         job = self.get_object()
-        
         from .services.publishing_service import JobPublishingService
-        
         analytics = JobPublishingService.get_analytics(job)
-        
         return Response(analytics, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
@@ -93,7 +85,7 @@ class PublicJobViewSet(viewsets.ReadOnlyModelViewSet):
 
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsHRManagerOrAdmin]
     filter_backends = [filters.SearchFilter]
     search_fields = ['first_name', 'last_name', 'email', 'skills']
 
@@ -103,15 +95,46 @@ class CandidateViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
 
+    @action(detail=False, methods=['post'])
+    def parse_resume(self, request):
+        """
+        Extract candidate data from a resume file
+        """
+        resume_file = request.FILES.get('resume')
+        if not resume_file:
+            return Response({'error': 'No resume file provided'}, status=400)
+
+        from .services.resume_parser import ResumeParsingService
+        
+        # Extract text
+        text = ResumeParsingService.extract_text_from_pdf(resume_file)
+        if not text:
+            return Response({'error': 'Could not extract text from PDF'}, status=400)
+            
+        # Parse text
+        parsed_data = ResumeParsingService.parse_resume_text(text)
+        
+        return Response(parsed_data)
+
 class ApplicationViewSet(viewsets.ModelViewSet):
     serializer_class = ApplicationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['applied_at', 'score']
 
     def get_queryset(self):
-        queryset = Application.objects.filter(job__company=self.request.user.company)
+        user = self.request.user
+        queryset = Application.objects.filter(job__company=user.company)
         
+        # Managers only see applications for jobs in their department
+        if user.role == 'manager':
+             if hasattr(user, 'employee'):
+                 queryset = queryset.filter(job__department=user.employee.department)
+             else:
+                 queryset = queryset.none()
+        elif user.role == 'employee':
+             queryset = queryset.none()
+             
         job_id = self.request.query_params.get('job_id')
         if job_id:
             queryset = queryset.filter(job_id=job_id)
@@ -121,6 +144,11 @@ class ApplicationViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(stage=stage)
             
         return queryset
+
+    def get_permissions(self):
+        if self.action in ['move_stage', 'destroy']:
+            return [IsAuthenticated(), IsHRManagerOrAdmin()]
+        return super().get_permissions()
 
     @action(detail=True, methods=['patch'])
     def move_stage(self, request, pk=None):
@@ -135,25 +163,26 @@ class ApplicationViewSet(viewsets.ModelViewSet):
 
 class InterviewViewSet(viewsets.ModelViewSet):
     serializer_class = InterviewSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
         user = self.request.user
         queryset = Interview.objects.filter(application__job__company=user.company)
         
-        if self.request.query_params.get('my_interviews'):
-            # Interviews I am conducting
-            if hasattr(user, 'employee'):
-                queryset = queryset.filter(interviewer=user.employee)
+        if user.role == 'employee':
+             queryset = queryset.filter(interviewer=user.employee) if hasattr(user, 'employee') else queryset.none()
         
         return queryset
 
 class IntegrationSettingsViewSet(viewsets.ModelViewSet):
     serializer_class = IntegrationSettingsSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
         return IntegrationSettings.objects.filter(company=self.request.user.company)
+    
+    def get_permissions(self):
+        return [IsAuthenticated(), IsCompanyAdmin()]
     
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)

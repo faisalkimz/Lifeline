@@ -19,10 +19,12 @@ class CompanySerializer(serializers.ModelSerializer):
         model = Company
         fields = [
             'id', 'name', 'slug', 'email', 'phone', 'address', 'city', 'country',
-            'tax_id', 'registration_number', 'currency', 'date_format',
+            'website', 'industry', 'tax_id', 'registration_number', 'currency', 'date_format',
             'subscription_tier', 'subscription_start', 'subscription_expires', 
             'max_employees', 'logo', 'is_active', 'employee_count', 
-            'is_subscription_active', 'created_at', 'updated_at'
+            'is_subscription_active', 'created_at', 'updated_at',
+            'automated_onboarding_email', 'disciplinary_alerts',
+            'leave_request_notifications', 'attendance_exceptions_alerts'
         ]
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at', 'employee_count', 'is_subscription_active']
 
@@ -59,7 +61,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
             'company', 'company_name', 'role', 'phone', 'photo', 
-            'is_active', 'date_joined', 'last_login'
+            'employee', 'is_active', 'date_joined', 'last_login'
         ]
         read_only_fields = ['id', 'date_joined', 'last_login']
         extra_kwargs = {

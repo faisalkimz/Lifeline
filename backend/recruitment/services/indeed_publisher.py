@@ -15,16 +15,44 @@ class IndeedPublisher(BaseJobPublisher):
     
     def __init__(self, integration_settings):
         super().__init__(integration_settings)
-        self.api_token = self.api_key
+        self.access_token = self.access_token or self.api_key
     
+    def refresh_token(self) -> bool:
+        """Refresh Indeed access token"""
+        if not self.refresh_token_str or not self.client_id or not self.client_secret:
+            return False
+            
+        try:
+            response = self._make_request(
+                'POST',
+                'https://apis.indeed.com/oauth/v2/tokens',
+                data={
+                    'grant_type': 'refresh_token',
+                    'refresh_token': self.refresh_token_str,
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret
+                }
+            )
+            data = response.json()
+            self.access_token = data['access_token']
+            
+            # Update DB
+            from django.utils import timezone
+            import datetime
+            self.integration.access_token = self.access_token
+            if 'expires_in' in data:
+                self.integration.token_expires_at = timezone.now() + datetime.timedelta(seconds=data['expires_in'])
+            self.integration.save()
+            return True
+        except Exception:
+            return False
+
     def publish_job(self, job) -> Dict[str, Any]:
         """
         Post a job to Indeed
-        
-        Indeed API Reference:
-        https://ads.indeed.com/jobroll/xmlfeed
         """
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {
                 'success': False,
                 'error': 'Indeed integration not authorized. Please configure API credentials.'
@@ -64,13 +92,14 @@ class IndeedPublisher(BaseJobPublisher):
     
     def update_job(self, job, external_id: str) -> Dict[str, Any]:
         """Update Indeed  job posting"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         job_data = self._format_indeed_job(job)
         
         headers = {
-            'Authorization': f'Bearer {self.api_token}',
+            'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         
@@ -96,11 +125,12 @@ class IndeedPublisher(BaseJobPublisher):
     
     def close_job(self, external_id: str) -> Dict[str, Any]:
         """Close Indeed job posting"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         headers = {
-            'Authorization': f'Bearer {self.api_token}',
+            'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         
@@ -125,11 +155,12 @@ class IndeedPublisher(BaseJobPublisher):
     
     def get_analytics(self, external_id: str) -> Dict[str, Any]:
         """Get Indeed job analytics"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         headers = {
-            'Authorization': f'Bearer {self.api_token}'
+            'Authorization': f'Bearer {self.access_token}'
         }
         
         try:

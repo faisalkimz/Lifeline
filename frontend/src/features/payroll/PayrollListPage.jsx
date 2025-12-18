@@ -8,10 +8,11 @@ import {
   useGetPayrollRunsQuery,
   useProcessPayrollMutation,
   useApprovePayrollMutation,
-  useMarkPayrollPaidMutation
+  useMarkPayrollPaidMutation,
+  useLazyDownloadTaxSheetQuery
 } from '../../store/api';
 import CreatePayrollRunModal from './CreatePayrollRunModal';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Download } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PayrollListPage = () => {
@@ -23,6 +24,25 @@ const PayrollListPage = () => {
   const [processPayroll, { isLoading: isProcessing }] = useProcessPayrollMutation();
   const [approvePayroll, { isLoading: isApproving }] = useApprovePayrollMutation();
   const [markPaid, { isLoading: isPaying }] = useMarkPayrollPaidMutation();
+  const [triggerDownload] = useLazyDownloadTaxSheetQuery();
+
+  const handleDownloadTaxSheet = async (run) => {
+    try {
+      const data = await triggerDownload(run.id).unwrap();
+      const blob = new Blob([data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `uganda_tax_sheet_${run.month}_${run.year}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      toast.success('Tax sheet downloaded');
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Failed to download tax sheet');
+    }
+  };
 
   const getStatusBadge = (status) => {
     const statusColors = {
@@ -200,6 +220,16 @@ const PayrollListPage = () => {
                         >
                           Details
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDownloadTaxSheet(run)}
+                          title="Download Uganda Tax Sheet (PAYE/NSSF)"
+                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        >
+                          <Download className="h-4 w-4 mr-1" />
+                          Tax
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -264,6 +294,8 @@ const PayrollListPage = () => {
 };
 
 export default PayrollListPage;
+
+
 
 
 

@@ -22,6 +22,8 @@ class Company(models.Model):
     address = models.TextField(blank=True)
     city = models.CharField(max_length=100, blank=True)
     country = models.CharField(max_length=2, default='UG', help_text="ISO country code (UG for Uganda)")
+    website = models.URLField(blank=True)
+    industry = models.CharField(max_length=100, blank=True)
     
     # Tax & Registration
     tax_id = models.CharField(
@@ -55,6 +57,13 @@ class Company(models.Model):
     
     # Status
     is_active = models.BooleanField(default=True)
+    
+    # Automation & Workflow Alerts
+    automated_onboarding_email = models.BooleanField(default=True)
+    disciplinary_alerts = models.BooleanField(default=True)
+    leave_request_notifications = models.BooleanField(default=True)
+    attendance_exceptions_alerts = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

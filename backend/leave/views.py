@@ -47,11 +47,8 @@ class LeaveBalanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def my_balances(self, request):
         """Get current user's leave balances"""
-        if not hasattr(request.user, 'employee'):
-            return Response(
-                {"error": "User does not have an employee record"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if not hasattr(request.user, 'employee') or not request.user.employee:
+            return Response([])
         
         balances = LeaveBalance.objects.filter(
             employee=request.user.employee,
@@ -88,10 +85,7 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
     def my_requests(self, request):
         """Get current user's leave requests"""
         if not hasattr(request.user, 'employee') or not request.user.employee:
-            return Response(
-                {"error": "User does not have an employee record"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response([])
 
         requests = LeaveRequest.objects.filter(
             employee=request.user.employee

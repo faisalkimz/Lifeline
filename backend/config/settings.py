@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "benefits",    # Benefits Administration
     "documents",   # Document Management
     "offboarding", # Offboarding & Exit
+    "disciplinary", # Disciplinary tracking
 ]
 
 
@@ -145,7 +146,9 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+# https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 STATIC_URL = "static/"
 

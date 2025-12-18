@@ -2,310 +2,267 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Users, Building2, UserCheck, Crown,
-    Search, Plus, Edit
+    Search, Plus, Edit, Shield, Activity,
+    TrendingUp, Map as MapIcon, Layout, Target, Menu
 } from 'lucide-react';
-import { useGetManagersQuery, useGetDepartmentsQuery, usePromoteToManagerMutation, useGetEmployeesQuery } from '../../store/api';
+
+import {
+    useGetManagersQuery,
+    useGetDepartmentsQuery,
+    usePromoteToManagerMutation,
+    useGetEmployeesQuery
+} from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { StatCard } from '../../components/ui/StatCard';
-import {
-    Table, TableBody, TableCell, TableHead,
-    TableHeader, TableRow
-} from '../../components/ui/Table';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser, selectIsAuthenticated } from '../auth/authSlice';
+import { selectIsAuthenticated } from '../auth/authSlice';
 import PromoteManagerModal from './PromoteManagerModal';
 import toast from 'react-hot-toast';
-
-const getImageUrl = (photoPath) => {
-    if (!photoPath) return null;
-    if (photoPath.startsWith('http')) return photoPath;
-
-    // If path is absolute on the same host (starts with '/'), use window origin
-    if (photoPath.startsWith('/')) {
-        return `${window.location.origin}${photoPath}`;
-    }
-
-    // If a VITE_API_BASE_URL is configured and looks like a URL, use it
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-    if (baseUrl && baseUrl.startsWith('http')) {
-        return `${baseUrl.replace(/\/$/, '')}/${photoPath.replace(/^\//, '')}`;
-    }
-
-    // Fallback: return the raw path so the browser can resolve relatively
-    return photoPath;
-};
+import { cn } from '../../utils/cn';
 
 const ManagerManagementPage = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
-    const [viewMode, setViewMode] = useState('table');
     const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
-
     const isAuthenticated = useSelector(selectIsAuthenticated);
 
     const { data: managersData, isLoading, refetch } = useGetManagersQuery(undefined, {
         skip: !isAuthenticated
     });
-    // Also fetch all active employees as a fallback source for manager-like roles
     const { data: allEmployeesData } = useGetEmployeesQuery({ employment_status: 'active' }, { skip: !isAuthenticated });
     const { data: departments } = useGetDepartmentsQuery(undefined, {
         skip: !isAuthenticated
     });
 
-    // Debugging: log managers/departments responses to help troubleshoot missing data
-    React.useEffect(() => {
-        if (!isLoading) {
-            // eslint-disable-next-line no-console
-            console.debug('Managers data:', managersData);
-            // eslint-disable-next-line no-console
-            console.debug('Departments data:', departments);
-        }
-    }, [managersData, departments, isLoading]);
+    const [promoteToManager] = usePromoteToManagerMutation();
 
-    const [promoteToManager, { isLoading: isPromoting }] = usePromoteToManagerMutation();
-
-    // Handle managers data properly. If the managers endpoint returns unexpectedly few
-    // results, also include employees whose job_title contains "manager" as a fallback.
     const managers = useMemo(() => {
-        const mgrs = Array.isArray(managersData) ? managersData.slice() : [];
-
-        // Normalize existing managers into a map by id
+        const mgrs = Array.isArray(managersData) ? managersData : [];
         const byId = new Map();
+
         mgrs.forEach(m => {
-            const full_name = m.full_name || `${m.first_name || ''} ${m.last_name || ''}`.trim();
-            byId.set(m.id, { ...m, full_name });
+            byId.set(m.id, { ...m, full_name: m.full_name || `${m.first_name || ''} ${m.last_name || ''}`.trim() });
         });
 
-        // If we have employee data, look for titles that include "manager" (case-insensitive)
-        if (Array.isArray(allEmployeesData) && allEmployeesData.length > 0) {
+        if (Array.isArray(allEmployeesData)) {
             allEmployeesData.forEach(e => {
-                const title = String(e.job_title || '').toLowerCase();
-                if (title.includes('manager') && !byId.has(e.id)) {
-                    const full_name = e.full_name || `${e.first_name || ''} ${e.last_name || ''}`.trim();
-                    byId.set(e.id, { ...e, full_name });
+                if (String(e.job_title || '').toLowerCase().includes('manager') && !byId.has(e.id)) {
+                    byId.set(e.id, { ...e, full_name: e.full_name || `${e.first_name || ''} ${e.last_name || ''}`.trim() });
                 }
             });
         }
-
-        // Return as array
         return Array.from(byId.values());
     }, [managersData, allEmployeesData]);
 
     const filteredManagers = useMemo(() => {
-        const q = searchTerm.trim().toLowerCase();
-        if (!q) return managers;
-
-        return managers.filter(manager => {
-            const name = (manager.full_name || '').toLowerCase();
-            const title = (manager.job_title || '').toLowerCase();
-            const number = (manager.employee_number || '').toLowerCase();
-            return name.includes(q) || title.includes(q) || number.includes(q);
-        });
+        const q = searchTerm.toLowerCase();
+        return managers.filter(m =>
+            m.full_name.toLowerCase().includes(q) ||
+            (m.job_title || '').toLowerCase().includes(q) ||
+            (m.employee_number || '').toLowerCase().includes(q)
+        );
     }, [managers, searchTerm]);
 
     const stats = useMemo(() => ({
         total: managers.length,
-        departmentHeads: managers.filter(m => departments?.find(d => d.manager === m.id)).length,
-        totalReports: managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0),
-        avgTeamSize: managers.length > 0
-            ? Math.round(managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0) / managers.length)
-            : 0
+        deptHeads: managers.filter(m => departments?.some(d => d.manager === m.id)).length,
+        coverage: Math.round((departments?.filter(d => d.manager).length / (departments?.length || 1)) * 100),
+        avgTeam: managers.length ? Math.round(managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0) / managers.length) : 0
     }), [managers, departments]);
 
-    const handlePromoteEmployees = async (promotionData) => {
+    const handlePromote = async (data) => {
         try {
-            const result = await promoteToManager(promotionData).unwrap();
-            toast.success(result.message || 'Employees promoted successfully');
+            await promoteToManager(data).unwrap();
+            toast.success("Leadership status granted successfully");
             refetch();
             setIsPromoteModalOpen(false);
-        } catch (error) {
-            console.error('Promotion failed:', error);
-            toast.error(error?.data?.error || 'Failed to promote employees');
+        } catch (err) {
+            toast.error(err?.data?.error || "Promotion protocol failed");
         }
     };
 
     return (
-        <div className="space-y-10 bg-white">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-                <div>
-                    <h1 className="text-2xl font-bold text-black">Team Leaders</h1>
-                    <p className="text-sm text-gray-600 mt-1 max-w-xl">Manage who leads teams and departments — view leaders, their team sizes, and quickly edit leader profiles.</p>
+        <div className="space-y-8 pb-20 animate-fade-in font-sans">
+            {/* Tactical Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-10">
+                <div className="space-y-1">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic flex items-center gap-4">
+                        <Crown className="h-10 w-10 text-primary-600" />
+                        Command Intelligence
+                    </h1>
+                    <p className="text-slate-500 font-bold uppercase text-[10px] tracking-[0.3em] flex items-center gap-2">
+                        <Shield className="h-3 w-3 text-indigo-500" /> Operational Leadership & Hierarchy Management
+                    </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex gap-4">
                     <Button
-                        variant="ghost"
-                        onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
-                        className="h-9 px-3"
+                        onClick={() => setIsPromoteModalOpen(true)}
+                        className="bg-slate-900 hover:bg-black text-white rounded-2xl h-14 px-10 font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-900/20 transform hover:-translate-y-1 transition-all"
                     >
-                        {viewMode === 'grid' ? 'Table' : 'Cards'}
-                    </Button>
-                    <Button onClick={() => setIsPromoteModalOpen(true)} className="h-9 px-3 btn-primary">
-                        <Crown className="h-4 w-4 mr-2" />
-                        Promote
+                        <Plus className="h-5 w-5 mr-3" /> Initialize Rank Promotion
                     </Button>
                 </div>
             </div>
 
+            {/* Intelligence Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <StatCard
-                    title="Total Leaders"
+                <IntelCard
+                    label="Executive Density"
                     value={stats.total}
-                    icon="Crown"
-                    color="primary"
+                    icon={<Crown className="h-6 w-6" />}
+                    trend="+2 Active"
+                    color="from-primary-50 to-white"
                 />
-                <StatCard
-                    title="Dept Heads"
-                    value={stats.departmentHeads}
-                    icon="Building2"
-                    color="success"
+               <IntelCard
+                    label="Departmental Reach"
+                    value={`${stats.coverage}%`}
+                    icon={<MapIcon className="h-6 w-6" />}
+                    trend="High Coverage"
+                    color="from-indigo-50 to-white"
                 />
-                <StatCard
-                    title="Reports"
-                    value={stats.totalReports}
-                    icon="Users"
-                    color="warning"
+                <IntelCard
+                    label="Subordinate Flow"
+                    value={managers.reduce((acc, m) => acc + (m.subordinates?.length || 0), 0)}
+                    icon={<Users className="h-6 w-6" />}
+                    trend="Active Nodes"
+                    color="from-emerald-50 to-white"
                 />
-                <StatCard
-                    title="Avg Team"
-                    value={stats.avgTeamSize}
-                    icon="UserCheck"
-                    color="info"
+                <IntelCard
+                    label="Avg Vector Span"
+                    value={stats.avgTeam}
+                    icon={<Activity className="h-6 w-6" />}
+                    trend="Balanced"
+                    color="from-amber-50 to-white"
                 />
             </div>
 
-            <Card className="bg-white border border-primary-50">
-                <CardContent className="p-4">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                            placeholder="Search by name, title, or ID..."
-                            className="pl-10"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+            {/* Tactical Search Terminal */}
+            <Card className="border-none shadow-2xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
+                <CardContent className="p-0">
+                    <div className="p-8 bg-slate-50 border-b border-slate-100 flex flex-col md:flex-row gap-6 items-center">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                            <input
+                                className="w-full h-16 bg-white border-2 border-slate-200/60 rounded-3xl pl-16 pr-6 font-bold text-slate-900 focus:border-primary-500 focus:ring-0 transition-all shadow-inner outline-none placeholder:text-slate-400"
+                                placeholder="Search by Node Name, ID, or Tactical Role..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex gap-3">
+                            <Button variant="outline" className="h-16 w-16 rounded-3xl border-2">
+                                <Menu className="h-6 w-6" />
+                            </Button>
+                            <Button variant="outline" className="h-16 px-8 rounded-3xl border-2 font-black uppercase text-[10px] tracking-widest bg-white">
+                                <Layout className="h-4 w-4 mr-2" /> View Layout
+                            </Button>
+                        </div>
                     </div>
-                </CardContent>
-            </Card>
 
-            <Card className="overflow-hidden bg-white border border-primary-50">
-                <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                            <TableRow className="bg-primary-50">
-                                <TableHead className="text-black">Leader</TableHead>
-                                <TableHead className="text-black">Department</TableHead>
-                                <TableHead className="text-center text-black">Reports</TableHead>
-                                <TableHead className="text-black">Role</TableHead>
-                                <TableHead className="text-right text-black">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                Array.from({ length: 3 }).map((_, i) => (
-                                    <TableRow key={i} className="">
-                                        <TableCell>
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-full bg-primary-100 animate-pulse"></div>
-                                                <div className="space-y-1">
-                                                    <div className="h-4 bg-primary-50 rounded w-32 animate-pulse"></div>
-                                                    <div className="h-3 bg-primary-50 rounded w-24 animate-pulse"></div>
-                                                </div>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell><div className="h-4 bg-primary-50 rounded w-20 animate-pulse"></div></TableCell>
-                                        <TableCell className="text-center"><div className="h-4 bg-primary-50 rounded w-8 animate-pulse mx-auto"></div></TableCell>
-                                        <TableCell><div className="h-4 bg-primary-50 rounded w-24 animate-pulse"></div></TableCell>
-                                        <TableCell className="text-right"><div className="h-8 w-16 bg-primary-50 rounded animate-pulse"></div></TableCell>
-                                    </TableRow>
-                                ))
-                            ) : filteredManagers.length === 0 ? (
-                                <TableRow>
-                                    <TableCell colSpan={5} className="text-center py-12">
-                                        <div className="text-primary-600">
-                                            <Crown className="h-12 w-12 mx-auto mb-3 opacity-40" />
-                                            <p className="font-medium">No team leaders yet</p>
-                                            <p className="text-sm mt-1">Promote an employee to get started</p>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                filteredManagers.map((manager) => {
+                    <div className="overflow-x-auto p-4">
+                        <table className="w-full border-separate border-spacing-y-4">
+                            <thead>
+                                <tr className="text-left font-black text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                                    <th className="px-8 pb-4">Personnel Cluster</th>
+                                    <th className="px-8 pb-4">Department Unit</th>
+                                    <th className="px-8 pb-4 text-center">Span of Control</th>
+                                    <th className="px-8 pb-4">Operational Rank</th>
+                                    <th className="px-8 pb-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    [1, 2, 3].map(i => <tr key={i} className="h-24 bg-slate-50 animate-pulse rounded-[2rem]"></tr>)
+                                ) : filteredManagers.map((manager) => {
                                     const dept = departments?.find(d => d.manager === manager.id);
-                                    const photo = getImageUrl(manager.photo);
-
                                     return (
-                                        <TableRow key={manager.id} className="hover:bg-primary-50">
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="relative">
-                                                        {photo ? (
-                                                            <img 
-                                                                src={photo}
-                                                                alt={manager.full_name}
-                                                                className="h-10 w-10 rounded-full object-cover bg-primary-50"
-                                                                onError={(e) => e.target.style.display = 'none'}
-                                                            />
+                                        <tr key={manager.id} className="group bg-white hover:bg-slate-50 transition-all duration-300 shadow-sm hover:shadow-xl rounded-[2rem] border border-slate-100">
+                                            <td className="px-8 py-6 rounded-l-[2rem]">
+                                                <div className="flex items-center gap-5">
+                                                    <div className="relative h-14 w-14 rounded-2xl bg-slate-900 border-2 border-white shadow-xl flex items-center justify-center text-white font-black text-xl italic group-hover:scale-110 transition-transform overflow-hidden">
+                                                        {manager.photo ? (
+                                                            <img src={manager.photo} className="h-full w-full object-cover" alt="" />
                                                         ) : (
-                                                            <div className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold bg-primary-100 text-primary-700">
-                                                                {manager.first_name?.[0]}{manager.last_name?.[0]}
-                                                            </div>
+                                                            <span>{manager.full_name[0]}</span>
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <div className="font-medium text-black">{manager.full_name}</div>
-                                                        <div className="text-xs text-gray-500">{manager.employee_number}</div>
+                                                        <div className="font-black text-slate-900 uppercase italic tracking-tight">{manager.full_name}</div>
+                                                        <div className="text-[10px] font-bold text-primary-600 uppercase tracking-widest">{manager.employee_number || 'ID-0000'}</div>
                                                     </div>
                                                 </div>
-                                            </TableCell>
-                                            <TableCell>
+                                            </td>
+                                            <td className="px-8 py-6">
                                                 {dept ? (
-                                                    <span className="inline-flex items-center px-2 py-1 rounded-md bg-primary-50 text-primary-700 text-xs font-medium">
-                                                        {dept.name}
+                                                    <span className="inline-flex items-center px-4 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase tracking-widest border border-indigo-100">
+                                                        <Target className="h-3 w-3 mr-2" /> {dept.name}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-gray-500 text-xs">None</span>
+                                                    <span className="text-slate-300 font-bold italic text-xs">Unassigned Unit</span>
                                                 )}
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-50 text-success-700">
-                                                    {manager.subordinates?.length || 0}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell>
-                                                <div className="text-sm text-black max-w-xs truncate">{manager.job_title}</div>
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button
-                                                        variant="ghost"
-                                                        className="h-8 w-8 p-0 text-primary-600 hover:text-primary-700"
-                                                        onClick={() => navigate(`/employees/${manager.id}/edit`)}
-                                                    >
-                                                        <Edit className="h-4 w-4" />
-                                                    </Button>
+                                            </td>
+                                            <td className="px-8 py-6 text-center">
+                                                <div className="flex flex-col items-center">
+                                                    <span className="text-2xl font-black italic text-slate-900">{manager.subordinates?.length || 0}</span>
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Direct Nodes</span>
                                                 </div>
-                                            </TableCell>
-                                        </TableRow>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="text-xs font-bold text-slate-700 uppercase tracking-tight max-w-[150px] truncate">
+                                                    {manager.job_title}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6 text-right rounded-r-[2rem]">
+                                                <Button
+                                                    onClick={() => navigate(`/employees/${manager.id}/edit`)}
+                                                    variant="ghost"
+                                                    className="h-12 w-12 rounded-2xl hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                                                >
+                                                    <Edit className="h-5 w-5" />
+                                                </Button>
+                                            </td>
+                                        </tr>
                                     );
-                                })
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                </CardContent>
             </Card>
 
             <PromoteManagerModal
                 isOpen={isPromoteModalOpen}
                 onClose={() => setIsPromoteModalOpen(false)}
-                onPromote={handlePromoteEmployees}
+                onPromote={handlePromote}
             />
         </div>
     );
 };
 
+const IntelCard = ({ label, value, icon, trend, color }) => (
+    <Card className={cn("border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden group hover:scale-105 transition-all duration-500")}>
+        <CardContent className={cn("p-8 bg-gradient-to-br transition-all", color)}>
+            <div className="flex justify-between items-start">
+                <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-50 group-hover:rotate-12 transition-transform">
+                    {icon}
+                </div>
+                <div className="text-right">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">{label}</p>
+                    <h3 className="text-4xl font-black italic tracking-tighter text-slate-900">{value}</h3>
+                </div>
+            </div>
+            <div className="mt-8 flex items-center gap-2">
+                <TrendingUp className="h-3 w-3 text-emerald-500" />
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">{trend}</span>
+            </div>
+        </CardContent>
+    </Card>
+);
+
 export default ManagerManagementPage;
+
+
 
 
 

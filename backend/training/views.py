@@ -614,11 +614,8 @@ class TrainingDashboardViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def my_stats(self, request):
         """Get current user's training statistics."""
-        if not hasattr(request.user, 'employee'):
-            return Response(
-                {'error': 'User has no associated employee record'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if not hasattr(request.user, 'employee') or not request.user.employee:
+            return Response({})
         
         stats = get_training_stats_for_employee(request.user.employee)
         serializer = TrainingStatisticsSerializer(stats)
@@ -628,10 +625,7 @@ class TrainingDashboardViewSet(viewsets.ViewSet):
     def my_compliance(self, request):
         """Get current user's compliance status."""
         if not hasattr(request.user, 'employee') or request.user.employee is None:
-            return Response(
-                {'error': 'User has no associated employee record'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response([])
 
         compliance = ComplianceService.get_employee_compliance_status(request.user.employee)
         serializer = ComplianceStatusSerializer(compliance, many=True)
@@ -649,10 +643,7 @@ class TrainingDashboardViewSet(viewsets.ViewSet):
         from .utils import get_upcoming_sessions_for_employee
         
         if not hasattr(request.user, 'employee'):
-            return Response(
-                {'error': 'User has no associated employee record'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response([])
         
         days = int(request.query_params.get('days', 30))
         enrollments = get_upcoming_sessions_for_employee(request.user.employee, days)

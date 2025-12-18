@@ -27,10 +27,14 @@ const DocumentsPage = () => {
     const [isViewerOpen, setIsViewerOpen] = useState(false);
 
     const { data: user } = useGetCurrentUserQuery();
-    const { data: documents = [], isLoading: docsLoading } = useGetDocumentsQuery();
-    const { data: employeeDocuments = [], isLoading: empDocsLoading } = useGetEmployeeDocumentsQuery();
+    const { data: documentsData = [], isLoading: docsLoading } = useGetDocumentsQuery();
+    const { data: employeeDocumentsData = [], isLoading: empDocsLoading } = useGetEmployeeDocumentsQuery();
     const [createDocument] = useCreateDocumentMutation();
     const [createEmployeeDocument] = useCreateEmployeeDocumentMutation();
+
+    // Safe Data Extraction
+    const documents = Array.isArray(documentsData) ? documentsData : (documentsData?.results || []);
+    const employeeDocuments = Array.isArray(employeeDocumentsData) ? employeeDocumentsData : (employeeDocumentsData?.results || []);
 
     const [uploadForm, setUploadForm] = useState({
         title: '',
@@ -96,7 +100,7 @@ const DocumentsPage = () => {
 
     const filteredDocuments = documents.filter(doc => {
         const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             doc.description?.toLowerCase().includes(searchTerm.toLowerCase());
+            doc.description?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesCategory = selectedCategory === 'all' || doc.category === selectedCategory;
         return matchesSearch && matchesCategory;
     });

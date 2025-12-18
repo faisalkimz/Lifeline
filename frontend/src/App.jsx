@@ -25,13 +25,14 @@ import DisciplinaryPage from './features/disciplinary/DisciplinaryPage';
 import JobListPage from './features/recruitment/JobListPage';
 import PipelinePage from './features/recruitment/PipelinePage';
 import IntegrationsPage from './features/recruitment/IntegrationsPage';
-import CandidatePage from './features/recruitment/CandidatePage';
+import CandidateManagementPage from './features/recruitment/CandidateManagementPage';
 import InterviewSchedulingPage from './features/recruitment/InterviewSchedulingPage';
 import PublicCareerPage from './features/recruitment/PublicCareerPage';
 import TrainingPage from './features/training/TrainingPage';
 import BenefitsPage from './features/benefits/BenefitsPage';
 import BenefitsAdminPage from './features/benefits/BenefitsAdminPage';
 import DocumentsPage from './features/documents/DocumentsPage';
+import SettingsPage from './features/settings/SettingsPage';
 import OffboardingPage from './features/offboarding/OffboardingPage';
 import EmployeePortalLayout from './layouts/EmployeePortalLayout';
 import EmployeeDashboard from './features/employee-portal/EmployeeDashboard';
@@ -81,7 +82,7 @@ function App() {
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/disciplinary" element={<DisciplinaryPage />} />
         <Route path="/recruitment" element={<JobListPage />} />
-        <Route path="/recruitment/candidates" element={<CandidatePage />} />
+        <Route path="/recruitment/candidates" element={<CandidateManagementPage />} />
         <Route path="/recruitment/pipeline" element={<PipelinePage />} />
         <Route path="/recruitment/interviews" element={<InterviewSchedulingPage />} />
         <Route path="/recruitment/integrations" element={<IntegrationsPage />} />
@@ -102,7 +103,7 @@ function App() {
         {/* Organization Routes */}
         <Route path="/organization" element={<Navigate to="/org-chart" replace />} />
 
-        <Route path="/settings" element={<div>Settings Page (Coming Soon)</div>} />
+        <Route path="/settings" element={<SettingsPage />} />
 
         {/* Employee Self-Service Portal */}
         <Route path="/employee" element={<EmployeePortalLayout />}>

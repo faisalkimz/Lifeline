@@ -61,7 +61,7 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class DepartmentCreateSerializer(serializers.ModelSerializer):
     """
     Simplified serializer for creating departments.
-    Company is automatically set from request user.
+    Company is automatically set from request user in the view, not here.
     """
     class Meta:
         model = Department
@@ -69,9 +69,8 @@ class DepartmentCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
     
     def create(self, validated_data):
-        """Create department with company from request context"""
-        company = self.context['request'].user.company
-        return Department.objects.create(company=company, **validated_data)
+        """Create department without manually passing company"""
+        return Department.objects.create(**validated_data)
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -179,7 +178,23 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating new employees.
     Company is automatically set, employee number is auto-generated.
+    Supports optional User account creation.
     """
+    # User Account Creation Fields
+    create_user = serializers.BooleanField(write_only=True, required=False, default=False)
+    username = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=False)
+    role = serializers.ChoiceField(
+        choices=[
+            ('hr_manager', 'HR Manager'),
+            ('manager', 'Manager'),
+            ('employee', 'Employee'),
+        ],
+        write_only=True, 
+        required=False, 
+        default='employee'
+    )
+
     class Meta:
         model = Employee
         fields = [
@@ -200,14 +215,68 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             # Family Information
             'marital_status', 'number_of_dependents',
             # Notes
-            'notes'
+            'notes',
+            # User Account Fields
+            'create_user', 'username', 'password', 'role'
         ]
         read_only_fields = ['id']
     
     def create(self, validated_data):
-        """Create employee with company from request context"""
-        company = self.context['request'].user.company
-        return Employee.objects.create(company=company, **validated_data)
+        """Create employee with optional user account"""
+        # Extract user account data
+        create_user = validated_data.pop('create_user', False)
+        username = validated_data.pop('username', None)
+        password = validated_data.pop('password', None)
+        role = validated_data.pop('role', 'employee')
+        
+        request = self.context.get('request')
+        company = request.user.company
+
+        # Remove company from validated_data if it exists to avoid duplication
+        validated_data.pop('company', None)
+
+        # Create Employee
+        employee = Employee.objects.create(company=company, **validated_data)
+        
+        # Create User Account if requested
+        if create_user:
+            from accounts.models import User
+            from django.utils.crypto import get_random_string
+
+            # Default username to email if not provided
+            if not username:
+                username = validated_data.get('email')
+
+            # Ensure username is unique
+            original_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{original_username}{counter}"
+                counter += 1
+
+            # Generate a random password if not provided
+            if not password:
+                password = get_random_string(length=10)
+            
+            # Create User
+            user = User.objects.create_user(
+                username=username,
+                email=validated_data.get('email'),
+                password=password,
+                company=company,
+                role=role,
+                first_name=validated_data.get('first_name'),
+                last_name=validated_data.get('last_name'),
+                employee=employee,
+                phone=validated_data.get('phone', '')
+            )
+
+            # Send welcome email
+            from .utils import send_welcome_email
+            send_welcome_email(employee, password)
+            
+        return employee
+
 
 
 class EmployeeBasicSerializer(serializers.ModelSerializer):

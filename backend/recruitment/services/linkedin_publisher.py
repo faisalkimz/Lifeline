@@ -15,16 +15,46 @@ class LinkedInPublisher(BaseJobPublisher):
     
     def __init__(self, integration_settings):
         super().__init__(integration_settings)
-        self.access_token = self.api_key  # API key is the access token
+        # Use access_token from DB if available, fallback to api_key
+        self.access_token = self.access_token or self.api_key
     
+    def refresh_token(self) -> bool:
+        """Refresh LinkedIn access token"""
+        if not self.refresh_token_str or not self.client_id or not self.client_secret:
+            return False
+            
+        try:
+            response = self._make_request(
+                'POST',
+                'https://www.linkedin.com/oauth/v2/accessToken',
+                data={
+                    'grant_type': 'refresh_token',
+                    'refresh_token': self.refresh_token_str,
+                    'client_id': self.client_id,
+                    'client_secret': self.client_secret
+                }
+            )
+            data = response.json()
+            self.access_token = data['access_token']
+            
+            # Update DB
+            from django.utils import timezone
+            import datetime
+            self.integration.access_token = self.access_token
+            # LinkedIn tokens typically last 60 days, but they provide expires_in
+            if 'expires_in' in data:
+                self.integration.token_expires_at = timezone.now() + datetime.timedelta(seconds=data['expires_in'])
+            self.integration.save()
+            return True
+        except Exception:
+            return False
+
     def publish_job(self, job) -> Dict[str, Any]:
         """
         Post a job to LinkedIn
-        
-        LinkedIn API Reference:
-        https://docs.microsoft.com/en-us/linkedin/talent/job-postings
         """
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {
                 'success': False,
                 'error': 'LinkedIn integration not authorized. Please configure API credentials.'
@@ -65,7 +95,8 @@ class LinkedInPublisher(BaseJobPublisher):
     
     def update_job(self, job, external_id: str) -> Dict[str, Any]:
         """Update LinkedIn job posting"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         job_data = self._format_linkedin_job(job)
@@ -98,7 +129,8 @@ class LinkedInPublisher(BaseJobPublisher):
     
     def close_job(self, external_id: str) -> Dict[str, Any]:
         """Close LinkedIn job posting"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         headers = {
@@ -129,7 +161,8 @@ class LinkedInPublisher(BaseJobPublisher):
     
     def get_analytics(self, external_id: str) -> Dict[str, Any]:
         """Get LinkedIn job analytics"""
-        if not self.is_authorized():
+        self.ensure_valid_token()
+        if not self.access_token:
             return {'success': False, 'error': 'Not authorized'}
         
         headers = {

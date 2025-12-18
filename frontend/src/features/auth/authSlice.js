@@ -3,11 +3,13 @@ import { api } from '../../store/api';
 
 // Try to load token from localStorage
 const token = localStorage.getItem('token');
+const refresh = localStorage.getItem('refresh');
 const user = JSON.parse(localStorage.getItem('user') || 'null');
 
 const initialState = {
     user: user,
     token: token,
+    refresh: refresh,
     isAuthenticated: !!token,
 };
 
@@ -16,22 +18,26 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setCredentials: (state, action) => {
-            const { user, token } = action.payload;
+            const { user, token, refresh } = action.payload;
             state.user = user;
             state.token = token;
+            state.refresh = refresh;
             state.isAuthenticated = true;
 
             // Persist to localStorage
             localStorage.setItem('token', token);
+            if (refresh) localStorage.setItem('refresh', refresh);
             localStorage.setItem('user', JSON.stringify(user));
         },
         logout: (state) => {
             state.user = null;
             state.token = null;
+            state.refresh = null;
             state.isAuthenticated = false;
 
             // Clear localStorage
             localStorage.removeItem('token');
+            localStorage.removeItem('refresh');
             localStorage.removeItem('user');
         },
     },

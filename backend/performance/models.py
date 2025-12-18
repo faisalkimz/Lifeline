@@ -75,11 +75,20 @@ class PerformanceReview(models.Model):
         ('acknowledged', 'Acknowledged'), # Employee signed off
     ]
 
+    REVIEW_TYPE_CHOICES = [
+        ('self', 'Self Review'),
+        ('manager', 'Manager Review'),
+        ('peer', 'Peer Review'),
+        ('subordinate', 'Subordinate Review'),
+    ]
+
     cycle = models.ForeignKey(PerformanceCycle, on_delete=models.CASCADE, related_name='reviews')
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='performance_reviews_received')
     reviewer = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, related_name='performance_reviews_given')
+    review_type = models.CharField(max_length=20, choices=REVIEW_TYPE_CHOICES, default='manager')
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    is_360_request = models.BooleanField(default=False)
     review_date = models.DateField(null=True, blank=True)
     
     # Ratings (1-5 scale)
@@ -99,7 +108,7 @@ class PerformanceReview(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ['cycle', 'employee']
+        unique_together = ['cycle', 'employee', 'reviewer']
 
     def calculate_overall(self):
         fields = [self.technical_skills, self.communication, self.teamwork, self.productivity, self.initiative]

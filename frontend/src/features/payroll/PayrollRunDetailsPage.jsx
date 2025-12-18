@@ -13,7 +13,7 @@ import { Button } from '../../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
-import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload } from 'lucide-react';
+import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PayrollRunDetailsPage = () => {
@@ -110,6 +110,40 @@ const PayrollRunDetailsPage = () => {
         }
     };
 
+    const handleExportTaxReport = () => {
+        if (!payslips || payslips.length === 0) {
+            toast.error("No transactional data available for export");
+            return;
+        }
+
+        // Generate CSV for Uganda Statutory Returns (PAYE & NSSF)
+        const headers = ["Employee Name", "TIN", "Gross Salary", "PAYE Tax", "NSSF Employee (5%)", "NSSF Employer (10%)", "Total NSSF (15%)", "Net Pay"];
+        const rows = payslips.map(p => [
+            p.employee_name,
+            p.tin || "N/A",
+            p.gross_salary,
+            p.paye_tax,
+            p.nssf_employee || (p.gross_salary * 0.05),
+            p.nssf_employer || (p.gross_salary * 0.10),
+            (Number(p.nssf_employee) || (p.gross_salary * 0.05)) + (Number(p.nssf_employer) || (p.gross_salary * 0.10)),
+            p.net_salary
+        ]);
+
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + headers.join(",") + "\n"
+            + rows.map(r => r.join(",")).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Lifeline_Tax_Report_${run.year}_${run.month}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast.success("Statutory Compliance Matrix generated");
+    };
+
     if (isLoadingRun || isLoadingPayslips) {
         return <div className="flex justify-center items-center h-screen"><Loader2 className="h-8 w-8 animate-spin" /></div>;
     }
@@ -155,6 +189,15 @@ const PayrollRunDetailsPage = () => {
                             Mark Paid
                         </Button>
                     )}
+                    <Button
+                        onClick={handleExportTaxReport}
+                        variant="outline"
+                        className="border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
+                        disabled={payslips.length === 0}
+                    >
+                        <DownloadCloud className="h-4 w-4 mr-2" />
+                        Export Tax Matrix
+                    </Button>
                 </div>
             </div>
 

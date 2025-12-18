@@ -1,329 +1,193 @@
-import React, { useMemo, useState } from 'react';
-import Tree from 'react-d3-tree';
-import { useGetEmployeesQuery } from '../../store/api';
+import React, { useState } from 'react';
+import { useGetManagersQuery } from '../../store/api';
 import { Card, CardContent } from '../../components/ui/Card';
-import { Users, Building2, Search, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
+import {
+    Users, ChevronDown, ChevronRight, User,
+    Briefcase, MapPin, Mail, Phone, Network,
+    Maximize2, Minimize2, Search, Filter,
+    Download, Share2, Printer
+} from 'lucide-react';
+import { cn } from '../../utils/cn';
 
 const OrgChartPage = () => {
-    const { data: employees, isLoading } = useGetEmployeesQuery({ employment_status: 'active' });
-    const [translate, setTranslate] = useState({ x: 0, y: 0 });
-    const [zoom, setZoom] = useState(1);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const { data: managers, isLoading } = useGetManagersQuery();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [expandedNodes, setExpandedNodes] = useState(new Set());
 
-    const orgChartData = useMemo(() => {
-        if (!employees || employees.length === 0) return null;
-
-        const employeeMap = {};
-        employees.forEach(emp => {
-            employeeMap[emp.id] = {
-                name: emp.full_name,
-                attributes: {
-                    title: emp.job_title,
-                    department: emp.department_name,
-                    email: emp.email,
-                },
-                children: [],
-                _id: emp.id,
-                _managerId: emp.manager,
-            };
-        });
-
-        const roots = [];
-        Object.values(employeeMap).forEach(emp => {
-            if (emp._managerId && employeeMap[emp._managerId]) {
-                employeeMap[emp._managerId].children.push(emp);
-            } else {
-                roots.push(emp);
-            }
-        });
-
-        if (roots.length === 1) return roots[0];
-
-        return {
-            name: 'Leadership',
-            attributes: { title: 'Executive Team', department: 'Organization' },
-            children: roots,
-        };
-    }, [employees]);
-
-    const handleReset = () => {
-        setTranslate({ x: dimensions.width / 2, y: 100 });
-        setZoom(1);
+    const toggleNode = (id) => {
+        const newSet = new Set(expandedNodes);
+        if (newSet.has(id)) newSet.delete(id);
+        else newSet.add(id);
+        setExpandedNodes(newSet);
     };
 
-    const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.2, 2));
-    const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.2, 0.5));
+    const getImageUrl = (path) => {
+        if (!path) return null;
+        if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
+        return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+    };
 
-    if (isLoading) {
+    const OrgNode = ({ person, isRoot = false }) => {
+        const hasSubordinates = person.subordinates && person.subordinates.length > 0;
+        const isExpanded = expandedNodes.has(person.id);
+
         return (
-            <div className="flex items-center justify-center h-[70vh]">
-                <div className="text-center space-y-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-500 border-t-transparent mx-auto"></div>
-                    <p className="text-gray-600 font-medium">Building organization chart...</p>
+            <div className="flex flex-col items-center">
+                <div
+                    className={cn(
+                        "relative p-6 rounded-3xl border-2 transition-all duration-300 group cursor-pointer w-72",
+                        isRoot ? "bg-slate-900 border-slate-900 shadow-2xl shadow-slate-900/20" : "bg-white border-slate-100 hover:border-primary-400 hover:shadow-xl hover:shadow-primary-400/10 shadow-sm"
+                    )}
+                    onClick={() => hasSubordinates && toggleNode(person.id)}
+                >
+                    {/* Connection Line Top */}
+                    {!isRoot && (
+                        <div className="absolute -top-10 left-1/2 w-0.5 h-10 bg-slate-200"></div>
+                    )}
+
+                    <div className="flex items-center gap-4">
+                        <div className={cn(
+                            "h-14 w-14 rounded-2xl overflow-hidden border-2",
+                            isRoot ? "border-slate-800" : "border-slate-50"
+                        )}>
+                            {person.photo ? (
+                                <img src={getImageUrl(person.photo)} alt="" className="h-full w-full object-cover" />
+                            ) : (
+                                <div className="h-full w-full bg-slate-100 flex items-center justify-center">
+                                    <User className="h-6 w-6 text-slate-400" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <h3 className={cn("font-black text-sm uppercase tracking-tight truncate", isRoot ? "text-white" : "text-slate-900")}>
+                                {person.first_name} {person.last_name}
+                            </h3>
+                            <p className={cn("text-[10px] font-bold uppercase tracking-widest mt-0.5 truncate", isRoot ? "text-primary-400" : "text-primary-600")}>
+                                {person.job_title}
+                            </p>
+                            <p className={cn("text-[9px] font-bold uppercase tracking-tight mt-1 opacity-50", isRoot ? "text-slate-400" : "text-slate-500")}>
+                                {person.department_name || 'Global Ops'}
+                            </p>
+                        </div>
+                        {hasSubordinates && (
+                            <div className={cn("h-6 w-6 rounded-lg flex items-center justify-center transition-transform", isExpanded ? "rotate-180" : "", isRoot ? "bg-slate-800 text-slate-400" : "bg-slate-50 text-slate-400")}>
+                                <ChevronDown className="h-3 w-3" />
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Connection Line Bottom */}
+                    {hasSubordinates && isExpanded && (
+                        <div className="absolute -bottom-10 left-1/2 w-0.5 h-10 bg-slate-200"></div>
+                    )}
                 </div>
+
+                {hasSubordinates && isExpanded && (
+                    <div className="relative pt-10 flex gap-8">
+                        {/* Horizontal Connection Line */}
+                        {person.subordinates.length > 1 && (
+                            <div className="absolute top-10 left-[144px] right-[144px] h-0.5 bg-slate-200"></div>
+                        )}
+
+                        {person.subordinates.map(sub => (
+                            <OrgNode key={sub.id} person={sub} />
+                        ))}
+                    </div>
+                )}
             </div>
         );
-    }
+    };
 
-    if (!employees || employees.length === 0) {
-        return (
-            <div className="flex items-center justify-center h-[70vh]">
-                <Card className="max-w-md border-2 border-dashed">
-                    <CardContent className="text-center p-12">
-                        <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <Building2 className="h-8 w-8 text-gray-400" />
+    const rootManagers = managers?.filter(m => !m.manager) || [];
+
+    return (
+        <div className="space-y-8 pb-20 animate-fade-in font-sans">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-8">
+                <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
+                        <Network className="h-8 w-8 text-primary-600" /> Organizational Topology
+                    </h1>
+                    <p className="text-slate-500 mt-1 font-bold uppercase tracking-tight text-[10px] opacity-70">
+                        Visualizing corporate genetic structure and reporting vectors.
+                    </p>
+                </div>
+                <div className="flex gap-3">
+                    <Button variant="outline" className="rounded-2xl h-12 px-6 font-black uppercase text-[10px] tracking-widest border-2">
+                        <Download className="h-4 w-4 mr-2" /> Export PDF
+                    </Button>
+                    <Button className="rounded-2xl h-12 px-8 font-black uppercase text-[10px] tracking-widest bg-slate-900 shadow-2xl shadow-slate-900/20">
+                        <Printer className="h-4 w-4 mr-2" /> Print Map
+                    </Button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="md:col-span-2 relative">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                        type="text"
+                        placeholder="SEARCH PERSONNEL OR DEPARTMENTS..."
+                        className="w-full h-14 pl-14 pr-6 bg-white border-2 border-slate-100 rounded-2xl font-black text-[10px] tracking-widest uppercase focus:border-primary-400 outline-none transition-all shadow-sm"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <Button variant="outline" className="h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest border-2">
+                    <Filter className="h-4 w-4 mr-2" /> Filter Hierarchy
+                </Button>
+                <div className="bg-primary-50 rounded-2xl border-2 border-primary-100 flex items-center justify-between px-14 group cursor-pointer hover:bg-primary-100 transition-all">
+                    <span className="text-[10px] font-black text-primary-700 uppercase tracking-widest">Active Headcount</span>
+                    <span className="text-xl font-black text-primary-900 tracking-tighter">{managers?.length || 0}</span>
+                </div>
+            </div>
+
+            <div className="relative min-h-[600px] overflow-auto bg-slate-50/50 rounded-[3rem] border-4 border-white shadow-inner p-20 flex justify-center selection:bg-primary-100">
+                <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center space-y-4">
+                        <div className="h-12 w-12 border-4 border-slate-200 border-t-primary-600 rounded-full animate-spin"></div>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Compiling Topology...</p>
+                    </div>
+                ) : rootManagers.length > 0 ? (
+                    <div className="flex flex-col items-center gap-20">
+                        {rootManagers.map(root => (
+                            <OrgNode key={root.id} person={root} isRoot />
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center">
+                        <Users className="h-16 w-16 text-slate-200 mx-auto mb-6" />
+                        <h3 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No Organizational Structure Detected</h3>
+                    </div>
+                )}
+            </div>
+
+            <div className="fixed bottom-10 right-10 z-50">
+                <Card className="border-none shadow-2xl shadow-slate-900/10 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-xl w-64 border-t border-white">
+                    <CardContent className="p-6 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Legend</h4>
+                            <Minimize2 className="h-3 w-3 text-slate-300" />
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Organization Data</h3>
-                        <p className="text-gray-600">
-                            Add employees to your company to generate the organization chart.
-                        </p>
+                        <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                                <div className="h-3 w-3 rounded-full bg-slate-900 shadow-lg shadow-slate-900/20"></div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Executive</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="h-3 w-3 rounded-full bg-white border-2 border-slate-100"></div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Personnel</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <div className="h-0.5 w-6 bg-slate-200"></div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-600">Reporting Line</span>
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
-        );
-    }
-
-    return (
-        <div className="space-y-6 animate-fade-in">
-            {/* Enhanced Header with gradient */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-500 to-indigo-600 p-8 shadow-2xl">
-                <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px]" />
-                <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-                <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-
-                <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2.5 bg-white/20 backdrop-blur-sm rounded-xl">
-                                <Building2 className="h-7 w-7 text-white" />
-                            </div>
-                            <h1 className="text-3xl font-bold text-white">Organization Chart</h1>
-                        </div>
-                        <p className="text-blue-100 text-lg">
-                            Visual hierarchy of your company structure — {employees?.length || 0} team members
-                        </p>
-                    </div>
-
-                    {/* Controls */}
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleZoomOut}
-                            className="bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-sm"
-                        >
-                            <ZoomOut className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleZoomIn}
-                            className="bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-sm"
-                        >
-                            <ZoomIn className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleReset}
-                            className="bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-sm"
-                        >
-                            <Maximize2 className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Chart Container */}
-            <Card className="border-0 shadow-2xl bg-gradient-to-br from-gray-50 to-white overflow-hidden">
-                <CardContent className="p-0">
-                    <div
-                        ref={(el) => {
-                            if (el && dimensions.width === 0) {
-                                const rect = el.getBoundingClientRect();
-                                setDimensions({ width: rect.width, height: rect.height });
-                                setTranslate({ x: rect.width / 2, y: 100 });
-                            }
-                        }}
-                        className="relative w-full h-[80vh] bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30"
-                        style={{
-                            backgroundImage: `
-                                radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 50%),
-                                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.03) 0%, transparent 50%)
-                            `
-                        }}
-                    >
-                        {orgChartData && dimensions.width > 0 && (
-                            <Tree
-                                data={orgChartData}
-                                orientation="vertical"
-                                pathFunc="step"
-                                translate={translate}
-                                zoom={zoom}
-                                scaleExtent={{ min: 0.3, max: 2 }}
-                                nodeSize={{ x: 280, y: 180 }}
-                                separation={{ siblings: 1.2, nonSiblings: 1.5 }}
-                                enableLegacyTransitions
-                                transitionDuration={400}
-                                pathClassFunc={() => "org-chart-link"}
-                                renderCustomNodeElement={({ nodeDatum, toggleNode }) => {
-                                    const hasChildren = nodeDatum.children && nodeDatum.children.length > 0;
-                                    const isTopLevel = !nodeDatum._managerId;
-
-                                    return (
-                                        <g>
-                                            {/* Drop shadow */}
-                                            <defs>
-                                                <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                                                    <feDropShadow dx="0" dy="4" stdDeviation="8" floodOpacity="0.15" />
-                                                </filter>
-                                                <linearGradient id="cardGradient" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="0%" stopColor={isTopLevel ? "#3b82f6" : "#ffffff"} />
-                                                    <stop offset="100%" stopColor={isTopLevel ? "#2563eb" : "#f8fafc"} />
-                                                </linearGradient>
-                                            </defs>
-
-                                            {/* Card background */}
-                                            <rect
-                                                width="240"
-                                                height="140"
-                                                x="-120"
-                                                y="-70"
-                                                rx="16"
-                                                ry="16"
-                                                fill="url(#cardGradient)"
-                                                stroke={isTopLevel ? "#2563eb" : "#e2e8f0"}
-                                                strokeWidth="2"
-                                                filter="url(#shadow)"
-                                                onClick={toggleNode}
-                                                style={{
-                                                    cursor: hasChildren ? 'pointer' : 'default',
-                                                    transition: 'all 0.3s ease'
-                                                }}
-                                                className="org-node-rect"
-                                            />
-
-                                            {/* Icon circle */}
-                                            <circle
-                                                cx="0"
-                                                cy="-35"
-                                                r="22"
-                                                fill={isTopLevel ? "#ffffff" : "#3b82f6"}
-                                                stroke={isTopLevel ? "#e0e7ff" : "#dbeafe"}
-                                                strokeWidth="3"
-                                            />
-
-                                            {/* User icon */}
-                                            <text
-                                                x="0"
-                                                y="-30"
-                                                textAnchor="middle"
-                                                fontSize="20"
-                                                fill={isTopLevel ? "#3b82f6" : "#ffffff"}
-                                            >
-                                                👤
-                                            </text>
-
-                                            {/* Name */}
-                                            <text
-                                                fill={isTopLevel ? "#ffffff" : "#111827"}
-                                                x="0"
-                                                y="5"
-                                                textAnchor="middle"
-                                                fontSize="15"
-                                                fontWeight="700"
-                                                style={{ fontFamily: "'Inter', sans-serif" }}
-                                            >
-                                                {nodeDatum.name.length > 20
-                                                    ? nodeDatum.name.substring(0, 20) + '...'
-                                                    : nodeDatum.name}
-                                            </text>
-
-                                            {/* Job Title */}
-                                            <text
-                                                fill={isTopLevel ? "#e0e7ff" : "#4b5563"}
-                                                x="0"
-                                                y="25"
-                                                textAnchor="middle"
-                                                fontSize="12"
-                                                fontWeight="500"
-                                                style={{ fontFamily: "'Inter', sans-serif" }}
-                                            >
-                                                {(nodeDatum.attributes?.title || '').length > 25
-                                                    ? (nodeDatum.attributes?.title || '').substring(0, 25) + '...'
-                                                    : nodeDatum.attributes?.title}
-                                            </text>
-
-                                            {/* Department */}
-                                            <text
-                                                fill={isTopLevel ? "#cbd5e1" : "#9ca3af"}
-                                                x="0"
-                                                y="42"
-                                                textAnchor="middle"
-                                                fontSize="11"
-                                                fontWeight="400"
-                                                style={{ fontFamily: "'Inter', sans-serif" }}
-                                            >
-                                                {nodeDatum.attributes?.department || 'No Department'}
-                                            </text>
-
-                                            {/* Expand indicator */}
-                                            {hasChildren && (
-                                                <>
-                                                    <circle
-                                                        cx="0"
-                                                        cy="60"
-                                                        r="12"
-                                                        fill={isTopLevel ? "#ffffff" : "#3b82f6"}
-                                                        stroke={isTopLevel ? "#bfdbfe" : "#93c5fd"}
-                                                        strokeWidth="2"
-                                                    />
-                                                    <text
-                                                        x="0"
-                                                        y="65"
-                                                        textAnchor="middle"
-                                                        fontSize="10"
-                                                        fontWeight="700"
-                                                        fill={isTopLevel ? "#3b82f6" : "#ffffff"}
-                                                    >
-                                                        {nodeDatum.children.length}
-                                                    </text>
-                                                </>
-                                            )}
-                                        </g>
-                                    );
-                                }}
-                            />
-                        )}
-
-                        {/* Watermark */}
-                        <div className="absolute bottom-4 right-4 text-xs text-gray-400 font-medium">
-                            LahHR — Organization Structure
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Legend */}
-            <Card className="border border-gray-200">
-                <CardContent className="p-4">
-                    <div className="flex items-center justify-center gap-8 text-sm">
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-gradient-to-br from-blue-500 to-blue-600"></div>
-                            <span className="text-gray-700 font-medium">Leadership</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-4 h-4 rounded bg-white border-2 border-gray-300"></div>
-                            <span className="text-gray-700 font-medium">Team Members</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-xs font-bold">3</div>
-                            <span className="text-gray-700 font-medium">Direct Reports</span>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     );
 };

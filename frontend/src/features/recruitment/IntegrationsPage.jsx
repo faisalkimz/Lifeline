@@ -70,7 +70,12 @@ const IntegrationsPage = () => {
         }
     ];
 
-    const integrationList = integrations || [];
+    // normalize integrations to an array
+    const integrationList = Array.isArray(integrations?.results)
+        ? integrations.results
+        : Array.isArray(integrations)
+            ? integrations
+            : [];
     const activeIntegrations = integrationList.filter(i => i.is_active);
     const totalPlatforms = platforms.length;
     const connectedPlatforms = integrationList.length;
@@ -104,12 +109,7 @@ const IntegrationsPage = () => {
 
     if (isLoading) return <div>Loading...</div>;
 
-    // normalize integrations to an array (API may return object or results wrapper)
-    const integrationList = Array.isArray(integrations?.results)
-        ? integrations.results
-        : Array.isArray(integrations)
-            ? integrations
-            : [];
+
 
     return (
         <div className="space-y-8 pb-10">
@@ -190,50 +190,50 @@ const IntegrationsPage = () => {
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-primary-600 hover:bg-primary-700 shadow-sm">Connect New Platform</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Connect Job Board</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Platform</label>
-                                <select
-                                    className="w-full border rounded-md p-2"
-                                    value={selectedPlatform}
-                                    onChange={e => setSelectedPlatform(e.target.value)}
-                                >
-                                    {platforms.map(p => (
-                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">API Key / Client ID</label>
-                                <input
-                                    className="w-full border rounded-md p-2"
-                                    type="password"
-                                    value={formData.client_id}
-                                    onChange={e => setFormData({ ...formData, client_id: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Client Secret (if applicable)</label>
-                                <input
-                                    className="w-full border rounded-md p-2"
-                                    type="password"
-                                    value={formData.client_secret}
-                                    onChange={e => setFormData({ ...formData, client_secret: e.target.value })}
-                                />
-                            </div>
-                            <Button type="submit" className="w-full">Save Connection</Button>
-                        </form>
-                    </DialogContent>
-                </Dialog>
-            </div>
+                <DialogTrigger asChild>
+                    <Button className="bg-primary-600 hover:bg-primary-700 shadow-sm">Connect New Platform</Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Connect Job Board</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4 pt-4">
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Platform</label>
+                            <select
+                                className="w-full border rounded-md p-2"
+                                value={selectedPlatform}
+                                onChange={e => setSelectedPlatform(e.target.value)}
+                            >
+                                {platforms.map(p => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">API Key / Client ID</label>
+                            <input
+                                className="w-full border rounded-md p-2"
+                                type="password"
+                                value={formData.client_id}
+                                onChange={e => setFormData({ ...formData, client_id: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Client Secret (if applicable)</label>
+                            <input
+                                className="w-full border rounded-md p-2"
+                                type="password"
+                                value={formData.client_secret}
+                                onChange={e => setFormData({ ...formData, client_secret: e.target.value })}
+                            />
+                        </div>
+                        <Button type="submit" className="w-full">Save Connection</Button>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
 
             {/* Integration Platforms */}
             <div>
@@ -324,8 +324,8 @@ const IntegrationsPage = () => {
                     })}
                 </div>
             </div>
-            </div>
         </div>
+
     );
 };
 

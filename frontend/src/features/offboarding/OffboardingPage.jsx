@@ -178,7 +178,12 @@ const OffboardingPage = () => {
                 )}
             </div>
 
-            {isResigned ? (
+            {isLoading ? (
+                <div className="flex flex-col justify-center items-center h-64 text-primary-500">
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-current border-t-transparent mb-4"></div>
+                    <p className="font-medium animate-pulse">Loading offboarding details...</p>
+                </div>
+            ) : isResigned ? (
                 /* Active Offboarding Process */
                 <div className="space-y-8">
                     {/* Current Status Overview */}
@@ -216,11 +221,10 @@ const OffboardingPage = () => {
                                                 {Math.max(0, getDaysUntilLastWorkingDay(resignation.last_working_day))} days until departure
                                             </p>
                                         </div>
-                                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                            getDaysUntilLastWorkingDay(resignation.last_working_day) <= 7
+                                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${getDaysUntilLastWorkingDay(resignation.last_working_day) <= 7
                                                 ? 'bg-warning-100 text-warning-700'
                                                 : 'bg-primary-100 text-primary-700'
-                                        }`}>
+                                            }`}>
                                             {getDaysUntilLastWorkingDay(resignation.last_working_day)} days
                                         </div>
                                     </div>
@@ -246,11 +250,10 @@ const OffboardingPage = () => {
 
                                     return (
                                         <div key={step.id} className="flex items-start gap-4">
-                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                                                isCompleted ? 'bg-success-100 text-success-600' :
-                                                isError ? 'bg-error-100 text-error-600' :
-                                                'bg-neutral-100 text-neutral-400'
-                                            }`}>
+                                            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${isCompleted ? 'bg-success-100 text-success-600' :
+                                                    isError ? 'bg-error-100 text-error-600' :
+                                                        'bg-neutral-100 text-neutral-400'
+                                                }`}>
                                                 {isCompleted ? (
                                                     <CheckCircle className="h-4 w-4" />
                                                 ) : isError ? (
@@ -262,11 +265,10 @@ const OffboardingPage = () => {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between">
                                                     <div>
-                                                        <h4 className={`font-medium ${
-                                                            isCompleted ? 'text-text-primary' :
-                                                            isError ? 'text-error-600' :
-                                                            'text-text-primary'
-                                                        }`}>
+                                                        <h4 className={`font-medium ${isCompleted ? 'text-text-primary' :
+                                                                isError ? 'text-error-600' :
+                                                                    'text-text-primary'
+                                                            }`}>
                                                             {step.title}
                                                         </h4>
                                                         <p className="text-sm text-text-secondary mt-1">
@@ -682,80 +684,7 @@ const OffboardingPage = () => {
                     </form>
                 </DialogContent>
             </Dialog>
-                            <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Last Working Day</label>
-                                    <input
-                                        type="date"
-                                        className="w-full border rounded-md p-2"
-                                        value={formData.last_working_day}
-                                        onChange={e => setFormData({ ...formData, last_working_day: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Reason for Leaving</label>
-                                    <textarea
-                                        className="w-full border rounded-md p-2"
-                                        value={formData.reason}
-                                        onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                        rows="4"
-                                        required
-                                    />
-                                </div>
-                                <Button type="submit" variant="destructive" className="w-full">
-                                    Submit Request
-                                </Button>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                )}
-            </div>
 
-            {isLoading ? (
-                <div>Loading...</div>
-            ) : !resignations?.length ? (
-                <Card className="border-dashed">
-                    <CardContent className="py-20 text-center text-gray-500">
-                        <div className="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                            <LogOut className="h-6 w-6 text-gray-400" />
-                        </div>
-                        <h3 className="font-semibold text-lg text-gray-900">No Active Process</h3>
-                        <p>You are currently employed and have no pending exit requests.</p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="space-y-4">
-                    {resignations.map(res => (
-                        <Card key={res.id} className="border-l-4 border-l-red-500">
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900">Resignation Request</h3>
-                                        <p className="text-gray-500 text-sm mt-1">Submitted on {new Date(res.submission_date).toLocaleDateString()}</p>
-                                    </div>
-                                    <span className={`px-2 py-1 rounded-full text-xs font-bold capitalize ${res.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
-                                        }`}>
-                                        {res.status}
-                                    </span>
-                                </div>
-                                <div className="mt-4 pt-4 border-t border-gray-100 grid md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs font-bold text-gray-500 uppercase">Last Working Day</label>
-                                        <p className="font-semibold">{new Date(res.last_working_day).toLocaleDateString()}</p>
-                                    </div>
-                                    {res.manager_comment && (
-                                        <div>
-                                            <label className="text-xs font-bold text-gray-500 uppercase">Manager Comment</label>
-                                            <p className="text-gray-700">{res.manager_comment}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
         </div>
     );
 };

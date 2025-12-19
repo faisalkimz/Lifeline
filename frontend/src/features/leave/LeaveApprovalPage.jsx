@@ -42,7 +42,7 @@ const LeaveApprovalPage = () => {
     const handleApprove = async (requestId) => {
         try {
             await approveRequest(requestId).unwrap();
-            toast.success('Protocol Authorization Successful');
+            toast.success('Request Approved');
             setShowApprovalDialog(false);
             setSelectedRequest(null);
             refetch();
@@ -53,7 +53,7 @@ const LeaveApprovalPage = () => {
 
     const handleReject = async () => {
         if (!rejectionReason.trim()) {
-            toast.error('Provide rejection protocol justification.');
+            toast.error('Provide a reason for rejection.');
             return;
         }
 
@@ -62,13 +62,13 @@ const LeaveApprovalPage = () => {
                 id: selectedRequest.id,
                 reason: rejectionReason
             }).unwrap();
-            toast.success('Protocol Denial Executed');
+            toast.success('Request Rejected');
             setShowRejectionDialog(false);
             setSelectedRequest(null);
             setRejectionReason('');
             refetch();
         } catch (error) {
-            toast.error('Denial Failed');
+            toast.error('Rejection Failed');
         }
     };
 
@@ -107,20 +107,20 @@ const LeaveApprovalPage = () => {
                                 <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl">
                                     <Home className="h-3.5 w-3.5 text-primary-400" />
                                     <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Tactical Control</span>
+                                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Management Hub</span>
                                     <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">Leave Validation</span>
+                                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">Leave Approvals</span>
                                 </div>
                             </div>
                             <div className="flex items-center gap-3">
                                 <Shield className="h-5 w-5 text-primary-500" />
-                                <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Authorization Protocol Engine</span>
+                                <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Integrated Approval System</span>
                             </div>
                             <h1 className="text-6xl md:text-8xl font-black text-white tracking-[-0.04em] leading-[0.9]">
                                 Team <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400">Approvals</span>
                             </h1>
                             <p className="text-slate-400 font-bold text-xl max-w-2xl leading-relaxed opacity-80">
-                                Global command center for verifying, authorizing, and synchronizing organizational absence requests.
+                                Command center for reviewing and approving employee leave requests.
                             </p>
                         </div>
 
@@ -128,7 +128,7 @@ const LeaveApprovalPage = () => {
                             <div className="px-8 py-4 bg-slate-950/50 rounded-2xl border border-white/5 flex items-center gap-4">
                                 <div className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,1)] animate-pulse" />
                                 <span className="text-2xl font-black text-white italic">{pendingCount}</span>
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Pending Protocols</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Pending Requests</span>
                             </div>
                             <div className="px-8 py-4 bg-slate-950/50 rounded-2xl border border-white/5 flex items-center gap-4">
                                 <TrendingUp className="h-5 w-5 text-primary-400" />
@@ -147,8 +147,8 @@ const LeaveApprovalPage = () => {
                                 key={status}
                                 onClick={() => setSelectedStatus(status)}
                                 className={`px-10 py-4 rounded-[1.5rem] flex items-center gap-3 transition-all text-xs font-black uppercase tracking-widest ${selectedStatus === status
-                                        ? 'bg-primary-600 text-white shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)]'
-                                        : 'text-slate-500 hover:text-slate-300'
+                                    ? 'bg-primary-600 text-white shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)]'
+                                    : 'text-slate-500 hover:text-slate-300'
                                     }`}
                             >
                                 {status === 'pending' && <Clock className="h-4 w-4" />}
@@ -164,7 +164,7 @@ const LeaveApprovalPage = () => {
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary-500 transition-colors" />
                         <input
                             type="text"
-                            placeholder="Identify personnel lookup..."
+                            placeholder="Search employees..."
                             className="w-full h-16 pl-14 pr-6 bg-slate-900/40 border border-white/5 rounded-2xl text-sm font-bold text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary-500 transition-all backdrop-blur-xl"
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -177,14 +177,14 @@ const LeaveApprovalPage = () => {
                     {isLoading ? (
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 flex flex-col items-center gap-6">
                             <div className="h-16 w-16 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
-                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-500">Synchronizing Data Matrix...</p>
+                            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-500">Loading Request Data...</p>
                         </motion.div>
                     ) : filteredRequests.length === 0 ? (
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="p-24 bg-slate-900/40 backdrop-blur-3xl rounded-[3rem] border border-white/5 text-center shadow-2xl relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[100px]" />
                             <FileText className="h-20 w-20 mx-auto mb-8 text-slate-700 opacity-40" />
-                            <h3 className="text-2xl font-black text-white uppercase italic tracking-tight mb-4">Registry Optimized</h3>
-                            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No tactical requests currently await validation.</p>
+                            <h3 className="text-2xl font-black text-white uppercase italic tracking-tight mb-4">Inbox Clear</h3>
+                            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No pending requests currently await your review.</p>
                         </motion.div>
                     ) : (
                         <div className="grid grid-cols-1 gap-8">
@@ -234,7 +234,7 @@ const LeaveApprovalPage = () => {
                                                         </div>
                                                         <div className="flex items-center gap-2 text-slate-500">
                                                             <Sparkles className="h-4 w-4 text-primary-400" />
-                                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Protocol Registry: {request.created_at ? new Date(request.created_at).toLocaleDateString() : 'INITIALIZED'}</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.2em]">Submitted on: {request.created_at ? new Date(request.created_at).toLocaleDateString() : 'System'}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -247,20 +247,20 @@ const LeaveApprovalPage = () => {
                                                             onClick={() => { setSelectedRequest(request); setShowApprovalDialog(true); }}
                                                             className="h-16 flex-1 xl:px-10 rounded-2xl bg-primary-600 hover:bg-primary-500 text-white font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary-600/20 border-none transition-all"
                                                         >
-                                                            Authorize Request
+                                                            Approve Request
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
                                                             onClick={() => { setSelectedRequest(request); setShowRejectionDialog(true); }}
                                                             className="h-16 flex-1 xl:px-10 rounded-2xl border border-white/5 bg-white/5 text-rose-400 font-black uppercase tracking-widest text-[11px] hover:bg-rose-500/10 hover:border-rose-500/50 transition-all"
                                                         >
-                                                            Deny Protocol
+                                                            Reject Request
                                                         </Button>
                                                     </div>
                                                 ) : (
                                                     <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/5">
                                                         <Info className="h-5 w-5 text-slate-500" />
-                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Final Validation Status: </span>
+                                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Status: </span>
                                                         <span className={`text-[10px] font-black uppercase tracking-widest ${request.status === 'approved' ? 'text-emerald-400' : 'text-rose-400'
                                                             }`}>{request.status}</span>
                                                     </div>
@@ -270,7 +270,7 @@ const LeaveApprovalPage = () => {
                                                     <div className="p-4 bg-slate-950/50 border border-white/5 rounded-2xl">
                                                         <div className="flex items-center gap-2 mb-2">
                                                             <MessageSquare className="h-3 w-3 text-primary-500" />
-                                                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Employee Justification</span>
+                                                            <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest">Employee Reason</span>
                                                         </div>
                                                         <p className="text-xs text-slate-400 font-medium italic">"{request.reason}"</p>
                                                     </div>
@@ -291,8 +291,8 @@ const LeaveApprovalPage = () => {
                     <div className="p-12 bg-slate-950/80 border-b border-white/5 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-600/20 rounded-full blur-[80px]" />
                         <DialogHeader className="relative z-10">
-                            <DialogTitle className="text-3xl font-black text-white tracking-tight italic">Authorize Protocol</DialogTitle>
-                            <p className="text-emerald-500/60 text-xs font-black uppercase tracking-[0.3em] mt-3 font-mono">Permission Level: EXECUTIVE</p>
+                            <DialogTitle className="text-3xl font-black text-white tracking-tight italic">Approve Leave</DialogTitle>
+                            <p className="text-emerald-500/60 text-xs font-black uppercase tracking-[0.3em] mt-3 font-mono">Manager Approval Requirement</p>
                         </DialogHeader>
                     </div>
                     <div className="p-12 space-y-10 bg-slate-900/50">
@@ -314,12 +314,12 @@ const LeaveApprovalPage = () => {
                         <div className="p-6 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-start gap-4">
                             <AlertTriangle className="h-5 w-5 text-amber-500 mt-1" />
                             <p className="text-xs font-medium text-amber-200/70 leading-relaxed uppercase tracking-widest">
-                                Confirming this protocol will immediately synchronize personnel availability across the corporate scheduler. This action is terminal and cannot be reversed from this interface.
+                                Confirming this request will immediately update the company roster and the employee's remaining leave balance.
                             </p>
                         </div>
                         <div className="flex gap-4">
-                            <Button variant="ghost" onClick={() => setShowApprovalDialog(false)} className="h-16 flex-1 rounded-2xl text-slate-400 font-black uppercase tracking-widest text-[11px] hover:bg-white/5">Abort Action</Button>
-                            <Button onClick={() => selectedRequest && handleApprove(selectedRequest.id)} className="h-16 flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 border-none transition-all">Authorize Presence Removal</Button>
+                            <Button variant="ghost" onClick={() => setShowApprovalDialog(false)} className="h-16 flex-1 rounded-2xl text-slate-400 font-black uppercase tracking-widest text-[11px] hover:bg-white/5">Cancel</Button>
+                            <Button onClick={() => selectedRequest && handleApprove(selectedRequest.id)} className="h-16 flex-[2] bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 border-none transition-all">Confirm Approval</Button>
                         </div>
                     </div>
                 </DialogContent>
@@ -331,24 +331,24 @@ const LeaveApprovalPage = () => {
                     <div className="p-12 bg-slate-950/80 border-b border-white/5 relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-rose-600/20 rounded-full blur-[80px]" />
                         <DialogHeader className="relative z-10">
-                            <DialogTitle className="text-3xl font-black text-white tracking-tight italic">Protocol Denial</DialogTitle>
-                            <p className="text-rose-500/60 text-xs font-black uppercase tracking-[0.3em] mt-3 font-mono">Required: Tactical Justification</p>
+                            <DialogTitle className="text-3xl font-black text-white tracking-tight italic">Reject Request</DialogTitle>
+                            <p className="text-rose-500/60 text-xs font-black uppercase tracking-[0.3em] mt-3 font-mono">Reason Required for Rejection</p>
                         </DialogHeader>
                     </div>
                     <div className="p-12 space-y-10 bg-slate-900/50">
                         <div className="space-y-4">
-                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Official Justification</label>
+                            <label className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 ml-1">Reason for Rejection</label>
                             <textarea
                                 className="w-full min-h-[160px] p-8 bg-white/5 border border-white/10 rounded-[2.5rem] text-sm font-bold text-white placeholder:text-slate-700 focus:ring-2 focus:ring-rose-500 transition-all resize-none"
                                 value={rejectionReason}
                                 onChange={(e) => setRejectionReason(e.target.value)}
-                                placeholder="Identify structural reasons for protocol denial..."
+                                placeholder="Provide a reason for rejecting this leave request..."
                                 required
                             />
                         </div>
                         <div className="flex gap-4">
-                            <Button variant="ghost" onClick={() => { setShowRejectionDialog(false); setRejectionReason(''); }} className="h-16 flex-1 rounded-2xl text-slate-400 font-black uppercase tracking-widest text-[11px] hover:bg-white/5">Abort</Button>
-                            <Button variant="destructive" onClick={handleReject} disabled={!rejectionReason.trim()} className="h-16 flex-[2] bg-rose-600 hover:bg-rose-500 text-white font-black rounded-2xl shadow-xl shadow-rose-500/20 border-none transition-all disabled:opacity-50">Execute Denial Protocol</Button>
+                            <Button variant="ghost" onClick={() => { setShowRejectionDialog(false); setRejectionReason(''); }} className="h-16 flex-1 rounded-2xl text-slate-400 font-black uppercase tracking-widest text-[11px] hover:bg-white/5">Cancel</Button>
+                            <Button variant="destructive" onClick={handleReject} disabled={!rejectionReason.trim()} className="h-16 flex-[2] bg-rose-600 hover:bg-rose-500 text-white font-black rounded-2xl shadow-xl shadow-rose-500/20 border-none transition-all disabled:opacity-50">Confirm Rejection</Button>
                         </div>
                     </div>
                 </DialogContent>

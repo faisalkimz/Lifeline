@@ -133,15 +133,15 @@ const CandidateManagementPage = () => {
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
                         <Users className="h-8 w-8 text-primary-600" />
-                        Candidate Registry
+                        Candidate Management
                     </h1>
-                    <p className="text-slate-500 mt-1 font-medium italic">Advanced talent acquisition and data extraction terminal.</p>
+                    <p className="text-slate-500 mt-1 font-medium italic">Manage your talent pipeline and candidate information.</p>
                 </div>
                 <div className="flex gap-3 w-full md:w-auto">
                     <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                         <DialogTrigger asChild>
                             <Button className="flex-1 md:flex-none rounded-2xl bg-slate-900 shadow-xl shadow-slate-900/20 font-black uppercase text-[10px] tracking-widest px-8 h-14">
-                                <Plus className="h-5 w-5 mr-2" /> Recruit Talent
+                                <Plus className="h-5 w-5 mr-2" /> Add Candidate
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="rounded-[3rem] border-none shadow-2xl p-0 overflow-hidden max-w-2xl font-sans">
@@ -151,7 +151,7 @@ const CandidateManagementPage = () => {
                                 </div>
                                 <DialogHeader>
                                     <DialogTitle className="text-2xl font-black uppercase tracking-widest italic flex items-center gap-3">
-                                        Candidate Onboarding
+                                        Add New Candidate
                                     </DialogTitle>
                                     <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Automated parsing enabled for PDF/DOCX assets.</p>
                                 </DialogHeader>
@@ -159,7 +159,7 @@ const CandidateManagementPage = () => {
                             <form onSubmit={handleSubmit} className="p-10 space-y-8 bg-white max-h-[70vh] overflow-y-auto">
                                 {/* Resume Upload / Parse */}
                                 <div className="space-y-4">
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Digital Asset Sync (Smart Parse)</p>
+                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Resume Upload (Auto-Parse)</p>
                                     <div className={cn(
                                         "border-2 border-dashed rounded-[2rem] p-10 transition-all group flex flex-col items-center justify-center text-center cursor-pointer",
                                         formData.resume ? 'border-primary-500 bg-primary-50/20' : 'border-slate-100 bg-slate-50 hover:border-primary-400'
@@ -179,7 +179,7 @@ const CandidateManagementPage = () => {
                                             )}
                                             <div>
                                                 <p className="text-sm font-black text-slate-900 uppercase italic">
-                                                    {formData.resume ? formData.resume.name : 'Inject Resume File'}
+                                                    {formData.resume ? formData.resume.name : 'Upload Resume File'}
                                                 </p>
                                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">
                                                     PDF, DOCX • MAX 10MB
@@ -211,7 +211,7 @@ const CandidateManagementPage = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Email Identity</label>
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Email Address</label>
                                     <input
                                         type="email"
                                         className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
@@ -223,7 +223,7 @@ const CandidateManagementPage = () => {
 
                                 <div className="grid grid-cols-2 gap-8">
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Comm Channel (Phone)</label>
+                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Phone Number</label>
                                         <input
                                             className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
                                             value={formData.phone}
@@ -231,7 +231,7 @@ const CandidateManagementPage = () => {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Exp years</label>
+                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Experience (Years)</label>
                                         <input
                                             type="number"
                                             className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
@@ -242,7 +242,7 @@ const CandidateManagementPage = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Skill Matrix (Comma Separated)</label>
+                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Skills (Comma Separated)</label>
                                     <input
                                         className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
                                         value={formData.skills}
@@ -252,8 +252,8 @@ const CandidateManagementPage = () => {
                                 </div>
 
                                 <div className="pt-6 flex gap-4">
-                                    <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="ghost" className="flex-1 h-16 rounded-[2rem] font-black uppercase text-xs tracking-widest text-slate-400">Abort</Button>
-                                    <Button type="submit" className="flex-[2] h-16 rounded-[2rem] bg-slate-900 font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-900/20">Commit Candidate</Button>
+                                    <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="ghost" className="flex-1 h-16 rounded-[2rem] font-black uppercase text-xs tracking-widest text-slate-400">Cancel</Button>
+                                    <Button type="submit" className="flex-[2] h-16 rounded-[2rem] bg-slate-900 font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-900/20">Add Candidate</Button>
                                 </div>
                             </form>
                         </DialogContent>
@@ -267,7 +267,7 @@ const CandidateManagementPage = () => {
                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary-500 transition-colors" />
                     <input
                         type="text"
-                        placeholder="Scan registry for names, email, skills..."
+                        placeholder="Search candidates by name, email, skills..."
                         className="w-full h-14 pl-14 pr-6 bg-slate-50 border-none rounded-2xl font-bold focus:ring-4 focus:ring-primary-500/10 transition-all outline-none italic"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -279,7 +279,7 @@ const CandidateManagementPage = () => {
                         onChange={(e) => setSelectedStatus(e.target.value)}
                         className="w-full h-14 px-6 bg-slate-50 border-none rounded-2xl font-black uppercase text-[10px] tracking-widest outline-none focus:ring-4 focus:ring-primary-500/10 transition-all cursor-pointer"
                     >
-                        <option value="all">Global Status</option>
+                        <option value="all">Status</option>
                         <option value="applied">Applied</option>
                         <option value="screening">Screening</option>
                         <option value="interview">Interview</option>
@@ -300,9 +300,9 @@ const CandidateManagementPage = () => {
                     <div className="inline-flex p-10 bg-slate-50 rounded-full mb-8">
                         <Users className="h-16 w-16 text-slate-200" />
                     </div>
-                    <h4 className="text-3xl font-black text-slate-900 uppercase italic mb-3 tracking-tighter">Null Result</h4>
+                    <h4 className="text-3xl font-black text-slate-900 uppercase italic mb-3 tracking-tighter">No Results</h4>
                     <p className="text-slate-400 font-bold text-xs uppercase tracking-widest max-w-sm mx-auto leading-loose italic">
-                        No candidate signatures match your current search parameters.
+                        No candidates found matching your current search parameters.
                     </p>
                 </Card>
             ) : (
@@ -368,7 +368,7 @@ const CandidateManagementPage = () => {
                                             onClick={() => handleViewProfile(candidate)}
                                             className="flex-1 rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-widest h-14 group/btn"
                                         >
-                                            Telemetry <ChevronRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                                            View Profile <ChevronRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                                         </Button>
                                         <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-slate-50 hover:bg-slate-100 p-0 text-slate-400">
                                             <Edit className="h-5 w-5" />

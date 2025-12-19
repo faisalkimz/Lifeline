@@ -140,12 +140,12 @@ const DisciplinaryPage = () => {
                     </div>
                     <div>
                         <h1 className="text-2xl font-black text-slate-900 tracking-tight">Disciplinary Management</h1>
-                        <p className="text-slate-500 font-medium">Compliance & Conduct Enforcement</p>
+                        <p className="text-slate-500 font-medium">Employee Conduct & Disciplinary Actions</p>
                     </div>
                 </div>
                 {isAdmin && (
                     <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800 shadow-xl rounded-xl px-6">
-                        <Plus className="h-4 w-4 mr-2" /> New Case Record
+                        <Plus className="h-4 w-4 mr-2" /> New Disciplinary Case
                     </Button>
                 )}
             </div>
@@ -182,9 +182,9 @@ const DisciplinaryPage = () => {
                     <table className="w-full text-sm text-left">
                         <thead className="bg-slate-50 text-slate-400 font-black uppercase tracking-[0.1em] text-[10px]">
                             <tr>
-                                <th className="px-6 py-5">Incident / Case</th>
-                                <th className="px-6 py-5">Personnel</th>
-                                <th className="px-6 py-5">Intensity</th>
+                                <th className="px-6 py-5">Incident</th>
+                                <th className="px-6 py-5">Employee</th>
+                                <th className="px-6 py-5">Severity</th>
                                 <th className="px-6 py-5">Status</th>
                                 <th className="px-6 py-5 text-right">Actions</th>
                             </tr>
@@ -248,9 +248,9 @@ const DisciplinaryPage = () => {
                                             <div className="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 border-2 border-dashed border-slate-200">
                                                 <FileText className="h-8 w-8 text-slate-300" />
                                             </div>
-                                            <p className="text-xl font-black text-slate-900 tracking-tight">Clear Record</p>
+                                            <p className="text-xl font-black text-slate-900 tracking-tight">No Cases Found</p>
                                             <p className="text-slate-500 mt-2 max-w-xs mx-auto text-sm font-medium">
-                                                No disciplinary proceedings found for this selection.
+                                                No disciplinary records found for this selection.
                                             </p>
                                         </div>
                                     </td>
@@ -287,7 +287,7 @@ const DisciplinaryPage = () => {
                                 <div className="md:col-span-2 space-y-8">
                                     <section>
                                         <h4 className="flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest mb-4">
-                                            <FileText className="h-4 w-4 text-orange-500" /> Case Subject & Narrative
+                                            <FileText className="h-4 w-4 text-orange-500" /> Case Description
                                         </h4>
                                         <div className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
                                             <h3 className="text-xl font-bold text-slate-900 mb-3">{selectedCase.reason}</h3>
@@ -334,7 +334,7 @@ const DisciplinaryPage = () => {
                                     {isAdmin && (
                                         <section>
                                             <h4 className="flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest mb-4">
-                                                <Save className="h-4 w-4 text-emerald-500" /> Administrative Decision
+                                                <Save className="h-4 w-4 text-emerald-500" /> Management Decision
                                             </h4>
                                             <form onSubmit={handleUpdateCase} className="space-y-6">
                                                 <div className="grid grid-cols-2 gap-4">
@@ -367,16 +367,16 @@ const DisciplinaryPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Formal Decision Summary</label>
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decision Summary</label>
                                                     <textarea
                                                         className="w-full h-24 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm resize-none"
                                                         value={updateFormData.decision}
                                                         onChange={(e) => setUpdateFormData({ ...updateFormData, decision: e.target.value })}
-                                                        placeholder="Document the final verdict..."
+                                                        placeholder="Document the final decision..."
                                                     />
                                                 </div>
                                                 <Button type="submit" disabled={isUpdating} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl w-full font-black uppercase tracking-widest h-12 shadow-lg shadow-emerald-100">
-                                                    {isUpdating ? 'Saving...' : 'Finalize Record'}
+                                                    {isUpdating ? 'Saving...' : 'Save Decision'}
                                                 </Button>
                                             </form>
                                         </section>
@@ -386,20 +386,20 @@ const DisciplinaryPage = () => {
                                 {/* Right Side: Personnel & Log */}
                                 <div className="space-y-6">
                                     <Card className="bg-slate-50 border-none rounded-[1.5rem] p-6">
-                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Subject Personnel</h4>
+                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Employee</h4>
                                         <div className="flex items-center gap-4">
                                             <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-lg font-black text-slate-900 shadow-sm border border-slate-100">
                                                 {selectedCase.employee_name[0]}
                                             </div>
                                             <div>
                                                 <p className="font-black text-slate-900">{selectedCase.employee_name}</p>
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Active Duty</p>
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Active</p>
                                             </div>
                                         </div>
                                     </Card>
 
                                     <Card className="bg-slate-50 border-none rounded-[1.5rem] p-6">
-                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Context Metrics</h4>
+                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Case Details</h4>
                                         <div className="space-y-4">
                                             <div className="flex justify-between items-center">
                                                 <span className="text-xs font-bold text-slate-500">Incident Date</span>
@@ -419,7 +419,7 @@ const DisciplinaryPage = () => {
                                     </Card>
 
                                     <Button onClick={() => setSelectedCase(null)} variant="outline" className="w-full rounded-xl h-12 border-slate-200 font-bold hover:bg-slate-50">
-                                        <X className="h-4 w-4 mr-2" /> Exit Record View
+                                        <X className="h-4 w-4 mr-2" /> Close View
                                     </Button>
                                 </div>
                             </div>
@@ -432,14 +432,14 @@ const DisciplinaryPage = () => {
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
                 <DialogContent className="max-w-2xl rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden">
                     <div className="bg-slate-900 p-8 text-white relative">
-                        <DialogTitle className="text-2xl font-black tracking-tight">New Incident Record</DialogTitle>
-                        <p className="text-slate-400 text-sm mt-1">Initiate formal disciplinary proceedings.</p>
+                        <DialogTitle className="text-2xl font-black tracking-tight">New Disciplinary Case</DialogTitle>
+                        <p className="text-slate-400 text-sm mt-1">Record a new disciplinary incident.</p>
                     </div>
 
                     <form onSubmit={handleCreate} className="p-8 space-y-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Subject Personnel</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Employee</label>
                                 <select
                                     className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
                                     value={formData.employee}
@@ -453,7 +453,7 @@ const DisciplinaryPage = () => {
                                 </select>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Incident Timestamp</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Incident Date</label>
                                 <input
                                     type="date"
                                     className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
@@ -465,7 +465,7 @@ const DisciplinaryPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Primary Violation / Reason</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Reason for Action</label>
                             <Input
                                 placeholder="Nature of the conduct issue..."
                                 value={formData.reason}
@@ -476,7 +476,7 @@ const DisciplinaryPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Full Narrative Description</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Description</label>
                             <textarea
                                 className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900 min-h-[120px] resize-none"
                                 placeholder="Describe exactly what occurred..."
@@ -488,7 +488,7 @@ const DisciplinaryPage = () => {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Severity Classification</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Severity Level</label>
                                 <select
                                     className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
                                     value={formData.severity}
@@ -514,9 +514,9 @@ const DisciplinaryPage = () => {
                         </div>
 
                         <div className="flex justify-end gap-3 pt-4">
-                            <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl px-8 h-12">Discard</Button>
+                            <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl px-8 h-12">Cancel</Button>
                             <Button type="submit" disabled={isCreating} className="bg-slate-900 hover:bg-slate-800 rounded-xl px-12 h-12 shadow-xl shadow-slate-200">
-                                {isCreating ? 'Processing...' : 'Commit Record'}
+                                {isCreating ? 'Processing...' : 'Create Case'}
                             </Button>
                         </div>
                     </form>

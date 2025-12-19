@@ -47,7 +47,7 @@ const SalaryAdvancesPage = () => {
         e.preventDefault();
         try {
             await createAdvance(formData).unwrap();
-            toast.success('Disbursement request submitted.');
+            toast.success('Salary advance request submitted.');
             setShowForm(false);
             setFormData({
                 employee: user?.employee || '',
@@ -63,7 +63,7 @@ const SalaryAdvancesPage = () => {
     const handleApprove = async (id) => {
         try {
             await approveAdvance(id).unwrap();
-            toast.success('Advance approved & activated.');
+            toast.success('Salary advance approved.');
         } catch (error) {
             toast.error('Approval failed.');
         }
@@ -72,7 +72,7 @@ const SalaryAdvancesPage = () => {
     const handleReject = async (id) => {
         try {
             await rejectAdvance(id).unwrap();
-            toast.success('Advance request cancelled.');
+            toast.success('Salary advance request rejected.');
         } catch (error) {
             toast.error('Rejection failed.');
         }
@@ -225,7 +225,7 @@ const SalaryAdvancesPage = () => {
                                 <DollarSign className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Liquidated</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Disbursed</p>
                                 <p className="text-2xl font-black text-slate-900 tracking-tighter">
                                     {formatCurrency(advances.filter(a => a.status === 'active' || a.status === 'completed').reduce((acc, curr) => acc + parseFloat(curr.amount), 0))}
                                 </p>
@@ -241,7 +241,7 @@ const SalaryAdvancesPage = () => {
                                 <CheckCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Credits</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Advances</p>
                                 <p className="text-2xl font-black text-emerald-600 tracking-tighter">
                                     {advances.filter(a => a.status === 'active').length}
                                 </p>
@@ -257,7 +257,7 @@ const SalaryAdvancesPage = () => {
                                 <Clock className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Audit</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Approvals</p>
                                 <p className="text-2xl font-black text-orange-600 tracking-tighter">
                                     {advances.filter(a => a.status === 'pending').length}
                                 </p>
@@ -273,7 +273,7 @@ const SalaryAdvancesPage = () => {
                                 <XCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revoked / Settled</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Settled / Cancelled</p>
                                 <p className="text-2xl font-black text-slate-900 tracking-tighter">
                                     {advances.filter(a => a.status === 'cancelled' || a.status === 'completed').length}
                                 </p>
@@ -286,19 +286,19 @@ const SalaryAdvancesPage = () => {
             {/* Advances Table */}
             <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
                 <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Disbursement Ledger</CardTitle>
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Advance Ledger</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
                             <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                 <tr>
-                                    <th className="px-8 py-5">Personnel</th>
-                                    <th className="px-8 py-5">Quantum</th>
-                                    <th className="px-8 py-5">Objective</th>
-                                    <th className="px-8 py-5">Repayment Matrix</th>
+                                    <th className="px-8 py-5">Employee</th>
+                                    <th className="px-8 py-5">Amount</th>
+                                    <th className="px-8 py-5">Purpose</th>
+                                    <th className="px-8 py-5">Repayment Plan</th>
                                     <th className="px-8 py-5">Status</th>
-                                    <th className="px-8 py-5 text-right">Operational Actions</th>
+                                    <th className="px-8 py-5 text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50">
@@ -316,7 +316,7 @@ const SalaryAdvancesPage = () => {
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-slate-900">{formatCurrency(advance.amount)}</span>
-                                                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight mt-0.5">Liquidated Asset</span>
+                                                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight mt-0.5">Approved Amount</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
@@ -324,8 +324,8 @@ const SalaryAdvancesPage = () => {
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
-                                                    <span className="text-xs font-black text-slate-700">{advance.repayment_period_months} Cycles</span>
-                                                    <span className="text-[10px] font-bold text-orange-500 uppercase mt-0.5">-{formatCurrency(advance.monthly_deduction)}/MO</span>
+                                                    <span className="text-xs font-black text-slate-700">{advance.repayment_period_months} Months</span>
+                                                    <span className="text-[10px] font-bold text-orange-500 uppercase mt-0.5">-{formatCurrency(advance.monthly_deduction)} / mo</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
@@ -355,7 +355,7 @@ const SalaryAdvancesPage = () => {
                                 ) : (
                                     <tr>
                                         <td colSpan="6" className="px-8 py-20 text-center">
-                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">Settled Balance Sheet</p>
+                                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No advances found</p>
                                         </td>
                                     </tr>
                                 )}
@@ -370,14 +370,14 @@ const SalaryAdvancesPage = () => {
                 <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white">
                     <DialogHeader className="bg-slate-900 p-10 text-white">
                         <DialogTitle className="text-2xl font-black tracking-tight uppercase italic flex items-center gap-3">
-                            <Zap className="h-6 w-6 text-primary-400" /> Disbursement Logic
+                            <DollarSign className="h-6 w-6 text-primary-400" /> Request Salary Advance
                         </DialogTitle>
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Configure your early wage access parameters.</p>
+                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Configure your salary advance request parameters.</p>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="p-10 space-y-8">
                         {isAdmin && (
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject Personnel</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Select Employee</label>
                                 <select
                                     name="employee"
                                     value={formData.employee}
@@ -385,7 +385,7 @@ const SalaryAdvancesPage = () => {
                                     className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
                                     required
                                 >
-                                    <option value="">Select Target Employee</option>
+                                    <option value="">Select Employee</option>
                                     {employees?.map(emp => (
                                         <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                                     ))}
@@ -395,7 +395,7 @@ const SalaryAdvancesPage = () => {
 
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Quantum (UGX)</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Amount (UGX)</label>
                                 <Input
                                     name="amount"
                                     type="number"
@@ -407,7 +407,7 @@ const SalaryAdvancesPage = () => {
                                 />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Repayment Cycles</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Repayment Period (Months)</label>
                                 <select
                                     name="repayment_period_months"
                                     value={formData.repayment_period_months}
@@ -415,23 +415,23 @@ const SalaryAdvancesPage = () => {
                                     className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
                                     required
                                 >
-                                    <option value="1">1 Cycle (Next Payroll)</option>
-                                    <option value="2">2 Cycles</option>
-                                    <option value="3">3 Cycles</option>
-                                    <option value="6">6 Cycles</option>
+                                    <option value="1">1 Month (Next Payroll)</option>
+                                    <option value="2">2 Months</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
                                 </select>
                             </div>
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Disbursement Objective</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Reason for Advance</label>
                             <textarea
                                 name="loan_purpose"
                                 value={formData.loan_purpose}
                                 onChange={handleInputChange}
                                 rows="3"
                                 className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-[2rem] font-medium text-slate-700 focus:bg-white outline-none resize-none"
-                                placeholder="State the tactical reason for this liquidity request..."
+                                placeholder="Please state the reason for this advance request..."
                                 required
                             />
                         </div>
@@ -439,7 +439,7 @@ const SalaryAdvancesPage = () => {
                         {formData.amount && (
                             <div className="bg-slate-900 p-8 rounded-[2rem] text-white">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-400 italic">Net Impact Summary</h4>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-400 italic">Net Payment Summary</h4>
                                     <Badge className="bg-primary-600 text-[9px] font-black">0% INTEREST</Badge>
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
@@ -448,7 +448,7 @@ const SalaryAdvancesPage = () => {
                                         <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(calculateMonthlyDeduction())}</p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Total Liquidated</p>
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Total Amount</p>
                                         <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(parseFloat(formData.amount) || 0)}</p>
                                     </div>
                                 </div>
@@ -456,9 +456,9 @@ const SalaryAdvancesPage = () => {
                         )}
 
                         <DialogFooter className="gap-4">
-                            <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-14 font-black uppercase text-[10px] tracking-widest rounded-2xl px-8">Discard</Button>
+                            <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-14 font-black uppercase text-[10px] tracking-widest rounded-2xl px-8">Cancel</Button>
                             <Button type="submit" disabled={isCreating} className="h-14 bg-slate-900 shadow-2xl shadow-slate-900/20 rounded-2xl px-12 font-black uppercase text-[10px] tracking-widest">
-                                {isCreating ? 'Liquidating...' : 'Commit Request'}
+                                {isCreating ? 'Processing...' : 'Submit Request'}
                             </Button>
                         </DialogFooter>
                     </form>

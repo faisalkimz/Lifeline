@@ -122,7 +122,7 @@ const LeaveCalendar = () => {
                         className="h-14 px-8 rounded-2xl bg-white/5 border border-white/5 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-primary-600 hover:text-white transition-all shadow-xl"
                     >
                         <Home className="h-4 w-4 mr-3" />
-                        Today Protocol
+                        Today
                     </Button>
                 </div>
             </div>
@@ -184,7 +184,7 @@ const LeaveCalendar = () => {
                                             ))}
                                             {leaveRequestsForDay.length > 3 && (
                                                 <div className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-center pt-1 group-hover:text-primary-500 transition-colors">
-                                                    + {leaveRequestsForDay.length - 3} ENTITIES
+                                                    + {leaveRequestsForDay.length - 3} MORE
                                                 </div>
                                             )}
                                         </div>
@@ -201,20 +201,20 @@ const LeaveCalendar = () => {
                 <Card className="rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-3xl overflow-hidden p-10 shadow-2xl">
                     <div className="flex items-center gap-4 mb-8">
                         <Shield className="h-6 w-6 text-primary-400" />
-                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Active Duty Registry</h3>
+                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Calendar Legend</h3>
                     </div>
                     <div className="flex flex-wrap gap-5">
                         <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
                             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Annual Protocol</span>
+                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Annual Leave</span>
                         </div>
                         <div className="flex items-center gap-3 px-5 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
                             <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                            <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Medical Exclusion</span>
+                            <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Sick Leave</span>
                         </div>
                         <div className="flex items-center gap-3 px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
                             <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">Tactical Alert</span>
+                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">Emergency Leave</span>
                         </div>
                     </div>
                 </Card>
@@ -223,7 +223,7 @@ const LeaveCalendar = () => {
                     <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/10 rounded-full blur-[60px]" />
                     <div className="flex items-center gap-4 mb-8 relative z-10">
                         <Clock className="h-6 w-6 text-primary-400" />
-                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Upcoming Synchronizations</h3>
+                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Upcoming Absences</h3>
                     </div>
                     <div className="space-y-4">
                         {leaveRequests?.filter(r => new Date(r.start_date) >= new Date()).slice(0, 3).map((req, i) => (

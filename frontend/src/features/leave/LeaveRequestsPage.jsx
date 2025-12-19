@@ -105,9 +105,9 @@ const LeaveRequestsPage = () => {
                             >
                                 <Home className="h-3.5 w-3.5 text-primary-400" />
                                 <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Self Service Hub</span>
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Employee Hub</span>
                                 <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">Tactical Absence</span>
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">Leave Management</span>
                             </motion.div>
                         </div>
 
@@ -118,13 +118,13 @@ const LeaveRequestsPage = () => {
                                         <div className="h-2 w-2 rounded-full bg-primary-500 shadow-[0_0_15px_rgba(59,130,246,1)]" />
                                         <div className="h-2 w-2 rounded-full bg-primary-500/30 animate-ping" />
                                     </div>
-                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Presence Registry Engine</span>
+                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Integrated Attendance System</span>
                                 </div>
                                 <h1 className="text-6xl md:text-8xl font-black text-white tracking-[-0.04em] leading-[0.9] flex flex-col">
                                     <span>Manage</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Absence</span>
                                 </h1>
                                 <p className="text-slate-400 font-bold text-xl max-w-2xl leading-relaxed opacity-80">
-                                    Synchronize your professional availability and tactical leave requests within the corporate architecture.
+                                    Manage and track your leave requests, balances, and upcoming absences.
                                 </p>
                             </div>
 
@@ -132,9 +132,9 @@ const LeaveRequestsPage = () => {
                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                     <DialogTrigger asChild>
                                         <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
-                                            <Button className="bg-primary-600 hover:bg-primary-500 text-white font-black px-12 h-16 rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.6)] transition-all flex items-center gap-4 border-none text-lg tracking-tight">
+                                            <Button className="bg-primary-600 hover:bg-primary-500 text-white font-black px-12 h-16 rounded-[1.5rem] shadow-[0_20px_40px_-5px_rgba(37,99,235,0.4)] transition-all flex items-center gap-4 border-none text-lg tracking-tight">
                                                 <Plus className="h-6 w-6" />
-                                                <span>Initialize Request</span>
+                                                <span>Request Leave</span>
                                             </Button>
                                         </motion.div>
                                     </DialogTrigger>
@@ -142,13 +142,13 @@ const LeaveRequestsPage = () => {
                                         <div className="p-10 bg-slate-950/80 border-b border-white/5 relative overflow-hidden">
                                             <div className="absolute top-0 right-0 w-48 h-48 bg-primary-600/20 rounded-full blur-[80px]" />
                                             <DialogHeader className="relative z-10">
-                                                <DialogTitle className="text-3xl font-black text-white tracking-tight">New Absence Request</DialogTitle>
-                                                <p className="text-slate-500 text-sm font-bold mt-2 font-mono uppercase tracking-widest">Compliance-grade leave submission protocol.</p>
+                                                <DialogTitle className="text-3xl font-black text-white tracking-tight">New Leave Request</DialogTitle>
+                                                <p className="text-slate-500 text-sm font-bold mt-2 font-mono uppercase tracking-widest">Submit your application for review.</p>
                                             </DialogHeader>
                                         </div>
                                         <form onSubmit={handleSubmit} className="p-10 space-y-8 bg-slate-900/50">
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Protocol Type</label>
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Leave Category</label>
                                                 <div className="relative">
                                                     <select
                                                         className="w-full h-16 px-6 bg-white/5 border border-white/10 rounded-2xl text-sm font-bold text-white focus:ring-2 focus:ring-primary-500 transition-all cursor-pointer appearance-none"
@@ -206,10 +206,10 @@ const LeaveRequestsPage = () => {
                                             )}
 
                                             <div className="space-y-3">
-                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Statement of Reason</label>
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 ml-1">Reason for Absence</label>
                                                 <textarea
                                                     className="w-full min-h-[140px] p-6 bg-white/5 border border-white/10 rounded-[2rem] text-sm font-bold text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary-500 transition-all resize-none"
-                                                    placeholder="Provide official justification..."
+                                                    placeholder="Provide details for your request..."
                                                     value={formData.reason}
                                                     onChange={e => setFormData({ ...formData, reason: e.target.value })}
                                                     required
@@ -229,7 +229,7 @@ const LeaveRequestsPage = () => {
                                                     type="submit"
                                                     className="h-16 flex-[2] bg-primary-600 hover:bg-primary-500 text-white font-black rounded-2xl shadow-xl shadow-primary-600/40 border-none"
                                                 >
-                                                    Deploy Request
+                                                    Submit Request
                                                 </Button>
                                             </div>
                                         </form>
@@ -244,16 +244,16 @@ const LeaveRequestsPage = () => {
                 <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
                     <div className="flex gap-2 p-2 bg-slate-900/60 rounded-[2rem] border border-white/5 backdrop-blur-2xl shadow-2xl">
                         {[
-                            { id: 'dashboard', label: 'Overview', icon: PieChart },
-                            { id: 'requests', label: 'Registry', icon: Clock },
-                            { id: 'calendar', label: 'Scheduler', icon: Calendar }
+                            { id: 'dashboard', label: 'Dashboard', icon: PieChart },
+                            { id: 'requests', label: 'History', icon: Clock },
+                            { id: 'calendar', label: 'Calendar', icon: Calendar }
                         ].map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`px-10 py-4 rounded-[1.5rem] flex items-center gap-3 transition-all text-xs font-black uppercase tracking-widest ${activeTab === tab.id
-                                        ? 'bg-primary-600 text-white shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)]'
-                                        : 'text-slate-500 hover:text-slate-300'
+                                    ? 'bg-primary-600 text-white shadow-[0_10px_20px_-5px_rgba(37,99,235,0.4)]'
+                                    : 'text-slate-500 hover:text-slate-300'
                                     }`}
                             >
                                 <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'animate-pulse' : ''}`} />
@@ -267,7 +267,7 @@ const LeaveRequestsPage = () => {
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-primary-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Sync registry lookup..."
+                                placeholder="Search records..."
                                 className="w-full h-16 pl-14 pr-6 bg-slate-900/40 border border-white/5 rounded-2xl text-sm font-bold text-white placeholder:text-slate-600 focus:ring-2 focus:ring-primary-500 transition-all backdrop-blur-xl"
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
@@ -293,12 +293,12 @@ const LeaveRequestsPage = () => {
                                     <Card className="rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-3xl overflow-hidden min-h-[500px] shadow-2xl">
                                         <div className="p-10 border-b border-white/5 flex justify-between items-center">
                                             <div>
-                                                <h3 className="text-2xl font-black text-white tracking-tight">Accrual Trend</h3>
-                                                <p className="text-primary-500/80 text-[10px] font-black uppercase tracking-[0.3em] mt-2 font-mono">Real-time Progression Analytics</p>
+                                                <h3 className="text-2xl font-black text-white tracking-tight">Usage Trend</h3>
+                                                <p className="text-primary-500/80 text-[10px] font-black uppercase tracking-[0.3em] mt-2 font-mono">Monthly Leave Analytics</p>
                                             </div>
                                             <div className="flex gap-3 bg-white/5 p-1.5 rounded-2xl border border-white/5">
-                                                <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest px-6 h-10 hover:bg-white/5">Q1</Button>
-                                                <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest px-6 h-10 bg-primary-600 text-white hover:bg-primary-500 border-none">Current</Button>
+                                                <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest px-6 h-10 hover:bg-white/5">Trend</Button>
+                                                <Button variant="ghost" size="sm" className="rounded-xl font-black text-[10px] uppercase tracking-widest px-6 h-10 bg-primary-600 text-white hover:bg-primary-500 border-none">Active</Button>
                                             </div>
                                         </div>
                                         <CardContent className="p-12">
@@ -335,7 +335,7 @@ const LeaveRequestsPage = () => {
                                                 <div className="p-4 bg-primary-600/20 rounded-2xl border border-primary-500/20">
                                                     <Clock className="h-6 w-6 text-primary-400" />
                                                 </div>
-                                                <h3 className="text-2xl font-black text-white tracking-tight">Absence Queue</h3>
+                                                <h3 className="text-2xl font-black text-white tracking-tight">Upcoming Leave</h3>
                                             </div>
 
                                             <div className="space-y-6">
@@ -369,7 +369,7 @@ const LeaveRequestsPage = () => {
                                         </div>
                                         <div className="absolute bottom-0 left-0 w-full p-10 bg-gradient-to-t from-slate-950 to-transparent pt-20">
                                             <div className="flex items-center justify-between p-6 bg-white/5 rounded-[2rem] border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
-                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-400">Tactical Analytics</span>
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary-400">Detailed Report</span>
                                                 <ArrowUpRight className="h-5 w-5 text-white group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                             </div>
                                         </div>
@@ -402,7 +402,7 @@ const LeaveRequestsPage = () => {
                                     </div>
                                     <Button variant="ghost" className="rounded-2xl h-14 px-8 border border-white/5 text-slate-400 font-black uppercase tracking-widest text-[10px] gap-3">
                                         <Sparkles className="h-4 w-4" />
-                                        Export Protocol
+                                        Export List
                                     </Button>
                                 </div>
 
@@ -410,9 +410,9 @@ const LeaveRequestsPage = () => {
                                     <table className="w-full">
                                         <thead>
                                             <tr className="bg-white/5">
-                                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">Protocol / Dates</th>
+                                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">Type / Dates</th>
                                                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">Duration</th>
-                                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">Validation</th>
+                                                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-left">Status</th>
                                                 <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 text-right">Actions</th>
                                             </tr>
                                         </thead>
@@ -448,11 +448,11 @@ const LeaveRequestsPage = () => {
                                                         <td className="px-10 py-8">
                                                             <div className="flex items-center gap-3">
                                                                 <div className={`h-2.5 w-2.5 rounded-full ${req.status === 'approved' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :
-                                                                        req.status === 'rejected' ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' :
-                                                                            'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
+                                                                    req.status === 'rejected' ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' :
+                                                                        'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]'
                                                                     }`} />
                                                                 <span className={`text-[10px] font-black uppercase tracking-widest ${req.status === 'approved' ? 'text-emerald-400' :
-                                                                        req.status === 'rejected' ? 'text-rose-400' : 'text-amber-400'
+                                                                    req.status === 'rejected' ? 'text-rose-400' : 'text-amber-400'
                                                                     }`}>{req.status}</span>
                                                             </div>
                                                         </td>
@@ -468,7 +468,7 @@ const LeaveRequestsPage = () => {
                                                     <td colSpan="4" className="px-10 py-32 text-center">
                                                         <div className="max-w-xs mx-auto opacity-30">
                                                             <Search className="h-16 w-16 mx-auto mb-6 text-primary-400" />
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] leading-relaxed">Registry Synchronized<br />0 Tactical Matches</p>
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.4em] leading-relaxed">Records Updated<br />No matches found</p>
                                                         </div>
                                                     </td>
                                                 </tr>

@@ -26,8 +26,8 @@ const LeaveBalances = () => {
             >
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[100px]" />
                 <Calendar className="h-20 w-20 mx-auto mb-6 text-slate-700 opacity-50" />
-                <h3 className="text-2xl font-black text-white tracking-tight uppercase italic pb-4">Protocol Imbalance Detected</h3>
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No active leave entitlements synchronized with your profile.</p>
+                <h3 className="text-2xl font-black text-white tracking-tight uppercase italic pb-4">Balance Overview</h3>
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No active leave entitlements found for your profile.</p>
             </motion.div>
         );
     }
@@ -70,7 +70,7 @@ const LeaveBalances = () => {
                                     <div className="space-y-2">
                                         <div className="flex items-center gap-2">
                                             <div className={`h-1.5 w-1.5 rounded-full ${isCritical ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,1)]' : 'bg-primary-500 shadow-[0_0_10px_rgba(59,130,246,1)]'}`} />
-                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{balance.year} Registry</span>
+                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">{balance.year} Balance</span>
                                         </div>
                                         <h3 className="font-black text-2xl text-white tracking-[-0.03em] uppercase italic group-hover:text-primary-400 transition-colors">{balance.leave_type_name}</h3>
                                     </div>
@@ -86,10 +86,10 @@ const LeaveBalances = () => {
                                                 <p className="text-5xl font-black text-white tracking-tighter italic">{balance.available_days}</p>
                                                 <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest pb-1 font-mono">Days</span>
                                             </div>
-                                            <p className="text-[10px] font-black text-primary-500/60 uppercase tracking-[0.3em] mt-2">Available Credits</p>
+                                            <p className="text-[10px] font-black text-primary-500/60 uppercase tracking-[0.3em] mt-2">Available for Use</p>
                                         </div>
                                         <div className="text-right pb-1">
-                                            <p className="text-xs font-black text-white group-hover:text-primary-400 transition-colors uppercase italic">{balance.total_days} Core</p>
+                                            <p className="text-xs font-black text-white group-hover:text-primary-400 transition-colors uppercase italic">{balance.total_days} Total</p>
                                         </div>
                                     </div>
 
@@ -109,11 +109,11 @@ const LeaveBalances = () => {
                                         <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
                                             <div className="flex items-center gap-2 text-emerald-500">
                                                 <CheckCircle className="h-3 w-3" />
-                                                <span>{balance.used_days} DEPLOYED</span>
+                                                <span>{balance.used_days} USED</span>
                                             </div>
                                             <div className="flex items-center gap-2 text-amber-500 animate-pulse">
                                                 <Clock className="h-3 w-3" />
-                                                <span>{balance.pending_days} QUEUED</span>
+                                                <span>{balance.pending_days} PENDING</span>
                                             </div>
                                         </div>
                                     </div>

@@ -58,7 +58,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                     <DialogHeader>
                         <DialogTitle className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-3">
                             <Sparkles className="h-8 w-8 text-primary-200" />
-                            Draft Digital Offer
+                            Draft Offer Letter
                         </DialogTitle>
                         <p className="text-primary-100 text-sm font-bold uppercase tracking-widest mt-2">{application?.candidate?.full_name} • {application?.job_title}</p>
                     </DialogHeader>
@@ -100,7 +100,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Contract Content Templates</label>
+                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Offer Content</label>
                                 <textarea
                                     className="w-full h-48 bg-slate-50 border border-slate-100 rounded-2xl p-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none resize-none"
                                     value={offerData.content}
@@ -114,8 +114,8 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                                 <Download className="h-10 w-10 text-primary-600" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-slate-900 uppercase italic">Offer Encrypted & Ready</h3>
-                                <p className="text-slate-500 mt-2 font-medium italic">The digital asset has been generated. You can now download the PDF or sync it with the candidate's portal.</p>
+                                <h3 className="text-2xl font-black text-slate-900 uppercase italic">Offer Letter Ready</h3>
+                                <p className="text-slate-500 mt-2 font-medium italic">The offer letter has been drafted. You can now download the PDF or notify the candidate.</p>
                             </div>
                             <Button
                                 onClick={handleGeneratePdf}
@@ -123,7 +123,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                                 className="h-14 px-10 bg-black hover:bg-slate-900 rounded-2xl font-black uppercase tracking-widest italic"
                             >
                                 {isGenerating ? <Loader2 className="animate-spin h-5 w-5 mr-3" /> : <Download className="h-5 w-5 mr-3" />}
-                                Download PDF Package
+                                Download PDF
                             </Button>
                         </div>
                     )}
@@ -131,7 +131,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
 
                 <DialogFooter className="p-10 bg-slate-50 border-t border-slate-100">
                     <Button variant="ghost" onClick={onClose} className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest italic text-slate-400 hover:text-slate-600">
-                        Abort Mission
+                        Cancel
                     </Button>
                     {step === 'form' && (
                         <Button
@@ -140,7 +140,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                             className="h-14 px-10 bg-primary-600 hover:bg-primary-700 rounded-2xl font-black uppercase tracking-widest italic"
                         >
                             {isCreating ? <Loader2 className="animate-spin h-5 w-5 mr-3" /> : <Send className="h-5 w-5 mr-3" />}
-                            Generate & Finalize
+                            Create Offer
                         </Button>
                     )}
                 </DialogFooter>

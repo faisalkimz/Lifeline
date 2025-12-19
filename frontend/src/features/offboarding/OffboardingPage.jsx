@@ -160,15 +160,15 @@ const OffboardingPage = () => {
         },
         {
             id: 'laptop_return',
-            title: 'Computing Audit',
-            description: 'Workstation & peripherals recovery',
+            title: 'Equipment Return',
+            description: 'Workstation & peripherals return',
             status: resignation?.laptop_returned ? 'completed' : 'pending',
             icon: Laptop,
             canToggle: user?.role !== 'employee'
         },
         {
             id: 'id_badge_return',
-            title: 'Identity Reclamation',
+            title: 'ID Return',
             description: 'Return of ID badge & credentials',
             status: resignation?.id_badge_returned ? 'completed' : 'pending',
             icon: Users,
@@ -176,7 +176,7 @@ const OffboardingPage = () => {
         },
         {
             id: 'keys_return',
-            title: 'Access Decoupling',
+            title: 'Keys & Access Return',
             description: 'Physical keys & parking permits',
             status: resignation?.keys_returned ? 'completed' : 'pending',
             icon: Key,
@@ -208,8 +208,8 @@ const OffboardingPage = () => {
                     <h1 className="text-3xl font-bold text-text-primary tracking-tight">Employee Offboarding</h1>
                     <p className="text-text-secondary mt-1">
                         {isResigned
-                            ? `Departure process for ${resignation.employee_name || 'Personnel'}`
-                            : "Manage resignation and professional transition lifecycle"}
+                            ? `Departure process for ${resignation.employee_name || 'Employee'}`
+                            : "Manage resignation and employee transition process"}
                     </p>
                 </div>
                 {!isResigned && user?.role === 'employee' && (
@@ -235,13 +235,13 @@ const OffboardingPage = () => {
                         <Card className="lg:col-span-2 overflow-hidden border-none shadow-xl ring-1 ring-slate-100">
                             <CardHeader className="bg-slate-50/50 border-b border-slate-100">
                                 <CardTitle className="text-sm font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Clock className="h-4 w-4" /> Timeline Metrics
+                                    <Clock className="h-4 w-4" /> Departure Timeline
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-8">
                                 <div className="flex flex-col md:flex-row justify-between items-center gap-8">
                                     <div className="text-center md:text-left">
-                                        <p className="text-xs font-bold text-slate-400 uppercase">Effective Departure</p>
+                                        <p className="text-xs font-bold text-slate-400 uppercase">Last Working Day</p>
                                         <p className="text-3xl font-black text-slate-900 mt-1">
                                             {resignation.last_working_day ? new Date(resignation.last_working_day).toLocaleDateString('en-US', {
                                                 month: 'long', day: 'numeric', year: 'numeric'
@@ -287,16 +287,16 @@ const OffboardingPage = () => {
                                     <Shield className="h-40 w-40" />
                                 </div>
                                 <CardContent className="p-6 relative z-10">
-                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Security Clearance</h4>
+                                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">System Access</h4>
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-center group cursor-pointer" onClick={() => user?.role !== 'employee' && handleToggleStep('email_disabled', resignation.email_disabled)}>
-                                            <span className="text-sm font-medium text-slate-300">Email Architecture</span>
+                                            <span className="text-sm font-medium text-slate-300">Email Account</span>
                                             <Badge variant={resignation.email_disabled ? 'error' : 'success'} className="font-black">
                                                 {resignation.email_disabled ? 'DEACTIVATED' : 'ACTIVE'}
                                             </Badge>
                                         </div>
                                         <div className="flex justify-between items-center group cursor-pointer" onClick={() => user?.role !== 'employee' && handleToggleStep('access_revoked', resignation.access_revoked)}>
-                                            <span className="text-sm font-medium text-slate-300">Internal ERP Access</span>
+                                            <span className="text-sm font-medium text-slate-300">Internal System Access</span>
                                             <Badge variant={resignation.access_revoked ? 'error' : 'success'} className="font-black">
                                                 {resignation.access_revoked ? 'REVOKED' : 'ACTIVE'}
                                             </Badge>
@@ -325,7 +325,7 @@ const OffboardingPage = () => {
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-slate-900">Offboarding Workflow</h3>
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sequence of separation</span>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Departure steps</span>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -403,7 +403,7 @@ const OffboardingPage = () => {
                             onClick={() => setIsResignationDialogOpen(true)}
                             className="mt-8 px-12 h-12 rounded-full font-bold shadow-xl shadow-error-100 transition-transform hover:scale-105"
                         >
-                            Finalize Separation Notice
+                            Submit Resignation
                         </Button>
                     </CardContent>
                 </Card>
@@ -416,14 +416,14 @@ const OffboardingPage = () => {
                         <div className="absolute top-0 right-0 p-8 opacity-20">
                             <LogOut className="h-20 w-20" />
                         </div>
-                        <DialogTitle className="text-3xl font-black tracking-tight">Separation Notice</DialogTitle>
+                        <DialogTitle className="text-3xl font-black tracking-tight">Resignation Notice</DialogTitle>
                         <p className="mt-2 text-rose-100 text-sm font-medium">This is a formal procedure. Ensure you've briefed your manager.</p>
                     </div>
 
                     <form onSubmit={handleSubmitResignation} className="p-8 space-y-6 bg-white">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <Input
-                                label="Last Contractual Day"
+                                label="Last Working Day"
                                 type="date"
                                 value={resignationForm.last_working_day}
                                 onChange={(e) => setResignationForm({ ...resignationForm, last_working_day: e.target.value })}
@@ -432,7 +432,7 @@ const OffboardingPage = () => {
                             />
 
                             <Input
-                                label="Notice Window (Days)"
+                                label="Notice Period (Days)"
                                 type="number"
                                 value={resignationForm.notice_period_days}
                                 onChange={(e) => setResignationForm({ ...resignationForm, notice_period_days: e.target.value })}
@@ -442,7 +442,7 @@ const OffboardingPage = () => {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Reason for Separation</label>
+                            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Reason for Leaving</label>
                             <select
                                 value={resignationForm.reason}
                                 onChange={(e) => setResignationForm({ ...resignationForm, reason: e.target.value })}
@@ -470,7 +470,7 @@ const OffboardingPage = () => {
 
                         <div className="flex justify-end gap-3 pt-4">
                             <Button type="button" variant="outline" onClick={() => setIsResignationDialogOpen(false)} className="rounded-2xl px-8">Cancel</Button>
-                            <Button type="submit" variant="destructive" className="rounded-2xl px-12 bg-rose-600 hover:bg-rose-700">Submit Separation Notice</Button>
+                            <Button type="submit" variant="destructive" className="rounded-2xl px-12 bg-rose-600 hover:bg-rose-700">Submit Resignation</Button>
                         </div>
                     </form>
                 </DialogContent>
@@ -480,8 +480,8 @@ const OffboardingPage = () => {
             <Dialog open={isExitInterviewDialogOpen} onOpenChange={setIsExitInterviewDialogOpen}>
                 <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-0 overflow-hidden border-none shadow-2xl">
                     <div className="bg-indigo-600 p-8 text-white">
-                        <DialogTitle className="text-2xl font-black">Exit Reflection</DialogTitle>
-                        <p className="text-indigo-100 text-sm mt-1">Your feedback helps us evolve as an employer of choice.</p>
+                        <DialogTitle className="text-2xl font-black">Exit Interview</DialogTitle>
+                        <p className="text-indigo-100 text-sm mt-1">Your feedback helps us improve our employee experience.</p>
                     </div>
                     <form onSubmit={handleSubmitExitInterview} className="p-8 space-y-8 bg-white">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -518,17 +518,17 @@ const OffboardingPage = () => {
 
                         <div className="space-y-6">
                             <Input
-                                label="Primary Growth Catalyst (Why you joined)"
+                                label="What originally brought you to Lifeline?"
                                 value={exitInterviewForm.what_improved}
                                 onChange={(e) => setExitInterviewForm({ ...exitInterviewForm, what_improved: e.target.value })}
-                                placeholder="What attracted you to Lifeline?"
+                                placeholder="What attracted you to the company?"
                                 className="rounded-xl"
                             />
                             <Input
-                                label="Points of Friction (Areas for improvement)"
+                                label="Areas for Improvement"
                                 value={exitInterviewForm.suggestions}
                                 onChange={(e) => setExitInterviewForm({ ...exitInterviewForm, suggestions: e.target.value })}
-                                placeholder="Be honest, we value transparency..."
+                                placeholder="Please share your honest feedback..."
                                 className="rounded-xl"
                             />
                         </div>

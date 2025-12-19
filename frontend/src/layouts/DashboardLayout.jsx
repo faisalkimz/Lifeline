@@ -44,9 +44,9 @@ const DashboardLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'People', href: '/employees', icon: Users },
+    { name: 'Employees', href: '/employees', icon: Users },
     { name: 'Payroll', href: '/payroll', icon: CreditCard },
-    { name: 'Leaves', href: '/leave', icon: Calendar },
+    { name: 'Leave', href: '/leave', icon: Calendar },
     { name: 'Attendance', href: '/attendance', icon: Clock },
     { name: 'Performance', href: '/performance', icon: TrendingUp },
     { name: 'Recruitment', href: '/recruitment', icon: Briefcase },
@@ -113,7 +113,7 @@ const DashboardLayout = () => {
         <div className="flex-1 overflow-y-auto pt-6 px-3 space-y-8 scrollbar-hide">
           {/* Main Modules */}
           <div>
-            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-600 mb-3">Main Modules</p>
+            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-600 mb-3">Human Resources</p>
             <nav className="space-y-1">
               {navigation.map((item) => {
                 const isActive = location.pathname.startsWith(item.href);
@@ -180,7 +180,7 @@ const DashboardLayout = () => {
                   colorClass="bg-primary-500"
                 />
                 <StatItem
-                  label="Working Today"
+                  label="Present Today"
                   value={stats?.working_today}
                   icon={Clock}
                   colorClass="bg-success-500"
@@ -192,7 +192,7 @@ const DashboardLayout = () => {
                   colorClass="bg-warning-500"
                 />
                 <StatItem
-                  label="Full Team"
+                  label="Total Employees"
                   value={stats?.total}
                   icon={Users}
                   colorClass="bg-indigo-500"

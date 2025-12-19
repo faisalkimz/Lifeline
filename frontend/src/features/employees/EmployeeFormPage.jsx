@@ -339,9 +339,9 @@ const EmployeeFormPage = () => {
                             >
                                 <Home className="h-3.5 w-3.5 text-primary-400" />
                                 <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white cursor-pointer transition-colors" onClick={() => navigate('/employees')}>Personnel Base</span>
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 hover:text-white cursor-pointer transition-colors" onClick={() => navigate('/employees')}>Employee List</span>
                                 <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
-                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">{isEditMode ? 'Modify Entity' : 'Origin Protocol'}</span>
+                                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-primary-400">{isEditMode ? 'Edit Employee' : 'New Onboarding'}</span>
                             </motion.div>
                         </div>
 
@@ -352,19 +352,19 @@ const EmployeeFormPage = () => {
                                         <div className="h-2 w-2 rounded-full bg-primary-500 shadow-[0_0_15px_rgba(59,130,246,1)]" />
                                         <div className="h-2 w-2 rounded-full bg-primary-500/30 animate-ping" />
                                     </div>
-                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Multi-Tenant Core Engine</span>
+                                    <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Integrated HR System</span>
                                 </div>
                                 <h1 className="text-6xl md:text-8xl font-black text-white tracking-[-0.04em] leading-[0.9] flex flex-col">
                                     {isEditMode ? (
-                                        <><span>Modify</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Personnel</span></>
+                                        <><span>Edit</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Employee</span></>
                                     ) : (
                                         <><span>New</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Onboarding</span></>
                                     )}
                                 </h1>
                                 <p className="text-slate-400 font-bold text-xl max-w-2xl leading-relaxed opacity-80">
                                     {isEditMode
-                                        ? "Synchronizing encrypted organizational credentials and fiscal parameters."
-                                        : "Establishing a foundational node within the corporate digital architecture."}
+                                        ? "Update employee details and organizational information."
+                                        : "Create a new employee profile in the system."}
                                 </p>
                             </div>
 
@@ -386,7 +386,7 @@ const EmployeeFormPage = () => {
                                         variant="ghost"
                                         className="h-16 px-10 rounded-[1.5rem] text-red-400 hover:text-red-300 hover:bg-red-500/10 font-black uppercase tracking-widest text-[11px] transition-all"
                                     >
-                                        Terminate
+                                        Delete Employee
                                     </Button>
                                 )}
 
@@ -397,7 +397,7 @@ const EmployeeFormPage = () => {
                                         className="bg-primary-600 hover:bg-primary-500 text-white font-black px-12 h-16 rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.6)] transition-all flex items-center gap-4 border-none text-lg tracking-tight"
                                     >
                                         <Save className="h-6 w-6" />
-                                        <span>{isCreating || isUpdating ? 'Processing Synchronicity...' : 'Deploy Changes'}</span>
+                                        <span>{isCreating || isUpdating ? 'Saving...' : 'Save Changes'}</span>
                                     </Button>
                                 </motion.div>
                             </div>
@@ -438,7 +438,7 @@ const EmployeeFormPage = () => {
                                             <div className="p-5 bg-white/20 rounded-3xl mb-4">
                                                 <Upload className="h-10 w-10 text-white" />
                                             </div>
-                                            <span className="text-[14px] font-black uppercase tracking-[0.25em] text-center px-4 leading-tight">Sync Entity<br />Identity</span>
+                                            <span className="text-[14px] font-black uppercase tracking-[0.25em] text-center px-4 leading-tight">Upload Profile<br />Photo</span>
                                             <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                                         </label>
                                     </motion.div>
@@ -459,10 +459,10 @@ const EmployeeFormPage = () => {
                                     </h3>
                                     <div className="flex flex-wrap justify-center gap-3">
                                         <span className="text-[11px] font-black text-primary-400 uppercase tracking-[0.3em] bg-primary-500/10 px-6 py-3 rounded-2xl border border-primary-500/20 backdrop-blur-md">
-                                            {watch('job_title') || 'Unassigned Role'}
+                                            {watch('job_title') || 'No Title'}
                                         </span>
                                         <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] bg-white/5 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
-                                            {watch('employment_status')?.replace('_', ' ') || 'Draft Registry'}
+                                            {watch('employment_status')?.replace('_', ' ') || 'Pending'}
                                         </span>
                                     </div>
                                 </div>
@@ -479,8 +479,8 @@ const EmployeeFormPage = () => {
                                         <Sparkles className="h-6 w-6 text-primary-400 group-hover:text-white" />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-lg tracking-tight">Onboarding Pulse</h4>
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Protocol Completeness</p>
+                                        <h4 className="font-black text-lg tracking-tight">Onboarding Progress</h4>
+                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Form Completion</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col items-end">
@@ -501,9 +501,9 @@ const EmployeeFormPage = () => {
 
                             <div className="space-y-6 relative z-10">
                                 {[
-                                    { icon: Info, text: "All mandatory fields must meet compliance standards.", color: "text-primary-400" },
-                                    { icon: Shield, text: "Role assignment defines the data exposure layer.", color: "text-indigo-400" },
-                                    { icon: AlertTriangle, text: departments.length ? "Departments synchronized." : "WARN: Organizational units missing.", color: departments.length ? "text-emerald-400" : "text-amber-500" }
+                                    { icon: Info, text: "All mandatory fields must be filled correctly.", color: "text-primary-400" },
+                                    { icon: Shield, text: "Role assignment determines system access levels.", color: "text-indigo-400" },
+                                    { icon: AlertTriangle, text: departments.length ? "Departments loaded." : "WARN: No departments found.", color: departments.length ? "text-emerald-400" : "text-amber-500" }
                                 ].map((tip, idx) => (
                                     <motion.div
                                         key={idx}
@@ -526,11 +526,11 @@ const EmployeeFormPage = () => {
                             <TabsList className="flex flex-wrap h-auto p-2 bg-slate-100/50 dark:bg-slate-950/50 rounded-[2rem] mb-10 gap-2 border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl">
                                 {[
                                     { id: 'personal', icon: User, label: 'Identity', step: '01' },
-                                    { id: 'employment', icon: Briefcase, label: 'Registry', step: '02' },
-                                    { id: 'compensation', icon: Wallet, label: 'Fiscal', step: '03' },
+                                    { id: 'employment', icon: Briefcase, label: 'Employment', step: '02' },
+                                    { id: 'compensation', icon: Wallet, label: 'Salary', step: '03' },
                                     { id: 'access', icon: Lock, label: 'Security', step: '04' },
-                                    { id: 'documents', icon: Shield, label: 'Compliance', step: '05' },
-                                    { id: 'other', icon: CreditCard, label: 'Protocols', step: '06' },
+                                    { id: 'documents', icon: Shield, label: 'Documents', step: '05' },
+                                    { id: 'other', icon: CreditCard, label: 'Emergency', step: '06' },
                                 ].map((tab) => (
                                     <TabsTrigger
                                         key={tab.id}
@@ -573,22 +573,22 @@ const EmployeeFormPage = () => {
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Digital Registry (Email)" error={errors.email} required icon={Mail}>
+                                                        <FormField label="Email Address" error={errors.email} required icon={Mail}>
                                                             <Input type="email" {...register('email')} placeholder="email@domain.com" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Mobile Link" error={errors.phone} required icon={Phone}>
+                                                        <FormField label="Phone Number" error={errors.phone} required icon={Phone}>
                                                             <Input {...register('phone')} placeholder="+256..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                                        <FormField label="Origin Date" error={errors.date_of_birth} required icon={Calendar}>
+                                                        <FormField label="Date of Birth" error={errors.date_of_birth} required icon={Calendar}>
                                                             <Input type="date" {...register('date_of_birth')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Gender Entity" error={errors.gender} required icon={User}>
+                                                        <FormField label="Gender" error={errors.gender} required icon={User}>
                                                             <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('gender')}>
-                                                                <option value="male">Male Spectrum</option>
-                                                                <option value="female">Female Spectrum</option>
+                                                                <option value="male">Male</option>
+                                                                <option value="female">Female</option>
                                                                 <option value="other">Other</option>
                                                             </select>
                                                         </FormField>
@@ -603,7 +603,7 @@ const EmployeeFormPage = () => {
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Residential Node" error={errors.address} icon={MapPin}>
+                                                        <FormField label="Address" error={errors.address} icon={MapPin}>
                                                             <Input {...register('address')} placeholder="Physical Address" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                         <div className="grid grid-cols-2 gap-4">
@@ -620,7 +620,7 @@ const EmployeeFormPage = () => {
                                                 {/* Employment Tab */}
                                                 <TabsContent value="employment" className="space-y-10 mt-0">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Organizational Unit" error={errors.department} required icon={Building2}>
+                                                        <FormField label="Department" error={errors.department} required icon={Building2}>
                                                             <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('department')}>
                                                                 <option value="">Select Department</option>
                                                                 {departments.map(dept => (
@@ -628,24 +628,24 @@ const EmployeeFormPage = () => {
                                                                 ))}
                                                             </select>
                                                         </FormField>
-                                                        <FormField label="Professional Designation" error={errors.job_title} required icon={Briefcase}>
+                                                        <FormField label="Job Title" error={errors.job_title} required icon={Briefcase}>
                                                             <Input {...register('job_title')} placeholder="e.g. Lead Architect" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Reporting Node" error={errors.manager} icon={User}>
+                                                        <FormField label="Reporting Manager" error={errors.manager} icon={User}>
                                                             <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('manager')}>
-                                                                <option value="">Direct Superior (Optional)</option>
+                                                                <option value="">Select Manager</option>
                                                                 {employees.map(emp => (
                                                                     <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                                                                 ))}
                                                             </select>
                                                         </FormField>
-                                                        <FormField label="Protocol Type" error={errors.employment_type} required icon={Briefcase}>
+                                                        <FormField label="Employment Type" error={errors.employment_type} required icon={Briefcase}>
                                                             <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_type')}>
-                                                                <option value="full_time">Full Spectrum</option>
-                                                                <option value="part_time">Part Spectrum</option>
+                                                                <option value="full_time">Full-Time</option>
+                                                                <option value="part_time">Part-Time</option>
                                                                 <option value="contract">Contractor</option>
                                                                 <option value="intern">Internship</option>
                                                                 <option value="casual">Casual Basis</option>
@@ -654,15 +654,15 @@ const EmployeeFormPage = () => {
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                                        <FormField label="Registry Effective Date" error={errors.join_date} required icon={Calendar}>
+                                                        <FormField label="Joined Date" error={errors.join_date} required icon={Calendar}>
                                                             <Input type="date" {...register('join_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Probation Pulse" error={errors.probation_end_date} icon={Calendar}>
+                                                        <FormField label="Probation End Date" error={errors.probation_end_date} icon={Calendar}>
                                                             <Input type="date" {...register('probation_end_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Tactical Status" error={errors.employment_status} required icon={CheckCircle}>
+                                                        <FormField label="Status" error={errors.employment_status} required icon={CheckCircle}>
                                                             <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_status')}>
-                                                                <option value="active">Active Duty</option>
+                                                                <option value="active">Active</option>
                                                                 <option value="on_leave">On Leave</option>
                                                                 <option value="suspended">Suspended</option>
                                                                 <option value="terminated">Terminated</option>
@@ -681,9 +681,9 @@ const EmployeeFormPage = () => {
                                                                 <Wallet className="h-10 w-10 text-primary-400 group-hover:text-white" />
                                                             </div>
                                                             <div>
-                                                                <h4 className="text-2xl font-black tracking-tighter">Fiscal Architecture</h4>
+                                                                <h4 className="text-2xl font-black tracking-tighter">Salary Information</h4>
                                                                 <p className="text-slate-500 text-sm mt-1 max-w-lg font-medium leading-relaxed">
-                                                                    Configure the core compensation matrix. Our engine automatically synchronizes statutory compliance and net-pay distributions.
+                                                                    Configure the employee's compensation details. Our system will handle calculations and compliance rules automatically.
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -692,10 +692,10 @@ const EmployeeFormPage = () => {
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
                                                         <div className="md:col-span-2 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                                                             <div className="h-2 w-2 rounded-full bg-primary-500" />
-                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Primary Allocation Components</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Monthly Components</span>
                                                         </div>
 
-                                                        <FormField label="Gross Basic Salary" error={errors.basic_salary} required icon={Wallet}>
+                                                        <FormField label="Basic Salary" error={errors.basic_salary} required icon={Wallet}>
                                                             <div className="relative group/input">
                                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
                                                                     <span className="text-[10px] font-black">UGX</span>
@@ -717,10 +717,10 @@ const EmployeeFormPage = () => {
 
                                                         <div className="md:col-span-2 pt-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                                                             <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Supplementary Increments</span>
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Allowances</span>
                                                         </div>
 
-                                                        <FormField label="Transport Scheme" error={errors.transport_allowance} icon={MapPin}>
+                                                        <FormField label="Transport Allowance" error={errors.transport_allowance} icon={MapPin}>
                                                             <div className="relative group/input">
                                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
                                                                     <span className="text-[10px] font-black">UGX</span>
@@ -730,7 +730,7 @@ const EmployeeFormPage = () => {
                                                             </div>
                                                         </FormField>
 
-                                                        <FormField label="Health Provision" error={errors.medical_allowance} icon={Shield}>
+                                                        <FormField label="Medical Allowance" error={errors.medical_allowance} icon={Shield}>
                                                             <div className="relative group/input">
                                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
                                                                     <span className="text-[10px] font-black">UGX</span>
@@ -740,7 +740,7 @@ const EmployeeFormPage = () => {
                                                             </div>
                                                         </FormField>
 
-                                                        <FormField label="Daily Subsistence" error={errors.lunch_allowance} icon={Info}>
+                                                        <FormField label="Lunch Allowance" error={errors.lunch_allowance} icon={Info}>
                                                             <div className="relative group/input">
                                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
                                                                     <span className="text-[10px] font-black">UGX</span>
@@ -750,7 +750,7 @@ const EmployeeFormPage = () => {
                                                             </div>
                                                         </FormField>
 
-                                                        <FormField label="Other Fiscal Adjustments" error={errors.other_allowances} icon={Plus}>
+                                                        <FormField label="Other Allowances" error={errors.other_allowances} icon={Plus}>
                                                             <div className="relative group/input">
                                                                 <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
                                                                     <span className="text-[10px] font-black">UGX</span>
@@ -770,9 +770,9 @@ const EmployeeFormPage = () => {
                                                                 <Lock className="h-10 w-10" />
                                                             </div>
                                                             <div>
-                                                                <h4 className="text-2xl font-black text-emerald-950 dark:text-emerald-400 tracking-tight">Access Control Protocol</h4>
+                                                                <h4 className="text-2xl font-black text-emerald-950 dark:text-emerald-400 tracking-tight">Account Credentials</h4>
                                                                 <p className="text-emerald-800/70 dark:text-emerald-500/70 text-sm mt-1 leading-relaxed font-medium max-w-lg">
-                                                                    Initialize system credentials to enable self-service synchronization. Designated roles will dictate organizational data visibility and execution rights.
+                                                                    Create system credentials to allow the employee to log in to the portal. Roles define what actions and data the employee can access.
                                                                 </p>
                                                             </div>
                                                         </div>
@@ -822,15 +822,15 @@ const EmployeeFormPage = () => {
                                                                         <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${autoPassword ? 'bg-primary-500 border-primary-500' : 'border-slate-300'}`}>
                                                                             {autoPassword && <CheckCircle className="h-4 w-4 text-white" />}
                                                                         </div>
-                                                                        <span className="text-xs font-black uppercase tracking-[0.2em]">Automated Entropy Generation</span>
+                                                                        <span className="text-xs font-black uppercase tracking-[0.2em]">Auto-generate Password</span>
                                                                         <input type="checkbox" className="hidden" {...register('auto_password')} />
                                                                     </div>
 
-                                                                    <FormField label="Access Key" error={errors.password} required={!autoPassword} icon={Lock}>
+                                                                    <FormField label="Password" error={errors.password} required={!autoPassword} icon={Lock}>
                                                                         <Input
                                                                             type="password"
                                                                             {...register('password')}
-                                                                            placeholder={autoPassword ? "GENERATED ON SYNC" : "••••••••"}
+                                                                            placeholder={autoPassword ? "AUTO-GENERATED" : "••••••••"}
                                                                             className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800"
                                                                             disabled={autoPassword}
                                                                         />
@@ -841,13 +841,13 @@ const EmployeeFormPage = () => {
                                                             <div className="space-y-6">
                                                                 <div className="flex items-center gap-3">
                                                                     <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
-                                                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Security Clearance Level</span>
+                                                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">System Role</span>
                                                                 </div>
                                                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                                                     {[
-                                                                        { id: 'employee', label: 'Limited', desc: 'Self-service view only' },
-                                                                        { id: 'manager', label: 'Standard', desc: 'Team-level oversight' },
-                                                                        { id: 'hr_manager', label: 'Absolute', desc: 'Full core authority' }
+                                                                        { id: 'employee', label: 'Basic', desc: 'Standard employee portal access' },
+                                                                        { id: 'manager', label: 'Manager', desc: 'Manage team and approvals' },
+                                                                        { id: 'hr_manager', label: 'Administrator', desc: 'Full system access' }
                                                                     ].map((role) => (
                                                                         <div
                                                                             key={role.id}
@@ -872,18 +872,18 @@ const EmployeeFormPage = () => {
                                                 {/* Documents Tab */}
                                                 <TabsContent value="documents" className="space-y-10 mt-0">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="National Entity ID" error={errors.national_id} required icon={Shield}>
+                                                        <FormField label="National ID" error={errors.national_id} required icon={Shield}>
                                                             <Input {...register('national_id')} placeholder="CM..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold uppercase" />
                                                         </FormField>
-                                                        <FormField label="Passport Registry" error={errors.passport_number} icon={Shield}>
+                                                        <FormField label="Passport Number" error={errors.passport_number} icon={Shield}>
                                                             <Input {...register('passport_number')} placeholder="A..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold uppercase" />
                                                         </FormField>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Tax Identity Number (TIN)" error={errors.tin_number} icon={FileText}>
+                                                        <FormField label="Tax Identification Number (TIN)" error={errors.tin_number} icon={FileText}>
                                                             <Input {...register('tin_number')} placeholder="100..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Statutory NSSF Registry" error={errors.nssf_number} icon={FileText}>
+                                                        <FormField label="NSSF Number" error={errors.nssf_number} icon={FileText}>
                                                             <Input {...register('nssf_number')} placeholder="NS..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                     </div>
@@ -892,40 +892,40 @@ const EmployeeFormPage = () => {
                                                 {/* Protocols Tab */}
                                                 <TabsContent value="other" className="space-y-12 mt-0">
                                                     <div>
-                                                        <h4 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mb-8 border-b border-primary-500/10 pb-4">Bank Federation Details</h4>
+                                                        <h4 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mb-8 border-b border-primary-500/10 pb-4">Bank Details</h4>
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                            <FormField label="Institution" error={errors.bank_name} icon={CreditCard}>
+                                                            <FormField label="Bank Name" error={errors.bank_name} icon={CreditCard}>
                                                                 <Input {...register('bank_name')} placeholder="e.g. Stanbic Bank" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                             </FormField>
-                                                            <FormField label="Account Node" error={errors.bank_account_number} icon={CreditCard}>
+                                                            <FormField label="Account Number" error={errors.bank_account_number} icon={CreditCard}>
                                                                 <Input {...register('bank_account_number')} placeholder="0123..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono font-bold" />
                                                             </FormField>
-                                                            <FormField label="Branch Node" error={errors.bank_branch} icon={MapPin}>
+                                                            <FormField label="Branch Name" error={errors.bank_branch} icon={MapPin}>
                                                                 <Input {...register('bank_branch')} placeholder="e.g. Forest Mall" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                             </FormField>
                                                         </div>
                                                     </div>
 
                                                     <div>
-                                                        <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-8 border-b border-indigo-500/10 pb-4">Crisis Liaison Protocol</h4>
+                                                        <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-8 border-b border-indigo-500/10 pb-4">Emergency Contact</h4>
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                            <FormField label="Liaison Name" error={errors.emergency_contact_name} icon={User}>
+                                                            <FormField label="Contact Name" error={errors.emergency_contact_name} icon={User}>
                                                                 <Input {...register('emergency_contact_name')} placeholder="Next of Kin" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                             </FormField>
-                                                            <FormField label="Liaison Phone" error={errors.emergency_contact_phone} icon={Phone}>
+                                                            <FormField label="Contact Phone" error={errors.emergency_contact_phone} icon={Phone}>
                                                                 <Input {...register('emergency_contact_phone')} placeholder="+256..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                             </FormField>
-                                                            <FormField label="Hierarchy Relationship" error={errors.emergency_contact_relationship} icon={User}>
+                                                            <FormField label="Relationship" error={errors.emergency_contact_relationship} icon={User}>
                                                                 <Input {...register('emergency_contact_relationship')} placeholder="Spouse, Parent" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                             </FormField>
                                                         </div>
                                                     </div>
 
-                                                    <FormField label="Executive Summary / Notes" error={errors.notes} icon={FileText}>
+                                                    <FormField label="Additional Notes" error={errors.notes} icon={FileText}>
                                                         <textarea
                                                             className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 px-5 py-4 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[120px] transition-all"
                                                             {...register('notes')}
-                                                            placeholder="Additional organizational context..."
+                                                            placeholder="Internal notes about the employee..."
                                                         />
                                                     </FormField>
                                                 </TabsContent>
@@ -938,7 +938,7 @@ const EmployeeFormPage = () => {
                                                         onClick={() => navigate('/employees')}
                                                         className="h-16 px-10 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 font-black transition-all"
                                                     >
-                                                        Abort Registry
+                                                        Cancel
                                                     </Button>
                                                     <Button
                                                         onClick={handleSubmit(onSubmit)}
@@ -946,7 +946,7 @@ const EmployeeFormPage = () => {
                                                         className="h-16 px-12 bg-primary-600 hover:bg-primary-500 text-white font-black rounded-2xl shadow-[0_20px_40px_-15px_rgba(37,99,235,0.5)] transition-all flex items-center gap-3 border-none"
                                                     >
                                                         <Save className="h-6 w-6" />
-                                                        {isCreating || isUpdating ? 'Processing Synchronicity...' : 'Commit Protocol'}
+                                                        {isCreating || isUpdating ? 'Saving...' : 'Save Employee'}
                                                     </Button>
                                                 </div>
                                             </form>

@@ -231,6 +231,7 @@ class Payslip(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     payment_date = models.DateField(null=True, blank=True)
     payment_reference = models.CharField(max_length=100, blank=True)
+    pdf_file = models.FileField(upload_to='payslips/', null=True, blank=True)
 
     # Audit fields
     created_at = models.DateTimeField(auto_now_add=True)

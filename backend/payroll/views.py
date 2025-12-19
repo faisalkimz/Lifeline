@@ -350,6 +350,13 @@ class PayslipViewSet(viewsets.ModelViewSet):
         
         return qs
 
+    @action(detail=True, methods=['post'])
+    def generate_pdf(self, request, pk=None):
+        payslip = self.get_object()
+        from .services.payslip_generator import PayslipGenerator
+        pdf_url = PayslipGenerator.generate_pdf(payslip)
+        return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+
 
 # ────────────────────── SALARY STRUCTURES ──────────────────────
 class SalaryStructureViewSet(viewsets.ModelViewSet):

@@ -199,3 +199,30 @@ class Interview(models.Model):
 
     def __str__(self):
         return f"Interview: {self.application.candidate.full_name} with {self.interviewer}"
+
+
+class OfferLetter(models.Model):
+    """Offer Letter for a candidate"""
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('sent', 'Sent'),
+        ('accepted', 'Accepted'),
+        ('declined', 'Declined'),
+    ]
+
+    application = models.OneToOneField(Application, on_delete=models.CASCADE, related_name='offer_letter')
+    content = models.TextField(help_text="The body of the offer letter")
+    
+    salary_offered = models.DecimalField(max_digits=12, decimal_places=2)
+    start_date = models.DateField()
+    expiry_date = models.DateField(null=True, blank=True)
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    
+    pdf_file = models.FileField(upload_to='offer_letters/', null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Offer for {self.application.candidate.full_name}"

@@ -74,10 +74,8 @@ const PipelinePage = () => {
     const hiredCandidates = applicationsArray.filter(app => app.stage === 'hired').length;
     const conversionRate = totalCandidates > 0 ? Math.round((hiredCandidates / totalCandidates) * 100) : 0;
 
-    const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http') || photoPath.startsWith('data:') || photoPath.startsWith('blob:')) return photoPath;
-        return `http://localhost:8000${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
+    const getFullPhotoUrl = (photoPath) => {
+        return getMediaUrl(photoPath);
     };
 
     const getStageColor = (stageId) => {

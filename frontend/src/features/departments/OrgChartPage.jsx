@@ -9,6 +9,7 @@ import {
     Download, Share2, Printer
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { getMediaUrl } from '../../config/api';
 
 const OrgChartPage = () => {
     const { data: managers, isLoading } = useGetManagersQuery();
@@ -23,9 +24,7 @@ const OrgChartPage = () => {
     };
 
     const getImageUrl = (path) => {
-        if (!path) return null;
-        if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
-        return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+        return getMediaUrl(path);
     };
 
     const OrgNode = ({ person, isRoot = false }) => {

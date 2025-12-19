@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -264,6 +264,13 @@ export const api = createApi({
       }),
       invalidatesTags: ['Payslip', 'PayrollRun']
     }),
+    generatePayslipPdf: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/payslips/${id}/generate_pdf/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Payslip']
+    }),
 
     // --- Employee Stats and Managers ---
     getEmployeeStats: builder.query({
@@ -274,56 +281,56 @@ export const api = createApi({
       query: () => '/employees/managers/',
       providesTags: ['Employee']
     }),
-   // ========== SALARY ADVANCES ==========
-getSalaryAdvances: builder.query({
-  query: (params) => ({
-    url: '/payroll/salary-advances/',
-    params
-  }),
-  transformResponse: (response) => {
-    if (response?.results) return response.results
-    if (Array.isArray(response)) return response
-    return []
-  },
-  providesTags: (result = []) => [
-    ...result.map(({ id }) => ({ type: 'SalaryAdvance', id })),
-    { type: 'SalaryAdvance', id: 'LIST' }
-  ]
-}),
+    // ========== SALARY ADVANCES ==========
+    getSalaryAdvances: builder.query({
+      query: (params) => ({
+        url: '/payroll/salary-advances/',
+        params
+      }),
+      transformResponse: (response) => {
+        if (response?.results) return response.results
+        if (Array.isArray(response)) return response
+        return []
+      },
+      providesTags: (result = []) => [
+        ...result.map(({ id }) => ({ type: 'SalaryAdvance', id })),
+        { type: 'SalaryAdvance', id: 'LIST' }
+      ]
+    }),
 
-createSalaryAdvance: builder.mutation({
-  query: (body) => ({
-    url: '/payroll/salary-advances/',
-    method: 'POST',
-    body
-  }),
-  invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
-}),
+    createSalaryAdvance: builder.mutation({
+      query: (body) => ({
+        url: '/payroll/salary-advances/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
+    }),
 
-updateSalaryAdvance: builder.mutation({
-  query: ({ id, ...body }) => ({
-    url: `/payroll/salary-advances/${id}/`,
-    method: 'PATCH',
-    body
-  }),
-  invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
-}),
+    updateSalaryAdvance: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/payroll/salary-advances/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: [{ type: 'SalaryAdvance', id: 'LIST' }]
+    }),
 
-approveSalaryAdvance: builder.mutation({
-  query: (id) => ({
-    url: `/payroll/salary-advances/${id}/approve/`,
-    method: 'PATCH'
-  }),
-  invalidatesTags: ['SalaryAdvance']
-}),
+    approveSalaryAdvance: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/salary-advances/${id}/approve/`,
+        method: 'PATCH'
+      }),
+      invalidatesTags: ['SalaryAdvance']
+    }),
 
-rejectSalaryAdvance: builder.mutation({
-  query: (id) => ({
-    url: `/payroll/salary-advances/${id}/reject/`,
-    method: 'PATCH'
-  }),
-  invalidatesTags: ['SalaryAdvance']
-}),
+    rejectSalaryAdvance: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/salary-advances/${id}/reject/`,
+        method: 'PATCH'
+      }),
+      invalidatesTags: ['SalaryAdvance']
+    }),
 
     // --- My Profile ---
     getMyProfile: builder.query({
@@ -690,6 +697,28 @@ rejectSalaryAdvance: builder.mutation({
       }),
       invalidatesTags: ['Job', 'JobPost']
     }),
+    getOffers: builder.query({
+      query: (params) => ({
+        url: '/recruitment/offers/',
+        params
+      }),
+      providesTags: ['OfferLetter']
+    }),
+    createOffer: builder.mutation({
+      query: (body) => ({
+        url: '/recruitment/offers/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['OfferLetter']
+    }),
+    generateOfferPdf: builder.mutation({
+      query: (id) => ({
+        url: `/recruitment/offers/${id}/generate_pdf/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['OfferLetter']
+    }),
 
     // ========== TRAINING & DEVELOPMENT ==========
     getTrainingPrograms: builder.query({
@@ -833,6 +862,36 @@ rejectSalaryAdvance: builder.mutation({
     }),
 
     // ========== DOCUMENT MANAGEMENT ==========
+    getFolders: builder.query({
+      query: (params) => ({
+        url: '/documents/folders/',
+        params
+      }),
+      providesTags: ['Document']
+    }),
+    createFolder: builder.mutation({
+      query: (body) => ({
+        url: '/documents/folders/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Document']
+    }),
+    updateFolder: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/documents/folders/${id}/`,
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: ['Document']
+    }),
+    deleteFolder: builder.mutation({
+      query: (id) => ({
+        url: `/documents/folders/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Document']
+    }),
     getDocuments: builder.query({
       query: (params) => ({
         url: '/documents/company/',
@@ -848,6 +907,21 @@ rejectSalaryAdvance: builder.mutation({
       }),
       invalidatesTags: ['Document']
     }),
+    updateDocument: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/documents/company/${id}/`,
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: ['Document']
+    }),
+    deleteDocument: builder.mutation({
+      query: (id) => ({
+        url: `/documents/company/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Document']
+    }),
     getEmployeeDocuments: builder.query({
       query: (params) => ({
         url: '/documents/employee/',
@@ -860,6 +934,21 @@ rejectSalaryAdvance: builder.mutation({
         url: '/documents/employee/',
         method: 'POST',
         body
+      }),
+      invalidatesTags: ['EmployeeDocument']
+    }),
+    updateEmployeeDocument: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/documents/employee/${id}/`,
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: ['EmployeeDocument']
+    }),
+    deleteEmployeeDocument: builder.mutation({
+      query: (id) => ({
+        url: `/documents/employee/${id}/`,
+        method: 'DELETE'
       }),
       invalidatesTags: ['EmployeeDocument']
     }),
@@ -972,6 +1061,7 @@ export const {
   useLazyDownloadTaxSheetQuery, // Added
   useGetPayslipsQuery, // Added
   useUpdatePayslipMutation, // Added
+  useGeneratePayslipPdfMutation,
   useGetSalaryStructuresQuery,
   useCreateSalaryStructureMutation,
   useUpdateSalaryStructureMutation,
@@ -1034,6 +1124,9 @@ export const {
   usePublishJobMutation,
   useGetPublicJobsQuery,
   useSubmitJobApplicationMutation,
+  useGetOffersQuery,
+  useCreateOfferMutation,
+  useGenerateOfferPdfMutation,
   // Training
   useGetTrainingProgramsQuery,
   useCreateTrainingProgramMutation,
@@ -1057,10 +1150,18 @@ export const {
   useUpdateEmployeeBenefitMutation,
   useDeleteEmployeeBenefitMutation,
   // Documents
+  useGetFoldersQuery,
+  useCreateFolderMutation,
+  useUpdateFolderMutation,
+  useDeleteFolderMutation,
   useGetDocumentsQuery,
   useCreateDocumentMutation,
+  useUpdateDocumentMutation,
+  useDeleteDocumentMutation,
   useGetEmployeeDocumentsQuery,
   useCreateEmployeeDocumentMutation,
+  useUpdateEmployeeDocumentMutation,
+  useDeleteEmployeeDocumentMutation,
   // Offboarding
   useGetResignationsQuery,
   useCreateResignationMutation,

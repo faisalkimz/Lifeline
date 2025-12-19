@@ -135,9 +135,9 @@ class PayslipSerializer(serializers.ModelSerializer):
             'gross_salary', 'paye_tax', 'nssf_employee', 'nssf_employer',
             'loan_deduction', 'advance_deduction', 'other_deductions',
             'total_deductions', 'net_salary', 'payment_method', 'payment_status',
-            'payment_date', 'payment_reference'
+            'payment_date', 'payment_reference', 'pdf_file'
         ]
-        read_only_fields = ['id', 'total_deductions', 'total_allowances']
+        read_only_fields = ['id', 'total_deductions', 'total_allowances', 'pdf_file']
 
     def get_payroll_period(self, obj):
         """Format payroll period as MM/YYYY"""

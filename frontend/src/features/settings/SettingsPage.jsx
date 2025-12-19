@@ -18,6 +18,7 @@ import {
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge';
+import { getMediaUrl } from '../../config/api';
 
 const SettingsPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -72,10 +73,7 @@ const SettingsPage = () => {
                 attendance_exceptions_alerts: companyData.attendance_exceptions_alerts !== false
             });
             if (companyData.logo) {
-                const fullLogoUrl = companyData.logo.startsWith('http')
-                    ? companyData.logo
-                    : `http://localhost:8000${companyData.logo}`;
-                setLogoPreview(fullLogoUrl);
+                setLogoPreview(getMediaUrl(companyData.logo));
             }
         }
     }, [companyData]);

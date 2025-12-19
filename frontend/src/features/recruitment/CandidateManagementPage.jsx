@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import { getMediaUrl } from '../../config/api';
 import CandidateProfileDrawer from './CandidateProfileDrawer';
 
 const CandidateManagementPage = () => {
@@ -122,12 +123,9 @@ const CandidateManagementPage = () => {
         setIsDrawerOpen(true);
     };
 
-    const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http') || photoPath.startsWith('data:') || photoPath.startsWith('blob:')) return photoPath;
-        return `http://localhost:8000${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
+    const getFullPhotoUrl = (photoPath) => {
+        return getMediaUrl(photoPath);
     };
-
     return (
         <div className="space-y-8 pb-20 animate-fade-in font-sans">
             {/* Premium Header */}
@@ -317,7 +315,7 @@ const CandidateManagementPage = () => {
                                         <div className="h-20 w-20 rounded-[1.8rem] bg-slate-900 p-0.5 shadow-xl shadow-slate-900/10">
                                             <div className="h-full w-full rounded-[1.7rem] bg-slate-800 overflow-hidden flex items-center justify-center">
                                                 {candidate.photo ? (
-                                                    <img src={getImageUrl(candidate.photo)} alt={candidate.full_name} className="h-full w-full object-cover" />
+                                                    <img src={getFullPhotoUrl(candidate.photo)} alt={candidate.full_name} className="h-full w-full object-cover" />
                                                 ) : (
                                                     <span className="text-white font-black italic text-xl">{candidate.first_name[0]}{candidate.last_name[0]}</span>
                                                 )}

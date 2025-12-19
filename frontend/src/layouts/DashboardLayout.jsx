@@ -24,10 +24,8 @@ const DashboardLayout = () => {
     pollingInterval: 30000, // Refresh stats every 30s
   });
 
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('data:') || path.startsWith('blob:') || path.startsWith('http')) return path;
-    return `http://localhost:8000${path.startsWith('/') ? '' : '/'}${path}`;
+  const getFullPhotoUrl = (path) => {
+    return getMediaUrl(path);
   };
 
   if (!user) {

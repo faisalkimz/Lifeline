@@ -5,17 +5,24 @@ import {
   X, Mail, Phone, MapPin, FileText, Download,
   Briefcase, GraduationCap, Calendar, Star,
   ExternalLink, Linkedin, Github, Globe,
-  ChevronRight, ArrowUpRight, Zap, Target
+  ChevronRight, ArrowUpRight, Zap, Target, Award
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { getMediaUrl } from '../../config/api';
+import OfferLetterModal from './OfferLetterModal';
+import { useGetApplicationsQuery } from '../../store/api';
 
 const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
+  const [isOfferModalOpen, setIsOfferModalOpen] = React.useState(false);
+
+  // We need to find the application for this candidate to link the offer
+  const { data: applications = [] } = useGetApplicationsQuery();
+  const application = applications.find(app => app.candidate?.id === candidate?.id);
+
   if (!candidate) return null;
 
-  const getImageUrl = (photoPath) => {
-    if (!photoPath) return null;
-    if (photoPath.startsWith('http') || photoPath.startsWith('data:') || photoPath.startsWith('blob:')) return photoPath;
-    return `http://localhost:8000${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
+  const getImageUrl = (path) => {
+    return getMediaUrl(path);
   };
 
   return (
@@ -192,11 +199,11 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
 
           {/* Footer Actions */}
           <div className="bg-white border-t border-slate-100 pt-12 flex gap-4">
-            <Button className="flex-1 h-16 rounded-[2rem] bg-slate-900 text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-slate-900/10">
-              Move Stage
-            </Button>
-            <Button variant="outline" className="flex-1 h-16 rounded-[2rem] border-2 border-slate-900 text-slate-900 font-black uppercase text-xs tracking-[0.2em]">
-              Request Interview
+            <Button
+              onClick={() => setIsOfferModalOpen(true)}
+              className="flex-1 h-16 rounded-[2rem] bg-indigo-600 text-white font-black uppercase text-xs tracking-[0.2em] shadow-2xl shadow-indigo-600/10 hover:bg-indigo-700"
+            >
+              Generate Offer
             </Button>
             <Button variant="ghost" className="h-16 w-16 p-0 rounded-[2rem] bg-rose-50 text-rose-600 hover:bg-rose-100">
               <ArrowUpRight className="h-6 w-6" />
@@ -204,6 +211,14 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           </div>
         </div>
       </div>
+
+      {application && (
+        <OfferLetterModal
+          isOpen={isOfferModalOpen}
+          onClose={() => setIsOfferModalOpen(false)}
+          application={application}
+        />
+      )}
     </>
   );
 };

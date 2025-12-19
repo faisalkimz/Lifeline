@@ -14,6 +14,7 @@ import {
     Table, TableBody, TableCell, TableHead,
     TableHeader, TableRow
 } from '../../components/ui/Table';
+import { getMediaUrl } from '../../config/api';
 
 const StatusBadge = ({ status }) => {
     const config = {
@@ -41,10 +42,7 @@ const EmployeeListPage = () => {
     const [statusFilter, setStatusFilter] = useState('all');
 
     const getImageUrl = (photoPath) => {
-        if (!photoPath) return null;
-        if (photoPath.startsWith('http') || photoPath.startsWith('data:') || photoPath.startsWith('blob:')) return photoPath;
-        const baseUrl = 'http://localhost:8000';
-        return `${baseUrl}${photoPath.startsWith('/') ? '' : '/'}${photoPath}`;
+        return getMediaUrl(photoPath);
     };
 
     const { data: employeesData, isLoading } = useGetEmployeesQuery({

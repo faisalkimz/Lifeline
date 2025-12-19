@@ -6,8 +6,10 @@ import {
     useUpdatePayslipMutation,
     useProcessPayrollMutation,
     useApprovePayrollMutation,
-    useMarkPayrollPaidMutation
+    useMarkPayrollPaidMutation,
+    useGeneratePayslipPdfMutation
 } from '../../store/api';
+import { getMediaUrl } from '../../config/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
@@ -33,6 +35,7 @@ const PayrollRunDetailsPage = () => {
     const [processPayroll, { isLoading: isProcessing }] = useProcessPayrollMutation();
     const [approvePayroll, { isLoading: isApproving }] = useApprovePayrollMutation();
     const [markPaid, { isLoading: isPaying }] = useMarkPayrollPaidMutation();
+    const [generatePayslipPdf, { isLoading: isGeneratingPdf }] = useGeneratePayslipPdfMutation();
 
     // Helper functions
     const formatCurrency = (val) => new Intl.NumberFormat('en-UG', {
@@ -107,6 +110,38 @@ const PayrollRunDetailsPage = () => {
             toast.success('Payroll marked as paid');
         } catch (error) {
             toast.error('Mark paid failed');
+        }
+    };
+
+    const handleDownloadPayslip = async (payslipId) => {
+        try {
+            const result = await generatePayslipPdf(payslipId).unwrap();
+            window.open(getMediaUrl(result.pdf_url), '_blank');
+            toast.success('Payslip generated');
+        } catch (error) {
+            toast.error('Failed to generate payslip');
+        }
+    };
+
+    const handleDownloadAll = async () => {
+        toast.loading('Generating all payslips... This may take a moment', { duration: 3000 });
+        for (const p of payslips) {
+            try {
+                const result = await generatePayslipPdf(p.id).unwrap();
+                // To avoid browser blocking popups, we might want to do this differently for bulk, 
+                // but for now, we open them or provide a zip if backend supported it.
+                // Since backend doesn't support zip yet, we do them one by one (limited)
+                if (payslips.length <= 5) {
+                    window.open(getMediaUrl(result.pdf_url), '_blank');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        if (payslips.length > 5) {
+            toast.success('Payslips generated on server. You can download them individually.');
+        } else {
+            toast.success('Processing complete');
         }
     };
 
@@ -190,12 +225,21 @@ const PayrollRunDetailsPage = () => {
                         </Button>
                     )}
                     <Button
+                        onClick={handleDownloadAll}
+                        variant="outline"
+                        className="border-slate-200 text-blue-600 hover:bg-blue-50 font-bold"
+                        disabled={payslips.length === 0 || isGeneratingPdf}
+                    >
+                        {isGeneratingPdf ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <DownloadCloud className="h-4 w-4 mr-2" />}
+                        Download All
+                    </Button>
+                    <Button
                         onClick={handleExportTaxReport}
                         variant="outline"
                         className="border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
                         disabled={payslips.length === 0}
                     >
-                        <DownloadCloud className="h-4 w-4 mr-2" />
+                        <FileSpreadsheet className="h-4 w-4 mr-2" />
                         Export Tax Matrix
                     </Button>
                 </div>
@@ -241,6 +285,7 @@ const PayrollRunDetailsPage = () => {
                                 <TableHead className="text-right">PAYE</TableHead>
                                 <TableHead className="text-right">NSSF</TableHead>
                                 <TableHead className="text-right font-bold">Net Pay</TableHead>
+                                <TableHead className="text-center">PDF</TableHead>
                                 {isEditable && <TableHead className="text-center">Actions</TableHead>}
                             </TableRow>
                         </TableHeader>
@@ -296,6 +341,16 @@ const PayrollRunDetailsPage = () => {
                                         <TableCell className="text-right text-slate-500">{formatCurrency(payslip.paye_tax)}</TableCell>
                                         <TableCell className="text-right text-slate-500">{formatCurrency(Number(payslip.nssf_employee) + Number(payslip.nssf_employer))}</TableCell>
                                         <TableCell className="text-right font-bold text-blue-700 text-lg">{formatCurrency(payslip.net_salary)}</TableCell>
+                                        <TableCell className="text-center">
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="text-primary-600 hover:bg-primary-50"
+                                                onClick={() => handleDownloadPayslip(payslip.id)}
+                                            >
+                                                <DownloadCloud className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
 
                                         {isEditable && (
                                             <TableCell className="text-center">

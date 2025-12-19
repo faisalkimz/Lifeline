@@ -3,13 +3,14 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from accounts.permissions import IsCompanyUser, IsHRManagerOrAdmin, IsCompanyAdmin
-from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost
+from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost, OfferLetter
 from .serializers import (
     JobSerializer, 
     CandidateSerializer, 
     ApplicationSerializer, 
     InterviewSerializer,
-    IntegrationSettingsSerializer
+    IntegrationSettingsSerializer,
+    OfferLetterSerializer
 )
 from django.utils import timezone
 import random # Mocking ID generation
@@ -98,22 +99,27 @@ class CandidateViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def parse_resume(self, request):
         """
-        Extract candidate data from a resume file
+        Extract candidate data from a resume file (PDF or DOCX)
         """
         resume_file = request.FILES.get('resume')
         if not resume_file:
             return Response({'error': 'No resume file provided'}, status=400)
 
+        filename = resume_file.name.lower()
         from .services.resume_parser import ResumeParsingService
         
-        # Extract text
-        text = ResumeParsingService.extract_text_from_pdf(resume_file)
+        text = ""
+        if filename.endswith('.pdf'):
+            text = ResumeParsingService.extract_text_from_pdf(resume_file)
+        elif filename.endswith('.docx'):
+            text = ResumeParsingService.extract_text_from_docx(resume_file)
+        else:
+            return Response({'error': 'Unsupported file format. Please upload PDF or DOCX.'}, status=400)
+
         if not text:
-            return Response({'error': 'Could not extract text from PDF'}, status=400)
+            return Response({'error': 'Could not extract text from file'}, status=400)
             
-        # Parse text
         parsed_data = ResumeParsingService.parse_resume_text(text)
-        
         return Response(parsed_data)
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -186,3 +192,17 @@ class IntegrationSettingsViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
+
+class OfferLetterViewSet(viewsets.ModelViewSet):
+    serializer_class = OfferLetterSerializer
+    permission_classes = [IsAuthenticated, IsHRManagerOrAdmin]
+
+    def get_queryset(self):
+        return OfferLetter.objects.filter(application__job__company=self.request.user.company)
+
+    @action(detail=True, methods=['post'])
+    def generate_pdf(self, request, pk=None):
+        offer_letter = self.get_object()
+        from .services.offer_letter_generator import OfferLetterGenerator
+        pdf_url = OfferLetterGenerator.generate_pdf(offer_letter)
+        return Response({'status': 'PDF generated', 'pdf_url': pdf_url})

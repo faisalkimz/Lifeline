@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost
+from .models import Job, Candidate, Application, Interview, IntegrationSettings, ExternalJobPost, OfferLetter
 from employees.serializers import EmployeeSerializer
 
 class JobSerializer(serializers.ModelSerializer):
@@ -64,3 +64,12 @@ class InterviewSerializer(serializers.ModelSerializer):
         model = Interview
         fields = '__all__'
         read_only_fields = ['created_at']
+
+class OfferLetterSerializer(serializers.ModelSerializer):
+    candidate_name = serializers.CharField(source='application.candidate.full_name', read_only=True)
+    job_title = serializers.CharField(source='application.job.title', read_only=True)
+
+    class Meta:
+        model = OfferLetter
+        fields = '__all__'
+        read_only_fields = ['pdf_file', 'created_at', 'updated_at']

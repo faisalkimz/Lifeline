@@ -8,17 +8,17 @@ import {
 } from 'lucide-react';
 import {
     useGetBenefitTypesQuery,
-    useGetMyBenefitsQuery,
-    useEnrollInBenefitMutation,
-    useUnenrollFromBenefitMutation,
+    useGetEmployeeBenefitsQuery,
+    useCreateEmployeeBenefitMutation,
+    useDeleteEmployeeBenefitMutation,
 } from '../../store/api';
 import toast from 'react-hot-toast';
 
 const BenefitsPage = () => {
     const { data: benefitTypes } = useGetBenefitTypesQuery();
-    const { data: myBenefits } = useGetMyBenefitsQuery();
-    const [enrollInBenefit] = useEnrollInBenefitMutation();
-    const [unenrollFromBenefit] = useUnenrollFromBenefitMutation();
+    const { data: myBenefits } = useGetEmployeeBenefitsQuery();
+    const [enrollInBenefit] = useCreateEmployeeBenefitMutation();
+    const [unenrollFromBenefit] = useDeleteEmployeeBenefitMutation();
     const [isEnrollDialogOpen, setIsEnrollDialogOpen] = useState(false);
     const [selectedBenefit, setSelectedBenefit] = useState(null);
 

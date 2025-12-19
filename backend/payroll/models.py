@@ -5,6 +5,9 @@ from decimal import Decimal
 from accounts.models import Company
 from employees.models import Employee
 
+# Import EWA models
+from .ewa_models import EarlyWageAccessConfig, WageAccessRequest
+
 
 class TaxSettings(models.Model):
     """Tax settings for each company (Uganda-specific by default)"""

@@ -1,62 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import {
+    Clock, Calendar, TrendingUp, Users, CheckCircle, XCircle, LogIn, LogOut
+} from 'lucide-react';
 import {
     useClockInMutation,
     useClockOutMutation,
     useGetTodayAttendanceQuery,
-    useGetMyAttendanceQuery,
-    useGetTeamAttendanceQuery,
-    useGetCurrentUserQuery
+    useGetMyAttendanceQuery
 } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
-import { Clock, LogIn, LogOut, Calendar, MapPin, History, Users } from 'lucide-react';
-import { extractErrorMessage } from '../../utils/errorHandling'; // Assuming utility exists or I'll handle inline
 import toast from 'react-hot-toast';
 
 const AttendancePage = () => {
-    const { data: user } = useGetCurrentUserQuery();
-    const { data: todayStatus, isLoading, refetch } = useGetTodayAttendanceQuery();
+    const { data: todayStatus, refetch } = useGetTodayAttendanceQuery();
+    const { data: myAttendance } = useGetMyAttendanceQuery({ month: new Date().getMonth() + 1 });
     const [clockIn] = useClockInMutation();
     const [clockOut] = useClockOutMutation();
-    const [notes, setNotes] = useState('');
-    const [currentTime, setCurrentTime] = useState(new Date());
-
-    const [elapsed, setElapsed] = useState('00:00:00');
-
-    useEffect(() => {
-        // Clock timer
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-
-        // Shift Duration Timer
-        let durationTimer;
-        if (todayStatus?.clock_in && !todayStatus.clock_out) {
-            const start = new Date(todayStatus.clock_in).getTime();
-            durationTimer = setInterval(() => {
-                const now = new Date().getTime();
-                const diff = now - start;
-                const h = Math.floor(diff / (1000 * 60 * 60)).toString().padStart(2, '0');
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-                const s = Math.floor((diff % (1000 * 60)) / 1000).toString().padStart(2, '0');
-                setElapsed(`${h}:${m}:${s}`);
-            }, 1000);
-        } else if (todayStatus?.hours_worked) {
-            setElapsed(`${todayStatus.hours_worked}h`);
-        } else {
-            setElapsed('00:00:00');
-        }
-
-        return () => {
-            clearInterval(timer);
-            if (durationTimer) clearInterval(durationTimer);
-        };
-    }, [todayStatus]);
 
     const handleClockIn = async () => {
         try {
-            await clockIn({ notes }).unwrap();
+            await clockIn({}).unwrap();
             toast.success('Clocked in successfully!');
-            setNotes('');
             refetch();
         } catch (error) {
             toast.error('Failed to clock in');
@@ -65,281 +31,210 @@ const AttendancePage = () => {
 
     const handleClockOut = async () => {
         try {
-            await clockOut({ notes }).unwrap();
+            await clockOut({}).unwrap();
             toast.success('Clocked out successfully!');
-            setNotes('');
             refetch();
         } catch (error) {
             toast.error('Failed to clock out');
         }
     };
 
-    const isClockedIn = todayStatus?.is_clocked_in;
+    const attendanceArray = Array.isArray(myAttendance) ? myAttendance : (myAttendance?.results || []);
+    const presentDays = attendanceArray.filter(a => a.status === 'present').length;
+    const lateDays = attendanceArray.filter(a => a.is_late).length;
+    const totalHours = attendanceArray.reduce((sum, a) => sum + (a.hours_worked || 0), 0);
+
+    const currentTime = new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+
+    const currentDate = new Date().toLocaleDateString('en-GB', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6 pb-12">
             {/* Header */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 p-8 shadow-xl text-white">
-                <div className="absolute inset-0 bg-white/5 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3 bg-white/20 backdrop-blur-md rounded-xl">
-                            <Clock className="h-8 w-8" />
-                        </div>
-                        <div>
-                            <h1 className="text-3xl font-bold">Attendance Hub</h1>
-                            <p className="text-indigo-100">Track and manage your work hours</p>
-                        </div>
-                    </div>
-                    <div className="text-right bg-white/10 p-4 rounded-xl backdrop-blur-sm border border-white/10">
-                        <div className="text-3xl font-mono font-bold tracking-wider flex items-center justify-end gap-3">
-                            {currentTime.toLocaleTimeString()}
-                            <div className="h-3 w-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(239,68,68,0.6)]"></div>
-                        </div>
-                        <div className="text-sm text-indigo-100 uppercase tracking-widest font-semibold">
-                            {currentTime.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">Attendance</h1>
+                <p className="text-gray-600 mt-1">Track your work hours</p>
             </div>
 
-            <Tabs defaultValue="today" className="space-y-6">
-                <TabsList className="bg-white p-1 shadow-sm border border-gray-100 rounded-xl">
-                    <TabsTrigger value="today" className="gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
-                        <Clock className="h-4 w-4" /> Today's Action
-                    </TabsTrigger>
-                    <TabsTrigger value="history" className="gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
-                        <History className="h-4 w-4" /> History
-                    </TabsTrigger>
-                    {user?.role !== 'employee' && (
-                        <TabsTrigger value="team" className="gap-2 data-[state=active]:bg-indigo-50 data-[state=active]:text-indigo-700">
-                            <Users className="h-4 w-4" /> Team Status
-                        </TabsTrigger>
-                    )}
-                </TabsList>
+            {/* Clock In/Out Card */}
+            <Card className="border border-gray-200">
+                <CardContent className="p-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="text-center">
+                            <div className="mb-4">
+                                <p className="text-4xl font-bold text-gray-900 mb-2">{currentTime}</p>
+                                <p className="text-gray-600">{currentDate}</p>
+                            </div>
 
-                <TabsContent value="today" className="space-y-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Action Card */}
-                        <Card className="h-full border-none shadow-lg">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <MapPin className="h-5 w-5 text-gray-400" />
-                                    Actions
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="p-4 rounded-lg bg-gray-50 border border-gray-100">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Shift Notes (Optional)</label>
-                                    <textarea
-                                        value={notes}
-                                        onChange={(e) => setNotes(e.target.value)}
-                                        rows={3}
-                                        className="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
-                                        placeholder="Leaving early for appointment..."
-                                    />
+                            {!todayStatus?.clocked_in ? (
+                                <Button onClick={handleClockIn} size="lg" className="w-full md:w-auto">
+                                    <LogIn className="h-5 w-5 mr-2" /> Clock In
+                                </Button>
+                            ) : !todayStatus?.clocked_out ? (
+                                <div className="space-y-4">
+                                    <Badge className="bg-green-100 text-green-700 border-0 text-sm px-4 py-2">
+                                        <CheckCircle className="h-4 w-4 mr-2 inline" />
+                                        Clocked in at {todayStatus.clock_in_time}
+                                    </Badge>
+                                    <Button onClick={handleClockOut} size="lg" className="w-full md:w-auto">
+                                        <LogOut className="h-5 w-5 mr-2" /> Clock Out
+                                    </Button>
                                 </div>
-
-                                {!isClockedIn ? (
-                                    <Button
-                                        onClick={handleClockIn}
-                                        className="w-full h-16 text-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 shadow-lg shadow-green-500/20"
-                                    >
-                                        <LogIn className="h-6 w-6 mr-2" /> Clock In
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        onClick={handleClockOut}
-                                        variant="destructive"
-                                        className="w-full h-16 text-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 shadow-lg shadow-red-500/20"
-                                    >
-                                        <LogOut className="h-6 w-6 mr-2" /> Clock Out
-                                    </Button>
-                                )}
-                            </CardContent>
-                        </Card>
-
-                        {/* Status Card */}
-                        <Card className="h-full border-none shadow-lg">
-                            <CardHeader>
-                                <CardTitle>Session Details</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                                        <span className="text-gray-500">Status</span>
-                                        <span className={`px-3 py-1 rounded-full text-sm font-bold flex items-center gap-2 ${isClockedIn ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
-                                            {isClockedIn && <span className="relative flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                            </span>}
-                                            {isClockedIn ? 'ACTIVE' : 'OFF DUTY'}
-                                        </span>
+                            ) : (
+                                <div className="space-y-2">
+                                    <Badge className="bg-blue-100 text-blue-700 border-0 text-sm px-4 py-2 block">
+                                        <CheckCircle className="h-4 w-4 mr-2 inline" />
+                                        Completed for today
+                                    </Badge>
+                                    <div className="text-sm text-gray-600">
+                                        <p>In: {todayStatus.clock_in_time}</p>
+                                        <p>Out: {todayStatus.clock_out_time}</p>
+                                        <p className="font-semibold mt-2">Hours: {todayStatus.hours_worked || 0}h</p>
                                     </div>
-
-                                    {todayStatus?.clock_in && (
-                                        <>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="p-3 bg-indigo-50 rounded-lg">
-                                                    <div className="text-xs text-indigo-600 uppercase font-bold mb-1">Clock In</div>
-                                                    <div className="text-lg font-mono font-semibold text-gray-900">
-                                                        {new Date(todayStatus.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </div>
-                                                </div>
-                                                <div className="p-3 bg-pink-50 rounded-lg">
-                                                    <div className="text-xs text-pink-600 uppercase font-bold mb-1">Clock Out</div>
-                                                    <div className="text-lg font-mono font-semibold text-gray-900">
-                                                        {todayStatus.clock_out ? new Date(todayStatus.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-4 border border-dashed border-gray-200 rounded-lg">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-gray-500 text-sm">Session Duration</span>
-                                                    <span className="text-2xl font-mono font-bold text-gray-900">{elapsed}</span>
-                                                </div>
-                                                <div className="w-full bg-gray-100 rounded-full h-2">
-                                                    <div
-                                                        className="bg-indigo-600 h-2 rounded-full transition-all duration-1000"
-                                                        style={{ width: `${Math.min(((todayStatus.hours_worked || 0) / 8) * 100, 100)}%` }}
-                                                    />
-                                                </div>
-                                                <div className="text-xs text-gray-400 mt-1 text-right">Target: 8h</div>
-                                            </div>
-                                        </>
-                                    )}
                                 </div>
-                            </CardContent>
-                        </Card>
+                            )}
+                        </div>
+
+                        <div className="border-l border-gray-200 pl-8">
+                            <h3 className="font-semibold text-gray-900 mb-4">Today's Status</h3>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span className="text-sm text-gray-600">Status</span>
+                                    <Badge className={`${todayStatus?.clocked_in ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'} border-0`}>
+                                        {todayStatus?.clocked_in ? 'Present' : 'Not Yet'}
+                                    </Badge>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span className="text-sm text-gray-600">Clock In</span>
+                                    <span className="text-sm font-medium text-gray-900">{todayStatus?.clock_in_time || '--:--'}</span>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <span className="text-sm text-gray-600">Clock Out</span>
+                                    <span className="text-sm font-medium text-gray-900">{todayStatus?.clock_out_time || '--:--'}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </TabsContent>
+                </CardContent>
+            </Card>
 
-                <TabsContent value="history">
-                    <MyAttendanceHistory />
-                </TabsContent>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <CheckCircle className="h-5 w-5 text-green-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{presentDays}</p>
+                            <p className="text-sm text-gray-600">Days Present</p>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                <TabsContent value="team">
-                    <TeamAttendanceStatus />
-                </TabsContent>
-            </Tabs>
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-yellow-100 rounded-lg">
+                                <Clock className="h-5 w-5 text-yellow-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{lateDays}</p>
+                            <p className="text-sm text-gray-600">Late Arrivals</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <TrendingUp className="h-5 w-5 text-blue-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{Math.round(totalHours)}</p>
+                            <p className="text-sm text-gray-600">Total Hours</p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                                <Calendar className="h-5 w-5 text-purple-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{attendanceArray.length}</p>
+                            <p className="text-sm text-gray-600">This Month</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Attendance History */}
+            <Card className="border border-gray-200">
+                <CardHeader className="border-b border-gray-100">
+                    <CardTitle className="text-lg font-semibold">Attendance History</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    {attendanceArray.length > 0 ? (
+                        <div className="divide-y divide-gray-100">
+                            {attendanceArray.slice(0, 10).map((record, i) => (
+                                <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
+                                    <div className="flex items-center justify-between">
+                                        <div>
+                                            <p className="font-medium text-gray-900">
+                                                {new Date(record.date).toLocaleDateString('en-GB', {
+                                                    weekday: 'long',
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </p>
+                                            <p className="text-sm text-gray-600 mt-1">
+                                                In: {record.clock_in_time || '--'} | Out: {record.clock_out_time || '--'}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-sm text-gray-600">{record.hours_worked || 0}h</span>
+                                            <Badge className={`
+                                                ${record.status === 'present' ? 'bg-green-100 text-green-700' : ''}
+                                                ${record.status === 'absent' ? 'bg-red-100 text-red-700' : ''}
+                                                ${record.status === 'leave' ? 'bg-blue-100 text-blue-700' : ''}
+                                                border-0
+                                            `}>
+                                                {record.status}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-12 text-center">
+                            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                            <p className="text-gray-600">No attendance records yet</p>
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     );
 };
-
-const MyAttendanceHistory = () => {
-    const { data: history, isLoading } = useGetMyAttendanceQuery();
-
-    if (isLoading) return <LoadingSkeleton />;
-
-    if (!history || history.length === 0) {
-        return <div className="text-center py-10 text-gray-500">No attendance records found.</div>;
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>My Attendance Log</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 text-gray-600 font-medium">
-                            <tr>
-                                <th className="px-4 py-3 rounded-l-lg">Date</th>
-                                <th className="px-4 py-3">Clock In</th>
-                                <th className="px-4 py-3">Clock Out</th>
-                                <th className="px-4 py-3">Hours</th>
-                                <th className="px-4 py-3">Status</th>
-                                <th className="px-4 py-3 rounded-r-lg">Note</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-100">
-                            {history.map((record) => (
-                                <tr key={record.id} className="hover:bg-gray-50/50">
-                                    <td className="px-4 py-3 font-medium text-gray-900">
-                                        {new Date(record.date).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-4 py-3 text-indigo-600">
-                                        {record.clock_in ? new Date(record.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                    </td>
-                                    <td className="px-4 py-3 text-pink-600">
-                                        {record.clock_out ? new Date(record.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '-'}
-                                    </td>
-                                    <td className="px-4 py-3 font-mono font-bold">
-                                        {record.hours_worked}h
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${record.status === 'present' ? 'bg-green-100 text-green-700' :
-                                            record.status === 'absent' ? 'bg-red-100 text-red-700' :
-                                                'bg-yellow-100 text-yellow-700'
-                                            }`}>
-                                            {record.status.toUpperCase()}
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-3 text-gray-500 max-w-xs truncate" title={record.notes}>
-                                        {record.notes || '-'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </CardContent>
-        </Card>
-    );
-};
-
-const TeamAttendanceStatus = () => {
-    const { data: team, isLoading } = useGetTeamAttendanceQuery();
-
-    if (isLoading) return <LoadingSkeleton />;
-
-    if (!team || team.length === 0) {
-        return <div className="text-center py-10 text-gray-500">No team data for today.</div>;
-    }
-
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>Team Status (Today)</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {team.map((member) => (
-                        <div key={member.id} className="flex items-center justify-between p-4 border rounded-xl hover:shadow-md transition-shadow">
-                            <div>
-                                <h4 className="font-bold text-gray-900">{member.employee_name || 'Unknown Employee'}</h4>
-                                <div className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                                    {member.clock_in ? (
-                                        <span className="text-green-600 flex items-center gap-1">
-                                            <LogIn className="h-3 w-3" /> {new Date(member.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    ) : (
-                                        <span className="text-gray-400">Not clocked in</span>
-                                    )}
-                                </div>
-                            </div>
-                            <div>
-                                <span className={`px-2 py-1 rounded-lg text-xs font-bold ${member.is_clocked_in ? 'bg-green-100 text-green-700 border border-green-200' :
-                                    'bg-gray-100 text-gray-500 border border-gray-200'
-                                    }`}>
-                                    {member.is_clocked_in ? 'ONLINE' : 'OFFLINE'}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
-    );
-};
-
-const LoadingSkeleton = () => (
-    <div className="space-y-4 animate-pulse">
-        <div className="h-32 bg-gray-100 rounded-xl"></div>
-        <div className="h-32 bg-gray-100 rounded-xl"></div>
-    </div>
-);
 
 export default AttendancePage;

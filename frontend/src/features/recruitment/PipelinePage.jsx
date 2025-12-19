@@ -14,7 +14,9 @@ import {
     CheckCircle, XCircle, AlertTriangle, ChevronRight, Zap
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { cn } from '../../utils/cn';
 import CandidateProfileDrawer from './CandidateProfileDrawer';
+
 
 const PipelinePage = () => {
     const [selectedJob, setSelectedJob] = useState('all');
@@ -33,6 +35,9 @@ const PipelinePage = () => {
 
     const { data: applications = [], isLoading, refetch } = useGetApplicationsQuery({});
     const [moveStage] = useMoveApplicationStageMutation();
+
+    // Ensure applications is always an array
+    const applicationsArray = Array.isArray(applications) ? applications : (applications?.results ? applications.results : []);
 
     const onDragEnd = async (result) => {
         const { destination, source, draggableId } = result;
@@ -54,9 +59,7 @@ const PipelinePage = () => {
 
     // Group applications by stage
     const columns = stages.reduce((acc, stage) => {
-        acc[stage.id] = Array.isArray(applications)
-            ? applications.filter(app => app.stage === stage.id)
-            : [];
+        acc[stage.id] = applicationsArray.filter(app => app.stage === stage.id);
         return acc;
     }, {});
 
@@ -66,9 +69,9 @@ const PipelinePage = () => {
     };
 
     // Calculate pipeline stats
-    const totalCandidates = applications.length;
-    const activeCandidates = applications.filter(app => ['screening', 'interview', 'offer'].includes(app.stage)).length;
-    const hiredCandidates = applications.filter(app => app.stage === 'hired').length;
+    const totalCandidates = applicationsArray.length;
+    const activeCandidates = applicationsArray.filter(app => ['screening', 'interview', 'offer'].includes(app.stage)).length;
+    const hiredCandidates = applicationsArray.filter(app => app.stage === 'hired').length;
     const conversionRate = totalCandidates > 0 ? Math.round((hiredCandidates / totalCandidates) * 100) : 0;
 
     const getImageUrl = (photoPath) => {

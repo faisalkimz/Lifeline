@@ -1,279 +1,235 @@
 import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
+import {
+    Plus, Heart, DollarSign, Shield, Calendar, CheckCircle, X
+} from 'lucide-react';
 import {
     useGetBenefitTypesQuery,
-    useGetEmployeeBenefitsQuery,
-    useCreateEmployeeBenefitMutation
+    useGetMyBenefitsQuery,
+    useEnrollInBenefitMutation,
+    useUnenrollFromBenefitMutation,
 } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../../components/ui/Card';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
-import {
-    Shield, Heart, DollarSign, Gift,
-    AlertCircle, CheckCircle, Clock, Plus,
-    ArrowRight, Star, Sparkles, Umbrella,
-    Stethoscope, Plane, Coffee, GraduationCap,
-    Zap
-} from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../../components/ui/Dialog';
-import { Input } from '../../components/ui/Input';
 import toast from 'react-hot-toast';
-import { cn } from '../../utils/cn';
 
 const BenefitsPage = () => {
-    return (
-        <div className="space-y-10 pb-20 animate-fade-in font-sans">
-            {/* High-End Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-10">
-                <div className="space-y-2">
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className="h-6 w-px bg-primary-500"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">Total Rewards</span>
-                    </div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase tracking-[0.05em]">Compensation & Perks</h1>
-                    <p className="text-slate-500 font-medium max-w-xl">
-                        A curated selection of insurance, wellness programs, and lifestyle benefits designed for your growth.
-                    </p>
-                </div>
-            </div>
+    const { data: benefitTypes } = useGetBenefitTypesQuery();
+    const { data: myBenefits } = useGetMyBenefitsQuery();
+    const [enrollInBenefit] = useEnrollInBenefitMutation();
+    const [unenrollFromBenefit] = useUnenrollFromBenefitMutation();
+    const [isEnrollDialogOpen, setIsEnrollDialogOpen] = useState(false);
+    const [selectedBenefit, setSelectedBenefit] = useState(null);
 
-            <Tabs defaultValue="available" className="space-y-10">
-                <TabsList className="bg-slate-50 p-1.5 w-full max-w-lg grid grid-cols-2 rounded-2xl border border-slate-100 shadow-inner">
-                    <TabsTrigger
-                        value="available"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm py-3 flex items-center justify-center gap-2 rounded-xl transition-all font-bold text-xs uppercase tracking-wider text-slate-500"
-                    >
-                        <Zap className="h-4 w-4" /> Available Marketplace
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="my-benefits"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm py-3 flex items-center justify-center gap-2 rounded-xl transition-all font-bold text-xs uppercase tracking-wider text-slate-500"
-                    >
-                        <Shield className="h-4 w-4" /> My Enrolled Assets
-                    </TabsTrigger>
-                </TabsList>
+    const benefitTypesArray = Array.isArray(benefitTypes) ? benefitTypes : (benefitTypes?.results || []);
+    const myBenefitsArray = Array.isArray(myBenefits) ? myBenefits : (myBenefits?.results || []);
 
-                <TabsContent value="my-benefits" className="animate-slide-up">
-                    <MyBenefitsList />
-                </TabsContent>
-
-                <TabsContent value="available" className="animate-slide-up">
-                    <AvailableBenefitsList />
-                </TabsContent>
-            </Tabs>
-        </div>
-    );
-};
-
-const MyBenefitsList = () => {
-    const { data: benefitsData, isLoading } = useGetEmployeeBenefitsQuery({ my_benefits: 'true' });
-    const benefits = Array.isArray(benefitsData) ? benefitsData : (benefitsData?.results || []);
-
-    if (isLoading) return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3].map(i => <div key={i} className="h-64 bg-slate-50 rounded-3xl animate-pulse border border-slate-100"></div>)}
-        </div>
-    );
-
-    if (!benefits?.length) {
-        return (
-            <Card className="border-slate-200 border-dashed border-2 rounded-[2.5rem] bg-slate-50/50">
-                <CardContent className="py-24 flex flex-col items-center text-center">
-                    <div className="bg-white p-6 rounded-3xl shadow-xl shadow-slate-200/50 mb-6 border border-slate-100">
-                        <Umbrella className="h-10 w-10 text-slate-400" />
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">No Active Assets</h3>
-                    <p className="text-slate-500 max-w-sm mt-3 font-bold text-xs uppercase tracking-widest leading-relaxed">
-                        You haven't activated any rewards yet. Browse the marketplace to secure your future.
-                    </p>
-                </CardContent>
-            </Card>
-        );
-    }
-
-    return (
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {benefits.map(benefit => (
-                <BenefitCard key={benefit.id} benefit={benefit} />
-            ))}
-        </div>
-    );
-};
-
-const BenefitCard = ({ benefit }) => {
-    const categories = {
-        'insurance': { icon: Stethoscope, color: 'text-indigo-500', bg: 'bg-indigo-50', border: 'border-indigo-100' },
-        'allowance': { icon: DollarSign, color: 'text-emerald-500', bg: 'bg-emerald-50', border: 'border-emerald-100' },
-        'perk': { icon: Gift, color: 'text-rose-500', bg: 'bg-rose-50', border: 'border-rose-100' },
-        'wellness': { icon: Heart, color: 'text-pink-500', bg: 'bg-pink-50', border: 'border-pink-100' },
-        'travel': { icon: Plane, color: 'text-sky-500', bg: 'bg-sky-50', border: 'border-sky-100' },
-        'lifestyle': { icon: Coffee, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-100' },
-        'education': { icon: GraduationCap, color: 'text-purple-500', bg: 'bg-purple-50', border: 'border-purple-100' }
-    };
-
-    const style = categories[benefit.benefit_category?.toLowerCase()] || categories['perk'];
-    const Icon = style.icon;
-
-    return (
-        <Card className="border-slate-200 rounded-[2rem] overflow-hidden group hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 bg-white">
-            <div className="p-8">
-                <div className="flex justify-between items-start mb-6">
-                    <div className={cn("p-4 rounded-2xl shadow-sm transition-transform group-hover:scale-110 duration-500", style.bg, style.color)}>
-                        <Icon className="h-7 w-7" />
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                        <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100 flex items-center gap-1.5 shadow-sm">
-                            <CheckCircle className="h-3 w-3" /> Active Asset
-                        </span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Verified Enrollment</span>
-                    </div>
-                </div>
-
-                <div className="space-y-4">
-                    <div>
-                        <h3 className="text-xl font-black text-slate-900 tracking-tight uppercase group-hover:text-primary-600 transition-colors">{benefit.benefit_name}</h3>
-                        <p className="text-slate-500 text-xs font-bold uppercase tracking-wide mt-1 line-clamp-2 opacity-70">{benefit.description}</p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-50">
-                        <div className="bg-slate-50 rounded-2xl p-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Coverage</span>
-                            <span className="text-sm font-black text-slate-900">{benefit.coverage_amount}</span>
-                        </div>
-                        <div className="bg-slate-50 rounded-2xl p-4">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Deduction</span>
-                            <span className="text-sm font-black text-red-500">-{benefit.employee_contribution}</span>
-                        </div>
-                    </div>
-
-                    <div className="bg-indigo-900 rounded-2xl p-4 text-white flex justify-between items-center group-hover:bg-primary-600 transition-colors">
-                        <span className="text-[10px] font-black uppercase tracking-widest">Co-Contribution</span>
-                        <span className="text-sm font-black">+{benefit.employer_contribution}</span>
-                    </div>
-                </div>
-            </div>
-        </Card>
-    );
-};
-
-const AvailableBenefitsList = () => {
-    const { data: typesData, isLoading } = useGetBenefitTypesQuery();
-    const [createEnrollment, { isLoading: isEnrolling }] = useCreateEmployeeBenefitMutation();
-    const [selectedType, setSelectedType] = useState(null);
-    const types = Array.isArray(typesData) ? typesData : (typesData?.results || []);
-
-    const handleEnroll = async () => {
-        if (!selectedType) return;
-
+    const handleEnroll = async (benefitTypeId) => {
         try {
-            await createEnrollment({
-                benefit_type: selectedType.id,
-                start_date: new Date().toISOString().split('T')[0],
-                status: 'pending'
-            }).unwrap();
-
-            toast.success(`Deployment of ${selectedType.name} request logged!`);
-            setSelectedType(null);
+            await enrollInBenefit({ benefit_type: benefitTypeId }).unwrap();
+            toast.success('Enrolled successfully!');
+            setIsEnrollDialogOpen(false);
         } catch (error) {
-            toast.error(error?.data?.error || "Failed to initiate enrollment.");
+            toast.error('Failed to enroll');
         }
     };
 
-    if (isLoading) return (
-        <div className="space-y-4">
-            {[1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-50 rounded-2xl animate-pulse"></div>)}
-        </div>
-    );
+    const handleUnenroll = async (enrollmentId) => {
+        if (window.confirm('Are you sure you want to unenroll from this benefit?')) {
+            try {
+                await unenrollFromBenefit(enrollmentId).unwrap();
+                toast.success('Unenrolled successfully');
+            } catch (error) {
+                toast.error('Failed to unenroll');
+            }
+        }
+    };
 
-    if (!types?.length) {
-        return (
-            <div className="text-center py-20 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200">
-                <Sparkles className="h-10 w-10 text-slate-300 mx-auto mb-4" />
-                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Marketplace currently offline</p>
-            </div>
-        );
-    }
+    const enrolledBenefitIds = myBenefitsArray.map(b => b.benefit_type?.id || b.benefit_type);
+    const availableBenefits = benefitTypesArray.filter(bt => !enrolledBenefitIds.includes(bt.id));
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {types.map(type => (
-                <div key={type.id} className="group relative bg-white border border-slate-200 p-8 rounded-[2rem] hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-                    <div className="flex items-center gap-6">
-                        <div className="h-20 w-20 bg-slate-900 rounded-[1.5rem] flex items-center justify-center shrink-0 shadow-lg shadow-slate-900/10 group-hover:rotate-6 transition-transform">
-                            <Gift className="h-10 w-10 text-primary-400" />
-                        </div>
-                        <div className="space-y-2">
-                            <div className="inline-flex px-2 py-0.5 rounded-md bg-primary-50 text-primary-600 text-[10px] font-black uppercase tracking-widest border border-primary-100">
-                                Global Eligibility
-                            </div>
-                            <h4 className="font-black text-slate-900 text-2xl tracking-tight uppercase">{type.name}</h4>
-                            <p className="text-[11px] font-bold text-slate-500 tracking-tight leading-relaxed max-w-md uppercase opacity-60">{type.description}</p>
-                            <div className="flex gap-4 pt-2">
-                                <div className="flex items-center gap-1.5">
-                                    <div className="h-1 w-1 rounded-full bg-slate-300"></div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cap: {type.max_coverage_amount}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    <div className="h-1 w-1 rounded-full bg-slate-300"></div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rate: {type.default_employee_contribution}%</span>
-                                </div>
+        <div className="space-y-6 pb-12">
+            {/* Header */}
+            <div>
+                <h1 className="text-2xl font-bold text-gray-900">Benefits & Compensation</h1>
+                <p className="text-gray-600 mt-1">Manage your benefits and perks</p>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <CheckCircle className="h-5 w-5 text-green-600" />
                             </div>
                         </div>
-                    </div>
-                    <Button
-                        onClick={() => setSelectedType(type)}
-                        className="shrink-0 h-14 px-8 rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-slate-900/10 hover:bg-slate-800 transition-all group-hover:translate-y-[-4px]"
-                    >
-                        Initiate <ArrowRight className="h-4 w-4 ml-2" />
-                    </Button>
-                </div>
-            ))}
-
-            <Dialog open={!!selectedType} onOpenChange={(open) => !open && setSelectedType(null)}>
-                <DialogContent className="rounded-[2.5rem] border-none shadow-2xl overflow-hidden p-0 max-w-md">
-                    <div className="bg-slate-900 h-32 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/30 to-transparent"></div>
-                        <div className="absolute -right-10 -bottom-10 h-32 w-32 bg-white/10 rounded-full blur-2xl"></div>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Gift className="h-12 w-12 text-white opacity-20" />
-                        </div>
-                    </div>
-
-                    <div className="p-10 space-y-8">
                         <div>
-                            <h3 className="text-3xl font-black text-slate-900 tracking-tighter uppercase mb-2">Benefit Activation</h3>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
-                                Proceeding will initiate a request for <span className="text-primary-600">{selectedType?.name}</span>. Enrollment is subject to administrative auditing.
-                            </p>
+                            <p className="text-2xl font-bold text-gray-900">{myBenefitsArray.length}</p>
+                            <p className="text-sm text-gray-600">Enrolled Benefits</p>
                         </div>
+                    </CardContent>
+                </Card>
 
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                <div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Deduction Schedule</span>
-                                    <span className="text-sm font-black text-slate-900">{selectedType?.default_employee_contribution}% Gross Pay</span>
-                                </div>
-                                <Clock className="h-6 w-6 text-slate-300" />
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <Heart className="h-5 w-5 text-blue-600" />
                             </div>
                         </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{availableBenefits.length}</p>
+                            <p className="text-sm text-gray-600">Available Benefits</p>
+                        </div>
+                    </CardContent>
+                </Card>
 
-                        <DialogFooter className="flex flex-col gap-3">
-                            <Button
-                                onClick={handleEnroll}
-                                disabled={isEnrolling}
-                                className="w-full h-14 bg-slate-900 text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl shadow-slate-900/20"
-                            >
-                                {isEnrolling ? 'Processing...' : 'Authorize Enrollment'}
-                            </Button>
-                            <button
-                                onClick={() => setSelectedType(null)}
-                                className="w-full text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] hover:text-slate-900 transition-colors"
-                            >
-                                Dismiss Request
-                            </button>
-                        </DialogFooter>
+                <Card className="border border-gray-200">
+                    <CardContent className="p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                                <Shield className="h-5 w-5 text-purple-600" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-2xl font-bold text-gray-900">{benefitTypesArray.length}</p>
+                            <p className="text-sm text-gray-600">Total Programs</p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* My Benefits */}
+            <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">My Enrolled Benefits</h2>
+                {myBenefitsArray.length === 0 ? (
+                    <Card className="p-12 text-center border-dashed">
+                        <Heart className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No benefits enrolled</h3>
+                        <p className="text-gray-600">Enroll in available benefits to get started</p>
+                    </Card>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {myBenefitsArray.map(benefit => (
+                            <Card key={benefit.id} className="hover:shadow-md transition-shadow border border-gray-200">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="p-2 bg-green-100 rounded-lg">
+                                            <Heart className="h-5 w-5 text-green-600" />
+                                        </div>
+                                        <Badge className="bg-green-100 text-green-700 border-0">Enrolled</Badge>
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900 mb-2">{benefit.benefit_type_name || 'Benefit'}</h3>
+                                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">{benefit.benefit_type?.description || 'No description'}</p>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-gray-600">Enrolled on</span>
+                                        <span className="font-medium text-gray-900">
+                                            {new Date(benefit.enrollment_date).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="w-full mt-4 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300"
+                                        onClick={() => handleUnenroll(benefit.id)}
+                                    >
+                                        <X className="h-4 w-4 mr-2" /> Unenroll
+                                    </Button>
+                                </CardContent>
+                            </Card>
+                        ))}
                     </div>
-                </DialogContent>
-            </Dialog>
+                )}
+            </div>
+
+            {/* Available Benefits */}
+            <div>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Available Benefits</h2>
+                {availableBenefits.length === 0 ? (
+                    <Card className="p-12 text-center border-dashed">
+                        <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">All set!</h3>
+                        <p className="text-gray-600">You're enrolled in all available benefits</p>
+                    </Card>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {availableBenefits.map(benefit => (
+                            <Card key={benefit.id} className="hover:shadow-md transition-shadow border border-gray-200">
+                                <CardContent className="p-6">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Heart className="h-5 w-5 text-blue-600" />
+                                        </div>
+                                        <Badge className="bg-blue-100 text-blue-700 border-0">Available</Badge>
+                                    </div>
+                                    <h3 className="font-semibold text-gray-900 mb-2">{benefit.name}</h3>
+                                    <p className="text-sm text-gray-600 mb-4 line-clamp-3">{benefit.description}</p>
+                                    <div className="space-y-2 mb-4">
+                                        {benefit.employer_contribution > 0 && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-gray-600">Company covers</span>
+                                                <span className="font-semibold text-green-600">
+                                                    {benefit.employer_contribution}%
+                                                </span>
+                                            </div>
+                                        )}
+                                        {benefit.cost > 0 && (
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span className="text-gray-600">Your cost</span>
+                                                <span className="font-semibold text-gray-900">
+                                                    ${benefit.cost}/month
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button size="sm" className="w-full" onClick={() => setSelectedBenefit(benefit)}>
+                                                <Plus className="h-4 w-4 mr-2" /> Enroll
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Enroll in {benefit.name}</DialogTitle>
+                                            </DialogHeader>
+                                            <div className="space-y-4">
+                                                <p className="text-gray-600">{benefit.description}</p>
+                                                <div className="p-4 bg-gray-50 rounded-lg space-y-2">
+                                                    <div className="flex justify-between">
+                                                        <span className="text-sm text-gray-600">Category</span>
+                                                        <span className="text-sm font-medium text-gray-900">{benefit.category}</span>
+                                                    </div>
+                                                    {benefit.cost > 0 && (
+                                                        <div className="flex justify-between">
+                                                            <span className="text-sm text-gray-600">Monthly Cost</span>
+                                                            <span className="text-sm font-medium text-gray-900">${benefit.cost}</span>
+                                                        </div>
+                                                    )}
+                                                    {benefit.employer_contribution > 0 && (
+                                                        <div className="flex justify-between">
+                                                            <span className="text-sm text-gray-600">Company Contribution</span>
+                                                            <span className="text-sm font-medium text-green-600">{benefit.employer_contribution}%</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <Button variant="outline" className="flex-1">Cancel</Button>
+                                                    <Button className="flex-1" onClick={() => handleEnroll(benefit.id)}>
+                                                        Confirm Enrollment
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

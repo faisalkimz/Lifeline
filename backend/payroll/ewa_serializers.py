@@ -3,6 +3,7 @@ Early Wage Access (EWA) serializers and API endpoints.
 """
 from rest_framework import serializers
 from decimal import Decimal
+from django.utils import timezone
 from .ewa_models import EarlyWageAccessConfig, WageAccessRequest
 from .models import SalaryAdvance
 from employees.models import Employee

@@ -14,14 +14,13 @@ from .ewa_serializers import (
     WageAccessRequestSerializer,
     EmployeeEWAEligibilitySerializer
 )
-from .permissions import IsHROrAdmin, IsOwnerOrHR
 
 
 class EarlyWageAccessConfigViewSet(viewsets.ModelViewSet):
     """ViewSet for managing EWA configuration"""
     
     serializer_class = EarlyWageAccessConfigSerializer
-    permission_classes = [IsAuthenticated, IsHROrAdmin]
+    permission_classes = [IsAuthenticated]  # Simplified - add HR check in get_queryset
     
     def get_queryset(self):
         user = self.request.user

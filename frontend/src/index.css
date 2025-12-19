@@ -1,34 +1,61 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-@import './styles/variables.css';
 
-/* Tailwind layers MUST be present */
+/* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles */
-* {
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
+/* WorkPay-inspired Professional Color System */
+:root {
+  /* Primary - Blue (WorkPay brand color) */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
 
+  /* Neutral - Professional grays */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 
-.dark {
-  /* Dark theme */
-  --color-bg-primary: 17 24 39;
-  --color-bg-secondary: 31 41 55;
-  --color-bg-tertiary: 55 65 81;
-  --color-text-primary: 243 244 246;
-  --color-text-secondary: 209 213 219;
-  --color-text-tertiary: 156 163 175;
-  --color-border: 55 65 81;
-  --color-border-hover: 75 85 99;
+  /* Success - Green */
+  --color-success: #10b981;
+  --color-success-light: #d1fae5;
+
+  /* Warning - Orange */
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+
+  /* Error - Red */
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+
+  /* Info - Blue */
+  --color-info: #3b82f6;
+  --color-info-light: #dbeafe;
 }
 
 @layer base {
+  * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
   body {
     @apply font-sans antialiased;
-    @apply bg-gray-50 dark:bg-gray-900;
-    @apply text-gray-900 dark:text-gray-100;
+    @apply bg-gray-50 text-gray-900;
     @apply transition-colors duration-200;
   }
 
@@ -36,56 +63,65 @@
     scroll-behavior: smooth;
   }
 
-  * {
-    @apply border-gray-200 dark:border-gray-700;
+  /* Professional focus states */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
   }
 }
 
 @layer components {
-  .card {
-    @apply bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm transition-shadow duration-200;
+  /* WorkPay-style Card */
+  .card-workpay {
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200;
   }
 
-  .btn-primary {
-    @apply bg-teal-600 hover:bg-teal-700 text-white shadow-sm hover:shadow transition-all duration-200 rounded-lg font-medium px-4 py-2;
+  /* WorkPay-style Primary Button */
+  .btn-workpay-primary {
+    @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm hover:shadow transition-all duration-200 rounded-lg font-medium px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .btn-secondary {
-    @apply bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm transition-all duration-200 rounded-lg font-medium px-4 py-2;
+  /* WorkPay-style Secondary Button */
+  .btn-workpay-secondary {
+    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 shadow-sm transition-all duration-200 rounded-lg font-medium px-4 py-2;
   }
 
-  .input-field {
-    @apply w-full rounded-lg border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:border-teal-500 focus:ring-teal-500 focus:ring-1 focus:outline-none transition-all duration-200;
+  /* WorkPay-style Input */
+  .input-workpay {
+    @apply w-full rounded-lg border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 focus:outline-none transition-all duration-200 px-3 py-2;
   }
 
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  /* WorkPay-style Badge */
+  .badge-workpay {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-700 border border-green-200;
+  }
+
+  .badge-warning {
+    @apply bg-yellow-100 text-yellow-700 border border-yellow-200;
+  }
+
+  .badge-error {
+    @apply bg-red-100 text-red-700 border border-red-200;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-700 border border-blue-200;
+  }
+
+  .badge-neutral {
+    @apply bg-gray-100 text-gray-700 border border-gray-200;
   }
 }
 
-/* Org Chart Styles */
-.org-chart-link {
-  stroke: #cbd5e1;
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-}
-
-.dark .org-chart-link {
-  stroke: #4b5563;
-}
-
-.org-node-rect:hover {
-  filter: brightness(1.05) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.2));
-}
-
-/* Smooth animations */
+/* Professional animations */
 @keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -93,62 +129,126 @@
 }
 
 .animate-fade-in {
-  animation: fade-in 0.5s ease-out;
+  animation: fade-in 0.4s ease-out;
 }
 
-/* Grid pattern background */
-.bg-grid-white\/10 {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.dark .bg-grid-white\/10 {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
 }
 
-/* Scrollbar styling */
+/* Professional scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  @apply bg-gray-300 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400 dark:bg-gray-500;
+  @apply bg-gray-400;
 }
 
-/* Selection */
+/* Professional selection */
 ::selection {
-  @apply bg-teal-100 dark:bg-teal-900 text-teal-900 dark:text-teal-100;
+  @apply bg-blue-100 text-blue-900;
 }
 
-/* Compact utilities */
-.compact-spacing {
-  @apply p-3 space-y-3;
+/* Skeleton loading */
+.skeleton {
+  @apply animate-pulse bg-gray-200 rounded;
 }
 
-.compact-card {
-  @apply p-4 space-y-2;
+/* Hover states - WorkPay style */
+.hover-lift {
+  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-md;
 }
 
-.compact-table {
-  @apply text-sm;
+/* Status indicators */
+.status-dot {
+  @apply inline-block w-2 h-2 rounded-full;
 }
 
-.compact-table th {
-  @apply py-2 px-3;
+.status-dot-success {
+  @apply bg-green-500;
 }
 
-.compact-table td {
-  @apply py-2 px-3;
+.status-dot-warning {
+  @apply bg-yellow-500;
+}
+
+.status-dot-error {
+  @apply bg-red-500;
+}
+
+.status-dot-info {
+  @apply bg-blue-500;
+}
+
+/* Professional table styles */
+.table-workpay {
+  @apply w-full text-sm text-left;
+}
+
+.table-workpay th {
+  @apply bg-gray-50 px-4 py-3 text-xs font-medium text-gray-700 uppercase tracking-wide border-b border-gray-200;
+}
+
+.table-workpay td {
+  @apply px-4 py-3 border-b border-gray-100;
+}
+
+.table-workpay tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Clean shadows - WorkPay style */
+.shadow-workpay {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-workpay-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-workpay-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Professional spacing utilities */
+.spacing-workpay {
+  @apply space-y-6;
+}
+
+.spacing-workpay-sm {
+  @apply space-y-4;
+}
+
+.spacing-workpay-xs {
+  @apply space-y-3;
+}
+
+/* Clean borders */
+.border-workpay {
+  @apply border border-gray-200;
+}
+
+.border-workpay-hover {
+  @apply border border-gray-200 hover:border-gray-300;
 }

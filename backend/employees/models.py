@@ -233,13 +233,15 @@ class Employee(models.Model):
     
     @property
     def years_of_service(self):
-        """Calculate years of service"""
-        from django.utils import timezone
-        from dateutil.relativedelta import relativedelta
-        
-        end_date = self.last_working_date if self.last_working_date else timezone.now().date()
-        delta = relativedelta(end_date, self.join_date)
-        return delta.years
+        """Calculate years of service (safe, avoids external deps)"""
+        from datetime import date
+
+        end_date = self.last_working_date or date.today()
+        years = end_date.year - self.join_date.year
+        # Adjust if the current date is before the join date's anniversary
+        if (end_date.month, end_date.day) < (self.join_date.month, self.join_date.day):
+            years -= 1
+        return years
     
     def save(self, *args, **kwargs):
         """Auto-generate employee number if not provided"""

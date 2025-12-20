@@ -4,21 +4,23 @@ from rest_framework import permissions
 class IsHRAdmin(permissions.BasePermission):
     """
     Permission class for HR Admin only actions.
+    Accepts the app-wide admin role names (company_admin, hr_manager, super_admin).
     """
     message = "Only HR administrators can perform this action."
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'admin'
+        return request.user.is_authenticated and request.user.role in ['company_admin', 'hr_manager', 'super_admin']
 
 
 class IsHRAdminOrManager(permissions.BasePermission):
     """
     Permission class for HR Admin or Manager actions.
+    Uses consistent role names across the app.
     """
     message = "Only HR administrators or managers can perform this action."
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ['admin', 'manager', 'super_admin']
+        return request.user.is_authenticated and request.user.role in ['company_admin', 'hr_manager', 'manager', 'super_admin']
 
 
 class IsOwnerOrManager(permissions.BasePermission):
@@ -49,6 +51,7 @@ class IsOwnerOrManager(permissions.BasePermission):
 class CanManageTraining(permissions.BasePermission):
     """
     Permission for training management operations.
+    Uses consistent role names across the app.
     """
     message = "You don't have permission to manage training programs."
 
@@ -60,5 +63,5 @@ class CanManageTraining(permissions.BasePermission):
         if request.method in permissions.SAFE_METHODS:
             return True
         
-        # Write permissions for admin and manager
-        return request.user.role in ['admin', 'manager']
+        # Write permissions for HR/admin/manager roles
+        return request.user.role in ['company_admin', 'hr_manager', 'manager', 'super_admin']

@@ -14,6 +14,7 @@ import {
     useCreateTrainingProgramMutation,
     useCreateTrainingSessionMutation,
     useEnrollInTrainingMutation,
+    useGetCurrentUserQuery
 } from '../../store/api';
 import toast from 'react-hot-toast';
 
@@ -23,6 +24,9 @@ const TrainingPage = () => {
     const { data: enrollments } = useGetEnrollmentsQuery();
     const [createProgram] = useCreateTrainingProgramMutation();
     const [createSession] = useCreateTrainingSessionMutation();
+
+    const { data: currentUser } = useGetCurrentUserQuery();
+    const canManageTraining = ['company_admin', 'hr_manager', 'manager', 'super_admin'].includes(currentUser?.role);
 
     const [isProgramDialogOpen, setIsProgramDialogOpen] = useState(false);
     const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
@@ -53,7 +57,9 @@ const TrainingPage = () => {
             setIsProgramDialogOpen(false);
             setProgramData({ title: '', description: '', duration_hours: '', category: 'technical', is_mandatory: false });
         } catch (error) {
-            toast.error('Failed to create program');
+            console.error('Create program failed:', error);
+            const msg = error?.data?.detail || error?.data?.error || error?.data || error?.message || 'Failed to create program';
+            toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg));
         }
     };
 
@@ -65,7 +71,9 @@ const TrainingPage = () => {
             setIsSessionDialogOpen(false);
             setSessionData({ program: '', instructor_name: '', start_date: '', end_date: '', max_participants: '', location: '', is_virtual: false });
         } catch (error) {
-            toast.error('Failed to create session');
+            console.error('Create session failed:', error);
+            const msg = error?.data?.detail || error?.data?.error || error?.data || error?.message || 'Failed to create session';
+            toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg));
         }
     };
 
@@ -87,150 +95,162 @@ const TrainingPage = () => {
                     <p className="text-gray-600 mt-1">Manage employee learning and development</p>
                 </div>
                 <div className="flex gap-3">
-                    <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button variant="outline">
-                                <Calendar className="h-4 w-4 mr-2" /> New Session
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create Training Session</DialogTitle>
-                            </DialogHeader>
-                            <form onSubmit={handleCreateSession} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
-                                    <select
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        value={sessionData.program}
-                                        onChange={e => setSessionData({ ...sessionData, program: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">Select program...</option>
-                                        {programsArray.map(p => (
-                                            <option key={p.id} value={p.id}>{p.title}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
+                    {canManageTraining ? (
+                        <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="outline">
+                                    <Calendar className="h-4 w-4 mr-2" /> New Session
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create Training Session</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleCreateSession} className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                                        <input
-                                            type="date"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            value={sessionData.start_date}
-                                            onChange={e => setSessionData({ ...sessionData, start_date: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                                        <input
-                                            type="date"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            value={sessionData.end_date}
-                                            onChange={e => setSessionData({ ...sessionData, end_date: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Instructor</label>
-                                    <input
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        value={sessionData.instructor_name}
-                                        onChange={e => setSessionData({ ...sessionData, instructor_name: e.target.value })}
-                                        required
-                                        placeholder="Instructor name"
-                                    />
-                                </div>
-                                <div className="flex gap-3">
-                                    <Button type="button" onClick={() => setIsSessionDialogOpen(false)} variant="outline" className="flex-1">
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="flex-1">Create Session</Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={isProgramDialogOpen} onOpenChange={setIsProgramDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button>
-                                <Plus className="h-4 w-4 mr-2" /> New Program
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Create Training Program</DialogTitle>
-                            </DialogHeader>
-                            <form onSubmit={handleCreateProgram} className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Program Title</label>
-                                    <input
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        value={programData.title}
-                                        onChange={e => setProgramData({ ...programData, title: e.target.value })}
-                                        required
-                                        placeholder="e.g. Leadership Training"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                    <textarea
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
-                                        rows="3"
-                                        value={programData.description}
-                                        onChange={e => setProgramData({ ...programData, description: e.target.value })}
-                                        required
-                                        placeholder="Describe the program..."
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
-                                        <input
-                                            type="number"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            value={programData.duration_hours}
-                                            onChange={e => setProgramData({ ...programData, duration_hours: e.target.value })}
-                                            required
-                                            min="1"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Program</label>
                                         <select
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                            value={programData.category}
-                                            onChange={e => setProgramData({ ...programData, category: e.target.value })}
+                                            value={sessionData.program}
+                                            onChange={e => setSessionData({ ...sessionData, program: e.target.value })}
+                                            required
                                         >
-                                            <option value="technical">Technical</option>
-                                            <option value="soft_skills">Soft Skills</option>
-                                            <option value="compliance">Compliance</option>
-                                            <option value="leadership">Leadership</option>
+                                            <option value="">Select program...</option>
+                                            {programsArray.map(p => (
+                                                <option key={p.id} value={p.id}>{p.title}</option>
+                                            ))}
                                         </select>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="checkbox"
-                                        id="is_mandatory"
-                                        className="h-4 w-4 text-blue-600 rounded"
-                                        checked={programData.is_mandatory}
-                                        onChange={e => setProgramData({ ...programData, is_mandatory: e.target.checked })}
-                                    />
-                                    <label htmlFor="is_mandatory" className="text-sm text-gray-700">Mandatory Training</label>
-                                </div>
-                                <div className="flex gap-3">
-                                    <Button type="button" onClick={() => setIsProgramDialogOpen(false)} variant="outline" className="flex-1">
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="flex-1">Create Program</Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                            <input
+                                                type="date"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                value={sessionData.start_date}
+                                                onChange={e => setSessionData({ ...sessionData, start_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                            <input
+                                                type="date"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                value={sessionData.end_date}
+                                                onChange={e => setSessionData({ ...sessionData, end_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Instructor</label>
+                                        <input
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            value={sessionData.instructor_name}
+                                            onChange={e => setSessionData({ ...sessionData, instructor_name: e.target.value })}
+                                            required
+                                            placeholder="Instructor name"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button type="button" onClick={() => setIsSessionDialogOpen(false)} variant="outline" className="flex-1">
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit" className="flex-1">Create Session</Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    ) : (
+                        <Button variant="outline" onClick={() => toast.error('Only HR/Admin/Managers can create sessions') }>
+                            <Calendar className="h-4 w-4 mr-2" /> New Session
+                        </Button>
+                    )}
+
+                    {canManageTraining ? (
+                        <Dialog open={isProgramDialogOpen} onOpenChange={setIsProgramDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button>
+                                    <Plus className="h-4 w-4 mr-2" /> New Program
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Create Training Program</DialogTitle>
+                                </DialogHeader>
+                                <form onSubmit={handleCreateProgram} className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Program Title</label>
+                                        <input
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            value={programData.title}
+                                            onChange={e => setProgramData({ ...programData, title: e.target.value })}
+                                            required
+                                            placeholder="e.g. Leadership Training"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                                        <textarea
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                                            rows="3"
+                                            value={programData.description}
+                                            onChange={e => setProgramData({ ...programData, description: e.target.value })}
+                                            required
+                                            placeholder="Describe the program..."
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Duration (hours)</label>
+                                            <input
+                                                type="number"
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                value={programData.duration_hours}
+                                                onChange={e => setProgramData({ ...programData, duration_hours: e.target.value })}
+                                                required
+                                                min="1"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                            <select
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                                value={programData.category}
+                                                onChange={e => setProgramData({ ...programData, category: e.target.value })}
+                                            >
+                                                <option value="technical">Technical</option>
+                                                <option value="soft_skills">Soft Skills</option>
+                                                <option value="compliance">Compliance</option>
+                                                <option value="leadership">Leadership</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="is_mandatory"
+                                            className="h-4 w-4 text-blue-600 rounded"
+                                            checked={programData.is_mandatory}
+                                            onChange={e => setProgramData({ ...programData, is_mandatory: e.target.checked })}
+                                        />
+                                        <label htmlFor="is_mandatory" className="text-sm text-gray-700">Mandatory Training</label>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button type="button" onClick={() => setIsProgramDialogOpen(false)} variant="outline" className="flex-1">
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit" className="flex-1">Create Program</Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+                    ) : (
+                        <Button onClick={() => toast.error('Only HR/Admin/Managers can create training programs')}>
+                            <Plus className="h-4 w-4 mr-2" /> New Program
+                        </Button>
+                    )}
                 </div>
             </div>
 

@@ -19,7 +19,8 @@ import {
     useGetEmployeesQuery,
     useDeleteEmployeeMutation,
     useCreateSalaryStructureMutation,
-    useUpdateSalaryStructureMutation
+    useUpdateSalaryStructureMutation,
+    useGetCurrentUserQuery
 } from '../../store/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -124,24 +125,17 @@ const FormField = ({ label, error, children, required, icon: Icon }) => (
         className="space-y-3 group"
     >
         <div className="flex items-center justify-between px-1">
-            <label className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.25em] flex items-center gap-2 transition-all group-focus-within:text-primary-500 group-focus-within:translate-x-1">
-                <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors group-focus-within:bg-primary-500" />
-                {Icon && <Icon className="h-3 w-3 transition-transform group-focus-within:rotate-12" />}
-                {label} {required && <span className="text-primary-500 animate-pulse">*</span>}
+            <label className="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-2 transition-all">
+                <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700 transition-colors" />
+                {Icon && <Icon className="h-4 w-4 text-slate-400" />}
+                {label} {required && <span className="text-red-500">*</span>}
             </label>
         </div>
         <div className="relative">
-            <div className="absolute -inset-[1px] bg-gradient-to-r from-primary-500/0 via-primary-500/0 to-primary-500/0 rounded-2xl transition-all duration-500 group-focus-within:from-primary-500/20 group-focus-within:via-indigo-500/20 group-focus-within:to-purple-500/20" />
+            <div className="absolute -inset-[1px] bg-gradient-to-r from-primary-500/0 via-primary-500/0 to-primary-500/0 rounded-2xl transition-all duration-500 group-focus-within:from-primary-500/20 group-focus-within:via-indigo-500/20 group-focus-within:to-purple-500/20 pointer-events-none" />
             {children}
             {error && (
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="absolute -bottom-6 left-1 flex items-center gap-1.5 text-[10px] text-primary-500 font-black tracking-tight bg-primary-500/10 px-2 py-0.5 rounded-full border border-primary-500/20 backdrop-blur-md"
-                >
-                    <AlertTriangle className="h-2.5 w-2.5" />
-                    {error.message}
-                </motion.div>
+                <p className="mt-2 text-sm text-red-500 flex items-center gap-2"><AlertTriangle className="h-4 w-4" />{error.message}</p>
             )}
         </div>
     </motion.div>
@@ -170,6 +164,10 @@ const EmployeeFormPage = () => {
     const [deleteEmployee, { isLoading: isDeleting }] = useDeleteEmployeeMutation();
     const [createSalaryStructure] = useCreateSalaryStructureMutation();
     const [updateSalaryStructure] = useUpdateSalaryStructureMutation();
+
+    // Current user info (used to check permissions for creating/updating salary structures)
+    const { data: currentUser } = useGetCurrentUserQuery();
+    const canManageSalaries = ['hr_manager', 'company_admin', 'super_admin'].includes(currentUser?.role);
 
     const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm({
         resolver: zodResolver(employeeSchema),
@@ -261,20 +259,45 @@ const EmployeeFormPage = () => {
             };
 
             if (data.basic_salary > 0) {
-                if (isEditMode && employeeData?.salary_structure?.id) {
-                    await updateSalaryStructure({ id: employeeData.salary_structure.id, ...salaryData });
+                if (!canManageSalaries) {
+                    toast.error('You do not have permission to set salary structures. Please ask an HR/Admin to set this.');
                 } else {
-                    await createSalaryStructure({ employee: employeeId, ...salaryData });
+                    if (isEditMode && employeeData?.salary_structure?.id) {
+                        try {
+                            await updateSalaryStructure({ id: employeeData.salary_structure.id, ...salaryData }).unwrap();
+                        } catch (err) {
+                            console.error('Failed to update salary structure:', err);
+                            const applied = applyServerErrors(err);
+                            if (!applied) {
+                                const msg = err?.data || err?.message || 'Failed to update salary structure';
+                                toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+                            }
+                        }
+                    } else {
+                        try {
+                            await createSalaryStructure({ employee: employeeId, ...salaryData }).unwrap();
+                        } catch (err) {
+                            console.error('Failed to create salary structure:', err);
+                            const applied = applyServerErrors(err);
+                            if (!applied) {
+                                const msg = err?.data || err?.message || 'Failed to create salary structure';
+                                toast.error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+                            }
+                        }
+                    }
                 }
             }
 
             navigate('/employees');
         } catch (error) {
             console.error('Failed to save employee:', error);
-            const errorMsg = error?.data?.detail
-                || (Array.isArray(error?.data?.non_field_errors) ? error.data.non_field_errors[0] : null)
-                || "Failed to save employee. Please check the form.";
-            toast.error(errorMsg);
+            const applied = applyServerErrors(error);
+            if (!applied) {
+                const errorMsg = error?.data?.detail
+                    || (Array.isArray(error?.data?.non_field_errors) ? error.data.non_field_errors[0] : null)
+                    || "Failed to save employee. Please check the form.";
+                toast.error(errorMsg);
+            }
         }
     };
 
@@ -300,6 +323,49 @@ const EmployeeFormPage = () => {
         }
     };
 
+    // Map backend validation errors into react-hook-form or show toasts
+    const applyServerErrors = (err) => {
+        const data = err?.data ?? err;
+        if (!data) return false;
+
+        let applied = false;
+
+        // Simple string response
+        if (typeof data === 'string') {
+            toast.error(data);
+            return true;
+        }
+
+        // Array of messages
+        if (Array.isArray(data)) {
+            toast.error(data.join(' '));
+            return true;
+        }
+
+        // Object mapping field -> [messages]
+        if (typeof data === 'object') {
+            Object.entries(data).forEach(([key, val]) => {
+                const message = Array.isArray(val) ? val.join(' ') : (typeof val === 'object' ? JSON.stringify(val) : String(val));
+                if (key === 'non_field_errors' || key === 'detail') {
+                    toast.error(message);
+                    applied = true;
+                } else {
+                    // Map to form field errors where possible
+                    try {
+                        setError(key, { type: 'server', message });
+                        applied = true;
+                    } catch (e) {
+                        // If setError fails for unknown fields, fallback to toast
+                        toast.error(message);
+                        applied = true;
+                    }
+                }
+            });
+        }
+
+        return applied;
+    };
+
     if (isEditMode && isLoadingEmployee) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-primary-600">
@@ -310,13 +376,10 @@ const EmployeeFormPage = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#050505] text-slate-200 selection:bg-primary-500/30">
-            {/* Animated Cosmic Background */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-600/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-600/10 rounded-full blur-[150px]" />
-                <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-purple-600/5 rounded-full blur-[100px] animate-bounce-slow" />
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.03] mix-blend-overlay" />
+        <div className="min-h-screen bg-white text-slate-800 selection:bg-primary-500/10">
+            {/* Subtle header accent */}
+            <div className="relative z-0">
+                <div className="w-full h-1 bg-gradient-to-r from-primary-600 to-indigo-500 opacity-10 mb-4" />
             </div>
 
             <div className="relative z-10 max-w-[1600px] mx-auto space-y-12 pb-20">
@@ -324,7 +387,7 @@ const EmployeeFormPage = () => {
                 <motion.div
                     initial={{ opacity: 0, y: -30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="relative rounded-[3rem] bg-slate-900/40 border border-white/5 overflow-hidden backdrop-blur-3xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)]"
+                    className="relative rounded-lg bg-white border border-slate-200 shadow-sm"
                 >
                     {/* Interior Glows */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" />
@@ -335,7 +398,7 @@ const EmployeeFormPage = () => {
                             <motion.div
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl"
+                                className="flex items-center gap-2 px-3 py-1 bg-slate-50 rounded-md border border-slate-200"
                             >
                                 <Home className="h-3.5 w-3.5 text-primary-400" />
                                 <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
@@ -354,53 +417,15 @@ const EmployeeFormPage = () => {
                                     </div>
                                     <span className="text-[10px] font-black text-primary-400 uppercase tracking-[0.4em]">Integrated HR System</span>
                                 </div>
-                                <h1 className="text-6xl md:text-8xl font-black text-white tracking-[-0.04em] leading-[0.9] flex flex-col">
-                                    {isEditMode ? (
-                                        <><span>Edit</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Employee</span></>
-                                    ) : (
-                                        <><span>New</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-indigo-400 to-purple-400 drop-shadow-sm">Onboarding</span></>
-                                    )}
+                                <h1 className="text-2xl font-bold text-slate-800">
+                                    {isEditMode ? 'Edit Employee' : 'New Employee'}
                                 </h1>
-                                <p className="text-slate-400 font-bold text-xl max-w-2xl leading-relaxed opacity-80">
-                                    {isEditMode
-                                        ? "Update employee details and organizational information."
-                                        : "Create a new employee profile in the system."}
+                                <p className="text-sm text-slate-400">
+                                    {isEditMode ? 'Update employee details and organizational information.' : 'Create a new employee profile.'}
                                 </p>
                             </div>
 
-                            <div className="flex items-center gap-6 p-3 bg-white/5 rounded-[2.5rem] border border-white/10 backdrop-blur-2xl shadow-2xl">
-                                <motion.button
-                                    whileHover={{ scale: 1.05, x: -5 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => navigate('/employees')}
-                                    className="h-16 w-16 rounded-[1.5rem] bg-white/5 border border-white/10 hover:bg-white/10 flex items-center justify-center text-white transition-all group"
-                                >
-                                    <ChevronLeft className="h-7 w-7 group-hover:text-primary-400 transition-colors" />
-                                </motion.button>
-
-                                {isEditMode && (
-                                    <Button
-                                        type="button"
-                                        onClick={handleDelete}
-                                        disabled={isDeleting}
-                                        variant="ghost"
-                                        className="h-16 px-10 rounded-[1.5rem] text-red-400 hover:text-red-300 hover:bg-red-500/10 font-black uppercase tracking-widest text-[11px] transition-all"
-                                    >
-                                        Delete Employee
-                                    </Button>
-                                )}
-
-                                <motion.div whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}>
-                                    <Button
-                                        onClick={handleSubmit(onSubmit)}
-                                        disabled={isCreating || isUpdating}
-                                        className="bg-primary-600 hover:bg-primary-500 text-white font-black px-12 h-16 rounded-[1.5rem] shadow-[0_20px_40px_-10px_rgba(37,99,235,0.6)] transition-all flex items-center gap-4 border-none text-lg tracking-tight"
-                                    >
-                                        <Save className="h-6 w-6" />
-                                        <span>{isCreating || isUpdating ? 'Saving...' : 'Save Changes'}</span>
-                                    </Button>
-                                </motion.div>
-                            </div>
+                            <div className="hidden" />
                         </div>
                     </div>
                 </motion.div>
@@ -409,121 +434,52 @@ const EmployeeFormPage = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
                     {/* Visual Sidebar - ULTRA PREMIUM */}
                     <div className="lg:col-span-4 space-y-12">
-                        <motion.div
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className="bg-slate-900/60 rounded-[4rem] border border-white/5 overflow-hidden backdrop-blur-3xl shadow-[0_40px_80px_-20px_rgba(0,0,0,0.8)] sticky top-8"
-                        >
-                            <div className="h-56 bg-[#0a0a0a] relative overflow-hidden group">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary-600/30 to-purple-600/30 animate-pulse"></div>
-                                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] hover:scale-110 transition-transform duration-[10s]"></div>
-                                <div className="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-slate-900 via-slate-900/90 to-transparent"></div>
-                            </div>
-
-                            <CardContent className="-mt-28 pb-16 px-12 flex flex-col items-center relative z-10 text-center">
-                                <div className="relative mb-10 group">
-                                    <motion.div
-                                        className="h-52 w-52 rounded-[4rem] bg-[#0a0a0a] p-2.5 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)] relative overflow-hidden ring-1 ring-white/10"
-                                        whileHover={{ y: -10, rotate: 2 }}
-                                        transition={{ type: "spring", stiffness: 200 }}
-                                    >
-                                        {previewImage ? (
-                                            <img src={getImageUrl(previewImage)} alt="Preview" className="h-full w-full object-cover rounded-[3.5rem]" />
-                                        ) : (
-                                            <div className="h-full w-full bg-slate-800/50 rounded-[3.5rem] flex items-center justify-center border border-white/5">
-                                                <User className="h-24 w-24 text-slate-700" />
-                                            </div>
-                                        )}
-                                        <label className="absolute inset-0 bg-primary-600/90 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white cursor-pointer transition-all duration-500 rounded-[3.5rem] backdrop-blur-md">
-                                            <div className="p-5 bg-white/20 rounded-3xl mb-4">
-                                                <Upload className="h-10 w-10 text-white" />
-                                            </div>
-                                            <span className="text-[14px] font-black uppercase tracking-[0.25em] text-center px-4 leading-tight">Upload Profile<br />Photo</span>
-                                            <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-                                        </label>
-                                    </motion.div>
-
-                                    <motion.div
-                                        animate={{ scale: [1, 1.15, 1], rotate: [0, 5, -5, 0] }}
-                                        transition={{ repeat: Infinity, duration: 4 }}
-                                        className="absolute -bottom-4 -right-4 h-20 w-20 rounded-[2rem] bg-gradient-to-br from-primary-500 to-indigo-600 p-5 shadow-[0_15px_30px_rgba(59,130,246,0.6)] border-[6px] border-[#0a0a0a] flex items-center justify-center"
-                                    >
-                                        <Shield className="h-9 w-9 text-white" />
-                                    </motion.div>
+                        <div className="sticky top-8 bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="h-20 w-20 rounded-md overflow-hidden bg-slate-700 flex items-center justify-center">
+                                    {previewImage ? (
+                                        <img src={getImageUrl(previewImage)} alt="Preview" className="h-full w-full object-cover" />
+                                    ) : (
+                                        <User className="h-10 w-10 text-slate-400" />
+                                    )}
                                 </div>
-
-                                <div className="space-y-5">
-                                    <h3 className="text-5xl font-black text-white mb-3 tracking-tighter leading-none">
-                                        <span className="block truncate max-w-[280px]">{watch('first_name') || 'Pending'}</span>
-                                        <span className="text-slate-500 block truncate max-w-[280px]">{watch('last_name') || 'Entity'}</span>
-                                    </h3>
-                                    <div className="flex flex-wrap justify-center gap-3">
-                                        <span className="text-[11px] font-black text-primary-400 uppercase tracking-[0.3em] bg-primary-500/10 px-6 py-3 rounded-2xl border border-primary-500/20 backdrop-blur-md">
-                                            {watch('job_title') || 'No Title'}
-                                        </span>
-                                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] bg-white/5 px-6 py-3 rounded-2xl border border-white/5 backdrop-blur-md">
-                                            {watch('employment_status')?.replace('_', ' ') || 'Pending'}
-                                        </span>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </motion.div>
-
-
-                        <div className="bg-slate-950 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden border border-white/5 group">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary-600/10 rounded-full blur-[100px] pointer-events-none transition-transform group-hover:scale-110 duration-1000"></div>
-
-                            <div className="flex items-center justify-between mb-10 relative z-10">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:bg-primary-500 transition-colors">
-                                        <Sparkles className="h-6 w-6 text-primary-400 group-hover:text-white" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-black text-lg tracking-tight">Onboarding Progress</h4>
-                                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Form Completion</p>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col items-end">
-                                    <span className="text-3xl font-black text-white">{progress}%</span>
-                                    <span className="text-[8px] font-black text-primary-500 uppercase tracking-widest">Calculated</span>
+                                <div>
+                                    <div className="text-lg font-bold text-slate-800">{(watch('first_name') || '') + ' ' + (watch('last_name') || '')}</div>
+                                    <div className="text-sm text-slate-400">{watch('job_title') || 'No Title'}</div>
+                                    <div className="text-xs text-slate-600 mt-2">Status: <span className="font-semibold text-slate-800">{watch('employment_status')?.replace('_',' ') || 'Pending'}</span></div>
                                 </div>
                             </div>
 
-                            {/* Progress Bar */}
-                            <div className="h-2 w-full bg-white/5 rounded-full mb-10 overflow-hidden border border-white/5">
-                                <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${progress}%` }}
-                                    transition={{ duration: 1.5, ease: "circOut" }}
-                                    className="h-full bg-gradient-to-r from-primary-600 to-indigo-500 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
-                                />
+                            <div className="mt-4">
+                                <div className="text-[10px] uppercase text-slate-400 font-black mb-2">Form Completion</div>
+                                <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div className="h-full bg-primary-600" style={{ width: `${progress}%` }} />
+                                </div>
+                                <div className="text-xs text-slate-400 mt-2">{progress}% complete</div>
                             </div>
 
-                            <div className="space-y-6 relative z-10">
-                                {[
-                                    { icon: Info, text: "All mandatory fields must be filled correctly.", color: "text-primary-400" },
-                                    { icon: Shield, text: "Role assignment determines system access levels.", color: "text-indigo-400" },
-                                    { icon: AlertTriangle, text: departments.length ? "Departments loaded." : "WARN: No departments found.", color: departments.length ? "text-emerald-400" : "text-amber-500" }
-                                ].map((tip, idx) => (
-                                    <motion.div
-                                        key={idx}
-                                        initial={{ x: -10, opacity: 0 }}
-                                        animate={{ x: 0, opacity: 1 }}
-                                        transition={{ delay: 0.3 + (idx * 0.1) }}
-                                        className="flex gap-5 p-5 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all group/tip"
-                                    >
-                                        <tip.icon className={`h-6 w-6 ${tip.color} shrink-0 group-hover/tip:scale-110 transition-transform`} />
-                                        <p className="text-xs text-slate-400 leading-relaxed font-bold group-hover/tip:text-slate-200 transition-colors">{tip.text}</p>
-                                    </motion.div>
-                                ))}
+                            <div className="mt-4">
+                                <label className="block text-sm text-slate-300 font-medium">Upload Photo</label>
+                                <input type="file" className="mt-2" accept="image/*" aria-label="Upload profile photo" onChange={handleImageChange} />
                             </div>
+                        </div>
+
+
+                        <div className="bg-white rounded-lg p-6 border border-slate-200 shadow-sm">
+                            <h4 className="font-semibold text-slate-800 mb-2">Quick Tips</h4>
+                            <ul className="text-sm text-slate-400 space-y-2">
+                                <li>• Fill mandatory fields (First name, Last name, Email, Phone, Department, Job title, National ID).</li>
+                                <li>• Assign a role only if system access is required.</li>
+                                <li>• Upload a clear profile photo for easier identification.</li>
+                                <li className="text-xs text-slate-500 mt-3">Departments loaded: {departments.length}</li>
+                            </ul>
                         </div>
                     </div>
 
                     {/* Main Form Fields - REDESIGNED */}
                     <div className="lg:col-span-8">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                            <TabsList className="flex flex-wrap h-auto p-2 bg-slate-100/50 dark:bg-slate-950/50 rounded-[2rem] mb-10 gap-2 border border-slate-200/50 dark:border-slate-800/50 backdrop-blur-xl">
+                            <TabsList className="flex gap-2 mb-6">
                                 {[
                                     { id: 'personal', icon: User, label: 'Identity', step: '01' },
                                     { id: 'employment', icon: Briefcase, label: 'Employment', step: '02' },
@@ -535,65 +491,56 @@ const EmployeeFormPage = () => {
                                     <TabsTrigger
                                         key={tab.id}
                                         value={tab.id}
-                                        className="flex-1 data-[state=active]:bg-white dark:data-[state=active]:bg-slate-900 data-[state=active]:text-primary-600 data-[state=active]:shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] h-16 rounded-[1.5rem] flex flex-col items-center justify-center gap-1 transition-all hover:bg-white/50 dark:hover:bg-white/5 relative group border-none shadow-none"
+                                        className="px-4 py-2 rounded-md data-[state=active]:bg-primary-600 data-[state=active]:text-white text-sm font-semibold"
                                     >
-                                        <span className="absolute top-2 right-3 text-[7px] font-black opacity-20 group-data-[state=active]:opacity-40 tracking-tighter">{tab.step}</span>
-                                        <tab.icon className={`h-4 w-4 transition-transform ${activeTab === tab.id ? 'scale-110' : 'group-hover:scale-110'}`} />
-                                        <span className="text-[10px] font-black uppercase tracking-[0.15em]">{tab.label}</span>
+                                        <div className="flex items-center gap-2">
+                                            <tab.icon className="h-4 w-4" />
+                                            <span className="uppercase tracking-wide text-[11px]">{tab.label}</span>
+                                        </div>
                                     </TabsTrigger>
                                 ))}
                             </TabsList>
 
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={activeTab}
-                                    initial={{ opacity: 0, x: 10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    <Card className="border-none shadow-premium bg-white dark:bg-slate-800/80 backdrop-blur-md min-h-[550px] overflow-hidden relative">
-                                        <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                                            <Sparkles className="h-32 w-32 text-primary-600" />
-                                        </div>
-                                        <CardContent className="p-10">
-                                            <form onSubmit={handleSubmit(onSubmit)}>
+                            <div>
+                                <Card className="bg-white dark:bg-slate-800 border rounded-lg">
+                                    <CardContent className="p-6">
+                                        <form onSubmit={handleSubmit(onSubmit)}>
                                                 {/* Personal Tab */}
                                                 <TabsContent value="personal" className="space-y-10 mt-0">
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                                         <FormField label="First Name" error={errors.first_name} required icon={User}>
-                                                            <Input {...register('first_name')} placeholder="First Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input {...register('first_name')} aria-label="First name" placeholder="First Name" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
                                                         </FormField>
                                                         <FormField label="Middle Name" error={errors.middle_name} icon={User}>
                                                             <Input {...register('middle_name')} placeholder="Middle Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                         <FormField label="Last Name" error={errors.last_name} required icon={User}>
-                                                            <Input {...register('last_name')} placeholder="Last Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input {...register('last_name')} aria-label="Last name" placeholder="Last Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                                         <FormField label="Email Address" error={errors.email} required icon={Mail}>
-                                                            <Input type="email" {...register('email')} placeholder="email@domain.com" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input type="email" {...register('email')} aria-label="Email address" placeholder="email@domain.com" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
                                                         </FormField>
                                                         <FormField label="Phone Number" error={errors.phone} required icon={Phone}>
-                                                            <Input {...register('phone')} placeholder="+256..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input {...register('phone')} aria-label="Phone number" placeholder="+256..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
                                                         </FormField>
                                                     </div>
 
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
                                                         <FormField label="Date of Birth" error={errors.date_of_birth} required icon={Calendar}>
-                                                            <Input type="date" {...register('date_of_birth')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input type="date" {...register('date_of_birth')} className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
                                                         </FormField>
                                                         <FormField label="Gender" error={errors.gender} required icon={User}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('gender')}>
+                                                            <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('gender')}>
                                                                 <option value="male">Male</option>
                                                                 <option value="female">Female</option>
                                                                 <option value="other">Other</option>
                                                             </select>
                                                         </FormField>
                                                         <FormField label="Marital Status" error={errors.marital_status} icon={Star}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('marital_status')}>
+                                                            <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('marital_status')}>
                                                                 <option value="single">Single</option>
                                                                 <option value="married">Married</option>
                                                                 <option value="divorced">Divorced</option>
@@ -621,7 +568,7 @@ const EmployeeFormPage = () => {
                                                 <TabsContent value="employment" className="space-y-10 mt-0">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                                         <FormField label="Department" error={errors.department} required icon={Building2}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('department')}>
+                                                            <select aria-label="Department" className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('department')}>
                                                                 <option value="">Select Department</option>
                                                                 {departments.map(dept => (
                                                                     <option key={dept.id} value={dept.id}>{dept.name}</option>
@@ -629,7 +576,7 @@ const EmployeeFormPage = () => {
                                                             </select>
                                                         </FormField>
                                                         <FormField label="Job Title" error={errors.job_title} required icon={Briefcase}>
-                                                            <Input {...register('job_title')} placeholder="e.g. Lead Architect" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            <Input {...register('job_title')} aria-label="Job title" placeholder="e.g. Lead Architect" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
                                                         </FormField>
                                                     </div>
 
@@ -677,7 +624,7 @@ const EmployeeFormPage = () => {
                                                     <div className="bg-slate-950 text-white p-10 rounded-[3rem] mb-10 relative overflow-hidden shadow-2xl border border-white/5 group">
                                                         <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-600/20 transition-colors duration-1000"></div>
                                                         <div className="relative z-10 flex items-center gap-8">
-                                                            <div className="p-5 bg-white/5 rounded-[2rem] backdrop-blur-2xl border border-white/10 shadow-inner group-hover:bg-primary-500 transition-colors duration-500">
+                                                            <div className="p-5 bg-slate-50 rounded-[1rem] border border-slate-200 shadow-inner transition-colors duration-500">
                                                                 <Wallet className="h-10 w-10 text-primary-400 group-hover:text-white" />
                                                             </div>
                                                             <div>
@@ -786,7 +733,7 @@ const EmployeeFormPage = () => {
                                                             }`}
                                                     >
                                                         <div className="flex items-center gap-6">
-                                                            <div className={`p-4 rounded-2xl transition-colors ${createUser ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                                                            <div className={`p-4 rounded-2xl transition-colors ${createUser ? 'bg-slate-50' : 'bg-slate-100'}`}>
                                                                 <User className={`h-8 w-8 ${createUser ? 'text-white' : 'text-slate-400'}`} />
                                                             </div>
                                                             <div>
@@ -873,10 +820,10 @@ const EmployeeFormPage = () => {
                                                 <TabsContent value="documents" className="space-y-10 mt-0">
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                                         <FormField label="National ID" error={errors.national_id} required icon={Shield}>
-                                                            <Input {...register('national_id')} placeholder="CM..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold uppercase" />
+                                                            <Input {...register('national_id')} aria-label="National ID" placeholder="CM..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
                                                         </FormField>
                                                         <FormField label="Passport Number" error={errors.passport_number} icon={Shield}>
-                                                            <Input {...register('passport_number')} placeholder="A..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold uppercase" />
+                                                            <Input {...register('passport_number')} placeholder="A..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
                                                         </FormField>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
@@ -931,29 +878,28 @@ const EmployeeFormPage = () => {
                                                 </TabsContent>
 
                                                 {/* Final Action Interface */}
-                                                <div className="flex justify-end gap-5 pt-12 border-t border-slate-100 dark:border-slate-800 mt-12">
+                                                <div className="flex justify-end gap-3 pt-8 border-t border-slate-100 dark:border-slate-800 mt-8">
                                                     <Button
                                                         variant="ghost"
                                                         type="button"
                                                         onClick={() => navigate('/employees')}
-                                                        className="h-16 px-10 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 font-black transition-all"
+                                                        className="px-4 py-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-all"
                                                     >
                                                         Cancel
                                                     </Button>
                                                     <Button
                                                         onClick={handleSubmit(onSubmit)}
                                                         disabled={isCreating || isUpdating}
-                                                        className="h-16 px-12 bg-primary-600 hover:bg-primary-500 text-white font-black rounded-2xl shadow-[0_20px_40px_-15px_rgba(37,99,235,0.5)] transition-all flex items-center gap-3 border-none"
+                                                        className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-md transition-all flex items-center gap-2 border-none"
                                                     >
-                                                        <Save className="h-6 w-6" />
-                                                        {isCreating || isUpdating ? 'Saving...' : 'Save Employee'}
+                                                        <Save className="h-4 w-4" />
+                                                        {isCreating || isUpdating ? 'Saving...' : 'Save'}
                                                     </Button>
                                                 </div>
                                             </form>
                                         </CardContent>
                                     </Card>
-                                </motion.div>
-                            </AnimatePresence>
+                                </div>
                         </Tabs>
                     </div>
                 </div>

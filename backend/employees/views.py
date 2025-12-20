@@ -296,12 +296,20 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def managers(self, request):
-        """Get all managers with their subordinates"""
-        # Get employees who have subordinates (managers)
+        """Get all managers with their subordinates or managerial roles.
+
+        Includes employees who:
+        - have subordinates, OR
+        - are assigned as department heads, OR
+        - have a job title containing 'manager' (case-insensitive)
+        This ensures recently promoted employees show up in the org chart even before they have direct reports.
+        """
+        # Get employees who look like managers
         managers = self.get_queryset().filter(
-            subordinates__isnull=False,
             employment_status='active'
-        ).distinct().prefetch_related('subordinates', 'department')
+        ).filter(
+            Q(subordinates__isnull=False) | Q(managed_departments__isnull=False) | Q(job_title__icontains='manager')
+        ).distinct().prefetch_related('subordinates', 'department', 'managed_departments')
 
         # Serialize with subordinates data using EmployeeListSerializer
         # which includes subordinates field for frontend compatibility

@@ -81,12 +81,12 @@ const DocumentsPage = () => {
     const [isEditingFolder, setIsEditingFolder] = useState(false);
     const [activeTab, setActiveTab] = useState('company');
 
+    // NOTE: These ids must match backend Document.CATEGORY_CHOICES
     const categories = [
         { id: 'policy', name: 'Company Policies', icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-        { id: 'hr', name: 'HR Documents', icon: User, color: 'text-green-600', bg: 'bg-green-50' },
-        { id: 'legal', name: 'Legal Documents', icon: Building, color: 'text-red-600', bg: 'bg-red-50' },
-        { id: 'training', name: 'Training Materials', icon: File, color: 'text-purple-600', bg: 'bg-purple-50' },
-        { id: 'forms', name: 'Forms & Templates', icon: FileText, color: 'text-orange-600', bg: 'bg-orange-50' }
+        { id: 'contract', name: 'Contracts', icon: Building, color: 'text-red-600', bg: 'bg-red-50' },
+        { id: 'form', name: 'Forms & Templates', icon: FileText, color: 'text-orange-600', bg: 'bg-orange-50' },
+        { id: 'other', name: 'Other', icon: File, color: 'text-purple-600', bg: 'bg-purple-50' }
     ];
 
     const getFileIcon = (fileName) => {
@@ -137,8 +137,9 @@ const DocumentsPage = () => {
             setIsUploadDialogOpen(false);
             setUploadForm({ title: '', category: 'policy', file: null, description: '', is_public: true, expiry_date: '', version: '1.0' });
         } catch (error) {
+            const serverMsg = error?.data ? Object.values(error.data).flat().join(' ') : error?.message || 'Failed to upload document.';
             console.error('Upload failed:', error);
-            toast.error('Failed to upload document.');
+            toast.error(serverMsg);
         }
     };
 
@@ -241,7 +242,9 @@ const DocumentsPage = () => {
             setIsUploadDialogOpen(false);
             setIsEditing(false);
         } catch (error) {
-            toast.error('Failed to update document.');
+            const serverMsg = error?.data ? Object.values(error.data).flat().join(' ') : error?.message || 'Failed to update document.';
+            console.error('Update failed:', error);
+            toast.error(serverMsg);
         }
     };
 

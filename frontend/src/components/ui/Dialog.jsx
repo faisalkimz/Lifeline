@@ -1,8 +1,13 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const DialogContext = createContext({});
 
-const Dialog = ({ open, onOpenChange, children }) => {
+// Support both controlled (open/onOpenChange) and uncontrolled usage (internal state)
+const Dialog = ({ open: controlledOpen, onOpenChange: controlledOnOpenChange, children }) => {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const open = controlledOpen ?? internalOpen;
+    const onOpenChange = controlledOnOpenChange ?? setInternalOpen;
+
     return (
         <DialogContext.Provider value={{ open, onOpenChange }}>
             {children}
@@ -13,7 +18,7 @@ const Dialog = ({ open, onOpenChange, children }) => {
 const DialogTrigger = ({ asChild, children }) => {
     const { onOpenChange } = useContext(DialogContext);
 
-    const handleClick = () => onOpenChange(true);
+    const handleClick = () => onOpenChange?.(true);
 
     if (asChild && React.isValidElement(children)) {
         return React.cloneElement(children, {
@@ -42,7 +47,7 @@ const DialogContent = ({ children, className = "" }) => {
             {/* Backdrop */}
             <div
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-                onClick={() => onOpenChange(false)}
+                onClick={() => onOpenChange?.(false)}
             />
 
             {/* Modal Content */}

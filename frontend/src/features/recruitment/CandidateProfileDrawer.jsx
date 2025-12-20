@@ -16,8 +16,10 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
   const [isOfferModalOpen, setIsOfferModalOpen] = React.useState(false);
 
   // We need to find the application for this candidate to link the offer
-  const { data: applications = [] } = useGetApplicationsQuery();
-  const application = applications.find(app => app.candidate?.id === candidate?.id);
+  const { data: applications } = useGetApplicationsQuery();
+  // Normalize API response to an array (the API may return { results: [...] } or an array)
+  const applicationsArray = Array.isArray(applications) ? applications : (applications?.results || []);
+  const application = applicationsArray.find(app => app.candidate?.id === candidate?.id);
 
   if (!candidate) return null;
 

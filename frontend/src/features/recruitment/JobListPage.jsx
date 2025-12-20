@@ -20,6 +20,7 @@ const JobListPage = () => {
     const [createJob] = useCreateJobMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [fieldErrors, setFieldErrors] = useState({});
 
     const [formData, setFormData] = useState({
         title: '',
@@ -36,6 +37,8 @@ const JobListPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setFieldErrors({});
+            // Use unwrap to get detailed server errors when available
             await createJob(formData).unwrap();
             toast.success("Job created successfully!");
             setIsDialogOpen(false);
@@ -44,8 +47,18 @@ const JobListPage = () => {
                 location: 'Kampala, Uganda', employment_type: 'full_time', status: 'draft',
                 salary_min: '', salary_max: '', is_remote: false
             });
+            setFieldErrors({});
         } catch (error) {
-            toast.error("Failed to create job");
+            // Surface validation errors if provided by backend and map them to form fields
+            const err = error?.data || error?.error || error?.message;
+            if (err && typeof err === 'object' && !Array.isArray(err)) {
+                const normalized = Object.fromEntries(Object.entries(err).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : String(v)]));
+                setFieldErrors(normalized);
+                const messages = Object.entries(normalized).map(([k, v]) => `${k}: ${v}`).join(' | ');
+                toast.error(messages || 'Failed to create job');
+            } else {
+                toast.error(err || 'Failed to create job');
+            }
         }
     };
 
@@ -84,10 +97,11 @@ const JobListPage = () => {
                                         <input
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             value={formData.title}
-                                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                            onChange={e => { setFormData({ ...formData, title: e.target.value }); setFieldErrors(prev => ({ ...prev, title: undefined })); }}
                                             required
                                             placeholder="e.g. Senior Software Engineer"
                                         />
+                                        {fieldErrors.title && <p className="mt-1 text-sm text-red-500">{fieldErrors.title}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Employment Type</label>
@@ -109,9 +123,10 @@ const JobListPage = () => {
                                     <input
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                         value={formData.location}
-                                        onChange={e => setFormData({ ...formData, location: e.target.value })}
+                                        onChange={e => { setFormData({ ...formData, location: e.target.value }); setFieldErrors(prev => ({ ...prev, location: undefined })); }}
                                         required
                                     />
+                                    {fieldErrors.location && <p className="mt-1 text-sm text-red-500">{fieldErrors.location}</p>}
                                 </div>
 
                                 <div>
@@ -120,10 +135,24 @@ const JobListPage = () => {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
                                         rows="4"
                                         value={formData.description}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        onChange={e => { setFormData({ ...formData, description: e.target.value }); setFieldErrors(prev => ({ ...prev, description: undefined })); }}
                                         required
                                         placeholder="Describe the role..."
                                     />
+                                    {fieldErrors.description && <p className="mt-1 text-sm text-red-500">{fieldErrors.description}</p> }
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Requirements</label>
+                                    <textarea
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                                        rows="3"
+                                        value={formData.requirements}
+                                        onChange={e => { setFormData({ ...formData, requirements: e.target.value }); setFieldErrors(prev => ({ ...prev, requirements: undefined })); }}
+                                        required
+                                        placeholder="List key requirements, skills, or experience needed"
+                                    />
+                                    {fieldErrors.requirements && <p className="mt-1 text-sm text-red-500">{fieldErrors.requirements}</p> }
                                 </div>
 
                                 <div className="flex items-center gap-2">

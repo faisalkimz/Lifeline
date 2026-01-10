@@ -37,7 +37,19 @@ const RegisterPage = () => {
 
     const onSubmit = async (data) => {
         try {
-            const result = await registerUser(data).unwrap();
+            // Add default values for optional fields
+            const registrationData = {
+                ...data,
+                company_phone: data.company_phone || '',
+                company_address: data.company_address || '',
+                company_city: data.company_city || '',
+                company_country: data.company_country || 'UG',
+                phone: data.phone || '',
+                tax_id: data.tax_id || ''
+            };
+
+            console.log('Sending registration data:', registrationData);
+            const result = await registerUser(registrationData).unwrap();
             dispatch(setCredentials({
                 user: result.user,
                 token: result.tokens.access
@@ -45,6 +57,7 @@ const RegisterPage = () => {
             navigate('/dashboard');
         } catch (err) {
             console.error('Registration failed:', err);
+            console.error('Error details:', err.data);
         }
     };
 
@@ -69,7 +82,17 @@ const RegisterPage = () => {
                             <AlertCircle className="h-5 w-5 text-error-600 mt-0.5 flex-shrink-0" />
                             <div className="text-sm text-error-700">
                                 <p className="font-medium">Registration failed</p>
-                                <p>{error?.data?.company_name || error?.data?.username || 'Please check your details and try again.'}</p>
+                                {error?.data && typeof error.data === 'object' ? (
+                                    <ul className="mt-1 list-disc list-inside">
+                                        {Object.entries(error.data).map(([field, messages]) => (
+                                            <li key={field}>
+                                                <strong>{field}:</strong> {Array.isArray(messages) ? messages.join(', ') : messages}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>{error?.data?.detail || error?.message || 'Please check your details and try again.'}</p>
+                                )}
                             </div>
                         </div>
                     )}

@@ -1,17 +1,14 @@
 import React, { useState } from 'react';
 import { useGetLeaveRequestsQuery, useGetPublicHolidaysQuery } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
 import {
-    ChevronLeft, ChevronRight, Calendar, User, Clock,
-    Sparkles, Shield, UserCheck, PlaneLanding, Home
+    ChevronLeft, ChevronRight, Calendar, Clock, Info
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 const LeaveCalendar = () => {
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [viewMode, setViewMode] = useState('month');
 
     const { data: leaveRequests, isLoading } = useGetLeaveRequestsQuery({
         start_date: getMonthStart(currentDate),
@@ -74,10 +71,10 @@ const LeaveCalendar = () => {
 
     const getLeaveTypeStyle = (leaveType) => {
         const styles = {
-            annual: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20',
-            sick: 'bg-rose-500/20 text-rose-400 border-rose-500/20',
-            emergency: 'bg-amber-500/20 text-amber-400 border-amber-500/20',
-            other: 'bg-primary-500/20 text-primary-400 border-primary-500/20'
+            annual: 'bg-blue-100 text-blue-700 border-blue-200',
+            sick: 'bg-red-100 text-red-700 border-red-200',
+            emergency: 'bg-orange-100 text-orange-700 border-orange-200',
+            other: 'bg-gray-100 text-gray-700 border-gray-200'
         };
         return styles[leaveType] || styles.other;
     };
@@ -89,49 +86,48 @@ const LeaveCalendar = () => {
     ];
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {/* Header / Nav */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="flex items-center gap-6 p-2 bg-white/5 rounded-[2rem] border border-white/5 backdrop-blur-3xl shadow-2xl">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-3">
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigateMonth(-1)}
-                        className="h-12 w-12 rounded-xl border border-white/5 hover:bg-white/5 text-slate-400"
+                        className="h-9 w-9 border border-gray-200"
                     >
-                        <ChevronLeft className="h-5 w-5" />
+                        <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <div className="px-6 py-2 text-center">
-                        <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">
-                            {monthNames[currentDate.getMonth()]} <span className="text-primary-500">{currentDate.getFullYear()}</span>
+                    <div className="px-4">
+                        <h2 className="text-xl font-semibold text-gray-900">
+                            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                         </h2>
                     </div>
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => navigateMonth(1)}
-                        className="h-12 w-12 rounded-xl border border-white/5 hover:bg-white/5 text-slate-400"
+                        className="h-9 w-9 border border-gray-200"
                     >
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <Button
-                        onClick={() => setCurrentDate(new Date())}
-                        className="h-14 px-8 rounded-2xl bg-white/5 border border-white/5 text-slate-400 font-black uppercase tracking-widest text-[10px] hover:bg-primary-600 hover:text-white transition-all shadow-xl"
-                    >
-                        <Home className="h-4 w-4 mr-3" />
-                        Today
-                    </Button>
-                </div>
+                <Button
+                    onClick={() => setCurrentDate(new Date())}
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700"
+                >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Today
+                </Button>
             </div>
 
-            {/* Calendar Matrix */}
-            <Card className="rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-3xl overflow-hidden shadow-2xl">
-                <div className="grid grid-cols-7 border-b border-white/5 bg-slate-950/50">
+            {/* Calendar Grid */}
+            <Card className="border border-gray-200 overflow-hidden">
+                <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                        <div key={day} className="p-6 text-center font-black text-[10px] uppercase tracking-[0.4em] text-slate-500 border-r border-white/5 last:border-r-0 italic">
+                        <div key={day} className="p-3 text-center text-xs font-semibold text-gray-700 border-r border-gray-200 last:border-r-0">
                             {day}
                         </div>
                     ))}
@@ -147,44 +143,39 @@ const LeaveCalendar = () => {
                         return (
                             <div
                                 key={index}
-                                className={`min-h-[160px] border-r border-b border-white/5 p-4 transition-all hover:bg-white/5 group ${isToday ? 'bg-primary-500/5' : ''
-                                    } ${!isCurrentMonth ? 'opacity-20 pointer-events-none' : ''}`}
+                                className={`min-h-[120px] border-r border-b border-gray-200 p-2 transition-all hover:bg-gray-50 ${isToday ? 'bg-blue-50' : ''
+                                    } ${!isCurrentMonth ? 'opacity-40' : ''}`}
                             >
                                 {date && (
                                     <>
-                                        <div className="flex justify-between items-start mb-4">
-                                            <span className={`text-sm font-black italic tracking-tighter transition-all ${isToday ? 'text-primary-400 scale-125' : 'text-slate-500 group-hover:text-white'
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className={`text-sm font-medium ${isToday ? 'text-blue-600 font-bold' : 'text-gray-700'
                                                 }`}>
                                                 {date.getDate()}
                                             </span>
                                             {isToday && (
-                                                <div className="h-1.5 w-1.5 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(59,130,246,1)]" />
+                                                <div className="h-2 w-2 rounded-full bg-blue-600" />
                                             )}
                                         </div>
 
                                         {holiday && (
-                                            <div className="mb-3 px-3 py-1 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-                                                <p className="text-[8px] font-black text-rose-400 uppercase tracking-widest truncate">🎄 {holiday.name}</p>
+                                            <div className="mb-2 px-2 py-1 bg-red-100 border border-red-200 rounded text-center">
+                                                <p className="text-[10px] font-medium text-red-700 truncate">{holiday.name}</p>
                                             </div>
                                         )}
 
-                                        <div className="space-y-1.5">
-                                            {leaveRequestsForDay.slice(0, 3).map((request, reqIndex) => (
-                                                <motion.div
-                                                    initial={{ opacity: 0, x: -5 }}
-                                                    animate={{ opacity: 1, x: 0 }}
+                                        <div className="space-y-1">
+                                            {leaveRequestsForDay.slice(0, 2).map((request, reqIndex) => (
+                                                <div
                                                     key={reqIndex}
-                                                    className={`px-3 py-1.5 rounded-xl border flex items-center gap-2 group/request ${getLeaveTypeStyle(request.leave_type)}`}
+                                                    className={`px-2 py-1 rounded border text-[10px] font-medium truncate ${getLeaveTypeStyle(request.leave_type)}`}
                                                 >
-                                                    <div className="h-1 w-1 rounded-full bg-current" />
-                                                    <span className="text-[9px] font-black uppercase tracking-tight truncate flex-1">
-                                                        {request.employee_name.split(' ')[0]}
-                                                    </span>
-                                                </motion.div>
+                                                    {request.employee_name.split(' ')[0]}
+                                                </div>
                                             ))}
-                                            {leaveRequestsForDay.length > 3 && (
-                                                <div className="text-[8px] font-black text-slate-600 uppercase tracking-widest text-center pt-1 group-hover:text-primary-500 transition-colors">
-                                                    + {leaveRequestsForDay.length - 3} MORE
+                                            {leaveRequestsForDay.length > 2 && (
+                                                <div className="text-[9px] text-gray-600 text-center">
+                                                    +{leaveRequestsForDay.length - 2} more
                                                 </div>
                                             )}
                                         </div>
@@ -196,52 +187,47 @@ const LeaveCalendar = () => {
                 </div>
             </Card>
 
-            {/* Matrix Data Footer */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <Card className="rounded-[3rem] border border-white/5 bg-slate-900/40 backdrop-blur-3xl overflow-hidden p-10 shadow-2xl">
-                    <div className="flex items-center gap-4 mb-8">
-                        <Shield className="h-6 w-6 text-primary-400" />
-                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Calendar Legend</h3>
+            {/* Legend */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <Card className="border border-gray-200 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Info className="h-5 w-5 text-blue-600" />
+                        <h3 className="font-semibold text-gray-900">Calendar Legend</h3>
                     </div>
-                    <div className="flex flex-wrap gap-5">
-                        <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                            <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Annual Leave</span>
+                    <div className="flex flex-wrap gap-3">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 border border-blue-200 rounded-lg">
+                            <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                            <span className="text-xs font-medium text-blue-700">Annual Leave</span>
                         </div>
-                        <div className="flex items-center gap-3 px-5 py-2.5 bg-rose-500/10 border border-rose-500/20 rounded-2xl">
-                            <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                            <span className="text-[10px] font-black text-rose-400 uppercase tracking-widest">Sick Leave</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-red-100 border border-red-200 rounded-lg">
+                            <div className="w-2 h-2 rounded-full bg-red-600"></div>
+                            <span className="text-xs font-medium text-red-700">Sick Leave</span>
                         </div>
-                        <div className="flex items-center gap-3 px-5 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-2xl">
-                            <div className="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
-                            <span className="text-[10px] font-black text-amber-400 uppercase tracking-widest">Emergency Leave</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 border border-orange-200 rounded-lg">
+                            <div className="w-2 h-2 rounded-full bg-orange-600"></div>
+                            <span className="text-xs font-medium text-orange-700">Emergency</span>
                         </div>
                     </div>
                 </Card>
 
-                <Card className="rounded-[3rem] border border-white/5 bg-slate-950/80 backdrop-blur-3xl overflow-hidden p-10 shadow-2xl relative">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary-600/10 rounded-full blur-[60px]" />
-                    <div className="flex items-center gap-4 mb-8 relative z-10">
-                        <Clock className="h-6 w-6 text-primary-400" />
-                        <h3 className="text-xl font-black text-white italic uppercase tracking-tight">Upcoming Absences</h3>
+                <Card className="border border-gray-200 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <Clock className="h-5 w-5 text-blue-600" />
+                        <h3 className="font-semibold text-gray-900">Upcoming Absences</h3>
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                         {leaveRequests?.filter(r => new Date(r.start_date) >= new Date()).slice(0, 3).map((req, i) => (
-                            <div key={i} className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer group">
-                                <div className="flex items-center gap-4">
-                                    <div className="h-10 w-10 rounded-xl bg-slate-900 border border-white/10 flex items-center justify-center">
-                                        <PlaneLanding className="h-5 w-5 text-primary-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-xs font-black text-white uppercase italic tracking-tight">{req.employee_name}</p>
-                                        <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mt-1">{new Date(req.start_date).toLocaleDateString()}</p>
-                                    </div>
+                            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-blue-50 transition-all">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900">{req.employee_name}</p>
+                                    <p className="text-xs text-gray-600">{new Date(req.start_date).toLocaleDateString()}</p>
                                 </div>
-                                <div className="p-2.5 bg-primary-600/20 text-primary-400 rounded-xl">
-                                    <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                </div>
+                                <ChevronRight className="h-4 w-4 text-gray-400" />
                             </div>
                         ))}
+                        {(!leaveRequests || leaveRequests.filter(r => new Date(r.start_date) >= new Date()).length === 0) && (
+                            <p className="text-sm text-gray-500 text-center py-4">No upcoming absences</p>
+                        )}
                     </div>
                 </Card>
             </div>

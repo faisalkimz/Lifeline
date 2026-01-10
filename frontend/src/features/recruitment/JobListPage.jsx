@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import {
     useGetJobsQuery,
     useCreateJobMutation,
-    usePublishJobMutation,
-    useGetRecruitmentIntegrationsQuery,
 } from '../../store/api';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
 import {
-    Plus, Briefcase, MapPin, Search, Send, Globe, CheckCircle, Users
+    Plus, Briefcase, MapPin, Search, Send, FileText, CheckCircle, Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import PublishJobDialog from './PublishJobDialog';
+import JobDescriptionEditor from './JobDescriptionEditor';
 
 const JobListPage = () => {
     const { data: jobs, isLoading } = useGetJobsQuery();
@@ -38,7 +38,6 @@ const JobListPage = () => {
         e.preventDefault();
         try {
             setFieldErrors({});
-            // Use unwrap to get detailed server errors when available
             await createJob(formData).unwrap();
             toast.success("Job created successfully!");
             setIsDialogOpen(false);
@@ -49,13 +48,11 @@ const JobListPage = () => {
             });
             setFieldErrors({});
         } catch (error) {
-            // Surface validation errors if provided by backend and map them to form fields
             const err = error?.data || error?.error || error?.message;
             if (err && typeof err === 'object' && !Array.isArray(err)) {
                 const normalized = Object.fromEntries(Object.entries(err).map(([k, v]) => [k, Array.isArray(v) ? v.join(', ') : String(v)]));
                 setFieldErrors(normalized);
-                const messages = Object.entries(normalized).map(([k, v]) => `${k}: ${v}`).join(' | ');
-                toast.error(messages || 'Failed to create job');
+                toast.error('Failed to create job');
             } else {
                 toast.error(err || 'Failed to create job');
             }
@@ -139,7 +136,7 @@ const JobListPage = () => {
                                         required
                                         placeholder="Describe the role..."
                                     />
-                                    {fieldErrors.description && <p className="mt-1 text-sm text-red-500">{fieldErrors.description}</p> }
+                                    {fieldErrors.description && <p className="mt-1 text-sm text-red-500">{fieldErrors.description}</p>}
                                 </div>
 
                                 <div>
@@ -152,7 +149,7 @@ const JobListPage = () => {
                                         required
                                         placeholder="List key requirements, skills, or experience needed"
                                     />
-                                    {fieldErrors.requirements && <p className="mt-1 text-sm text-red-500">{fieldErrors.requirements}</p> }
+                                    {fieldErrors.requirements && <p className="mt-1 text-sm text-red-500">{fieldErrors.requirements}</p>}
                                 </div>
 
                                 <div className="flex items-center gap-2">
@@ -216,28 +213,8 @@ const JobListPage = () => {
 };
 
 const JobCard = ({ job }) => {
-    const [publishJob] = usePublishJobMutation();
-    const { data: integrations } = useGetRecruitmentIntegrationsQuery();
     const [isPublishOpen, setIsPublishOpen] = useState(false);
-    const [selectedPlatforms, setSelectedPlatforms] = useState([]);
-
-    const integrationList = Array.isArray(integrations?.results) ? integrations.results : (Array.isArray(integrations) ? integrations : []);
-
-    const handlePublish = async () => {
-        try {
-            await publishJob({ id: job.id, platforms: selectedPlatforms }).unwrap();
-            toast.success("Job published successfully!");
-            setIsPublishOpen(false);
-        } catch (e) {
-            toast.error("Failed to publish job");
-        }
-    };
-
-    const togglePlatform = (platform) => {
-        setSelectedPlatforms(prev =>
-            prev.includes(platform) ? prev.filter(p => p !== platform) : [...prev, platform]
-        );
-    };
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
 
     const statusColors = {
         published: 'bg-green-100 text-green-700',
@@ -246,92 +223,86 @@ const JobCard = ({ job }) => {
     };
 
     return (
-        <Card className="hover:shadow-md transition-shadow border border-gray-200">
-            <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                        <Briefcase className="h-5 w-5 text-blue-600" />
+        <>
+            <Card className="hover:shadow-md transition-shadow border border-gray-200">
+                <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                        <div className="p-2 bg-blue-100 rounded-lg">
+                            <Briefcase className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <Badge className={`${statusColors[job.status]} border-0 capitalize`}>
+                            {job.status}
+                        </Badge>
                     </div>
-                    <Badge className={`${statusColors[job.status]} border-0`}>
-                        {job.status}
-                    </Badge>
-                </div>
 
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{job.title}</h3>
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                    <MapPin className="h-4 w-4" />
-                    <span>{job.location}</span>
-                    {job.is_remote && <span className="text-blue-600">• Remote</span>}
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
-                    <div>
-                        <p className="text-xs text-gray-600">Applications</p>
-                        <p className="text-sm font-semibold text-gray-900">{job.application_count || 0}</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{job.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                        <MapPin className="h-4 w-4" />
+                        <span>{job.location}</span>
+                        {job.is_remote && <span className="text-blue-600">• Remote</span>}
                     </div>
-                    <div>
-                        <p className="text-xs text-gray-600">Published On</p>
-                        <p className="text-sm font-semibold text-gray-900">{job.external_posts?.length || 0} platforms</p>
-                    </div>
-                </div>
 
-                <div className="flex gap-2">
-                    {job.status === 'draft' ? (
-                        <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="flex-1" size="sm">
+                    <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p className="text-xs text-gray-600">Applications</p>
+                            <p className="text-sm font-semibold text-gray-900">{job.application_count || 0}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs text-gray-600">Published On</p>
+                            <p className="text-sm font-semibold text-gray-900">
+                                {job.status === 'draft' && job.scheduled_publish_date ? (
+                                    <span className="flex items-center gap-1 text-blue-600">
+                                        <Clock className="h-3 w-3" /> Scheduled
+                                    </span>
+                                ) : (
+                                    `${job.external_posts?.length || 0} platforms`
+                                )}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                                onClick={() => setIsEditorOpen(true)}
+                            >
+                                <FileText className="h-4 w-4 mr-2" /> Edit Description
+                            </Button>
+                        </div>
+                        <div className="flex gap-2">
+                            {job.status === 'draft' ? (
+                                <Button
+                                    className="flex-1"
+                                    size="sm"
+                                    onClick={() => setIsPublishOpen(true)}
+                                >
                                     <Send className="h-4 w-4 mr-2" /> Publish
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Publish Job</DialogTitle>
-                                </DialogHeader>
-                                <div className="space-y-4">
-                                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-                                        <CheckCircle className="h-5 w-5 text-green-600" />
-                                        <div className="flex-1">
-                                            <p className="text-sm font-medium text-green-900">Internal Portal</p>
-                                            <p className="text-xs text-green-700">Career page</p>
-                                        </div>
-                                    </div>
+                            ) : (
+                                <Link to={`/recruitment/jobs/${job.id}`} className="flex-1">
+                                    <Button className="w-full" size="sm" variant="outline">View Details</Button>
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
-                                    {integrationList.filter(i => i.is_active).map(integration => (
-                                        <div
-                                            key={integration.id}
-                                            onClick={() => togglePlatform(integration.platform)}
-                                            className={`p-3 border rounded-lg cursor-pointer transition-all ${selectedPlatforms.includes(integration.platform)
-                                                    ? 'border-blue-500 bg-blue-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <Globe className="h-5 w-5 text-gray-600" />
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-medium text-gray-900">{integration.platform}</p>
-                                                    <p className="text-xs text-gray-600">External platform</p>
-                                                </div>
-                                                {selectedPlatforms.includes(integration.platform) && (
-                                                    <CheckCircle className="h-5 w-5 text-blue-600" />
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
+            <PublishJobDialog
+                job={job}
+                isOpen={isPublishOpen}
+                onClose={() => setIsPublishOpen(false)}
+            />
 
-                                    <Button onClick={handlePublish} disabled={selectedPlatforms.length === 0} className="w-full">
-                                        Publish Job
-                                    </Button>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    ) : (
-                        <Link to={`/recruitment/jobs/${job.id}`} className="flex-1">
-                            <Button className="w-full" size="sm" variant="outline">View Details</Button>
-                        </Link>
-                    )}
-                </div>
-            </CardContent>
-        </Card>
+            <JobDescriptionEditor
+                job={job}
+                isOpen={isEditorOpen}
+                onClose={() => setIsEditorOpen(false)}
+            />
+        </>
     );
 };
 

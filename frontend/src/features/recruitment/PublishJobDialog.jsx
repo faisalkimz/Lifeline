@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
 import { useUpdateJobMutation, useGetRecruitmentIntegrationsQuery } from '../../store/api';
-import { CheckCircle, XCircle, Loader, ExternalLink, Activity, Calendar, Clock } from 'lucide-react';
+import { CheckCircle, XCircle, Loader, ExternalLink, Activity, Calendar, Clock, Linkedin, Search, Globe, Sun } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PublishJobDialog = ({ job, isOpen, onClose }) => {
@@ -19,29 +19,29 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
         {
             id: 'linkedin',
             name: 'LinkedIn',
-            logo: '🔗',
-            color: 'bg-blue-50 border-blue-200',
+            icon: Linkedin,
+            color: 'bg-[#0077b5]/10 border-[#0077b5]/20 text-[#0077b5]',
             description: 'Professional network - Best for corporate roles'
         },
         {
             id: 'indeed',
             name: 'Indeed',
-            logo: '💼',
-            color: 'bg-purple-50 border-purple-200',
+            icon: Search, // Indeed is a search engine
+            color: 'bg-[#2164f3]/10 border-[#2164f3]/20 text-[#2164f3]',
             description: 'World\'s #1 job site - Maximum reach'
         },
         {
             id: 'fuzu',
             name: 'Fuzu',
-            logo: '🌍',
-            color: 'bg-green-50 border-green-200',
+            icon: Globe,
+            color: 'bg-emerald-50 border-emerald-200 text-emerald-600',
             description: 'East African jobs - Local talent'
         },
         {
             id: 'brightermonday',
             name: 'BrighterMonday',
-            logo: '🇺🇬',
-            color: 'bg-orange-50 border-orange-200',
+            icon: Sun, // Brighter
+            color: 'bg-orange-50 border-orange-200 text-orange-600',
             description: 'Uganda\'s #1 job site - Top local reach'
         },
     ];
@@ -62,7 +62,8 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
     };
 
     const isIntegrationActive = (platformId) => {
-        return integrations?.some(
+        const integrationsArray = Array.isArray(integrations) ? integrations : (integrations?.results || []);
+        return integrationsArray.some(
             int => int.platform === platformId && int.is_active
         );
     };
@@ -221,7 +222,9 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
                                     {/* Platform Info */}
                                     <div className="flex items-start gap-3">
-                                        <div className="text-3xl">{platform.logo}</div>
+                                        <div className={`p-2 rounded-lg border ${platform.color}`}>
+                                            <platform.icon className="h-6 w-6" />
+                                        </div>
                                         <div className="flex-1">
                                             <h3 className="font-semibold text-gray-900">{platform.name}</h3>
                                             <p className="text-xs text-gray-600 mt-1">{platform.description}</p>

@@ -23,6 +23,7 @@ import AttendancePage from './features/attendance/AttendancePage';
 import PerformancePage from './features/performance/PerformancePage';
 import DisciplinaryPage from './features/disciplinary/DisciplinaryPage';
 import JobListPage from './features/recruitment/JobListPage';
+import JobDetailsPage from './features/recruitment/JobDetailsPage';
 import PipelinePage from './features/recruitment/PipelinePage';
 import IntegrationsPage from './features/recruitment/IntegrationsPage';
 import CandidateManagementPage from './features/recruitment/CandidateManagementPage';
@@ -82,6 +83,7 @@ function App() {
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/disciplinary" element={<DisciplinaryPage />} />
         <Route path="/recruitment" element={<JobListPage />} />
+        <Route path="/recruitment/jobs/:id" element={<JobDetailsPage />} />
         <Route path="/recruitment/candidates" element={<CandidateManagementPage />} />
         <Route path="/recruitment/pipeline" element={<PipelinePage />} />
         <Route path="/recruitment/interviews" element={<InterviewSchedulingPage />} />

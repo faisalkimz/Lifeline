@@ -555,6 +555,10 @@ export const api = createApi({
       }),
       providesTags: ['Job']
     }),
+    getJob: builder.query({
+      query: (id) => `/recruitment/jobs/${id}/`,
+      providesTags: (result, error, id) => [{ type: 'Job', id }]
+    }),
     createJob: builder.mutation({
       query: (body) => ({
         url: '/recruitment/jobs/',
@@ -1105,6 +1109,7 @@ export const {
   useUpdateReviewMutation,
   // Recruitment
   useGetJobsQuery,
+  useGetJobQuery,
   useCreateJobMutation,
   useUpdateJobMutation,
   useGetCandidatesQuery,

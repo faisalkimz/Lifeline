@@ -262,29 +262,28 @@ const JobCard = ({ job }) => {
                     </div>
 
                     <div className="flex flex-col gap-2">
+                        <Link to={`/recruitment/jobs/${job.id}`} className="w-full">
+                            <Button className="w-full" size="sm" variant={job.status === 'draft' ? 'outline' : 'default'}>
+                                View Details
+                            </Button>
+                        </Link>
                         <div className="flex gap-2">
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                className="flex-1"
+                                className="flex-1 text-xs text-gray-500"
                                 onClick={() => setIsEditorOpen(true)}
                             >
-                                <FileText className="h-4 w-4 mr-2" /> Edit Description
+                                <FileText className="h-3 w-3 mr-1" /> Quick Edit
                             </Button>
-                        </div>
-                        <div className="flex gap-2">
-                            {job.status === 'draft' ? (
+                            {job.status === 'draft' && (
                                 <Button
                                     className="flex-1"
                                     size="sm"
                                     onClick={() => setIsPublishOpen(true)}
                                 >
-                                    <Send className="h-4 w-4 mr-2" /> Publish
+                                    <Send className="h-3 w-3 mr-1" /> Publish
                                 </Button>
-                            ) : (
-                                <Link to={`/recruitment/jobs/${job.id}`} className="flex-1">
-                                    <Button className="w-full" size="sm" variant="outline">View Details</Button>
-                                </Link>
                             )}
                         </div>
                     </div>

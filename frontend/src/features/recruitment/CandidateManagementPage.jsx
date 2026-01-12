@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import {
     useGetCandidatesQuery,
     useCreateCandidateMutation,
-    useUpdateCandidateMutation,
     useParseResumeMutation
 } from '../../store/api';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
@@ -13,8 +12,7 @@ import { Badge } from '../../components/ui/Badge';
 import {
     Plus, Search, User, Mail, Phone, MapPin, FileText,
     Eye, Edit, Trash2, Upload, X, Download, Calendar,
-    Award, Briefcase, GraduationCap, Users, Zap, Target,
-    ArrowUpRight, ChevronRight, Loader2, Star
+    Briefcase, Users, Star, ChevronRight, Loader2, ArrowUpRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
@@ -100,7 +98,7 @@ const CandidateManagementPage = () => {
             }
 
             await createCandidate(submitData).unwrap();
-            toast.success('Candidate deployed to registry!');
+            toast.success('Candidate added successfully!');
             setIsAddDialogOpen(false);
             resetForm();
             refetch();
@@ -126,149 +124,155 @@ const CandidateManagementPage = () => {
     const getFullPhotoUrl = (photoPath) => {
         return getMediaUrl(photoPath);
     };
+
+    const statusColors = {
+        applied: 'bg-blue-100 text-blue-700',
+        screening: 'bg-purple-100 text-purple-700',
+        interview: 'bg-orange-100 text-orange-700',
+        offer: 'bg-yellow-100 text-yellow-700',
+        hired: 'bg-green-100 text-green-700',
+        rejected: 'bg-red-100 text-red-700'
+    };
+
     return (
-        <div className="space-y-8 pb-20 animate-fade-in font-sans">
-            {/* Premium Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-slate-100 pb-8">
+        <div className="space-y-6 pb-20 animate-fade-in">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase italic flex items-center gap-3">
-                        <Users className="h-8 w-8 text-primary-600" />
-                        Candidate Management
-                    </h1>
-                    <p className="text-slate-500 mt-1 font-medium italic">Manage your talent pipeline and candidate information.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Candidates</h1>
+                    <p className="text-gray-600 mt-1">Manage your talent pool and applicants</p>
                 </div>
-                <div className="flex gap-3 w-full md:w-auto">
-                    <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="flex-1 md:flex-none rounded-2xl bg-slate-900 shadow-xl shadow-slate-900/20 font-black uppercase text-[10px] tracking-widest px-8 h-14">
-                                <Plus className="h-5 w-5 mr-2" /> Add Candidate
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="rounded-[3rem] border-none shadow-2xl p-0 overflow-hidden max-w-2xl font-sans">
-                            <div className="bg-slate-900 p-10 text-white relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-8 opacity-10">
-                                    <Target className="h-32 w-32 text-white" />
-                                </div>
-                                <DialogHeader>
-                                    <DialogTitle className="text-2xl font-black uppercase tracking-widest italic flex items-center gap-3">
-                                        Add New Candidate
-                                    </DialogTitle>
-                                    <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-2 italic">Automated parsing enabled for PDF/DOCX assets.</p>
-                                </DialogHeader>
-                            </div>
-                            <form onSubmit={handleSubmit} className="p-10 space-y-8 bg-white max-h-[70vh] overflow-y-auto">
-                                {/* Resume Upload / Parse */}
-                                <div className="space-y-4">
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Resume Upload (Auto-Parse)</p>
-                                    <div className={cn(
-                                        "border-2 border-dashed rounded-[2rem] p-10 transition-all group flex flex-col items-center justify-center text-center cursor-pointer",
-                                        formData.resume ? 'border-primary-500 bg-primary-50/20' : 'border-slate-100 bg-slate-50 hover:border-primary-400'
-                                    )}>
-                                        <input
-                                            type="file"
-                                            id="resume-upload"
-                                            className="hidden"
-                                            accept=".pdf,.doc,.docx"
-                                            onChange={handleFileUpload}
-                                        />
-                                        <label htmlFor="resume-upload" className="cursor-pointer space-y-4">
-                                            {isParsing ? (
-                                                <Loader2 className="h-12 w-12 text-primary-600 animate-spin mx-auto" />
-                                            ) : (
-                                                <Upload className={cn("h-12 w-12 mx-auto transition-transform group-hover:-translate-y-2", formData.resume ? 'text-primary-600' : 'text-slate-300')} />
-                                            )}
-                                            <div>
-                                                <p className="text-sm font-black text-slate-900 uppercase italic">
-                                                    {formData.resume ? formData.resume.name : 'Upload Resume File'}
-                                                </p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 italic">
-                                                    PDF, DOCX • MAX 10MB
-                                                </p>
+                <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <Plus className="h-4 w-4 mr-2" /> Add Candidate
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                        <DialogHeader>
+                            <DialogTitle>Add New Candidate</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmit} className="space-y-6 pt-4">
+                            {/* Resume Upload / Parse */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Resume Upload (Auto-fill)</label>
+                                <div className={cn(
+                                    "border-2 border-dashed rounded-lg p-6 transition-all group flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50",
+                                    formData.resume ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                                )}>
+                                    <input
+                                        type="file"
+                                        id="resume-upload"
+                                        className="hidden"
+                                        accept=".pdf,.doc,.docx"
+                                        onChange={handleFileUpload}
+                                    />
+                                    <label htmlFor="resume-upload" className="cursor-pointer space-y-2 w-full">
+                                        {isParsing ? (
+                                            <div className="flex flex-col items-center gap-2">
+                                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+                                                <p className="text-sm text-blue-600">Analyzing resume...</p>
                                             </div>
-                                        </label>
-                                    </div>
+                                        ) : (
+                                            <>
+                                                <Upload className={cn("h-8 w-8 mx-auto", formData.resume ? 'text-blue-600' : 'text-gray-400')} />
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-900">
+                                                        {formData.resume ? formData.resume.name : 'Upload Resume File'}
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 mt-1">
+                                                        PDF, DOCX up to 10MB
+                                                    </p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </label>
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">First Name</label>
-                                        <input
-                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                            value={formData.first_name}
-                                            onChange={e => setFormData({ ...formData, first_name: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Last Name</label>
-                                        <input
-                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                            value={formData.last_name}
-                                            onChange={e => setFormData({ ...formData, last_name: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Email Address</label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">First Name</label>
                                     <input
-                                        type="email"
-                                        className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                        value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        value={formData.first_name}
+                                        onChange={e => setFormData({ ...formData, first_name: e.target.value })}
                                         required
+                                        placeholder="First Name"
                                     />
                                 </div>
-
-                                <div className="grid grid-cols-2 gap-8">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Phone Number</label>
-                                        <input
-                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                            value={formData.phone}
-                                            onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Experience (Years)</label>
-                                        <input
-                                            type="number"
-                                            className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                            value={formData.experience_years}
-                                            onChange={e => setFormData({ ...formData, experience_years: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Skills (Comma Separated)</label>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">Last Name</label>
                                     <input
-                                        className="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none"
-                                        value={formData.skills}
-                                        onChange={e => setFormData({ ...formData, skills: e.target.value })}
-                                        placeholder="e.g. Django, React, Kubernetes"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        value={formData.last_name}
+                                        onChange={e => setFormData({ ...formData, last_name: e.target.value })}
+                                        required
+                                        placeholder="Last Name"
                                     />
                                 </div>
+                            </div>
 
-                                <div className="pt-6 flex gap-4">
-                                    <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="ghost" className="flex-1 h-16 rounded-[2rem] font-black uppercase text-xs tracking-widest text-slate-400">Cancel</Button>
-                                    <Button type="submit" className="flex-[2] h-16 rounded-[2rem] bg-slate-900 font-black uppercase text-xs tracking-widest shadow-2xl shadow-slate-900/20">Add Candidate</Button>
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">Email Address</label>
+                                <input
+                                    type="email"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    value={formData.email}
+                                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                    required
+                                    placeholder="john.doe@example.com"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">Phone</label>
+                                    <input
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        value={formData.phone}
+                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="+1 234 567 890"
+                                    />
                                 </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
-                </div>
+                                <div>
+                                    <label className="text-sm font-medium text-gray-700 mb-1 block">Experience (Years)</label>
+                                    <input
+                                        type="number"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        value={formData.experience_years}
+                                        onChange={e => setFormData({ ...formData, experience_years: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="text-sm font-medium text-gray-700 mb-1 block">Skills (Comma Separated)</label>
+                                <input
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    value={formData.skills}
+                                    onChange={e => setFormData({ ...formData, skills: e.target.value })}
+                                    placeholder="e.g. React, Node.js, Python"
+                                />
+                            </div>
+
+                            <div className="pt-4 flex gap-3">
+                                <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="outline" className="flex-1">Cancel</Button>
+                                <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">Add Candidate</Button>
+                            </div>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
 
-            {/* Tactical Filter Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-6 rounded-[2.5rem] shadow-xl shadow-slate-100 border border-slate-50">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300 group-focus-within:text-primary-500 transition-colors" />
+            {/* Filters */}
+            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 rounded-xl border border-gray-200">
+                <div className="relative flex-1 w-full">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <input
                         type="text"
-                        placeholder="Search candidates by name, email, skills..."
-                        className="w-full h-14 pl-14 pr-6 bg-slate-50 border-none rounded-2xl font-bold focus:ring-4 focus:ring-primary-500/10 transition-all outline-none italic"
+                        placeholder="Search candidates..."
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -277,9 +281,9 @@ const CandidateManagementPage = () => {
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full h-14 px-6 bg-slate-50 border-none rounded-2xl font-black uppercase text-[10px] tracking-widest outline-none focus:ring-4 focus:ring-primary-500/10 transition-all cursor-pointer"
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm"
                     >
-                        <option value="all">Status</option>
+                        <option value="all">All Statuses</option>
                         <option value="applied">Applied</option>
                         <option value="screening">Screening</option>
                         <option value="interview">Interview</option>
@@ -290,88 +294,66 @@ const CandidateManagementPage = () => {
                 </div>
             </div>
 
-            {/* Registry Grid */}
+            {/* Results */}
             {isLoading ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {[1, 2, 3].map(i => <div key={i} className="h-80 bg-slate-50 rounded-[3rem] animate-pulse"></div>)}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-64 bg-gray-100 rounded-xl animate-pulse"></div>)}
                 </div>
             ) : filteredCandidates.length === 0 ? (
-                <Card className="border-none shadow-xl shadow-slate-100 bg-white rounded-[4rem] p-24 text-center">
-                    <div className="inline-flex p-10 bg-slate-50 rounded-full mb-8">
-                        <Users className="h-16 w-16 text-slate-200" />
-                    </div>
-                    <h4 className="text-3xl font-black text-slate-900 uppercase italic mb-3 tracking-tighter">No Results</h4>
-                    <p className="text-slate-400 font-bold text-xs uppercase tracking-widest max-w-sm mx-auto leading-loose italic">
-                        No candidates found matching your current search parameters.
-                    </p>
-                </Card>
+                <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
+                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Candidates Found</h3>
+                    <p className="text-gray-500">Try adjusting your search or filters</p>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredCandidates.map((candidate) => (
-                        <Card key={candidate.id} className="border-none shadow-2xl shadow-slate-200/40 rounded-[3rem] overflow-hidden group hover:-translate-y-2 transition-all duration-500 bg-white">
-                            <CardContent className="p-0">
-                                <div className="p-10 space-y-6">
-                                    <div className="flex justify-between items-start">
-                                        <div className="h-20 w-20 rounded-[1.8rem] bg-slate-900 p-0.5 shadow-xl shadow-slate-900/10">
-                                            <div className="h-full w-full rounded-[1.7rem] bg-slate-800 overflow-hidden flex items-center justify-center">
-                                                {candidate.photo ? (
-                                                    <img src={getFullPhotoUrl(candidate.photo)} alt={candidate.full_name} className="h-full w-full object-cover" />
-                                                ) : (
-                                                    <span className="text-white font-black italic text-xl">{candidate.first_name[0]}{candidate.last_name[0]}</span>
-                                                )}
-                                            </div>
+                        <Card key={candidate.id} className="group hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+                            <CardContent className="p-6">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
+                                            {candidate.photo ? (
+                                                <img src={getFullPhotoUrl(candidate.photo)} alt={candidate.full_name} className="h-full w-full object-cover" />
+                                            ) : (
+                                                <span className="text-lg font-bold text-gray-500">{candidate.first_name[0]}{candidate.last_name[0]}</span>
+                                            )}
                                         </div>
-                                        <Badge className={cn(
-                                            "rounded-xl px-4 py-1.5 font-black text-[9px] uppercase tracking-widest border-none shadow-sm",
-                                            candidate.status === 'hired' ? 'bg-emerald-500 text-white' :
-                                                candidate.status === 'rejected' ? 'bg-rose-500 text-white' :
-                                                    candidate.status === 'applied' ? 'bg-slate-100 text-slate-500' : 'bg-amber-500 text-white'
-                                        )}>
+                                        <div>
+                                            <h3 className="font-semibold text-gray-900 line-clamp-1">{candidate.first_name} {candidate.last_name}</h3>
+                                            <p className="text-xs text-gray-500 truncate max-w-[150px]">{candidate.current_position || 'Candidate'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <Badge className={cn("capitalize border-0", statusColors[candidate.status] || 'bg-gray-100 text-gray-700')}>
                                             {candidate.status}
                                         </Badge>
+                                        {candidate.experience_years && (
+                                            <span className="text-xs text-gray-500 font-medium">{candidate.experience_years}y Exp</span>
+                                        )}
                                     </div>
 
-                                    <div className="space-y-1">
-                                        <h3 className="text-xl font-black text-slate-900 italic tracking-tighter uppercase whitespace-nowrap overflow-hidden text-ellipsis">
-                                            {candidate.first_name} {candidate.last_name}
-                                        </h3>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                            {candidate.current_position || 'Senior Professional'}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        {candidate.skills?.slice(0, 3).map((skill, idx) => (
-                                            <span key={idx} className="bg-slate-50 text-slate-500 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors">
+                                    <div className="flex flex-wrap gap-1.5 h-14 overflow-hidden content-start">
+                                        {candidate.skills?.slice(0, 4).map((skill, idx) => (
+                                            <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded border border-gray-100">
                                                 {skill}
                                             </span>
                                         ))}
+                                        {candidate.skills?.length > 4 && (
+                                            <span className="px-2 py-1 text-xs text-gray-400">+{candidate.skills.length - 4}</span>
+                                        )}
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-50">
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-tighter flex items-center gap-1">
-                                                <Zap className="h-3 w-3" /> Experience
-                                            </p>
-                                            <p className="text-xs font-black text-slate-900 italic">{candidate.experience_years} years</p>
-                                        </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[9px] font-black uppercase text-slate-400 tracking-tighter flex items-center gap-1">
-                                                <Star className="h-3 w-3" /> Match Score
-                                            </p>
-                                            <p className="text-xs font-black text-primary-600 italic">88% (AI)</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-6 flex gap-3">
+                                    <div className="pt-4 border-t border-gray-100 flex gap-2">
                                         <Button
+                                            variant="outline"
+                                            className="w-full text-xs"
                                             onClick={() => handleViewProfile(candidate)}
-                                            className="flex-1 rounded-2xl bg-slate-900 text-white font-black uppercase text-[10px] tracking-widest h-14 group/btn"
                                         >
-                                            View Profile <ChevronRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                                        </Button>
-                                        <Button variant="ghost" className="h-14 w-14 rounded-2xl bg-slate-50 hover:bg-slate-100 p-0 text-slate-400">
-                                            <Edit className="h-5 w-5" />
+                                            View Profile
                                         </Button>
                                     </div>
                                 </div>
@@ -381,7 +363,6 @@ const CandidateManagementPage = () => {
                 </div>
             )}
 
-            {/* Candidate Details Drawer */}
             <CandidateProfileDrawer
                 candidate={selectedCandidate}
                 open={isDrawerOpen}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation, useGetEmployeeStatsQuery } from '../store/api';
@@ -268,10 +269,11 @@ const DashboardLayout = () => {
 
             <div className="h-6 w-px bg-slate-200 mx-2"></div>
 
-            <button className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">
-              <HelpCircle className="h-5 w-5" />
-            </button>
-            <button className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">
+            <button
+              onClick={() => toast("Help center coming soon!", { icon: '👋' })}
+              className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+              title="Help & Support"
+            >
               <HelpCircle className="h-5 w-5" />
             </button>
             <NotificationsPopover />

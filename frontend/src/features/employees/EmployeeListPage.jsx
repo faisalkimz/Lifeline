@@ -19,7 +19,7 @@ import BulkEmployeeUpload from './BulkEmployeeUpload';
 
 const StatusBadge = ({ status }) => {
     const config = {
-        active: { color: "text-emerald-700 bg-emerald-50 border-emerald-200", icon: CheckCircle, label: "Active" },
+        active: { color: "text-primary-700 bg-primary-50 border-primary-200", icon: CheckCircle, label: "Active" },
         on_leave: { color: "text-amber-700 bg-amber-50 border-amber-200", icon: Clock, label: "On Leave" },
         terminated: { color: "text-rose-700 bg-rose-50 border-rose-200", icon: XCircle, label: "Terminated" },
         resigned: { color: "text-slate-700 bg-slate-100 border-slate-200", icon: LogOut, label: "Resigned" },
@@ -71,14 +71,14 @@ const EmployeeListPage = () => {
                     <Button
                         variant="outline"
                         onClick={() => setIsBulkUploadOpen(true)}
-                        className="bg-white"
+                        className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                     >
                         <Upload className="h-4 w-4 mr-2" />
                         Bulk Upload
                     </Button>
                     <Button
                         onClick={() => navigate('/employees/new')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                        className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm shadow-primary-200"
                     >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Employee
@@ -92,7 +92,7 @@ const EmployeeListPage = () => {
                     title="Total Team"
                     value={stats?.total || 0}
                     icon={Users}
-                    color="bg-blue-500"
+                    color="bg-primary-500"
                     trend="+12% growth"
                 />
                 <StatCard
@@ -125,14 +125,14 @@ const EmployeeListPage = () => {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search by name, email, or department..."
-                            className="pl-10 h-10 border-gray-200 bg-gray-50 focus:bg-white transition-colors"
+                            className="pl-10 h-10 border-gray-200 bg-gray-50 focus:bg-white transition-colors focus:ring-primary-500 focus:border-primary-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex gap-3">
                         <select
-                            className="h-10 px-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-blue-500 outline-none transition-all text-sm font-medium text-gray-700 cursor-pointer hover:border-gray-300"
+                            className="h-10 px-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary-500 outline-none transition-all text-sm font-medium text-gray-700 cursor-pointer hover:border-gray-300"
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
                         >
@@ -145,7 +145,7 @@ const EmployeeListPage = () => {
                         </select>
                         <Button
                             variant="outline"
-                            className="h-10 border-gray-200 text-gray-700"
+                            className="h-10 border-gray-200 text-gray-700 hover:bg-gray-50"
                         >
                             <Filter className="h-4 w-4 mr-2" />
                             Filters
@@ -157,7 +157,7 @@ const EmployeeListPage = () => {
             {/* Content Area */}
             {isLoading ? (
                 <div className="py-20 flex flex-col items-center justify-center text-gray-400">
-                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
+                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent mb-4"></div>
                     <p className="font-medium text-gray-500">Loading your team...</p>
                 </div>
             ) : employees.length === 0 ? (
@@ -176,7 +176,7 @@ const EmployeeListPage = () => {
                             Clear Filters
                         </Button>
                     ) : (
-                        <Button onClick={() => navigate('/employees/new')} className="bg-blue-600 text-white shadow-sm">
+                        <Button onClick={() => navigate('/employees/new')} className="bg-primary-600 text-white shadow-sm hover:bg-primary-700">
                             <Plus className="h-4 w-4 mr-2" />
                             Add First Employee
                         </Button>
@@ -184,17 +184,17 @@ const EmployeeListPage = () => {
                 </div>
             ) : (
                 <>
-                    {/* Mobile Card View */}
+                    {/* Mobile Card View - Enhanced with Icons */}
                     <div className="md:hidden space-y-4">
                         {employees.map((employee) => (
                             <Card
                                 key={employee.id}
-                                className="border border-gray-100 shadow-sm transition-shadow cursor-pointer active:scale-[0.98]"
+                                className="border border-gray-100 shadow-sm transition-shadow cursor-pointer active:scale-[0.98] group"
                                 onClick={() => navigate(`/employees/${employee.id}/edit`)}
                             >
                                 <CardContent className="p-4">
                                     <div className="flex items-start gap-4">
-                                        <div className="relative h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0">
+                                        <div className="relative h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0 border border-gray-200">
                                             {employee.photo ? (
                                                 <img
                                                     src={getImageUrl(employee.photo)}
@@ -207,12 +207,26 @@ const EmployeeListPage = () => {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-start justify-between mb-1">
-                                                <h3 className="font-semibold text-gray-900 truncate pr-2 text-sm">{employee.full_name}</h3>
+                                                <h3 className="font-semibold text-gray-900 truncate pr-2 text-sm group-hover:text-primary-600 transition-colors">{employee.full_name}</h3>
                                                 <StatusBadge status={employee.employment_status} />
                                             </div>
-                                            <p className="text-xs text-gray-500 truncate mb-2">{employee.job_title}</p>
-                                            <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                                                <Building2 className="h-3 w-3" /> {employee.department_name || 'No Dept'}
+                                            <p className="text-xs text-gray-500 truncate mb-3 font-medium">{employee.job_title}</p>
+
+                                            <div className="space-y-1.5 border-t border-gray-50 pt-2">
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Building2 className="h-3.5 w-3.5 text-gray-400" />
+                                                    <span className="truncate">{employee.department_name || 'No Dept'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                                    <span className="truncate">{employee.email}</span>
+                                                </div>
+                                                {employee.phone && (
+                                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                                        <span className="truncate">{employee.phone}</span>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -256,7 +270,7 @@ const EmployeeListPage = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm">{employee.full_name}</div>
+                                                    <div className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors text-sm">{employee.full_name}</div>
                                                     <div className="text-xs text-gray-500 font-mono">{employee.employee_number}</div>
                                                 </div>
                                             </div>
@@ -298,7 +312,7 @@ const EmployeeListPage = () => {
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 hover:text-primary-600"
                                             >
                                                 Edit
                                             </Button>

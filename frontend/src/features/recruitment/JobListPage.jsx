@@ -9,7 +9,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
 import {
-    Plus, Briefcase, MapPin, Search, Send, FileText, Clock, Loader2
+    Plus, Briefcase, MapPin, Search, Send, FileText, Clock, Loader2, Eye
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -306,8 +306,8 @@ const JobCard = ({ job }) => {
 
                 <div className="p-4 border-t border-gray-100 bg-gray-50/50 rounded-b-xl flex gap-2">
                     <Link to={`/recruitment/jobs/${job.id}`} className="flex-1">
-                        <Button className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm" size="sm">
-                            Details
+                        <Button className="w-full bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 shadow-sm group/btn" size="sm">
+                            <Eye className="h-4 w-4 mr-2 text-gray-400 group-hover/btn:text-primary-600 transition-colors" /> View Details
                         </Button>
                     </Link>
 

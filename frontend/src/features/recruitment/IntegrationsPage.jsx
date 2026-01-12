@@ -35,8 +35,8 @@ const IntegrationsPage = () => {
             id: 'linkedin',
             name: 'LinkedIn',
             icon: Linkedin,
-            color: 'text-blue-600',
-            bgColor: 'bg-blue-50',
+            color: 'text-primary-600',
+            bgColor: 'bg-primary-50',
             description: 'Professional networking platform',
             features: ['Auto-post jobs', 'Candidate insights', 'Analytics']
         },
@@ -44,8 +44,8 @@ const IntegrationsPage = () => {
             id: 'indeed',
             name: 'Indeed',
             icon: Briefcase,
-            color: 'text-blue-500',
-            bgColor: 'bg-blue-50',
+            color: 'text-primary-500',
+            bgColor: 'bg-primary-50',
             description: 'Leading job search engine',
             features: ['High traffic', 'Resume database', 'Sponsored posts']
         },
@@ -128,8 +128,8 @@ const IntegrationsPage = () => {
                                 <p className="text-sm font-medium text-gray-500">Connected Platforms</p>
                                 <p className="text-2xl font-bold text-gray-900">{connectedPlatforms}/{totalPlatforms}</p>
                             </div>
-                            <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <Zap className="h-5 w-5 text-blue-600" />
+                            <div className="h-10 w-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                                <Zap className="h-5 w-5 text-primary-600" />
                             </div>
                         </div>
                         <div className="mt-4 space-y-2">
@@ -139,7 +139,7 @@ const IntegrationsPage = () => {
                             </div>
                             <div className="bg-gray-100 rounded-full h-1.5 overflow-hidden">
                                 <div
-                                    className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                                    className="bg-primary-600 h-full rounded-full transition-all duration-300"
                                     style={{ width: `${(connectedPlatforms / totalPlatforms) * 100}%` }}
                                 />
                             </div>
@@ -184,7 +184,7 @@ const IntegrationsPage = () => {
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm">
+                    <Button className="bg-primary-600 hover:bg-primary-700 shadow-sm">
                         <Zap className="h-4 w-4 mr-2" /> Connect New Platform
                     </Button>
                 </DialogTrigger>
@@ -196,7 +196,7 @@ const IntegrationsPage = () => {
                         <div>
                             <label className="block text-sm font-medium mb-1 text-gray-700">Platform</label>
                             <select
-                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none bg-white"
                                 value={selectedPlatform}
                                 onChange={e => setSelectedPlatform(e.target.value)}
                             >
@@ -208,7 +208,7 @@ const IntegrationsPage = () => {
                         <div>
                             <label className="block text-sm font-medium mb-1 text-gray-700">API Key / Client ID</label>
                             <input
-                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                 type="password"
                                 value={formData.client_id}
                                 onChange={e => setFormData({ ...formData, client_id: e.target.value })}
@@ -218,14 +218,14 @@ const IntegrationsPage = () => {
                         <div>
                             <label className="block text-sm font-medium mb-1 text-gray-700">Client Secret (if applicable)</label>
                             <input
-                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                 type="password"
                                 value={formData.client_secret}
                                 onChange={e => setFormData({ ...formData, client_secret: e.target.value })}
                             />
                         </div>
                         <div className="pt-2">
-                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">Save Connection</Button>
+                            <Button type="submit" className="w-full bg-primary-600 hover:bg-primary-700">Save Connection</Button>
                         </div>
                     </form>
                 </DialogContent>
@@ -304,7 +304,7 @@ const IntegrationsPage = () => {
                                                     setSelectedPlatform(platform.id);
                                                     setIsDialogOpen(true);
                                                 }}
-                                                className="w-full text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
+                                                className="w-full text-gray-600 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50"
                                             >
                                                 <Zap className="h-4 w-4 mr-2" />
                                                 Connect

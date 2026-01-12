@@ -77,7 +77,7 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                     <div>
                         <h2 className="text-xl font-bold text-gray-900">Edit Job Description</h2>
                         <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{job?.title}</span>
+                            <span className="text-sm font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded">{job?.title}</span>
                             <span className="text-sm text-gray-400">•</span>
                             <span className="text-sm text-gray-500">{job?.department_name || 'No Department'}</span>
                         </div>
@@ -106,7 +106,7 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                         {/* Scheduled Publishing Section */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-2 text-gray-900 font-bold text-sm">
-                                <Calendar className="h-4 w-4 text-blue-600" />
+                                <Calendar className="h-4 w-4 text-primary-600" />
                                 Publishing Schedule
                             </div>
                             <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
@@ -122,7 +122,7 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                                             value={publishDate}
                                             onChange={(e) => setPublishDate(e.target.value)}
                                             min={new Date().toISOString().split('T')[0]}
-                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                                         />
                                     </div>
 
@@ -134,14 +134,14 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                                                 type="time"
                                                 value={publishTime}
                                                 onChange={(e) => setPublishTime(e.target.value)}
-                                                className="w-full h-10 pl-10 pr-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                                className="w-full h-10 pl-10 pr-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 {publishDate && publishTime && (
-                                    <div className="flex gap-2 p-3 bg-blue-50 text-blue-700 text-xs rounded-lg border border-blue-100 items-start">
+                                    <div className="flex gap-2 p-3 bg-primary-50 text-primary-700 text-xs rounded-lg border border-primary-100 items-start">
                                         <CheckCircle className="h-4 w-4 shrink-0 mt-0.5" />
                                         <span>
                                             Scheduled for <strong>{new Date(`${publishDate}T${publishTime}`).toLocaleDateString()}</strong> at <strong>{new Date(`${publishDate}T${publishTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
@@ -154,7 +154,7 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                         <div className="mt-auto pt-6 border-t border-gray-200">
                             <div className="grid gap-3">
                                 <Button
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 h-11"
+                                    className="w-full bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-600/20 h-11"
                                     onClick={handleSave}
                                     disabled={isSaving}
                                 >

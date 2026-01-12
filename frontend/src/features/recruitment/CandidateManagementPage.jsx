@@ -126,7 +126,7 @@ const CandidateManagementPage = () => {
     };
 
     const statusColors = {
-        applied: 'bg-blue-100 text-blue-700',
+        applied: 'bg-primary-100 text-primary-700',
         screening: 'bg-purple-100 text-purple-700',
         interview: 'bg-orange-100 text-orange-700',
         offer: 'bg-yellow-100 text-yellow-700',
@@ -157,8 +157,8 @@ const CandidateManagementPage = () => {
                             <div className="space-y-2">
                                 <label className="text-sm font-medium text-gray-700">Resume Upload (Auto-fill)</label>
                                 <div className={cn(
-                                    "border-2 border-dashed rounded-lg p-6 transition-all group flex flex-col items-center justify-center text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50",
-                                    formData.resume ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-gray-50'
+                                    "border-2 border-dashed rounded-lg p-6 transition-all group flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary-400 hover:bg-primary-50",
+                                    formData.resume ? 'border-primary-500 bg-primary-50' : 'border-gray-200 bg-gray-50'
                                 )}>
                                     <input
                                         type="file"
@@ -170,12 +170,12 @@ const CandidateManagementPage = () => {
                                     <label htmlFor="resume-upload" className="cursor-pointer space-y-2 w-full">
                                         {isParsing ? (
                                             <div className="flex flex-col items-center gap-2">
-                                                <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
-                                                <p className="text-sm text-blue-600">Analyzing resume...</p>
+                                                <Loader2 className="h-8 w-8 text-primary-600 animate-spin" />
+                                                <p className="text-sm text-primary-600">Analyzing resume...</p>
                                             </div>
                                         ) : (
                                             <>
-                                                <Upload className={cn("h-8 w-8 mx-auto", formData.resume ? 'text-blue-600' : 'text-gray-400')} />
+                                                <Upload className={cn("h-8 w-8 mx-auto", formData.resume ? 'text-primary-600' : 'text-gray-400')} />
                                                 <div>
                                                     <p className="text-sm font-semibold text-gray-900">
                                                         {formData.resume ? formData.resume.name : 'Upload Resume File'}
@@ -194,7 +194,7 @@ const CandidateManagementPage = () => {
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 mb-1 block">First Name</label>
                                     <input
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                         value={formData.first_name}
                                         onChange={e => setFormData({ ...formData, first_name: e.target.value })}
                                         required
@@ -204,7 +204,7 @@ const CandidateManagementPage = () => {
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 mb-1 block">Last Name</label>
                                     <input
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                         value={formData.last_name}
                                         onChange={e => setFormData({ ...formData, last_name: e.target.value })}
                                         required
@@ -217,7 +217,7 @@ const CandidateManagementPage = () => {
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">Email Address</label>
                                 <input
                                     type="email"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                                     required
@@ -229,7 +229,7 @@ const CandidateManagementPage = () => {
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 mb-1 block">Phone</label>
                                     <input
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                         value={formData.phone}
                                         onChange={e => setFormData({ ...formData, phone: e.target.value })}
                                         placeholder="+1 234 567 890"
@@ -239,7 +239,7 @@ const CandidateManagementPage = () => {
                                     <label className="text-sm font-medium text-gray-700 mb-1 block">Experience (Years)</label>
                                     <input
                                         type="number"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                         value={formData.experience_years}
                                         onChange={e => setFormData({ ...formData, experience_years: e.target.value })}
                                     />
@@ -249,7 +249,7 @@ const CandidateManagementPage = () => {
                             <div>
                                 <label className="text-sm font-medium text-gray-700 mb-1 block">Skills (Comma Separated)</label>
                                 <input
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                                     value={formData.skills}
                                     onChange={e => setFormData({ ...formData, skills: e.target.value })}
                                     placeholder="e.g. React, Node.js, Python"
@@ -258,7 +258,7 @@ const CandidateManagementPage = () => {
 
                             <div className="pt-4 flex gap-3">
                                 <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="outline" className="flex-1">Cancel</Button>
-                                <Button type="submit" className="flex-1 bg-blue-600 hover:bg-blue-700">Add Candidate</Button>
+                                <Button type="submit" className="flex-1 bg-primary-600 hover:bg-primary-700">Add Candidate</Button>
                             </div>
                         </form>
                     </DialogContent>
@@ -272,7 +272,7 @@ const CandidateManagementPage = () => {
                     <input
                         type="text"
                         placeholder="Search candidates..."
-                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -281,7 +281,7 @@ const CandidateManagementPage = () => {
                     <select
                         value={selectedStatus}
                         onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer text-sm"
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-primary-500 cursor-pointer text-sm"
                     >
                         <option value="all">All Statuses</option>
                         <option value="applied">Applied</option>

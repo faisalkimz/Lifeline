@@ -75,7 +75,7 @@ const PipelinePage = () => {
 
     const getStageColor = (stageId) => {
         const colorMap = {
-            blue: 'bg-blue-100 text-blue-700 border-blue-200',
+            blue: 'bg-primary-100 text-primary-700 border-primary-200',
             orange: 'bg-orange-100 text-orange-700 border-orange-200',
             purple: 'bg-purple-100 text-purple-700 border-purple-200',
             green: 'bg-green-100 text-green-700 border-green-200',
@@ -110,7 +110,7 @@ const PipelinePage = () => {
                             <Filter className="h-4 w-4 mr-2" />
                             Filters
                         </Button>
-                        <Button className="bg-blue-600 hover:bg-blue-700">
+                        <Button className="bg-primary-600 hover:bg-primary-700">
                             <TrendingUp className="h-4 w-4 mr-2" />
                             Analytics
                         </Button>
@@ -123,8 +123,8 @@ const PipelinePage = () => {
                 <StatCard
                     title="Total Applications"
                     value={totalCandidates}
-                    icon={<Users className="h-5 w-5 text-blue-600" />}
-                    color="bg-blue-50"
+                    icon={<Users className="h-5 w-5 text-primary-600" />}
+                    color="bg-primary-50"
                 />
                 <StatCard
                     title="Active Candidates"
@@ -149,7 +149,7 @@ const PipelinePage = () => {
             {/* Kanban Board */}
             {isLoading ? (
                 <div className="flex justify-center items-center py-20">
-                    <div className="h-12 w-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin"></div>
+                    <div className="h-12 w-12 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin"></div>
                 </div>
             ) : (
                 <DragDropContext onDragEnd={onDragEnd}>
@@ -179,7 +179,7 @@ const PipelinePage = () => {
                                                 className={cn(
                                                     "flex-1 min-h-[500px] rounded-xl border-2 border-dashed transition-all p-3 space-y-3",
                                                     snapshot.isDraggingOver
-                                                        ? 'border-blue-400 bg-blue-50'
+                                                        ? 'border-primary-400 bg-primary-50'
                                                         : 'border-gray-200 bg-gray-50'
                                                 )}
                                             >
@@ -209,7 +209,7 @@ const PipelinePage = () => {
                                                                         {/* Candidate Header */}
                                                                         <div className="flex items-start justify-between">
                                                                             <div className="flex items-center gap-3">
-                                                                                <div className="h-10 w-10 rounded-lg bg-blue-100 overflow-hidden">
+                                                                                <div className="h-10 w-10 rounded-lg bg-primary-100 overflow-hidden">
                                                                                     {application.candidate?.photo ? (
                                                                                         <img
                                                                                             src={getMediaUrl(application.candidate.photo)}
@@ -218,7 +218,7 @@ const PipelinePage = () => {
                                                                                             onError={(e) => { e.target.style.display = 'none'; }}
                                                                                         />
                                                                                     ) : (
-                                                                                        <div className="h-full w-full flex items-center justify-center text-blue-600 font-semibold text-sm">
+                                                                                        <div className="h-full w-full flex items-center justify-center text-primary-600 font-semibold text-sm">
                                                                                             {application.candidate?.first_name?.[0]}{application.candidate?.last_name?.[0]}
                                                                                         </div>
                                                                                     )}
@@ -267,7 +267,7 @@ const PipelinePage = () => {
                                                                                 <Button
                                                                                     variant="ghost"
                                                                                     size="sm"
-                                                                                    className="h-7 w-7 p-0 hover:bg-blue-100"
+                                                                                    className="h-7 w-7 p-0 hover:bg-primary-100"
                                                                                     onClick={() => handleViewDetails(application.candidate)}
                                                                                 >
                                                                                     <Eye className="h-4 w-4" />

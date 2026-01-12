@@ -52,7 +52,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-xl bg-white shadow-xl border border-gray-100">
                 <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                    <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
                         <FileText className="h-5 w-5" />
                     </div>
                     <div>
@@ -103,7 +103,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-gray-700">Letter Content</label>
                                 <textarea
-                                    className="w-full h-48 p-4 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-shadow"
+                                    className="w-full h-48 p-4 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-shadow"
                                     value={offerData.content}
                                     onChange={e => setOfferData({ ...offerData, content: e.target.value })}
                                 />
@@ -126,7 +126,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                             <Button
                                 onClick={handleGeneratePdf}
                                 disabled={isGenerating}
-                                className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold shadow-lg shadow-blue-200"
+                                className="h-12 px-8 bg-primary-600 hover:bg-primary-700 rounded-lg font-semibold shadow-lg shadow-blue-200"
                             >
                                 {isGenerating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Download className="h-5 w-5 mr-2" />}
                                 Download Offer PDF
@@ -143,7 +143,7 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                         <Button
                             onClick={handleCreate}
                             disabled={isCreating}
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 px-6"
+                            className="bg-primary-600 hover:bg-primary-700 text-white font-semibold h-11 px-6"
                         >
                             {isCreating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
                             Create Offer

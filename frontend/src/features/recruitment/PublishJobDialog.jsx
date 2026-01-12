@@ -131,9 +131,9 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
                 <div className="space-y-6 pt-4">
                     {/* Scheduled Publishing */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <div className="bg-primary-50 border border-primary-200 rounded-lg p-6">
                         <div className="flex items-center gap-2 mb-4">
-                            <Calendar className="h-5 w-5 text-blue-600" />
+                            <Calendar className="h-5 w-5 text-primary-600" />
                             <h3 className="font-semibold text-gray-900">Schedule Publishing</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-4">
@@ -149,7 +149,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                     value={publishDate}
                                     onChange={(e) => setPublishDate(e.target.value)}
                                     min={new Date().toISOString().split('T')[0]}
-                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 />
                             </div>
                             <div>
@@ -160,13 +160,13 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                     type="time"
                                     value={publishTime}
                                     onChange={(e) => setPublishTime(e.target.value)}
-                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                 />
                             </div>
                         </div>
                         {publishDate && publishTime && (
-                            <div className="mt-4 p-3 bg-white border border-blue-200 rounded-lg">
-                                <div className="flex items-center gap-2 text-sm text-blue-700">
+                            <div className="mt-4 p-3 bg-white border border-primary-200 rounded-lg">
+                                <div className="flex items-center gap-2 text-sm text-primary-700">
                                     <Clock className="h-4 w-4" />
                                     <span>
                                         Will publish on {new Date(`${publishDate}T${publishTime}`).toLocaleString()}
@@ -203,7 +203,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                     className={`
                                         relative p-4 rounded-lg border-2 transition-all cursor-pointer
                                         ${isSelected
-                                            ? 'border-blue-500 bg-blue-50'
+                                            ? 'border-primary-500 bg-primary-50'
                                             : 'border-gray-200 hover:border-gray-300'
                                         }
                                         ${!isActive && 'opacity-50 cursor-not-allowed'}
@@ -212,7 +212,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                     {/* Selection Checkbox */}
                                     <div className="absolute top-3 right-3">
                                         {isSelected ? (
-                                            <div className="h-5 w-5 bg-blue-600 rounded-full flex items-center justify-center">
+                                            <div className="h-5 w-5 bg-primary-600 rounded-full flex items-center justify-center">
                                                 <CheckCircle className="h-4 w-4 text-white" />
                                             </div>
                                         ) : (
@@ -254,7 +254,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                     {publishResults && (
                         <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
                             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-blue-600" />
+                                <Activity className="h-5 w-5 text-primary-600" />
                                 Publishing Results
                             </h3>
                             {Object.entries(publishResults.platforms).map(([platform, result]) => (
@@ -275,7 +275,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                                     href={result.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                                    className="text-xs text-primary-600 hover:underline flex items-center gap-1"
                                                 >
                                                     View on {platform}
                                                     <ExternalLink className="h-3 w-3" />
@@ -305,7 +305,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                             <Button
                                 onClick={handlePublish}
                                 disabled={publishing || (selectedPlatforms.length === 0 && !publishDate)}
-                                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                                className="flex-1 bg-primary-600 hover:bg-primary-700"
                             >
                                 {publishing ? (
                                     <>

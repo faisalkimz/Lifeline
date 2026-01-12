@@ -35,7 +35,7 @@ const JobDetailsPage = () => {
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-[50vh]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             </div>
         );
     }
@@ -135,8 +135,8 @@ const JobDetailsPage = () => {
                             <CardTitle className="text-sm uppercase tracking-wide text-gray-500 font-bold">Overview</CardTitle>
                         </CardHeader>
                         <CardContent className="grid grid-cols-2 gap-4">
-                            <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                                <p className="text-xs text-blue-600 font-semibold uppercase">Applicants</p>
+                            <div className="p-4 bg-primary-50 rounded-xl border border-primary-100">
+                                <p className="text-xs text-primary-600 font-semibold uppercase">Applicants</p>
                                 <p className="text-2xl font-bold text-gray-900 mt-1">{job.application_count || 0}</p>
                             </div>
                             <div className="p-4 bg-purple-50 rounded-xl border border-purple-100">

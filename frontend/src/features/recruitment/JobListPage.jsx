@@ -88,7 +88,7 @@ const JobListPage = () => {
                     </Link>
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+                            <Button className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
                                 <Plus className="h-4 w-4 mr-2" /> Create Job
                             </Button>
                         </DialogTrigger>
@@ -116,7 +116,7 @@ const JobListPage = () => {
                                         <label className="text-sm font-medium text-gray-700">Employment Type</label>
                                         <div className="relative">
                                             <select
-                                                className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
+                                                className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
                                                 name="employment_type"
                                                 value={formData.employment_type}
                                                 onChange={handleInputChange}
@@ -149,7 +149,7 @@ const JobListPage = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium text-gray-700">Description</label>
                                     <textarea
-                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow resize-none"
+                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
                                         rows="4"
                                         name="description"
                                         value={formData.description}
@@ -163,7 +163,7 @@ const JobListPage = () => {
                                 <div className="space-y-1.5">
                                     <label className="text-sm font-medium text-gray-700">Key Requirements</label>
                                     <textarea
-                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow resize-none"
+                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
                                         rows="3"
                                         name="requirements"
                                         value={formData.requirements}
@@ -179,7 +179,7 @@ const JobListPage = () => {
                                         <input
                                             type="checkbox"
                                             id="is_remote"
-                                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                            className="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
                                             checked={formData.is_remote}
                                             onChange={e => setFormData({ ...formData, is_remote: e.target.checked })}
                                         />
@@ -193,7 +193,7 @@ const JobListPage = () => {
                                     <Button type="button" onClick={() => setIsDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900 font-medium">
                                         Cancel
                                     </Button>
-                                    <Button type="submit" disabled={isCreating} className="bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md shadow-blue-200">
+                                    <Button type="submit" disabled={isCreating} className="bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-md shadow-blue-200">
                                         {isCreating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                                         Create Job
                                     </Button>
@@ -212,7 +212,7 @@ const JobListPage = () => {
                         <input
                             type="text"
                             placeholder="Search jobs by title, location, or department..."
-                            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-sm"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -223,7 +223,7 @@ const JobListPage = () => {
             {/* Jobs Grid */}
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-4" />
+                    <Loader2 className="h-8 w-8 text-primary-500 animate-spin mb-4" />
                     <p className="text-gray-500">Loading jobs...</p>
                 </div>
             ) : filteredJobs?.length === 0 ? (
@@ -233,7 +233,7 @@ const JobListPage = () => {
                     </div>
                     <h3 className="text-lg font-bold text-gray-900 mb-2">No jobs found</h3>
                     <p className="text-gray-500 mb-6 max-w-sm mx-auto">Create your first job posting to start attracting top talent to your organization.</p>
-                    <Button onClick={() => setIsDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={() => setIsDialogOpen(true)} className="bg-primary-600 hover:bg-primary-700">
                         <Plus className="h-4 w-4 mr-2" /> Create Job
                     </Button>
                 </Card>
@@ -263,7 +263,7 @@ const JobCard = ({ job }) => {
             <div className="bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200 flex flex-col h-full group">
                 <div className="p-6 flex-1">
                     <div className="flex items-start justify-between mb-4">
-                        <div className="h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                        <div className="h-10 w-10 bg-primary-50 rounded-lg flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform">
                             <Briefcase className="h-5 w-5" />
                         </div>
                         <Badge className={`${statusColors[job.status]} border font-medium capitalize px-2.5 py-0.5`}>
@@ -271,14 +271,14 @@ const JobCard = ({ job }) => {
                         </Badge>
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">{job.title}</h3>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-primary-600 transition-colors">{job.title}</h3>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-5">
                         <div className="flex items-center gap-1">
                             <MapPin className="h-3.5 w-3.5" />
                             <span className="truncate max-w-[100px]">{job.location}</span>
                         </div>
                         {job.is_remote && (
-                            <span className="flex items-center gap-1 text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-medium">
+                            <span className="flex items-center gap-1 text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full text-xs font-medium">
                                 Remote
                             </span>
                         )}
@@ -293,7 +293,7 @@ const JobCard = ({ job }) => {
                             <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Status</p>
                             <p className="text-sm font-semibold text-gray-900 mt-1 truncate">
                                 {job.status === 'draft' && job.scheduled_publish_date ? (
-                                    <span className="flex items-center gap-1 text-blue-600">
+                                    <span className="flex items-center gap-1 text-primary-600">
                                         <Clock className="h-3.5 w-3.5" /> Scheduled
                                     </span>
                                 ) : (
@@ -313,7 +313,7 @@ const JobCard = ({ job }) => {
 
                     {job.status === 'draft' ? (
                         <Button
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white shadow-sm shadow-blue-200"
+                            className="flex-1 bg-primary-600 hover:bg-primary-700 text-white shadow-sm shadow-blue-200"
                             size="sm"
                             onClick={() => setIsPublishOpen(true)}
                         >

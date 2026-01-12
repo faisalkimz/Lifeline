@@ -26,7 +26,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
   };
 
   const statusColors = {
-    new: 'bg-blue-100 text-blue-700',
+    new: 'bg-primary-100 text-primary-700',
     screening: 'bg-purple-100 text-purple-700',
     interview: 'bg-orange-100 text-orange-700',
     offer: 'bg-yellow-100 text-yellow-700',
@@ -99,7 +99,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           {/* Skills */}
           <div>
             <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <Star className="h-4 w-4 text-blue-600" /> Skills
+              <Star className="h-4 w-4 text-primary-600" /> Skills
             </h3>
             <div className="flex flex-wrap gap-2">
               {candidate.skills?.map((skill, idx) => (
@@ -115,11 +115,11 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-blue-600" /> Experience
+                <Briefcase className="h-4 w-4 text-primary-600" /> Experience
               </h3>
               <div className="pl-4 border-l-2 border-gray-100 space-y-4">
                 <div className="relative">
-                  <div className="absolute -left-[21px] top-1 h-3 w-3 rounded-full bg-blue-600 border-2 border-white" />
+                  <div className="absolute -left-[21px] top-1 h-3 w-3 rounded-full bg-primary-600 border-2 border-white" />
                   <p className="text-sm font-semibold text-gray-900">{candidate.experience_years} Years</p>
                   <p className="text-xs text-gray-500 mt-0.5">Total Experience</p>
                 </div>
@@ -127,7 +127,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
             </div>
             <div>
               <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-                <GraduationCap className="h-4 w-4 text-blue-600" /> Education
+                <GraduationCap className="h-4 w-4 text-primary-600" /> Education
               </h3>
               <div className="p-4 bg-white border border-gray-200 rounded-lg">
                 <p className="text-sm font-medium text-gray-900 capitalize">{candidate.education_level?.replace('_', ' ') || 'Not Specified'}</p>
@@ -138,9 +138,9 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           {/* Resume */}
           <div>
             <h3 className="text-sm font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-blue-600" /> Documents
+              <FileText className="h-4 w-4 text-primary-600" /> Documents
             </h3>
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
+            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 bg-red-50 rounded-lg flex items-center justify-center">
                   <FileText className="h-5 w-5 text-red-500" />
@@ -166,7 +166,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
         {/* Footer Actions */}
         <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
           <Button
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            className="flex-1 bg-primary-600 hover:bg-primary-700"
             onClick={() => setIsOfferModalOpen(true)}
           >
             Generate Offer

@@ -3,6 +3,7 @@ import { Outlet, Navigate, Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation, useGetEmployeeStatsQuery } from '../store/api';
+import NotificationsPopover from '../components/notifications/NotificationsPopover';
 import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
@@ -270,10 +271,10 @@ const DashboardLayout = () => {
             <button className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">
               <HelpCircle className="h-5 w-5" />
             </button>
-            <button className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
+            <button className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all">
+              <HelpCircle className="h-5 w-5" />
             </button>
+            <NotificationsPopover />
           </div>
         </header>
 

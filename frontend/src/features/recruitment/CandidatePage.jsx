@@ -78,7 +78,7 @@ const CandidatePage = () => {
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm text-white">
+                        <Button className="gap-2 bg-primary-600 hover:bg-primary-700 shadow-sm text-white">
                             <Plus className="h-4 w-4" /> Add Candidate
                         </Button>
                     </DialogTrigger>
@@ -166,7 +166,7 @@ const CandidatePage = () => {
                                 <label className="text-sm font-medium text-gray-700">Source</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
+                                        className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
                                         name="source"
                                         value={formData.source}
                                         onChange={handleInputChange}
@@ -198,7 +198,7 @@ const CandidatePage = () => {
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-gray-700">Summary</label>
                                 <textarea
-                                    className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
+                                    className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow"
                                     name="summary"
                                     value={formData.summary}
                                     onChange={handleInputChange}
@@ -208,7 +208,7 @@ const CandidatePage = () => {
                             </div>
 
                             <div className="pt-4 flex justify-end gap-3">
-                                <Button type="submit" disabled={isCreating} className="bg-blue-600 hover:bg-blue-700 w-full text-white font-semibold">
+                                <Button type="submit" disabled={isCreating} className="bg-primary-600 hover:bg-primary-700 w-full text-white font-semibold">
                                     {isCreating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                                     Add Candidate
                                 </Button>
@@ -227,14 +227,14 @@ const CandidatePage = () => {
                             <input
                                 type="text"
                                 placeholder="Search candidates by name or email..."
-                                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
+                                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                         <div className="relative">
                             <select
-                                className="w-full md:w-48 appearance-none bg-white border border-gray-200 rounded-lg pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                                className="w-full md:w-48 appearance-none bg-white border border-gray-200 rounded-lg pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 cursor-pointer"
                                 value={filterSource}
                                 onChange={(e) => setFilterSource(e.target.value)}
                             >
@@ -256,7 +256,7 @@ const CandidatePage = () => {
             {/* Candidates List */}
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-4" />
+                    <Loader2 className="h-8 w-8 text-primary-500 animate-spin mb-4" />
                     <p className="text-gray-500">Loading candidates...</p>
                 </div>
             ) : !filteredCandidates?.length ? (

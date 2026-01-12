@@ -78,7 +78,7 @@ const InterviewSchedulingPage = () => {
 
     const getTypeColor = (type) => {
         switch (type) {
-            case 'video_call': return 'text-blue-600 bg-blue-100';
+            case 'video_call': return 'text-primary-600 bg-primary-100';
             case 'phone_call': return 'text-green-600 bg-green-100';
             case 'in_person': return 'text-orange-600 bg-orange-100';
             case 'panel': return 'text-purple-600 bg-purple-100';
@@ -118,7 +118,7 @@ const InterviewSchedulingPage = () => {
                             type="date"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
                         />
                         <div className="mt-4 space-y-2">
                             <p className="text-sm text-gray-600">
@@ -183,7 +183,7 @@ const InterviewSchedulingPage = () => {
                                                                 <Button
                                                                     size="sm"
                                                                     variant="outline"
-                                                                    className="gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
+                                                                    className="gap-2 text-primary-600 border-primary-200 hover:bg-primary-50"
                                                                     onClick={() => window.open(interview.meeting_link, '_blank')}
                                                                 >
                                                                     <Video className="h-4 w-4" />
@@ -226,7 +226,7 @@ const InterviewSchedulingPage = () => {
                                     name="candidate_id"
                                     value={formData.candidate_id}
                                     onChange={handleInputChange}
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-white"
                                     required
                                 >
                                     <option value="">Select Candidate</option>
@@ -243,7 +243,7 @@ const InterviewSchedulingPage = () => {
                                     name="interviewer_id"
                                     value={formData.interviewer_id}
                                     onChange={handleInputChange}
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-white"
                                     required
                                 >
                                     <option value="">Select Interviewer</option>
@@ -264,7 +264,7 @@ const InterviewSchedulingPage = () => {
                                     name="scheduled_date"
                                     value={formData.scheduled_date}
                                     onChange={handleInputChange}
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                                     required
                                 />
                             </div>
@@ -275,7 +275,7 @@ const InterviewSchedulingPage = () => {
                                     name="scheduled_time"
                                     value={formData.scheduled_time}
                                     onChange={handleInputChange}
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                                     required
                                 />
                             </div>
@@ -285,7 +285,7 @@ const InterviewSchedulingPage = () => {
                                     name="duration_minutes"
                                     value={formData.duration_minutes}
                                     onChange={handleInputChange}
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none bg-white"
                                 >
                                     <option value="30">30 minutes</option>
                                     <option value="60">1 hour</option>
@@ -301,17 +301,17 @@ const InterviewSchedulingPage = () => {
                                 {interviewTypes.map((type) => {
                                     const Icon = type.icon;
                                     return (
-                                        <label key={type.value} className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${formData.interview_type === type.value ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50 border-gray-200'}`}>
+                                        <label key={type.value} className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${formData.interview_type === type.value ? 'bg-primary-50 border-primary-200' : 'hover:bg-gray-50 border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="interview_type"
                                                 value={type.value}
                                                 checked={formData.interview_type === type.value}
                                                 onChange={handleInputChange}
-                                                className="text-blue-600 focus:ring-blue-500"
+                                                className="text-primary-600 focus:ring-primary-500"
                                             />
-                                            <Icon className={`h-5 w-5 ${formData.interview_type === type.value ? 'text-blue-600' : 'text-gray-500'}`} />
-                                            <span className={`font-medium ${formData.interview_type === type.value ? 'text-blue-900' : 'text-gray-700'}`}>{type.label}</span>
+                                            <Icon className={`h-5 w-5 ${formData.interview_type === type.value ? 'text-primary-600' : 'text-gray-500'}`} />
+                                            <span className={`font-medium ${formData.interview_type === type.value ? 'text-primary-900' : 'text-gray-700'}`}>{type.label}</span>
                                         </label>
                                     );
                                 })}
@@ -327,7 +327,7 @@ const InterviewSchedulingPage = () => {
                                     value={formData.meeting_link}
                                     onChange={handleInputChange}
                                     placeholder="https://meet.google.com/..."
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                                 />
                             </div>
                         )}
@@ -341,7 +341,7 @@ const InterviewSchedulingPage = () => {
                                     value={formData.location}
                                     onChange={handleInputChange}
                                     placeholder="Conference Room A, 5th Floor"
-                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                                 />
                             </div>
                         )}
@@ -354,7 +354,7 @@ const InterviewSchedulingPage = () => {
                                 onChange={handleInputChange}
                                 rows="3"
                                 placeholder="Interview preparation notes, agenda, etc."
-                                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
                             />
                         </div>
 
@@ -362,7 +362,7 @@ const InterviewSchedulingPage = () => {
                             <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                            <Button type="submit" className="bg-primary-600 hover:bg-primary-700">
                                 Schedule Interview
                             </Button>
                         </div>

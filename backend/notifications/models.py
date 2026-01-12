@@ -1,0 +1,43 @@
+from django.db import models
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+
+class Notification(models.Model):
+    TYPES = (
+        ('info', 'Information'),
+        ('warning', 'Warning'),
+        ('success', 'Success'),
+        ('error', 'Error'),
+    )
+
+    recipient = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.CASCADE, 
+        related_name='notifications',
+        null=True, blank=True # Nullable for public notifications
+    )
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        related_name='notifications_created'
+    )
+    verb = models.CharField(max_length=255)  # e.g., "requested leave"
+    description = models.TextField(blank=True, null=True)
+    
+    # Generic relation to the object involved
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    action_object = GenericForeignKey('content_type', 'object_id')
+    
+    is_read = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=False)
+    notification_type = models.CharField(max_length=20, choices=TYPES, default='info')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.actor} {self.verb} - {self.recipient if self.recipient else 'Public'}"

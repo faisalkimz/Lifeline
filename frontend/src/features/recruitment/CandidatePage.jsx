@@ -2,19 +2,18 @@ import React, { useState } from 'react';
 import {
     useGetCandidatesQuery,
     useCreateCandidateMutation,
-    useUpdateCandidateMutation,
 } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
-import { Plus, User, Mail, Phone, Linkedin, Globe, FileText, Search, Filter } from 'lucide-react';
+import { Plus, Search, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
 import { CandidateCard } from './CandidateCard';
 
 const CandidatePage = () => {
     const { data: candidates, isLoading } = useGetCandidatesQuery();
-    const [createCandidate] = useCreateCandidateMutation();
+    const [createCandidate, { isLoading: isCreating }] = useCreateCandidateMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterSource, setFilterSource] = useState('all');
@@ -53,6 +52,11 @@ const CandidatePage = () => {
         }
     };
 
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
     const filteredCandidates = Array.isArray(candidates)
         ? candidates.filter(candidate => {
             const matchesSearch =
@@ -65,174 +69,212 @@ const CandidatePage = () => {
         : [];
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6 pb-10 animate-fade-in">
             {/* Header */}
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">Candidate Database</h1>
-                    <p className="text-slate-500 mt-1">Manage your talent pool and candidate profiles</p>
+                    <h1 className="text-2xl font-bold tracking-tight text-gray-900">Candidate Database</h1>
+                    <p className="text-gray-500 mt-1">Manage your talent pool and candidate profiles</p>
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="gap-2 bg-primary-600 hover:bg-primary-700 shadow-sm">
+                        <Button className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-sm text-white">
                             <Plus className="h-4 w-4" /> Add Candidate
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                        <DialogHeader>
-                            <DialogTitle>Add New Candidate</DialogTitle>
+                    <DialogContent className="max-w-2xl bg-white rounded-xl shadow-xl">
+                        <DialogHeader className="border-b border-gray-100 pb-4 mb-4">
+                            <DialogTitle className="text-xl font-bold text-gray-900">Add New Candidate</DialogTitle>
                         </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4 pt-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">First Name</label>
-                                    <input
-                                        className="w-full border rounded-md p-2"
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">First Name</label>
+                                    <Input
+                                        className="bg-white"
+                                        name="first_name"
                                         value={formData.first_name}
-                                        onChange={e => setFormData({ ...formData, first_name: e.target.value })}
+                                        onChange={handleInputChange}
                                         required
+                                        placeholder="e.g. John"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Last Name</label>
-                                    <input
-                                        className="w-full border rounded-md p-2"
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Last Name</label>
+                                    <Input
+                                        className="bg-white"
+                                        name="last_name"
                                         value={formData.last_name}
-                                        onChange={e => setFormData({ ...formData, last_name: e.target.value })}
+                                        onChange={handleInputChange}
                                         required
+                                        placeholder="e.g. Doe"
                                     />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Email</label>
-                                    <input
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Email Address</label>
+                                    <Input
                                         type="email"
-                                        className="w-full border rounded-md p-2"
+                                        className="bg-white"
+                                        name="email"
                                         value={formData.email}
-                                        onChange={e => setFormData({ ...formData, email: e.target.value })}
+                                        onChange={handleInputChange}
                                         required
+                                        placeholder="john@example.com"
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Phone</label>
-                                    <input
-                                        className="w-full border rounded-md p-2"
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Phone Number</label>
+                                    <Input
+                                        className="bg-white"
+                                        name="phone"
                                         value={formData.phone}
-                                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                                        onChange={handleInputChange}
+                                        placeholder="+256..."
                                     />
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">LinkedIn URL</label>
-                                    <input
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">LinkedIn URL</label>
+                                    <Input
                                         type="url"
-                                        className="w-full border rounded-md p-2"
+                                        className="bg-white"
+                                        name="linkedin_url"
                                         value={formData.linkedin_url}
-                                        onChange={e => setFormData({ ...formData, linkedin_url: e.target.value })}
+                                        onChange={handleInputChange}
                                         placeholder="https://linkedin.com/in/..."
                                     />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-1">Portfolio URL</label>
-                                    <input
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Portfolio URL</label>
+                                    <Input
                                         type="url"
-                                        className="w-full border rounded-md p-2"
+                                        className="bg-white"
+                                        name="portfolio_url"
                                         value={formData.portfolio_url}
-                                        onChange={e => setFormData({ ...formData, portfolio_url: e.target.value })}
+                                        onChange={handleInputChange}
+                                        placeholder="https://website.com"
                                     />
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Source</label>
-                                <select
-                                    className="w-full border rounded-md p-2"
-                                    value={formData.source}
-                                    onChange={e => setFormData({ ...formData, source: e.target.value })}
-                                >
-                                    <option value="career_page">Career Page</option>
-                                    <option value="linkedin">LinkedIn</option>
-                                    <option value="indeed">Indeed</option>
-                                    <option value="referral">Referral</option>
-                                    <option value="agency">Agency</option>
-                                    <option value="other">Other</option>
-                                </select>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Source</label>
+                                <div className="relative">
+                                    <select
+                                        className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
+                                        name="source"
+                                        value={formData.source}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="career_page">Career Page</option>
+                                        <option value="linkedin">LinkedIn</option>
+                                        <option value="indeed">Indeed</option>
+                                        <option value="referral">Referral</option>
+                                        <option value="agency">Agency</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                        <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Skills (comma-separated)</label>
-                                <input
-                                    className="w-full border rounded-md p-2"
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Skills (comma-separated)</label>
+                                <Input
+                                    className="bg-white"
+                                    name="skills"
                                     value={formData.skills}
-                                    onChange={e => setFormData({ ...formData, skills: e.target.value })}
+                                    onChange={handleInputChange}
                                     placeholder="React, Node.js, Python..."
                                 />
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Summary</label>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Summary</label>
                                 <textarea
-                                    className="w-full border rounded-md p-2"
+                                    className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-shadow"
+                                    name="summary"
                                     value={formData.summary}
-                                    onChange={e => setFormData({ ...formData, summary: e.target.value })}
+                                    onChange={handleInputChange}
                                     rows="4"
                                     placeholder="Brief professional summary..."
                                 />
                             </div>
 
-                            <Button type="submit" className="w-full">Add Candidate</Button>
+                            <div className="pt-4 flex justify-end gap-3">
+                                <Button type="submit" disabled={isCreating} className="bg-blue-600 hover:bg-blue-700 w-full text-white font-semibold">
+                                    {isCreating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+                                    Add Candidate
+                                </Button>
+                            </div>
                         </form>
                     </DialogContent>
                 </Dialog>
             </div>
 
             {/* Search and Filter Bar */}
-            <Card className="border-none shadow-sm">
+            <Card className="border border-gray-200 shadow-sm bg-white">
                 <CardContent className="p-4">
-                    <div className="flex gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search candidates by name or email..."
-                                className="w-full pl-9 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20"
+                                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
-                        <select
-                            className="border border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/20"
-                            value={filterSource}
-                            onChange={(e) => setFilterSource(e.target.value)}
-                        >
-                            <option value="all">All Sources</option>
-                            <option value="career_page">Career Page</option>
-                            <option value="linkedin">LinkedIn</option>
-                            <option value="indeed">Indeed</option>
-                            <option value="referral">Referral</option>
-                            <option value="agency">Agency</option>
-                        </select>
+                        <div className="relative">
+                            <select
+                                className="w-full md:w-48 appearance-none bg-white border border-gray-200 rounded-lg pl-4 pr-10 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer"
+                                value={filterSource}
+                                onChange={(e) => setFilterSource(e.target.value)}
+                            >
+                                <option value="all">All Sources</option>
+                                <option value="career_page">Career Page</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="indeed">Indeed</option>
+                                <option value="referral">Referral</option>
+                                <option value="agency">Agency</option>
+                            </select>
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                <svg className="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                            </div>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Candidates List */}
             {isLoading ? (
-                <div className="text-center py-10">Loading candidates...</div>
+                <div className="flex flex-col items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-4" />
+                    <p className="text-gray-500">Loading candidates...</p>
+                </div>
             ) : !filteredCandidates?.length ? (
-                <Card className="border-dashed">
-                    <CardContent className="py-10 text-center text-gray-500">
-                        {searchTerm || filterSource !== 'all' ?
-                            'No candidates match your filters' :
-                            'No candidates yet. Add one to get started!'}
+                <Card className="border border-dashed border-gray-300 bg-gray-50/50">
+                    <CardContent className="py-12 text-center">
+                        <div className="h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <Search className="h-6 w-6 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900">No candidates found</h3>
+                        <p className="text-gray-500 mt-1">
+                            {searchTerm || filterSource !== 'all' ?
+                                'Try adjusting your search or filters' :
+                                'Get started by adding your first candidate'}
+                        </p>
                     </CardContent>
                 </Card>
             ) : (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {filteredCandidates.map(candidate => (
                         <CandidateCard key={candidate.id} candidate={candidate} />
                     ))}

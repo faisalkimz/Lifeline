@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import {
     useGetInterviewsQuery,
-    useCreateInterviewMutation
+    useCreateInterviewMutation,
+    useGetCandidatesQuery,
+    useGetEmployeesQuery
 } from '../../store/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
-import { Input } from '../../components/ui/Input';
-import { Calendar, Clock, User, MapPin, Plus, Video, Phone, MessageSquare, Edit, Trash2 } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
+import { Calendar, Clock, User, MapPin, Plus, Video, Phone, Edit, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const InterviewSchedulingPage = () => {
@@ -15,8 +16,14 @@ const InterviewSchedulingPage = () => {
     const [showForm, setShowForm] = useState(false);
 
     const { data: interviews, isLoading } = useGetInterviewsQuery({ date: selectedDate });
+    const { data: candidatesData } = useGetCandidatesQuery();
+    const { data: employeesData } = useGetEmployeesQuery();
+
     const [createInterview] = useCreateInterviewMutation();
-    const [updateInterview] = useUpdateInterviewMutation();
+
+    // Data normalization
+    const candidates = Array.isArray(candidatesData) ? candidatesData : candidatesData?.results || [];
+    const employees = Array.isArray(employeesData) ? employeesData : employeesData?.results || [];
 
     const [formData, setFormData] = useState({
         candidate_id: '',
@@ -84,7 +91,7 @@ const InterviewSchedulingPage = () => {
     ) : [];
 
     return (
-        <div className="space-y-6 pb-10">
+        <div className="space-y-6 pb-10 animate-fade-in">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div>
@@ -111,7 +118,7 @@ const InterviewSchedulingPage = () => {
                             type="date"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                         />
                         <div className="mt-4 space-y-2">
                             <p className="text-sm text-gray-600">
@@ -142,7 +149,7 @@ const InterviewSchedulingPage = () => {
                                 {todayInterviews.map((interview) => {
                                     const TypeIcon = getTypeIcon(interview.interview_type);
                                     return (
-                                        <Card key={interview.id} className="hover:shadow-md transition-shadow">
+                                        <Card key={interview.id} className="hover:shadow-md transition-shadow border border-gray-100">
                                             <CardContent className="p-4">
                                                 <div className="flex items-start justify-between">
                                                     <div className="flex-1">
@@ -175,7 +182,8 @@ const InterviewSchedulingPage = () => {
                                                             <div className="mt-3">
                                                                 <Button
                                                                     size="sm"
-                                                                    className="gap-2"
+                                                                    variant="outline"
+                                                                    className="gap-2 text-blue-600 border-blue-200 hover:bg-blue-50"
                                                                     onClick={() => window.open(interview.meeting_link, '_blank')}
                                                                 >
                                                                     <Video className="h-4 w-4" />
@@ -187,9 +195,9 @@ const InterviewSchedulingPage = () => {
 
                                                     <div className="flex gap-2">
                                                         <Button variant="ghost" size="sm">
-                                                            <Edit className="h-4 w-4" />
+                                                            <Edit className="h-4 w-4 text-gray-500" />
                                                         </Button>
-                                                        <Button variant="ghost" size="sm" className="text-red-600">
+                                                        <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50">
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
                                                     </div>
@@ -206,76 +214,78 @@ const InterviewSchedulingPage = () => {
 
             {/* Schedule Interview Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl bg-white max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                         <DialogTitle>Schedule Interview</DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-6 pt-4">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Candidate *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Candidate *</label>
                                 <select
                                     name="candidate_id"
                                     value={formData.candidate_id}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                     required
                                 >
                                     <option value="">Select Candidate</option>
-                                    {/* Mock candidates - replace with actual data */}
-                                    <option value="1">Sarah Mirembe</option>
-                                    <option value="2">John Doe</option>
-                                    <option value="3">Jane Smith</option>
+                                    {candidates.map(candidate => (
+                                        <option key={candidate.id} value={candidate.id}>
+                                            {candidate.first_name} {candidate.last_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Interviewer *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Interviewer *</label>
                                 <select
                                     name="interviewer_id"
                                     value={formData.interviewer_id}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                     required
                                 >
                                     <option value="">Select Interviewer</option>
-                                    {/* Mock interviewers - replace with actual data */}
-                                    <option value="1">Alice Johnson (HR Manager)</option>
-                                    <option value="2">Bob Wilson (Tech Lead)</option>
-                                    <option value="3">Carol Davis (CEO)</option>
+                                    {employees.map(employee => (
+                                        <option key={employee.id} value={employee.id}>
+                                            {employee.first_name} {employee.last_name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium mb-1">Date *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Date *</label>
                                 <input
                                     type="date"
                                     name="scheduled_date"
                                     value={formData.scheduled_date}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Time *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Time *</label>
                                 <input
                                     type="time"
                                     name="scheduled_time"
                                     value={formData.scheduled_time}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium mb-1">Duration *</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Duration *</label>
                                 <select
                                     name="duration_minutes"
                                     value={formData.duration_minutes}
                                     onChange={handleInputChange}
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                                 >
                                     <option value="30">30 minutes</option>
                                     <option value="60">1 hour</option>
@@ -286,21 +296,22 @@ const InterviewSchedulingPage = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium mb-1">Interview Type *</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700">Interview Type *</label>
                             <div className="grid grid-cols-2 gap-3 mt-2">
                                 {interviewTypes.map((type) => {
                                     const Icon = type.icon;
                                     return (
-                                        <label key={type.value} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                        <label key={type.value} className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${formData.interview_type === type.value ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50 border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="interview_type"
                                                 value={type.value}
                                                 checked={formData.interview_type === type.value}
                                                 onChange={handleInputChange}
+                                                className="text-blue-600 focus:ring-blue-500"
                                             />
-                                            <Icon className="h-5 w-5 text-gray-600" />
-                                            <span className="font-medium">{type.label}</span>
+                                            <Icon className={`h-5 w-5 ${formData.interview_type === type.value ? 'text-blue-600' : 'text-gray-500'}`} />
+                                            <span className={`font-medium ${formData.interview_type === type.value ? 'text-blue-900' : 'text-gray-700'}`}>{type.label}</span>
                                         </label>
                                     );
                                 })}
@@ -309,49 +320,49 @@ const InterviewSchedulingPage = () => {
 
                         {formData.interview_type === 'video_call' && (
                             <div>
-                                <label className="block text-sm font-medium mb-1">Meeting Link</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Meeting Link</label>
                                 <input
                                     type="url"
                                     name="meeting_link"
                                     value={formData.meeting_link}
                                     onChange={handleInputChange}
                                     placeholder="https://meet.google.com/..."
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
                         )}
 
                         {formData.interview_type === 'in_person' && (
                             <div>
-                                <label className="block text-sm font-medium mb-1">Location</label>
+                                <label className="block text-sm font-medium mb-1 text-gray-700">Location</label>
                                 <input
                                     type="text"
                                     name="location"
                                     value={formData.location}
                                     onChange={handleInputChange}
                                     placeholder="Conference Room A, 5th Floor"
-                                    className="w-full p-2 border rounded-md"
+                                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium mb-1">Notes</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700">Notes</label>
                             <textarea
                                 name="notes"
                                 value={formData.notes}
                                 onChange={handleInputChange}
                                 rows="3"
                                 placeholder="Interview preparation notes, agenda, etc."
-                                className="w-full p-2 border rounded-md"
+                                className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4 border-t">
+                        <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
                             <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit">
+                            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
                                 Schedule Interview
                             </Button>
                         </div>

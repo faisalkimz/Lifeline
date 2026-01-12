@@ -1036,6 +1036,25 @@ export const api = createApi({
       }),
       invalidatesTags: ['Company'],
     }),
+    // Notifications
+    getNotifications: builder.query({
+      query: () => '/notifications/',
+      providesTags: ['Notification'],
+    }),
+    markNotificationRead: builder.mutation({
+      query: (id) => ({
+        url: `/notifications/${id}/mark_read/`,
+        method: 'POST',
+      }),
+      invalidatesTags: ['Notification'],
+    }),
+    markAllNotificationsRead: builder.mutation({
+      query: () => ({
+        url: '/notifications/mark_all_read/',
+        method: 'POST',
+      }),
+      invalidatesTags: ['Notification'],
+    }),
   })
 });
 
@@ -1186,6 +1205,10 @@ export const {
   useRejectSalaryAdvanceMutation,
   // Org Structure
   useGetManagersQuery,
+  // Notifications
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
 } = api;
 
 export default api;

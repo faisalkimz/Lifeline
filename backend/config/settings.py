@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "documents",   # Document Management
     "offboarding", # Offboarding & Exit
     "disciplinary", # Disciplinary tracking
+    "notifications", # Notifications system
 ]
 
 

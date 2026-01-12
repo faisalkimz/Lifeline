@@ -4,20 +4,19 @@ import {
     useCreateRecruitmentIntegrationMutation,
     useUpdateRecruitmentIntegrationMutation
 } from '../../store/api';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
+import { Badge } from '../../components/ui/Badge';
 import { Switch } from '../../components/ui/Switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
-import { Badge } from '../../components/ui/Badge';
 import {
     Linkedin, Globe, Briefcase, Settings, Zap, AlertCircle,
-    CheckCircle, XCircle, RefreshCw, ExternalLink, Shield
+    CheckCircle, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const IntegrationsPage = () => {
-    const { data: integrations = [], isLoading, refetch } = useGetRecruitmentIntegrationsQuery();
+    const { data: integrations = [], isLoading } = useGetRecruitmentIntegrationsQuery();
     const [createIntegration] = useCreateRecruitmentIntegrationMutation();
     const [updateIntegration] = useUpdateRecruitmentIntegrationMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -70,12 +69,13 @@ const IntegrationsPage = () => {
         }
     ];
 
-    // normalize integrations to an array
+    // normalize integrations
     const integrationList = Array.isArray(integrations?.results)
         ? integrations.results
         : Array.isArray(integrations)
             ? integrations
             : [];
+
     const activeIntegrations = integrationList.filter(i => i.is_active);
     const totalPlatforms = platforms.length;
     const connectedPlatforms = integrationList.length;
@@ -89,7 +89,7 @@ const IntegrationsPage = () => {
             }).unwrap();
             toast.success("Integration saved");
             setIsDialogOpen(false);
-            setFormData({ client_id: '', client_secret: '', api_key: '' });
+            setFormData({ client_id: '', client_secret: '', api_key: '', webhook_url: '', is_active: true });
         } catch (error) {
             toast.error("Failed to save integration");
         }
@@ -107,17 +107,15 @@ const IntegrationsPage = () => {
         }
     };
 
-    if (isLoading) return <div>Loading...</div>;
-
-
+    if (isLoading) return <div className="p-8 text-center text-gray-500">Loading integrations...</div>;
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-8 pb-10 animate-fade-in">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-text-primary">Job Board Integrations</h1>
-                    <p className="text-text-secondary mt-1">Connect to external platforms to auto-post jobs and expand your reach</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Job Board Integrations</h1>
+                    <p className="text-gray-500 mt-1">Connect to external platforms to auto-post jobs and expand your reach</p>
                 </div>
             </div>
 
@@ -127,23 +125,21 @@ const IntegrationsPage = () => {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-text-secondary">Connected Platforms</p>
-                                <p className="text-2xl font-bold text-text-primary">{connectedPlatforms}/{totalPlatforms}</p>
+                                <p className="text-sm font-medium text-gray-500">Connected Platforms</p>
+                                <p className="text-2xl font-bold text-gray-900">{connectedPlatforms}/{totalPlatforms}</p>
                             </div>
-                            <div className="h-12 w-12 bg-primary-100 rounded-lg flex items-center justify-center">
-                                <Zap className="h-6 w-6 text-primary-600" />
+                            <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <Zap className="h-5 w-5 text-blue-600" />
                             </div>
                         </div>
-                        <div className="mt-4">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-text-secondary">Progress</span>
-                                <span className="font-medium text-text-primary">
-                                    {Math.round((connectedPlatforms / totalPlatforms) * 100)}%
-                                </span>
+                        <div className="mt-4 space-y-2">
+                            <div className="flex items-center justify-between text-xs text-gray-500">
+                                <span>Utilization</span>
+                                <span>{Math.round((connectedPlatforms / totalPlatforms) * 100)}%</span>
                             </div>
-                            <div className="mt-2 bg-neutral-200 rounded-full h-2">
+                            <div className="bg-gray-100 rounded-full h-1.5 overflow-hidden">
                                 <div
-                                    className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                                    className="bg-blue-600 h-full rounded-full transition-all duration-300"
                                     style={{ width: `${(connectedPlatforms / totalPlatforms) * 100}%` }}
                                 />
                             </div>
@@ -155,18 +151,15 @@ const IntegrationsPage = () => {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-text-secondary">Active Integrations</p>
-                                <p className="text-2xl font-bold text-text-primary">{activeIntegrations.length}</p>
+                                <p className="text-sm font-medium text-gray-500">Active Integrations</p>
+                                <p className="text-2xl font-bold text-gray-900">{activeIntegrations.length}</p>
                             </div>
-                            <div className="h-12 w-12 bg-success-100 rounded-lg flex items-center justify-center">
-                                <CheckCircle className="h-6 w-6 text-success-600" />
+                            <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <CheckCircle className="h-5 w-5 text-green-600" />
                             </div>
                         </div>
-                        <p className="text-sm text-text-secondary mt-2">
-                            {activeIntegrations.length > 0
-                                ? `${activeIntegrations.length} platform${activeIntegrations.length > 1 ? 's' : ''} actively posting jobs`
-                                : 'No active integrations'
-                            }
+                        <p className="text-xs text-gray-500 mt-2">
+                            Automatically syncing jobs
                         </p>
                     </CardContent>
                 </Card>
@@ -175,15 +168,15 @@ const IntegrationsPage = () => {
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-medium text-text-secondary">Jobs Posted</p>
-                                <p className="text-2xl font-bold text-text-primary">0</p>
+                                <p className="text-sm font-medium text-gray-500">Jobs Posted</p>
+                                <p className="text-2xl font-bold text-gray-900">0</p>
                             </div>
-                            <div className="h-12 w-12 bg-warning-100 rounded-lg flex items-center justify-center">
-                                <Briefcase className="h-6 w-6 text-warning-600" />
+                            <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <Briefcase className="h-5 w-5 text-orange-600" />
                             </div>
                         </div>
-                        <p className="text-sm text-text-secondary mt-2">
-                            Total jobs posted via integrations
+                        <p className="text-xs text-gray-500 mt-2">
+                            External job views tracking
                         </p>
                     </CardContent>
                 </Card>
@@ -191,7 +184,9 @@ const IntegrationsPage = () => {
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                    <Button className="bg-primary-600 hover:bg-primary-700 shadow-sm">Connect New Platform</Button>
+                    <Button className="bg-blue-600 hover:bg-blue-700 shadow-sm">
+                        <Zap className="h-4 w-4 mr-2" /> Connect New Platform
+                    </Button>
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>
@@ -199,9 +194,9 @@ const IntegrationsPage = () => {
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4 pt-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Platform</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700">Platform</label>
                             <select
-                                className="w-full border rounded-md p-2"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white"
                                 value={selectedPlatform}
                                 onChange={e => setSelectedPlatform(e.target.value)}
                             >
@@ -211,9 +206,9 @@ const IntegrationsPage = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">API Key / Client ID</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700">API Key / Client ID</label>
                             <input
-                                className="w-full border rounded-md p-2"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                 type="password"
                                 value={formData.client_id}
                                 onChange={e => setFormData({ ...formData, client_id: e.target.value })}
@@ -221,15 +216,17 @@ const IntegrationsPage = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Client Secret (if applicable)</label>
+                            <label className="block text-sm font-medium mb-1 text-gray-700">Client Secret (if applicable)</label>
                             <input
-                                className="w-full border rounded-md p-2"
+                                className="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                                 type="password"
                                 value={formData.client_secret}
                                 onChange={e => setFormData({ ...formData, client_secret: e.target.value })}
                             />
                         </div>
-                        <Button type="submit" className="w-full">Save Connection</Button>
+                        <div className="pt-2">
+                            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">Save Connection</Button>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>
@@ -237,7 +234,7 @@ const IntegrationsPage = () => {
 
             {/* Integration Platforms */}
             <div>
-                <h2 className="text-xl font-semibold text-text-primary mb-6">Available Platforms</h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-6">Available Platforms</h2>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {platforms.map(platform => {
                         const integration = integrationList.find(i => i.platform === platform.id) || null;
@@ -245,7 +242,7 @@ const IntegrationsPage = () => {
                         const Icon = platform.icon;
 
                         return (
-                            <Card key={platform.id} className={`transition-all duration-200 hover:shadow-lg ${isConnected ? "border-primary-200 bg-primary-50/30" : "border-border-light"}`}>
+                            <Card key={platform.id} className={`transition-all duration-200 hover:shadow-md border border-gray-200`}>
                                 <CardContent className="p-6">
                                     <div className="flex justify-between items-start mb-4">
                                         <div className="flex items-center gap-3">
@@ -253,14 +250,14 @@ const IntegrationsPage = () => {
                                                 <Icon className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <h3 className="font-semibold text-text-primary">{platform.name}</h3>
-                                                <p className="text-xs text-text-secondary">{platform.description}</p>
+                                                <h3 className="font-semibold text-gray-900">{platform.name}</h3>
+                                                <p className="text-xs text-gray-500">{platform.description}</p>
                                             </div>
                                         </div>
                                         {isConnected && (
                                             <div className="flex items-center gap-2">
-                                                <Badge variant={integration.is_active ? 'success' : 'secondary'} size="sm">
-                                                    {integration.is_active ? 'Active' : 'Inactive'}
+                                                <Badge className={integration.is_active ? 'bg-green-100 text-green-700 border-green-200' : 'bg-gray-100 text-gray-700 border-gray-200'}>
+                                                    {integration.is_active ? 'Active' : 'Paused'}
                                                 </Badge>
                                                 <Switch
                                                     checked={integration.is_active}
@@ -271,50 +268,46 @@ const IntegrationsPage = () => {
                                     </div>
 
                                     {/* Features */}
-                                    <div className="mb-4">
-                                        <p className="text-xs font-medium text-text-secondary mb-2">Features:</p>
-                                        <div className="flex flex-wrap gap-1">
+                                    <div className="mb-6">
+                                        <div className="flex flex-wrap gap-1.5">
                                             {platform.features.map((feature, index) => (
-                                                <Badge key={index} variant="outline" size="sm">
+                                                <span key={index} className="text-[10px] font-medium px-2 py-1 bg-gray-50 text-gray-600 rounded border border-gray-100">
                                                     {feature}
-                                                </Badge>
+                                                </span>
                                             ))}
                                         </div>
                                     </div>
 
                                     {/* Status */}
                                     {isConnected ? (
-                                        <div className="space-y-3">
-                                            <div className="flex items-center gap-2 text-sm text-success-600 font-medium">
+                                        <div className="space-y-3 pt-2 border-t border-gray-100">
+                                            <div className="flex items-center gap-2 text-sm text-green-600 font-medium">
                                                 <CheckCircle className="h-4 w-4" />
-                                                Connected & Configured
+                                                Connected
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button size="sm" variant="outline" className="flex-1">
-                                                    <Settings className="h-4 w-4 mr-2" />
+                                                <Button size="sm" variant="outline" className="flex-1 text-xs h-9">
+                                                    <Settings className="h-3 w-3 mr-2" />
                                                     Configure
                                                 </Button>
-                                                <Button size="sm" variant="outline">
-                                                    <ExternalLink className="h-4 w-4" />
+                                                <Button size="sm" variant="ghost" className="h-9 w-9 p-0">
+                                                    <ExternalLink className="h-4 w-4 text-gray-400" />
                                                 </Button>
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="space-y-3">
-                                            <div className="flex items-center gap-2 text-sm text-text-secondary">
-                                                <AlertCircle className="h-4 w-4" />
-                                                Not Connected
-                                            </div>
+                                        <div className="pt-4 mt-2 border-t border-gray-100">
                                             <Button
+                                                variant="outline"
                                                 size="sm"
                                                 onClick={() => {
                                                     setSelectedPlatform(platform.id);
                                                     setIsDialogOpen(true);
                                                 }}
-                                                className="w-full"
+                                                className="w-full text-gray-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50"
                                             >
                                                 <Zap className="h-4 w-4 mr-2" />
-                                                Connect Platform
+                                                Connect
                                             </Button>
                                         </div>
                                     )}
@@ -325,7 +318,6 @@ const IntegrationsPage = () => {
                 </div>
             </div>
         </div>
-
     );
 };
 

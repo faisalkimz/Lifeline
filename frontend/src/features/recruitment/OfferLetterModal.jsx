@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { FileText, Send, Download, Loader2, Sparkles } from 'lucide-react';
+import { FileText, Send, Download, Loader2, Briefcase } from 'lucide-react';
 import { useCreateOfferMutation, useGenerateOfferPdfMutation } from '../../store/api';
 import toast from 'react-hot-toast';
 import { getMediaUrl } from '../../config/api';
@@ -50,96 +50,102 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-[2.5rem] border-none shadow-2xl">
-                <div className="bg-primary-600 p-8 text-white relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12">
-                        <FileText className="h-40 w-40" />
+            <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-xl bg-white shadow-xl border border-gray-100">
+                <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <FileText className="h-5 w-5" />
                     </div>
-                    <DialogHeader>
-                        <DialogTitle className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-3">
-                            <Sparkles className="h-8 w-8 text-primary-200" />
+                    <div>
+                        <DialogTitle className="text-xl font-bold text-gray-900">
                             Draft Offer Letter
                         </DialogTitle>
-                        <p className="text-primary-100 text-sm font-bold uppercase tracking-widest mt-2">{application?.candidate?.full_name} • {application?.job_title}</p>
-                    </DialogHeader>
+                        <p className="text-sm text-gray-500 mt-1">
+                            {application?.candidate?.full_name} • {application?.job_title}
+                        </p>
+                    </div>
                 </div>
 
-                <div className="p-10 space-y-8 bg-white max-h-[70vh] overflow-y-auto">
+                <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
                     {step === 'form' ? (
-                        <div className="space-y-8">
-                            <div className="grid grid-cols-2 gap-8">
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Salary Package (UGX)</label>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Salary Package (UGX)</label>
                                     <Input
                                         type="number"
-                                        className="h-14 bg-slate-50 border-slate-100 rounded-2xl font-bold"
+                                        className="bg-white"
                                         value={offerData.salary_offered}
                                         onChange={e => setOfferData({ ...offerData, salary_offered: e.target.value })}
                                         placeholder="e.g. 120,000,000"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Start Date</label>
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Start Date</label>
                                     <Input
                                         type="date"
-                                        className="h-14 bg-slate-50 border-slate-100 rounded-2xl font-bold"
+                                        className="bg-white"
                                         value={offerData.start_date}
                                         onChange={e => setOfferData({ ...offerData, start_date: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Offer Expiry</label>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Offer Expiry Date</label>
                                 <Input
                                     type="date"
-                                    className="h-14 bg-slate-50 border-slate-100 rounded-2xl font-bold"
+                                    className="bg-white"
                                     value={offerData.expiry_date}
                                     onChange={e => setOfferData({ ...offerData, expiry_date: e.target.value })}
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">Offer Content</label>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Letter Content</label>
                                 <textarea
-                                    className="w-full h-48 bg-slate-50 border border-slate-100 rounded-2xl p-5 font-bold focus:bg-white focus:ring-4 focus:ring-primary-500/10 transition-all outline-none resize-none"
+                                    className="w-full h-48 p-4 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none resize-none transition-shadow"
                                     value={offerData.content}
                                     onChange={e => setOfferData({ ...offerData, content: e.target.value })}
                                 />
+                                <p className="text-xs text-gray-400">
+                                    Use placeholders [Salary], [Date], [Expiry Date] for dynamic insertion.
+                                </p>
                             </div>
                         </div>
                     ) : (
-                        <div className="space-y-8 text-center py-10">
-                            <div className="bg-primary-50 h-24 w-24 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <Download className="h-10 w-10 text-primary-600" />
+                        <div className="text-center py-12 space-y-6">
+                            <div className="bg-green-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-50/50">
+                                <Briefcase className="h-10 w-10 text-green-600" />
                             </div>
                             <div>
-                                <h3 className="text-2xl font-black text-slate-900 uppercase italic">Offer Letter Ready</h3>
-                                <p className="text-slate-500 mt-2 font-medium italic">The offer letter has been drafted. You can now download the PDF or notify the candidate.</p>
+                                <h3 className="text-2xl font-bold text-gray-900">Offer Letter Ready</h3>
+                                <p className="text-gray-500 mt-2 max-w-sm mx-auto">
+                                    The offer letter has been successfully generated. You can now download the PDF or send it directly.
+                                </p>
                             </div>
                             <Button
                                 onClick={handleGeneratePdf}
                                 disabled={isGenerating}
-                                className="h-14 px-10 bg-black hover:bg-slate-900 rounded-2xl font-black uppercase tracking-widest italic"
+                                className="h-12 px-8 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold shadow-lg shadow-blue-200"
                             >
-                                {isGenerating ? <Loader2 className="animate-spin h-5 w-5 mr-3" /> : <Download className="h-5 w-5 mr-3" />}
-                                Download PDF
+                                {isGenerating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Download className="h-5 w-5 mr-2" />}
+                                Download Offer PDF
                             </Button>
                         </div>
                     )}
                 </div>
 
-                <DialogFooter className="p-10 bg-slate-50 border-t border-slate-100">
-                    <Button variant="ghost" onClick={onClose} className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest italic text-slate-400 hover:text-slate-600">
+                <DialogFooter className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                    <Button variant="outline" onClick={onClose} className="border-gray-200 text-gray-700 hover:bg-white text-base h-11 px-6">
                         Cancel
                     </Button>
                     {step === 'form' && (
                         <Button
                             onClick={handleCreate}
                             disabled={isCreating}
-                            className="h-14 px-10 bg-primary-600 hover:bg-primary-700 rounded-2xl font-black uppercase tracking-widest italic"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 px-6"
                         >
-                            {isCreating ? <Loader2 className="animate-spin h-5 w-5 mr-3" /> : <Send className="h-5 w-5 mr-3" />}
+                            {isCreating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
                             Create Offer
                         </Button>
                     )}

@@ -96,7 +96,7 @@ function App() {
         <Route path="/offboarding" element={<OffboardingPage />} />
 
         {/* Finance Routes */}
-        <Route path="/finance/expenses" element={<ExpensesPage />} />
+        <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/finance/loans" element={<div>Loans Page (Coming Soon)</div>} />
 
         {/* Payroll Routes */}

@@ -41,3 +41,21 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"{self.actor} {self.verb} - {self.recipient if self.recipient else 'Public'}"
+
+class Announcement(models.Model):
+    """
+    Company-wide announcements (e.g. Quarterly reviews, Holidays)
+    """
+    company = models.ForeignKey('accounts.Company', on_delete=models.CASCADE, related_name='announcements')
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    posted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.title

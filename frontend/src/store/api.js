@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -349,13 +349,17 @@ export const api = createApi({
 
     // ========== LEAVE MANAGEMENT ==========
     getLeaveRequests: builder.query({
-      query: (url) => url || '/leave/requests/',
-      transformResponse: (response, meta, arg) => {
-        // Handle error responses
-        if (response?.error) return [];
+      query: (params) => {
+        if (typeof params === 'string') return params;
+        return {
+          url: '/leave/requests/',
+          params
+        };
+      },
+      transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return [];
+        return response || [];
       },
       providesTags: ['LeaveRequest']
     }),
@@ -1027,6 +1031,45 @@ export const api = createApi({
       invalidatesTags: ['DisciplinaryAction']
     }),
 
+    // ========== EXPENSE MANAGEMENT ==========
+    getExpenseCategories: builder.query({
+      query: (params) => ({
+        url: '/expense/categories/',
+        params
+      }),
+      providesTags: ['ExpenseCategory']
+    }),
+    getExpenseClaims: builder.query({
+      query: (params) => ({
+        url: '/expense/claims/',
+        params
+      }),
+      providesTags: ['ExpenseClaim']
+    }),
+    createExpenseClaim: builder.mutation({
+      query: (body) => ({
+        url: '/expense/claims/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['ExpenseClaim']
+    }),
+    updateExpenseClaim: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/expense/claims/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['ExpenseClaim']
+    }),
+    deleteExpenseClaim: builder.mutation({
+      query: (id) => ({
+        url: `/expense/claims/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['ExpenseClaim']
+    }),
+
     // --- Accounts / Settings ---
     getUsers: builder.query({
       query: () => '/users/',
@@ -1062,6 +1105,34 @@ export const api = createApi({
         method: 'POST',
       }),
       invalidatesTags: ['Notification'],
+    }),
+    // Announcement Endpoints
+    getAnnouncements: builder.query({
+      query: () => '/notifications/announcements/',
+      providesTags: ['Announcement']
+    }),
+    createAnnouncement: builder.mutation({
+      query: (body) => ({
+        url: '/notifications/announcements/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Announcement']
+    }),
+    updateAnnouncement: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/notifications/announcements/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Announcement']
+    }),
+    deleteAnnouncement: builder.mutation({
+      query: (id) => ({
+        url: `/notifications/announcements/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Announcement']
     }),
   })
 });
@@ -1209,6 +1280,12 @@ export const {
   useGetUsersQuery,
   useGetCompanyQuery,
   useUpdateCompanyMutation,
+  // Expense Hooks
+  useGetExpenseCategoriesQuery,
+  useGetExpenseClaimsQuery,
+  useCreateExpenseClaimMutation,
+  useUpdateExpenseClaimMutation,
+  useDeleteExpenseClaimMutation,
   // Salary Advances
   useCreateSalaryAdvanceMutation,
   useApproveSalaryAdvanceMutation,
@@ -1219,6 +1296,11 @@ export const {
   useGetNotificationsQuery,
   useMarkNotificationReadMutation,
   useMarkAllNotificationsReadMutation,
+  // Announcements
+  useGetAnnouncementsQuery,
+  useCreateAnnouncementMutation,
+  useUpdateAnnouncementMutation,
+  useDeleteAnnouncementMutation,
 } = api;
 
 export default api;

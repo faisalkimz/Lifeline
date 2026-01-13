@@ -16,3 +16,8 @@ class EmployeeBenefitSerializer(serializers.ModelSerializer):
         model = EmployeeBenefit
         fields = '__all__'
         read_only_fields = ['created_at']
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        response['benefit_type'] = BenefitTypeSerializer(instance.benefit_type).data
+        return response

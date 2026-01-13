@@ -16,4 +16,4 @@ class DisciplinaryActionListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = DisciplinaryAction
-        fields = ('id', 'case_id', 'employee_name', 'reason', 'incident_date', 'severity', 'status')
+        fields = ('id', 'case_id', 'employee_name', 'reason', 'incident_date', 'severity', 'status', 'created_at')

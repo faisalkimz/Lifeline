@@ -55,13 +55,14 @@ class UserSerializer(serializers.ModelSerializer):
     """
     company_name = serializers.CharField(source='company.name', read_only=True)
     full_name = serializers.SerializerMethodField()
+    employee_id = serializers.IntegerField(source='employee.id', read_only=True, allow_null=True)
     
     class Meta:
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
             'company', 'company_name', 'role', 'phone', 'photo', 
-            'employee', 'is_active', 'date_joined', 'last_login'
+            'employee', 'employee_id', 'is_active', 'date_joined', 'last_login'
         ]
         read_only_fields = ['id', 'date_joined', 'last_login']
         extra_kwargs = {
@@ -187,7 +188,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create company and admin user"""
-        from employees.models import Employee
+        from employees.models import Employee, Department
         from django.utils import timezone
         from datetime import date
 
@@ -207,6 +208,17 @@ class RegisterSerializer(serializers.ModelSerializer):
         # Create company
         company = Company.objects.create(**company_data)
         
+        # Create Default Departments
+        default_depts = ["Management", "Human Resources", "Finance", "Engineering", "Sales", "Operations"]
+        created_depts = {}
+        for dept_name in default_depts:
+            dept = Department.objects.create(
+                company=company,
+                name=dept_name,
+                code=dept_name[:3].upper()
+            )
+            created_depts[dept_name] = dept
+
         # Extract user data
         validated_data.pop('password2')
         password = validated_data.pop('password')
@@ -221,6 +233,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         # Create corresponding Employee record for the admin
+        # Assign to Management or HR
+        admin_dept = created_depts.get("Management") or created_depts.get("Human Resources")
+
         employee = Employee.objects.create(
             company=company,
             first_name=user.first_name,
@@ -232,12 +247,18 @@ class RegisterSerializer(serializers.ModelSerializer):
             national_id=f'ADM-{user.id}', # Default
             join_date=timezone.now().date(),
             job_title='Company Administrator',
-            employment_status='active'
+            employment_status='active',
+            department=admin_dept
         )
         
         # Link user to employee
         user.employee = employee
         user.save()
+        
+        # Assign as manager of the department
+        if admin_dept:
+            admin_dept.manager = employee
+            admin_dept.save()
         
         return user
 

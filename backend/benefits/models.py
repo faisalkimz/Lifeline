@@ -25,6 +25,9 @@ class BenefitType(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.name} ({self.company.name})"
 
@@ -52,6 +55,9 @@ class EmployeeBenefit(models.Model):
     dependents_covered = models.JSONField(default=list, blank=True, help_text="List of family members covered")
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.benefit_type.name} - {self.employee.full_name}"

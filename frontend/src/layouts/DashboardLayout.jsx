@@ -9,7 +9,7 @@ import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
   Briefcase, BookOpen, Shield, FileText, Search, ChevronDown, HelpCircle,
-  Building, LayoutGrid, ChevronRight, Activity, Zap
+  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -53,6 +53,7 @@ const DashboardLayout = () => {
     { name: 'Performance', href: '/performance', icon: TrendingUp },
     { name: 'Recruitment', href: '/recruitment', icon: Briefcase },
     { name: 'Training', href: '/training', icon: BookOpen },
+    { name: 'Expenses', href: '/expenses', icon: DollarSign },
     { name: 'Benefits', href: '/benefits', icon: Shield },
     { name: 'Documents', href: '/documents', icon: FileText },
     { name: 'Org Chart', href: '/org-chart', icon: LayoutGrid },

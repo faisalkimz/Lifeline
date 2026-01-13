@@ -4,16 +4,20 @@ import { selectCurrentUser } from '../auth/authSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
+import { Input } from '../../components/ui/Input';
 import {
     Calendar, Users, Bell, TrendingUp, DollarSign,
     Briefcase, CheckCircle2, ChevronRight,
-    Clock, Activity, ArrowUpRight, Search, PieChart
+    Clock, Activity, ArrowUpRight, Search, PieChart,
+    Plus, Megaphone
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     useGetEmployeeStatsQuery,
     useGetLeaveRequestsQuery,
+    useGetAnnouncementsQuery,
+    useCreateAnnouncementMutation
 } from '../../store/api';
 import toast from 'react-hot-toast';
 
@@ -21,6 +25,9 @@ const DashboardPage = () => {
     const user = useSelector(selectCurrentUser);
     const { data: stats, isLoading: statsLoading } = useGetEmployeeStatsQuery();
     const { data: leaveRequests } = useGetLeaveRequestsQuery({ status: 'pending' });
+    const { data: announcements, isLoading: announcementsLoading } = useGetAnnouncementsQuery();
+
+    const [createAnnouncement, { isLoading: isCreatingAnnouncement }] = useCreateAnnouncementMutation();
 
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
@@ -28,6 +35,28 @@ const DashboardPage = () => {
         currentDate.getHours() < 17 ? 'Good afternoon' : 'Good evening';
 
     const pendingRequests = (leaveRequests?.results || leaveRequests || []).filter(r => r.status === 'pending');
+    // Get the latest active announcement or show a placeholder if critical
+    const latestAnnouncement = announcements?.length > 0 ? announcements[0] : null;
+
+    const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
+    const [isCreateAnnouncementOpen, setIsCreateAnnouncementOpen] = useState(false);
+
+    const [newAnnouncement, setNewAnnouncement] = useState({
+        title: '',
+        content: ''
+    });
+
+    const handleCreateAnnouncement = async (e) => {
+        e.preventDefault();
+        try {
+            await createAnnouncement(newAnnouncement).unwrap();
+            toast.success('Announcement posted successfully!');
+            setIsCreateAnnouncementOpen(false);
+            setNewAnnouncement({ title: '', content: '' });
+        } catch (error) {
+            toast.error('Failed to post announcement.');
+        }
+    };
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -42,7 +71,7 @@ const DashboardPage = () => {
         visible: { y: 0, opacity: 1 }
     };
 
-    const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
+    const isAdmin = user?.role === 'admin' || user?.role === 'company_admin' || user?.role === 'super_admin';
 
     return (
         <motion.div
@@ -249,56 +278,118 @@ const DashboardPage = () => {
                     </Card>
 
                     {/* Announcement / Tip */}
-                    <Card className="rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 bg-white p-6">
-                        <div className="flex items-start gap-4">
+                    <Card className="rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 bg-white p-6 relative overflow-hidden">
+                        <div className="flex items-start gap-4 z-10 relative">
                             <div className="p-3 bg-rose-50 rounded-2xl">
-                                <Bell className="h-6 w-6 text-rose-500" />
+                                <Megaphone className="h-6 w-6 text-rose-500" />
                             </div>
-                            <div>
+                            <div className="flex-1">
                                 <h4 className="font-bold text-slate-900 mb-1">Company Announcement</h4>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    The quarterly review period begins next week. Please ensure all employee evaluations are submitted.
-                                </p>
-                                <Button
-                                    variant="link"
-                                    onClick={() => setIsAnnouncementOpen(true)}
-                                    className="px-0 text-rose-600 hover:text-rose-800 h-auto mt-2 font-bold flex items-center cursor-pointer hover:underline decoration-rose-600 underline-offset-4"
-                                >
-                                    Read more <ChevronRight className="h-4 w-4 ml-1" />
-                                </Button>
+                                {latestAnnouncement ? (
+                                    <>
+                                        <h5 className='text-sm font-bold text-slate-700 mb-1 line-clamp-1'>{latestAnnouncement.title}</h5>
+                                        <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
+                                            {latestAnnouncement.content}
+                                        </p>
+                                        <Button
+                                            variant="link"
+                                            onClick={() => setIsAnnouncementOpen(true)}
+                                            className="px-0 text-rose-600 hover:text-rose-800 h-auto mt-2 font-bold flex items-center cursor-pointer hover:underline decoration-rose-600 underline-offset-4"
+                                        >
+                                            Read more <ChevronRight className="h-4 w-4 ml-1" />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <p className="text-sm text-slate-500">No active announcements.</p>
+                                )}
                             </div>
                         </div>
+                        {/* Admin Create Action */}
+                        {isAdmin && (
+                            <div className="mt-4 pt-4 border-t border-slate-100 flex justify-center">
+                                <Button
+                                    onClick={() => setIsCreateAnnouncementOpen(true)}
+                                    variant="ghost"
+                                    size="sm"
+                                    className="text-slate-400 hover:text-slate-900 font-medium text-xs"
+                                >
+                                    <Plus className="h-3 w-3 mr-1" /> Create Announcement
+                                </Button>
+                            </div>
+                        )}
                     </Card>
                 </div>
             </div>
 
+            {/* Read Announcement Dialog */}
             <Dialog open={isAnnouncementOpen} onOpenChange={setIsAnnouncementOpen}>
+                {latestAnnouncement && (
+                    <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
+                        <DialogHeader className="p-8 pb-4 border-b border-slate-50">
+                            <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                                <Megaphone className="h-6 w-6 text-rose-500" /> Announcement Details
+                            </DialogTitle>
+                        </DialogHeader>
+                        <div className="p-8">
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">{latestAnnouncement.title}</h3>
+                            <p className="text-slate-600 leading-relaxed mb-6 whitespace-pre-wrap">
+                                {latestAnnouncement.content}
+                            </p>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-500">Posted by {latestAnnouncement.posted_by_name || 'Admin'}</span>
+                                <span className="text-sm font-bold text-slate-900">{new Date(latestAnnouncement.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <div className="mt-8 flex justify-end">
+                                <Button onClick={() => setIsAnnouncementOpen(false)} className="bg-slate-900 text-white rounded-xl px-6">
+                                    Close Announcement
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                )}
+            </Dialog>
+
+            {/* Create Announcement Dialog */}
+            <Dialog open={isCreateAnnouncementOpen} onOpenChange={setIsCreateAnnouncementOpen}>
                 <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
                     <DialogHeader className="p-8 pb-4 border-b border-slate-50">
-                        <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                            <Bell className="h-6 w-6 text-rose-500" /> Announcement Details
+                        <DialogTitle className="text-2xl font-bold text-slate-900">
+                            New Announcement
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="p-8">
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">Quarterly Performance Reviews</h3>
-                        <p className="text-slate-600 leading-relaxed mb-6">
-                            The quarterly review period begins next week. Please ensure all employee evaluations are completed and submitted by Friday, January 26th.
-                            <br /><br />
-                            Managers are required to schedule 1-on-1 sessions with their direct reports to discuss progress, goals, and feedback.
-                            If you have any questions regarding the new evaluation criteria, please refer to the HR Handbook updated on January 2nd.
-                        </p>
-                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
-                            <span className="text-sm font-medium text-slate-500">Posted by HR Department</span>
-                            <span className="text-sm font-bold text-slate-900">{new Date().toLocaleDateString()}</span>
+                    <form onSubmit={handleCreateAnnouncement} className="p-8 space-y-4">
+                        <div className="space-y-2">
+                            <label className='text-sm font-bold text-slate-700'>Title</label>
+                            <Input
+                                required
+                                placeholder="e.g. Office Holiday Party"
+                                value={newAnnouncement.title}
+                                onChange={(e) => setNewAnnouncement({ ...newAnnouncement, title: e.target.value })}
+                                className="bg-white"
+                            />
                         </div>
-                        <div className="mt-8 flex justify-end">
-                            <Button onClick={() => setIsAnnouncementOpen(false)} className="bg-slate-900 text-white rounded-xl px-6">
-                                Close Announcement
+                        <div className="space-y-2">
+                            <label className='text-sm font-bold text-slate-700'>Content</label>
+                            <textarea
+                                required
+                                placeholder="Write your announcement here..."
+                                value={newAnnouncement.content}
+                                onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
+                                className="w-full p-3 min-h-[150px] bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 outline-none resize-none text-sm"
+                            />
+                        </div>
+                        <div className="mt-8 flex justify-end gap-3">
+                            <Button type="button" variant="ghost" onClick={() => setIsCreateAnnouncementOpen(false)} className="text-slate-500 rounded-xl px-6">
+                                Cancel
+                            </Button>
+                            <Button type="submit" className="bg-slate-900 text-white rounded-xl px-6 shadow-lg shadow-slate-900/20">
+                                {isCreatingAnnouncement ? 'Posting...' : 'Post Announcement'}
                             </Button>
                         </div>
-                    </div>
+                    </form>
                 </DialogContent>
             </Dialog>
+
         </motion.div>
     );
 };

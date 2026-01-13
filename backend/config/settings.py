@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "offboarding", # Offboarding & Exit
     "disciplinary", # Disciplinary tracking
     "notifications", # Notifications system
+    "expense",      # Expense claims
 ]
 
 

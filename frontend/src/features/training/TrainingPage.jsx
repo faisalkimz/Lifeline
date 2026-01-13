@@ -32,7 +32,7 @@ const TrainingPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [programData, setProgramData] = useState({
-        title: '',
+        name: '',
         description: '',
         duration_hours: '',
         category: 'technical',
@@ -55,7 +55,7 @@ const TrainingPage = () => {
             await createProgram(programData).unwrap();
             toast.success('Training program created!');
             setIsProgramDialogOpen(false);
-            setProgramData({ title: '', description: '', duration_hours: '', category: 'technical', is_mandatory: false });
+            setProgramData({ name: '', description: '', duration_hours: '', category: 'technical', is_mandatory: false });
         } catch (error) {
             console.error('Create program failed:', error);
             const msg = error?.data?.detail || 'Failed to create program';
@@ -87,7 +87,7 @@ const TrainingPage = () => {
     const certificates = enrollmentsArray.filter(e => e.certificate_issued).length;
 
     const filteredPrograms = programsArray.filter(p =>
-        p.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -125,7 +125,7 @@ const TrainingPage = () => {
                                                 >
                                                     <option value="">Select program...</option>
                                                     {programsArray.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.title}</option>
+                                                        <option key={p.id} value={p.id}>{p.name}</option>
                                                     ))}
                                                 </select>
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -210,11 +210,11 @@ const TrainingPage = () => {
                                     </div>
                                     <form onSubmit={handleCreateProgram} className="p-6 space-y-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Program Title</label>
+                                            <label className="text-sm font-medium text-gray-700">Program Name</label>
                                             <Input
                                                 className="bg-white"
-                                                value={programData.title}
-                                                onChange={e => setProgramData({ ...programData, title: e.target.value })}
+                                                value={programData.name}
+                                                onChange={e => setProgramData({ ...programData, name: e.target.value })}
                                                 required
                                                 placeholder="e.g. Advanced Leadership Skills"
                                             />
@@ -370,7 +370,7 @@ const TrainingPage = () => {
                                             <Badge className="bg-red-50 text-red-700 border-red-100 px-2 py-0.5">Required</Badge>
                                         )}
                                     </div>
-                                    <h3 className="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-primary-600 transition-colors">{program.title}</h3>
+                                    <h3 className="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-primary-600 transition-colors">{program.name}</h3>
                                     <p className="text-sm text-gray-600 mb-5 line-clamp-2 leading-relaxed">{program.description}</p>
 
                                     <div className="flex items-center gap-4 text-xs font-medium text-gray-500 mb-5">

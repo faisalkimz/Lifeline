@@ -5,7 +5,7 @@ import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, FileText, Loader2 } from 'lucide-react';
+import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, FileText, Loader2, Clock } from 'lucide-react';
 import { useGetExpenseClaimsQuery, useGetExpenseCategoriesQuery, useCreateExpenseClaimMutation } from '../../store/api';
 import toast from 'react-hot-toast';
 
@@ -14,8 +14,10 @@ const ExpensesPage = () => {
     const [selectedExpense, setSelectedExpense] = useState(null);
 
     const { data: claims, isLoading: claimsLoading } = useGetExpenseClaimsQuery();
-    const { data: categories } = useGetExpenseCategoriesQuery();
+    const { data: categoriesData } = useGetExpenseCategoriesQuery();
     const [createClaim, { isLoading: isCreating }] = useCreateExpenseClaimMutation();
+
+    const categories = Array.isArray(categoriesData) ? categoriesData : (categoriesData?.results || []);
 
     const [formData, setFormData] = useState({
         title: '',

@@ -169,7 +169,7 @@ const EmployeeFormPage = () => {
     const { data: currentUser } = useGetCurrentUserQuery();
     const canManageSalaries = ['hr_manager', 'company_admin', 'super_admin'].includes(currentUser?.role);
 
-    const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset, setValue, watch, setError } = useForm({
         resolver: zodResolver(employeeSchema),
         defaultValues: {
             gender: 'male',
@@ -446,7 +446,7 @@ const EmployeeFormPage = () => {
                                 <div>
                                     <div className="text-lg font-bold text-slate-800">{(watch('first_name') || '') + ' ' + (watch('last_name') || '')}</div>
                                     <div className="text-sm text-slate-400">{watch('job_title') || 'No Title'}</div>
-                                    <div className="text-xs text-slate-600 mt-2">Status: <span className="font-semibold text-slate-800">{watch('employment_status')?.replace('_',' ') || 'Pending'}</span></div>
+                                    <div className="text-xs text-slate-600 mt-2">Status: <span className="font-semibold text-slate-800">{watch('employment_status')?.replace('_', ' ') || 'Pending'}</span></div>
                                 </div>
                             </div>
 
@@ -505,401 +505,401 @@ const EmployeeFormPage = () => {
                                 <Card className="bg-white dark:bg-slate-800 border rounded-lg">
                                     <CardContent className="p-6">
                                         <form onSubmit={handleSubmit(onSubmit)}>
-                                                {/* Personal Tab */}
-                                                <TabsContent value="personal" className="space-y-10 mt-0">
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                        <FormField label="First Name" error={errors.first_name} required icon={User}>
-                                                            <Input {...register('first_name')} aria-label="First name" placeholder="First Name" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                            {/* Personal Tab */}
+                                            <TabsContent value="personal" className="space-y-10 mt-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                    <FormField label="First Name" error={errors.first_name} required icon={User}>
+                                                        <Input {...register('first_name')} aria-label="First name" placeholder="First Name" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                                    </FormField>
+                                                    <FormField label="Middle Name" error={errors.middle_name} icon={User}>
+                                                        <Input {...register('middle_name')} placeholder="Middle Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                    <FormField label="Last Name" error={errors.last_name} required icon={User}>
+                                                        <Input {...register('last_name')} aria-label="Last name" placeholder="Last Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="Email Address" error={errors.email} required icon={Mail}>
+                                                        <Input type="email" {...register('email')} aria-label="Email address" placeholder="email@domain.com" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                                    </FormField>
+                                                    <FormField label="Phone Number" error={errors.phone} required icon={Phone}>
+                                                        <Input {...register('phone')} aria-label="Phone number" placeholder="+256..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                                    </FormField>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                    <FormField label="Date of Birth" error={errors.date_of_birth} required icon={Calendar}>
+                                                        <Input type="date" {...register('date_of_birth')} className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                                    </FormField>
+                                                    <FormField label="Gender" error={errors.gender} required icon={User}>
+                                                        <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('gender')}>
+                                                            <option value="male">Male</option>
+                                                            <option value="female">Female</option>
+                                                            <option value="other">Other</option>
+                                                        </select>
+                                                    </FormField>
+                                                    <FormField label="Marital Status" error={errors.marital_status} icon={Star}>
+                                                        <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('marital_status')}>
+                                                            <option value="single">Single</option>
+                                                            <option value="married">Married</option>
+                                                            <option value="divorced">Divorced</option>
+                                                            <option value="widowed">Widowed</option>
+                                                        </select>
+                                                    </FormField>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="Address" error={errors.address} icon={MapPin}>
+                                                        <Input {...register('address')} placeholder="Physical Address" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <FormField label="City" error={errors.city} icon={MapPin}>
+                                                            <Input {...register('city')} placeholder="Kampala" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
-                                                        <FormField label="Middle Name" error={errors.middle_name} icon={User}>
-                                                            <Input {...register('middle_name')} placeholder="Middle Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                        <FormField label="Last Name" error={errors.last_name} required icon={User}>
-                                                            <Input {...register('last_name')} aria-label="Last name" placeholder="Last Name" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        <FormField label="District" error={errors.district} icon={MapPin}>
+                                                            <Input {...register('district')} placeholder="Central" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
                                                         </FormField>
                                                     </div>
+                                                </div>
+                                            </TabsContent>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Email Address" error={errors.email} required icon={Mail}>
-                                                            <Input type="email" {...register('email')} aria-label="Email address" placeholder="email@domain.com" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
-                                                        </FormField>
-                                                        <FormField label="Phone Number" error={errors.phone} required icon={Phone}>
-                                                            <Input {...register('phone')} aria-label="Phone number" placeholder="+256..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
-                                                        </FormField>
-                                                    </div>
+                                            {/* Employment Tab */}
+                                            <TabsContent value="employment" className="space-y-10 mt-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="Department" error={errors.department} required icon={Building2}>
+                                                        <select aria-label="Department" className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('department')}>
+                                                            <option value="">Select Department</option>
+                                                            {departments.map(dept => (
+                                                                <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </FormField>
+                                                    <FormField label="Job Title" error={errors.job_title} required icon={Briefcase}>
+                                                        <Input {...register('job_title')} aria-label="Job title" placeholder="e.g. Lead Architect" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
+                                                    </FormField>
+                                                </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                                        <FormField label="Date of Birth" error={errors.date_of_birth} required icon={Calendar}>
-                                                            <Input type="date" {...register('date_of_birth')} className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
-                                                        </FormField>
-                                                        <FormField label="Gender" error={errors.gender} required icon={User}>
-                                                            <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('gender')}>
-                                                                <option value="male">Male</option>
-                                                                <option value="female">Female</option>
-                                                                <option value="other">Other</option>
-                                                            </select>
-                                                        </FormField>
-                                                        <FormField label="Marital Status" error={errors.marital_status} icon={Star}>
-                                                            <select className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('marital_status')}>
-                                                                <option value="single">Single</option>
-                                                                <option value="married">Married</option>
-                                                                <option value="divorced">Divorced</option>
-                                                                <option value="widowed">Widowed</option>
-                                                            </select>
-                                                        </FormField>
-                                                    </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="Reporting Manager" error={errors.manager} icon={User}>
+                                                        <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('manager')}>
+                                                            <option value="">Select Manager</option>
+                                                            {employees.map(emp => (
+                                                                <option key={emp.id} value={emp.id}>{emp.full_name}</option>
+                                                            ))}
+                                                        </select>
+                                                    </FormField>
+                                                    <FormField label="Employment Type" error={errors.employment_type} required icon={Briefcase}>
+                                                        <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_type')}>
+                                                            <option value="full_time">Full-Time</option>
+                                                            <option value="part_time">Part-Time</option>
+                                                            <option value="contract">Contractor</option>
+                                                            <option value="intern">Internship</option>
+                                                            <option value="casual">Casual Basis</option>
+                                                        </select>
+                                                    </FormField>
+                                                </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Address" error={errors.address} icon={MapPin}>
-                                                            <Input {...register('address')} placeholder="Physical Address" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                        <div className="grid grid-cols-2 gap-4">
-                                                            <FormField label="City" error={errors.city} icon={MapPin}>
-                                                                <Input {...register('city')} placeholder="Kampala" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
-                                                            <FormField label="District" error={errors.district} icon={MapPin}>
-                                                                <Input {...register('district')} placeholder="Central" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                                    <FormField label="Joined Date" error={errors.join_date} required icon={Calendar}>
+                                                        <Input type="date" {...register('join_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                    <FormField label="Probation End Date" error={errors.probation_end_date} icon={Calendar}>
+                                                        <Input type="date" {...register('probation_end_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                    <FormField label="Status" error={errors.employment_status} required icon={CheckCircle}>
+                                                        <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_status')}>
+                                                            <option value="active">Active</option>
+                                                            <option value="on_leave">On Leave</option>
+                                                            <option value="suspended">Suspended</option>
+                                                            <option value="terminated">Terminated</option>
+                                                            <option value="resigned">Resigned</option>
+                                                        </select>
+                                                    </FormField>
+                                                </div>
+                                            </TabsContent>
+
+                                            {/* Compensation Tab */}
+                                            <TabsContent value="compensation" className="space-y-10 mt-0">
+                                                <div className="bg-slate-950 text-white p-10 rounded-[3rem] mb-10 relative overflow-hidden shadow-2xl border border-white/5 group">
+                                                    <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-600/20 transition-colors duration-1000"></div>
+                                                    <div className="relative z-10 flex items-center gap-8">
+                                                        <div className="p-5 bg-slate-50 rounded-[1rem] border border-slate-200 shadow-inner transition-colors duration-500">
+                                                            <Wallet className="h-10 w-10 text-primary-400 group-hover:text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-2xl font-black tracking-tighter">Salary Information</h4>
+                                                            <p className="text-slate-500 text-sm mt-1 max-w-lg font-medium leading-relaxed">
+                                                                Configure the employee's compensation details. Our system will handle calculations and compliance rules automatically.
+                                                            </p>
                                                         </div>
                                                     </div>
-                                                </TabsContent>
+                                                </div>
 
-                                                {/* Employment Tab */}
-                                                <TabsContent value="employment" className="space-y-10 mt-0">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Department" error={errors.department} required icon={Building2}>
-                                                            <select aria-label="Department" className="ui-select w-full h-10 px-3 rounded-md border border-slate-200 bg-white text-sm font-medium focus:ring-2 focus:ring-primary-500" {...register('department')}>
-                                                                <option value="">Select Department</option>
-                                                                {departments.map(dept => (
-                                                                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                                                ))}
-                                                            </select>
-                                                        </FormField>
-                                                        <FormField label="Job Title" error={errors.job_title} required icon={Briefcase}>
-                                                            <Input {...register('job_title')} aria-label="Job title" placeholder="e.g. Lead Architect" className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium" />
-                                                        </FormField>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
+                                                    <div className="md:col-span-2 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                                                        <div className="h-2 w-2 rounded-full bg-primary-500" />
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Monthly Components</span>
                                                     </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Reporting Manager" error={errors.manager} icon={User}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('manager')}>
-                                                                <option value="">Select Manager</option>
-                                                                {employees.map(emp => (
-                                                                    <option key={emp.id} value={emp.id}>{emp.full_name}</option>
-                                                                ))}
-                                                            </select>
-                                                        </FormField>
-                                                        <FormField label="Employment Type" error={errors.employment_type} required icon={Briefcase}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_type')}>
-                                                                <option value="full_time">Full-Time</option>
-                                                                <option value="part_time">Part-Time</option>
-                                                                <option value="contract">Contractor</option>
-                                                                <option value="intern">Internship</option>
-                                                                <option value="casual">Casual Basis</option>
-                                                            </select>
-                                                        </FormField>
-                                                    </div>
-
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                                        <FormField label="Joined Date" error={errors.join_date} required icon={Calendar}>
-                                                            <Input type="date" {...register('join_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                        <FormField label="Probation End Date" error={errors.probation_end_date} icon={Calendar}>
-                                                            <Input type="date" {...register('probation_end_date')} className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                        <FormField label="Status" error={errors.employment_status} required icon={CheckCircle}>
-                                                            <select className="ui-select w-full h-14 px-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 text-sm font-bold focus:ring-2 focus:ring-primary-500" {...register('employment_status')}>
-                                                                <option value="active">Active</option>
-                                                                <option value="on_leave">On Leave</option>
-                                                                <option value="suspended">Suspended</option>
-                                                                <option value="terminated">Terminated</option>
-                                                                <option value="resigned">Resigned</option>
-                                                            </select>
-                                                        </FormField>
-                                                    </div>
-                                                </TabsContent>
-
-                                                {/* Compensation Tab */}
-                                                <TabsContent value="compensation" className="space-y-10 mt-0">
-                                                    <div className="bg-slate-950 text-white p-10 rounded-[3rem] mb-10 relative overflow-hidden shadow-2xl border border-white/5 group">
-                                                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-primary-600/20 transition-colors duration-1000"></div>
-                                                        <div className="relative z-10 flex items-center gap-8">
-                                                            <div className="p-5 bg-slate-50 rounded-[1rem] border border-slate-200 shadow-inner transition-colors duration-500">
-                                                                <Wallet className="h-10 w-10 text-primary-400 group-hover:text-white" />
+                                                    <FormField label="Basic Salary" error={errors.basic_salary} required icon={Wallet}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
                                                             </div>
-                                                            <div>
-                                                                <h4 className="text-2xl font-black tracking-tighter">Salary Information</h4>
-                                                                <p className="text-slate-500 text-sm mt-1 max-w-lg font-medium leading-relaxed">
-                                                                    Configure the employee's compensation details. Our system will handle calculations and compliance rules automatically.
-                                                                </p>
+                                                            <Input type="number" {...register('basic_salary')} placeholder="0.00" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 transition-all font-mono font-black text-xl" />
+                                                        </div>
+                                                    </FormField>
+
+                                                    <FormField label="Housing Allowance" error={errors.housing_allowance} icon={Home}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
                                                             </div>
+                                                            <Input type="number" {...register('housing_allowance')} placeholder="0.00" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
+                                                        </div>
+                                                    </FormField>
+
+                                                    <div className="md:col-span-2 pt-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                                                        <div className="h-2 w-2 rounded-full bg-indigo-500" />
+                                                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Allowances</span>
+                                                    </div>
+
+                                                    <FormField label="Transport Allowance" error={errors.transport_allowance} icon={MapPin}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
+                                                            </div>
+                                                            <Input type="number" {...register('transport_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
+                                                        </div>
+                                                    </FormField>
+
+                                                    <FormField label="Medical Allowance" error={errors.medical_allowance} icon={Shield}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
+                                                            </div>
+                                                            <Input type="number" {...register('medical_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
+                                                        </div>
+                                                    </FormField>
+
+                                                    <FormField label="Lunch Allowance" error={errors.lunch_allowance} icon={Info}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
+                                                            </div>
+                                                            <Input type="number" {...register('lunch_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
+                                                        </div>
+                                                    </FormField>
+
+                                                    <FormField label="Other Allowances" error={errors.other_allowances} icon={Plus}>
+                                                        <div className="relative group/input">
+                                                            <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
+                                                                <span className="text-[10px] font-black">UGX</span>
+                                                                <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
+                                                            </div>
+                                                            <Input type="number" {...register('other_allowances')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
+                                                        </div>
+                                                    </FormField>
+                                                </div>
+                                            </TabsContent>
+
+                                            {/* ACCESS TAB */}
+                                            <TabsContent value="access" className="space-y-10 mt-0">
+                                                <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/50 p-10 rounded-[3rem] mb-10 group transition-all hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
+                                                    <div className="flex items-start gap-8">
+                                                        <div className="p-5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 rounded-[2rem] shadow-sm transform transition-transform group-hover:rotate-12">
+                                                            <Lock className="h-10 w-10" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-2xl font-black text-emerald-950 dark:text-emerald-400 tracking-tight">Account Credentials</h4>
+                                                            <p className="text-emerald-800/70 dark:text-emerald-500/70 text-sm mt-1 leading-relaxed font-medium max-w-lg">
+                                                                Create system credentials to allow the employee to log in to the portal. Roles define what actions and data the employee can access.
+                                                            </p>
                                                         </div>
                                                     </div>
+                                                </div>
 
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-                                                        <div className="md:col-span-2 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                                                            <div className="h-2 w-2 rounded-full bg-primary-500" />
-                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Monthly Components</span>
+                                                <div
+                                                    onClick={() => setValue('create_user', !createUser)}
+                                                    className={`flex items-center justify-between p-8 border-2 rounded-[2.5rem] cursor-pointer transition-all duration-500 ${createUser
+                                                        ? 'bg-emerald-500 border-emerald-500 shadow-[0_20px_40px_-15px_rgba(16,185,129,0.4)]'
+                                                        : 'bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/50'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-6">
+                                                        <div className={`p-4 rounded-2xl transition-colors ${createUser ? 'bg-slate-50' : 'bg-slate-100'}`}>
+                                                            <User className={`h-8 w-8 ${createUser ? 'text-white' : 'text-slate-400'}`} />
                                                         </div>
-
-                                                        <FormField label="Basic Salary" error={errors.basic_salary} required icon={Wallet}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('basic_salary')} placeholder="0.00" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 focus:bg-white dark:focus:bg-slate-900 transition-all font-mono font-black text-xl" />
-                                                            </div>
-                                                        </FormField>
-
-                                                        <FormField label="Housing Allowance" error={errors.housing_allowance} icon={Home}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('housing_allowance')} placeholder="0.00" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
-                                                            </div>
-                                                        </FormField>
-
-                                                        <div className="md:col-span-2 pt-6 pb-4 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                                                            <div className="h-2 w-2 rounded-full bg-indigo-500" />
-                                                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Allowances</span>
-                                                        </div>
-
-                                                        <FormField label="Transport Allowance" error={errors.transport_allowance} icon={MapPin}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('transport_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
-                                                            </div>
-                                                        </FormField>
-
-                                                        <FormField label="Medical Allowance" error={errors.medical_allowance} icon={Shield}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('medical_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
-                                                            </div>
-                                                        </FormField>
-
-                                                        <FormField label="Lunch Allowance" error={errors.lunch_allowance} icon={Info}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('lunch_allowance')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
-                                                            </div>
-                                                        </FormField>
-
-                                                        <FormField label="Other Allowances" error={errors.other_allowances} icon={Plus}>
-                                                            <div className="relative group/input">
-                                                                <div className="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 text-slate-400 group-focus-within/input:text-primary-500 transition-colors">
-                                                                    <span className="text-[10px] font-black">UGX</span>
-                                                                    <div className="w-[1px] h-5 bg-slate-200 dark:bg-slate-700"></div>
-                                                                </div>
-                                                                <Input type="number" {...register('other_allowances')} placeholder="0" className="pl-20 h-16 rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 transition-all font-mono font-bold" />
-                                                            </div>
-                                                        </FormField>
-                                                    </div>
-                                                </TabsContent>
-
-                                                {/* ACCESS TAB */}
-                                                <TabsContent value="access" className="space-y-10 mt-0">
-                                                    <div className="bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/50 p-10 rounded-[3rem] mb-10 group transition-all hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
-                                                        <div className="flex items-start gap-8">
-                                                            <div className="p-5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 rounded-[2rem] shadow-sm transform transition-transform group-hover:rotate-12">
-                                                                <Lock className="h-10 w-10" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className="text-2xl font-black text-emerald-950 dark:text-emerald-400 tracking-tight">Account Credentials</h4>
-                                                                <p className="text-emerald-800/70 dark:text-emerald-500/70 text-sm mt-1 leading-relaxed font-medium max-w-lg">
-                                                                    Create system credentials to allow the employee to log in to the portal. Roles define what actions and data the employee can access.
-                                                                </p>
-                                                            </div>
+                                                        <div>
+                                                            <span className={`block text-lg font-black tracking-tight ${createUser ? 'text-white' : 'text-slate-900 dark:text-white'}`}>Enable System Access</span>
+                                                            <span className={`text-xs font-bold uppercase tracking-widest ${createUser ? 'text-white/70' : 'text-slate-400'}`}>Requires username & role assignment</span>
                                                         </div>
                                                     </div>
+                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all ${createUser ? 'bg-white border-white scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
+                                                        {createUser && <CheckCircle className="h-6 w-6 text-emerald-500" />}
+                                                    </div>
+                                                    <input type="checkbox" className="hidden" {...register('create_user')} />
+                                                </div>
 
-                                                    <div
-                                                        onClick={() => setValue('create_user', !createUser)}
-                                                        className={`flex items-center justify-between p-8 border-2 rounded-[2.5rem] cursor-pointer transition-all duration-500 ${createUser
-                                                            ? 'bg-emerald-500 border-emerald-500 shadow-[0_20px_40px_-15px_rgba(16,185,129,0.4)]'
-                                                            : 'bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/50'
-                                                            }`}
+                                                {createUser && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        className="space-y-10 pt-6 px-4"
                                                     >
-                                                        <div className="flex items-center gap-6">
-                                                            <div className={`p-4 rounded-2xl transition-colors ${createUser ? 'bg-slate-50' : 'bg-slate-100'}`}>
-                                                                <User className={`h-8 w-8 ${createUser ? 'text-white' : 'text-slate-400'}`} />
-                                                            </div>
-                                                            <div>
-                                                                <span className={`block text-lg font-black tracking-tight ${createUser ? 'text-white' : 'text-slate-900 dark:text-white'}`}>Enable System Access</span>
-                                                                <span className={`text-xs font-bold uppercase tracking-widest ${createUser ? 'text-white/70' : 'text-slate-400'}`}>Requires username & role assignment</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all ${createUser ? 'bg-white border-white scale-110' : 'border-slate-200 dark:border-slate-800'}`}>
-                                                            {createUser && <CheckCircle className="h-6 w-6 text-emerald-500" />}
-                                                        </div>
-                                                        <input type="checkbox" className="hidden" {...register('create_user')} />
-                                                    </div>
-
-                                                    {createUser && (
-                                                        <motion.div
-                                                            initial={{ opacity: 0, y: 20 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            className="space-y-10 pt-6 px-4"
-                                                        >
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                                <FormField label="Unique Username" error={errors.username} required icon={User}>
-                                                                    <Input {...register('username')} placeholder="e.g. system.identity" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                                </FormField>
-
-                                                                <div className="space-y-6">
-                                                                    <div
-                                                                        onClick={() => setValue('auto_password', !autoPassword)}
-                                                                        className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all ${autoPassword
-                                                                            ? 'bg-slate-950 border-slate-950 text-white shadow-xl'
-                                                                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white'
-                                                                            }`}
-                                                                    >
-                                                                        <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${autoPassword ? 'bg-primary-500 border-primary-500' : 'border-slate-300'}`}>
-                                                                            {autoPassword && <CheckCircle className="h-4 w-4 text-white" />}
-                                                                        </div>
-                                                                        <span className="text-xs font-black uppercase tracking-[0.2em]">Auto-generate Password</span>
-                                                                        <input type="checkbox" className="hidden" {...register('auto_password')} />
-                                                                    </div>
-
-                                                                    <FormField label="Password" error={errors.password} required={!autoPassword} icon={Lock}>
-                                                                        <Input
-                                                                            type="password"
-                                                                            {...register('password')}
-                                                                            placeholder={autoPassword ? "AUTO-GENERATED" : "••••••••"}
-                                                                            className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800"
-                                                                            disabled={autoPassword}
-                                                                        />
-                                                                    </FormField>
-                                                                </div>
-                                                            </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                            <FormField label="Unique Username" error={errors.username} required icon={User}>
+                                                                <Input {...register('username')} placeholder="e.g. system.identity" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                            </FormField>
 
                                                             <div className="space-y-6">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
-                                                                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">System Role</span>
+                                                                <div
+                                                                    onClick={() => setValue('auto_password', !autoPassword)}
+                                                                    className={`flex items-center gap-4 p-5 rounded-2xl border-2 cursor-pointer transition-all ${autoPassword
+                                                                        ? 'bg-slate-950 border-slate-950 text-white shadow-xl'
+                                                                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white'
+                                                                        }`}
+                                                                >
+                                                                    <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${autoPassword ? 'bg-primary-500 border-primary-500' : 'border-slate-300'}`}>
+                                                                        {autoPassword && <CheckCircle className="h-4 w-4 text-white" />}
+                                                                    </div>
+                                                                    <span className="text-xs font-black uppercase tracking-[0.2em]">Auto-generate Password</span>
+                                                                    <input type="checkbox" className="hidden" {...register('auto_password')} />
                                                                 </div>
-                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                                                    {[
-                                                                        { id: 'employee', label: 'Basic', desc: 'Standard employee portal access' },
-                                                                        { id: 'manager', label: 'Manager', desc: 'Manage team and approvals' },
-                                                                        { id: 'hr_manager', label: 'Administrator', desc: 'Full system access' }
-                                                                    ].map((role) => (
-                                                                        <div
-                                                                            key={role.id}
-                                                                            onClick={() => setValue('role', role.id)}
-                                                                            className={`p-6 rounded-3xl border-2 cursor-pointer transition-all ${watch('role') === role.id
-                                                                                ? 'bg-primary-50 dark:bg-primary-900/10 border-primary-500 shadow-lg'
-                                                                                : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200'
-                                                                                }`}
-                                                                        >
-                                                                            <span className={`block font-black uppercase tracking-widest text-[10px] mb-2 ${watch('role') === role.id ? 'text-primary-600' : 'text-slate-400'}`}>{role.label}</span>
-                                                                            <span className="block font-black text-lg tracking-tighter text-slate-900 dark:text-white capitalize">{role.id.replace('_', ' ')}</span>
-                                                                            <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter">{role.desc}</p>
-                                                                        </div>
-                                                                    ))}
-                                                                    <input type="hidden" {...register('role')} />
-                                                                </div>
+
+                                                                <FormField label="Password" error={errors.password} required={!autoPassword} icon={Lock}>
+                                                                    <Input
+                                                                        type="password"
+                                                                        {...register('password')}
+                                                                        placeholder={autoPassword ? "AUTO-GENERATED" : "••••••••"}
+                                                                        className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono disabled:opacity-50 disabled:bg-slate-50 dark:disabled:bg-slate-800"
+                                                                        disabled={autoPassword}
+                                                                    />
+                                                                </FormField>
                                                             </div>
-                                                        </motion.div>
-                                                    )}
-                                                </TabsContent>
-
-                                                {/* Documents Tab */}
-                                                <TabsContent value="documents" className="space-y-10 mt-0">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="National ID" error={errors.national_id} required icon={Shield}>
-                                                            <Input {...register('national_id')} aria-label="National ID" placeholder="CM..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
-                                                        </FormField>
-                                                        <FormField label="Passport Number" error={errors.passport_number} icon={Shield}>
-                                                            <Input {...register('passport_number')} placeholder="A..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
-                                                        </FormField>
-                                                    </div>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                        <FormField label="Tax Identification Number (TIN)" error={errors.tin_number} icon={FileText}>
-                                                            <Input {...register('tin_number')} placeholder="100..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                        <FormField label="NSSF Number" error={errors.nssf_number} icon={FileText}>
-                                                            <Input {...register('nssf_number')} placeholder="NS..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                        </FormField>
-                                                    </div>
-                                                </TabsContent>
-
-                                                {/* Protocols Tab */}
-                                                <TabsContent value="other" className="space-y-12 mt-0">
-                                                    <div>
-                                                        <h4 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mb-8 border-b border-primary-500/10 pb-4">Bank Details</h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                            <FormField label="Bank Name" error={errors.bank_name} icon={CreditCard}>
-                                                                <Input {...register('bank_name')} placeholder="e.g. Stanbic Bank" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
-                                                            <FormField label="Account Number" error={errors.bank_account_number} icon={CreditCard}>
-                                                                <Input {...register('bank_account_number')} placeholder="0123..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono font-bold" />
-                                                            </FormField>
-                                                            <FormField label="Branch Name" error={errors.bank_branch} icon={MapPin}>
-                                                                <Input {...register('bank_branch')} placeholder="e.g. Forest Mall" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
                                                         </div>
-                                                    </div>
 
-                                                    <div>
-                                                        <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-8 border-b border-indigo-500/10 pb-4">Emergency Contact</h4>
-                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                            <FormField label="Contact Name" error={errors.emergency_contact_name} icon={User}>
-                                                                <Input {...register('emergency_contact_name')} placeholder="Next of Kin" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
-                                                            <FormField label="Contact Phone" error={errors.emergency_contact_phone} icon={Phone}>
-                                                                <Input {...register('emergency_contact_phone')} placeholder="+256..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
-                                                            <FormField label="Relationship" error={errors.emergency_contact_relationship} icon={User}>
-                                                                <Input {...register('emergency_contact_relationship')} placeholder="Spouse, Parent" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
-                                                            </FormField>
+                                                        <div className="space-y-6">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="h-1.5 w-1.5 rounded-full bg-primary-500" />
+                                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">System Role</span>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                                {[
+                                                                    { id: 'employee', label: 'Basic', desc: 'Standard employee portal access' },
+                                                                    { id: 'manager', label: 'Manager', desc: 'Manage team and approvals' },
+                                                                    { id: 'hr_manager', label: 'Administrator', desc: 'Full system access' }
+                                                                ].map((role) => (
+                                                                    <div
+                                                                        key={role.id}
+                                                                        onClick={() => setValue('role', role.id)}
+                                                                        className={`p-6 rounded-3xl border-2 cursor-pointer transition-all ${watch('role') === role.id
+                                                                            ? 'bg-primary-50 dark:bg-primary-900/10 border-primary-500 shadow-lg'
+                                                                            : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-slate-200'
+                                                                            }`}
+                                                                    >
+                                                                        <span className={`block font-black uppercase tracking-widest text-[10px] mb-2 ${watch('role') === role.id ? 'text-primary-600' : 'text-slate-400'}`}>{role.label}</span>
+                                                                        <span className="block font-black text-lg tracking-tighter text-slate-900 dark:text-white capitalize">{role.id.replace('_', ' ')}</span>
+                                                                        <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase tracking-tighter">{role.desc}</p>
+                                                                    </div>
+                                                                ))}
+                                                                <input type="hidden" {...register('role')} />
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    </motion.div>
+                                                )}
+                                            </TabsContent>
 
-                                                    <FormField label="Additional Notes" error={errors.notes} icon={FileText}>
-                                                        <textarea
-                                                            className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 px-5 py-4 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[120px] transition-all"
-                                                            {...register('notes')}
-                                                            placeholder="Internal notes about the employee..."
-                                                        />
+                                            {/* Documents Tab */}
+                                            <TabsContent value="documents" className="space-y-10 mt-0">
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="National ID" error={errors.national_id} required icon={Shield}>
+                                                        <Input {...register('national_id')} aria-label="National ID" placeholder="CM..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
                                                     </FormField>
-                                                </TabsContent>
-
-                                                {/* Final Action Interface */}
-                                                <div className="flex justify-end gap-3 pt-8 border-t border-slate-100 dark:border-slate-800 mt-8">
-                                                    <Button
-                                                        variant="ghost"
-                                                        type="button"
-                                                        onClick={() => navigate('/employees')}
-                                                        className="px-4 py-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-all"
-                                                    >
-                                                        Cancel
-                                                    </Button>
-                                                    <Button
-                                                        onClick={handleSubmit(onSubmit)}
-                                                        disabled={isCreating || isUpdating}
-                                                        className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-md transition-all flex items-center gap-2 border-none"
-                                                    >
-                                                        <Save className="h-4 w-4" />
-                                                        {isCreating || isUpdating ? 'Saving...' : 'Save'}
-                                                    </Button>
+                                                    <FormField label="Passport Number" error={errors.passport_number} icon={Shield}>
+                                                        <Input {...register('passport_number')} placeholder="A..." className="h-10 rounded-md border-slate-200 dark:border-slate-800 font-medium uppercase" />
+                                                    </FormField>
                                                 </div>
-                                            </form>
-                                        </CardContent>
-                                    </Card>
-                                </div>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <FormField label="Tax Identification Number (TIN)" error={errors.tin_number} icon={FileText}>
+                                                        <Input {...register('tin_number')} placeholder="100..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                    <FormField label="NSSF Number" error={errors.nssf_number} icon={FileText}>
+                                                        <Input {...register('nssf_number')} placeholder="NS..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                    </FormField>
+                                                </div>
+                                            </TabsContent>
+
+                                            {/* Protocols Tab */}
+                                            <TabsContent value="other" className="space-y-12 mt-0">
+                                                <div>
+                                                    <h4 className="text-[10px] font-black text-primary-500 uppercase tracking-[0.3em] mb-8 border-b border-primary-500/10 pb-4">Bank Details</h4>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                        <FormField label="Bank Name" error={errors.bank_name} icon={CreditCard}>
+                                                            <Input {...register('bank_name')} placeholder="e.g. Stanbic Bank" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        </FormField>
+                                                        <FormField label="Account Number" error={errors.bank_account_number} icon={CreditCard}>
+                                                            <Input {...register('bank_account_number')} placeholder="0123..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-mono font-bold" />
+                                                        </FormField>
+                                                        <FormField label="Branch Name" error={errors.bank_branch} icon={MapPin}>
+                                                            <Input {...register('bank_branch')} placeholder="e.g. Forest Mall" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        </FormField>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <h4 className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em] mb-8 border-b border-indigo-500/10 pb-4">Emergency Contact</h4>
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                                        <FormField label="Contact Name" error={errors.emergency_contact_name} icon={User}>
+                                                            <Input {...register('emergency_contact_name')} placeholder="Next of Kin" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        </FormField>
+                                                        <FormField label="Contact Phone" error={errors.emergency_contact_phone} icon={Phone}>
+                                                            <Input {...register('emergency_contact_phone')} placeholder="+256..." className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        </FormField>
+                                                        <FormField label="Relationship" error={errors.emergency_contact_relationship} icon={User}>
+                                                            <Input {...register('emergency_contact_relationship')} placeholder="Spouse, Parent" className="h-14 rounded-2xl border-slate-200 dark:border-slate-800 font-bold" />
+                                                        </FormField>
+                                                    </div>
+                                                </div>
+
+                                                <FormField label="Additional Notes" error={errors.notes} icon={FileText}>
+                                                    <textarea
+                                                        className="w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 px-5 py-4 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-[120px] transition-all"
+                                                        {...register('notes')}
+                                                        placeholder="Internal notes about the employee..."
+                                                    />
+                                                </FormField>
+                                            </TabsContent>
+
+                                            {/* Final Action Interface */}
+                                            <div className="flex justify-end gap-3 pt-8 border-t border-slate-100 dark:border-slate-800 mt-8">
+                                                <Button
+                                                    variant="ghost"
+                                                    type="button"
+                                                    onClick={() => navigate('/employees')}
+                                                    className="px-4 py-2 rounded-md text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 font-semibold transition-all"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    onClick={handleSubmit(onSubmit)}
+                                                    disabled={isCreating || isUpdating}
+                                                    className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white font-semibold rounded-md transition-all flex items-center gap-2 border-none"
+                                                >
+                                                    <Save className="h-4 w-4" />
+                                                    {isCreating || isUpdating ? 'Saving...' : 'Save'}
+                                                </Button>
+                                            </div>
+                                        </form>
+                                    </CardContent>
+                                </Card>
+                            </div>
                         </Tabs>
                     </div>
                 </div>

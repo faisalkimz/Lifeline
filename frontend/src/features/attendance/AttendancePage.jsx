@@ -58,7 +58,7 @@ const AttendancePage = () => {
 
     const stats = React.useMemo(() => {
         const present = attendanceArray.filter(a => a.status === 'present').length;
-        const totalHrs = attendanceArray.reduce((sum, a) => sum + (a.hours_worked || 0), 0);
+        const totalHrs = attendanceArray.reduce((sum, a) => sum + (parseFloat(a.hours_worked) || 0), 0);
         const lates = attendanceArray.filter(a => a.is_late).length;
         return { present, totalHrs, lates };
     }, [attendanceArray]);

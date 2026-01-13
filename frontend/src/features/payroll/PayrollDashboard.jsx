@@ -54,6 +54,30 @@ const PayrollDashboard = () => {
     return <Badge className={`${cfg.color} ${cfg.text}`}>{cfg.label}</Badge>;
   };
 
+  const handleExport = () => {
+    if (!currentPayroll) return toast.error('No payroll data to export for this period');
+
+    const headers = ['Period', 'Status', 'Total Employees', 'Total Gross', 'Total Deductions', 'Total Net'];
+    const row = [
+      `${new Date(currentPayroll.year, currentPayroll.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}`,
+      currentPayroll.status,
+      currentPayroll.employee_count,
+      currentPayroll.total_gross,
+      currentPayroll.total_deductions,
+      currentPayroll.total_net
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), row.join(',')].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `payroll_export_${currentPayroll.year}_${currentPayroll.month}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success('Payroll report exported successfully');
+  };
+
   return (
     <div className="space-y-6 bg-white text-black p-6 rounded-lg">
       <div className="flex items-center justify-between">
@@ -62,7 +86,7 @@ const PayrollDashboard = () => {
           <p className="mt-2 text-gray-700">Process and track salaries</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline">Export</Button>
+          <Button variant="outline" onClick={handleExport}>Export</Button>
           <Button variant="primary" onClick={handleCreatePayrollRun}>New Payroll Run</Button>
         </div>
       </div>

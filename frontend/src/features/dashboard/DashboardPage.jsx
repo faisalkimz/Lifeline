@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import {
     Calendar, Users, Bell, TrendingUp, DollarSign,
     Briefcase, CheckCircle2, ChevronRight,
@@ -14,6 +15,7 @@ import {
     useGetEmployeeStatsQuery,
     useGetLeaveRequestsQuery,
 } from '../../store/api';
+import toast from 'react-hot-toast';
 
 const DashboardPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -40,6 +42,8 @@ const DashboardPage = () => {
         visible: { y: 0, opacity: 1 }
     };
 
+    const [isAnnouncementOpen, setIsAnnouncementOpen] = useState(false);
+
     return (
         <motion.div
             initial="hidden"
@@ -61,12 +65,16 @@ const DashboardPage = () => {
                     </motion.p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="rounded-xl h-11 border-slate-200 text-slate-600 hover:text-slate-900 font-medium">
-                        <Calendar className="mr-2 h-4 w-4" /> Schedule
-                    </Button>
-                    <Button className="rounded-xl h-11 bg-slate-900 text-white hover:bg-slate-800 font-medium shadow-lg shadow-slate-900/20">
-                        <Users className="mr-2 h-4 w-4" /> Add Employee
-                    </Button>
+                    <Link to="/leave/calendar">
+                        <Button variant="outline" className="rounded-xl h-11 border-slate-200 text-slate-600 hover:text-slate-900 font-medium">
+                            <Calendar className="mr-2 h-4 w-4" /> Schedule
+                        </Button>
+                    </Link>
+                    <Link to="/employees/new">
+                        <Button className="rounded-xl h-11 bg-slate-900 text-white hover:bg-slate-800 font-medium shadow-lg shadow-slate-900/20">
+                            <Users className="mr-2 h-4 w-4" /> Add Employee
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
@@ -197,9 +205,11 @@ const DashboardPage = () => {
                                     <h3 className="text-2xl font-bold">Upcoming Run</h3>
                                     <p className="text-indigo-100 text-sm mt-1">Scheduled for {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1).toLocaleDateString()}</p>
                                 </div>
-                                <Button className="mt-6 w-full bg-white text-indigo-600 hover:bg-indigo-50 border-none font-bold">
-                                    View Payroll
-                                </Button>
+                                <Link to="/payroll">
+                                    <Button className="mt-6 w-full bg-white text-indigo-600 hover:bg-indigo-50 border-none font-bold">
+                                        View Payroll
+                                    </Button>
+                                </Link>
                             </div>
                         </Card>
                     </div>
@@ -249,7 +259,11 @@ const DashboardPage = () => {
                                 <p className="text-sm text-slate-500 leading-relaxed">
                                     The quarterly review period begins next week. Please ensure all employee evaluations are submitted.
                                 </p>
-                                <Button variant="link" className="px-0 text-rose-600 h-auto mt-2 font-medium">
+                                <Button
+                                    variant="link"
+                                    onClick={() => setIsAnnouncementOpen(true)}
+                                    className="px-0 text-rose-600 hover:text-rose-800 h-auto mt-2 font-bold flex items-center cursor-pointer hover:underline decoration-rose-600 underline-offset-4"
+                                >
                                     Read more <ChevronRight className="h-4 w-4 ml-1" />
                                 </Button>
                             </div>
@@ -257,6 +271,34 @@ const DashboardPage = () => {
                     </Card>
                 </div>
             </div>
+
+            <Dialog open={isAnnouncementOpen} onOpenChange={setIsAnnouncementOpen}>
+                <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
+                    <DialogHeader className="p-8 pb-4 border-b border-slate-50">
+                        <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                            <Bell className="h-6 w-6 text-rose-500" /> Announcement Details
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="p-8">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Quarterly Performance Reviews</h3>
+                        <p className="text-slate-600 leading-relaxed mb-6">
+                            The quarterly review period begins next week. Please ensure all employee evaluations are completed and submitted by Friday, January 26th.
+                            <br /><br />
+                            Managers are required to schedule 1-on-1 sessions with their direct reports to discuss progress, goals, and feedback.
+                            If you have any questions regarding the new evaluation criteria, please refer to the HR Handbook updated on January 2nd.
+                        </p>
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                            <span className="text-sm font-medium text-slate-500">Posted by HR Department</span>
+                            <span className="text-sm font-bold text-slate-900">{new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div className="mt-8 flex justify-end">
+                            <Button onClick={() => setIsAnnouncementOpen(false)} className="bg-slate-900 text-white rounded-xl px-6">
+                                Close Announcement
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </motion.div>
     );
 };

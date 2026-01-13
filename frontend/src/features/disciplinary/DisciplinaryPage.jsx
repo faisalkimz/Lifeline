@@ -1,24 +1,22 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import {
-    Search, ChevronLeft, ChevronRight, AlertCircle,
-    FileText, Filter, Plus, User, Calendar,
-    AlertTriangle, CheckCircle, Clock, Info, MessageSquare, Save, X
+    Search, AlertTriangle, FileText, Plus,
+    Info, MessageSquare, Save, X, Calendar
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
 import {
     useGetDisciplinaryActionsQuery,
-    useCreateDisciplinaryActionMutation,
     useUpdateDisciplinaryActionMutation,
     useSubmitDisciplinaryStatementMutation,
-    useGetEmployeesQuery
 } from '../../store/api';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Input } from '../../components/ui/Input';
+import { Dialog, DialogContent } from '../../components/ui/Dialog';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import { Badge } from '../../components/ui/Badge';
+import CreateDisciplinaryCaseDialog from './CreateDisciplinaryCaseDialog';
 
 const DisciplinaryPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -34,20 +32,9 @@ const DisciplinaryPage = () => {
         search: searchTerm,
         status: statusFilter === 'all' ? undefined : statusFilter
     });
-    const { data: employees } = useGetEmployeesQuery();
 
-    const [createAction, { isLoading: isCreating }] = useCreateDisciplinaryActionMutation();
     const [updateAction, { isLoading: isUpdating }] = useUpdateDisciplinaryActionMutation();
     const [submitStatement, { isLoading: isSubmitting }] = useSubmitDisciplinaryStatementMutation();
-
-    const [formData, setFormData] = useState({
-        employee: '',
-        reason: '',
-        description: '',
-        incident_date: new Date().toISOString().split('T')[0],
-        severity: 'minor',
-        status: 'active'
-    });
 
     const [updateFormData, setUpdateFormData] = useState({
         decision: '',
@@ -56,25 +43,6 @@ const DisciplinaryPage = () => {
     });
 
     const cases = Array.isArray(actionsData) ? actionsData : (actionsData?.results || []);
-
-    const handleCreate = async (e) => {
-        e.preventDefault();
-        try {
-            await createAction(formData).unwrap();
-            toast.success('Disciplinary case created successfully');
-            setIsCreateDialogOpen(false);
-            setFormData({
-                employee: '',
-                reason: '',
-                description: '',
-                incident_date: new Date().toISOString().split('T')[0],
-                severity: 'minor',
-                status: 'active'
-            });
-        } catch (error) {
-            toast.error(error?.data?.error || 'Failed to create case');
-        }
-    };
 
     const handleUpdateCase = async (e) => {
         e.preventDefault();
@@ -144,7 +112,7 @@ const DisciplinaryPage = () => {
                     </div>
                 </div>
                 {isAdmin && (
-                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800 shadow-xl rounded-xl px-6">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800 shadow-xl rounded-xl px-6 h-12 font-bold">
                         <Plus className="h-4 w-4 mr-2" /> New Disciplinary Case
                     </Button>
                 )}
@@ -166,7 +134,7 @@ const DisciplinaryPage = () => {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5"
+                        className="h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 cursor-pointer"
                     >
                         <option value="all">All Statuses</option>
                         <option value="draft">Draft</option>
@@ -261,7 +229,7 @@ const DisciplinaryPage = () => {
                 </div>
             </Card>
 
-            {/* Case Details Dialog */}
+            {/* Case Details Dialog (View Only/Update Mode) */}
             <Dialog open={!!selectedCase} onOpenChange={() => setSelectedCase(null)}>
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 border-none rounded-[2rem] shadow-2xl overflow-hidden">
                     {selectedCase && (
@@ -428,100 +396,10 @@ const DisciplinaryPage = () => {
                 </DialogContent>
             </Dialog>
 
-            {/* Create Case Dialog */}
-            <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-                <DialogContent className="max-w-2xl rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden">
-                    <div className="bg-slate-900 p-8 text-white relative">
-                        <DialogTitle className="text-2xl font-black tracking-tight">New Disciplinary Case</DialogTitle>
-                        <p className="text-slate-400 text-sm mt-1">Record a new disciplinary incident.</p>
-                    </div>
-
-                    <form onSubmit={handleCreate} className="p-8 space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Employee</label>
-                                <select
-                                    className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
-                                    value={formData.employee}
-                                    onChange={(e) => setFormData({ ...formData, employee: e.target.value })}
-                                    required
-                                >
-                                    <option value="">Select Employee</option>
-                                    {employees?.map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.full_name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Incident Date</label>
-                                <input
-                                    type="date"
-                                    className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
-                                    value={formData.incident_date}
-                                    onChange={(e) => setFormData({ ...formData, incident_date: e.target.value })}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Reason for Action</label>
-                            <Input
-                                placeholder="Nature of the conduct issue..."
-                                value={formData.reason}
-                                onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                                required
-                                className="h-12 border-2 border-slate-100 rounded-2xl"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Description</label>
-                            <textarea
-                                className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900 min-h-[120px] resize-none"
-                                placeholder="Describe exactly what occurred..."
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                required
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Severity Level</label>
-                                <select
-                                    className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
-                                    value={formData.severity}
-                                    onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
-                                >
-                                    <option value="minor">Minor</option>
-                                    <option value="moderate">Moderate</option>
-                                    <option value="severe">Severe</option>
-                                    <option value="critical">Critical</option>
-                                </select>
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Initial Status</label>
-                                <select
-                                    className="w-full h-12 px-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:border-slate-900 focus:bg-white focus:outline-none transition-all font-medium text-slate-900"
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                                >
-                                    <option value="draft">Review Draft</option>
-                                    <option value="active">Active Case</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="flex justify-end gap-3 pt-4">
-                            <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="rounded-xl px-8 h-12">Cancel</Button>
-                            <Button type="submit" disabled={isCreating} className="bg-slate-900 hover:bg-slate-800 rounded-xl px-12 h-12 shadow-xl shadow-slate-200">
-                                {isCreating ? 'Processing...' : 'Create Case'}
-                            </Button>
-                        </div>
-                    </form>
-                </DialogContent>
-            </Dialog>
+            <CreateDisciplinaryCaseDialog
+                isOpen={isCreateDialogOpen}
+                onClose={() => setIsCreateDialogOpen(false)}
+            />
         </div>
     );
 };

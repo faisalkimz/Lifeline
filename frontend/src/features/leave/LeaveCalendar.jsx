@@ -71,7 +71,7 @@ const LeaveCalendar = () => {
 
     const getLeaveTypeStyle = (leaveType) => {
         const styles = {
-            annual: 'bg-blue-100 text-blue-700 border-blue-200',
+            annual: 'bg-primary-100 text-primary-700 border-primary-200',
             sick: 'bg-red-100 text-red-700 border-red-200',
             emergency: 'bg-orange-100 text-orange-700 border-orange-200',
             other: 'bg-gray-100 text-gray-700 border-gray-200'
@@ -116,7 +116,7 @@ const LeaveCalendar = () => {
                 <Button
                     onClick={() => setCurrentDate(new Date())}
                     size="sm"
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-primary-600 hover:bg-primary-700 text-white"
                 >
                     <Calendar className="h-4 w-4 mr-2" />
                     Today
@@ -143,18 +143,18 @@ const LeaveCalendar = () => {
                         return (
                             <div
                                 key={index}
-                                className={`min-h-[120px] border-r border-b border-gray-200 p-2 transition-all hover:bg-gray-50 ${isToday ? 'bg-blue-50' : ''
+                                className={`min-h-[120px] border-r border-b border-gray-200 p-2 transition-all hover:bg-gray-50 ${isToday ? 'bg-primary-50' : ''
                                     } ${!isCurrentMonth ? 'opacity-40' : ''}`}
                             >
                                 {date && (
                                     <>
                                         <div className="flex justify-between items-start mb-2">
-                                            <span className={`text-sm font-medium ${isToday ? 'text-blue-600 font-bold' : 'text-gray-700'
+                                            <span className={`text-sm font-medium ${isToday ? 'text-primary-600 font-bold' : 'text-gray-700'
                                                 }`}>
                                                 {date.getDate()}
                                             </span>
                                             {isToday && (
-                                                <div className="h-2 w-2 rounded-full bg-blue-600" />
+                                                <div className="h-2 w-2 rounded-full bg-primary-600" />
                                             )}
                                         </div>
 
@@ -191,13 +191,13 @@ const LeaveCalendar = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <Card className="border border-gray-200 p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <Info className="h-5 w-5 text-blue-600" />
+                        <Info className="h-5 w-5 text-primary-600" />
                         <h3 className="font-semibold text-gray-900">Calendar Legend</h3>
                     </div>
                     <div className="flex flex-wrap gap-3">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-100 border border-blue-200 rounded-lg">
-                            <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                            <span className="text-xs font-medium text-blue-700">Annual Leave</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary-100 border border-primary-200 rounded-lg">
+                            <div className="w-2 h-2 rounded-full bg-primary-600"></div>
+                            <span className="text-xs font-medium text-primary-700">Annual Leave</span>
                         </div>
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-red-100 border border-red-200 rounded-lg">
                             <div className="w-2 h-2 rounded-full bg-red-600"></div>
@@ -212,12 +212,12 @@ const LeaveCalendar = () => {
 
                 <Card className="border border-gray-200 p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <Clock className="h-5 w-5 text-blue-600" />
+                        <Clock className="h-5 w-5 text-primary-600" />
                         <h3 className="font-semibold text-gray-900">Upcoming Absences</h3>
                     </div>
                     <div className="space-y-2">
                         {leaveRequests?.filter(r => new Date(r.start_date) >= new Date()).slice(0, 3).map((req, i) => (
-                            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-blue-50 transition-all">
+                            <div key={i} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200 hover:bg-primary-50 transition-all">
                                 <div>
                                     <p className="text-sm font-medium text-gray-900">{req.employee_name}</p>
                                     <p className="text-xs text-gray-600">{new Date(req.start_date).toLocaleDateString()}</p>

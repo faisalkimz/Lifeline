@@ -41,6 +41,7 @@ import ExpensesPage from './features/payroll/ExpensesPage';
 import MyPayslipsPage from './features/payroll/MyPayslipsPage';
 import SalaryAdvancesPage from './features/payroll/SalaryAdvancesPage';
 import OvertimePage from './features/attendance/OvertimePage';
+import HelpCenterPage from './features/help/HelpCenterPage';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -106,16 +107,17 @@ function App() {
         <Route path="/organization" element={<Navigate to="/org-chart" replace />} />
 
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/help" element={<HelpCenterPage />} />
+      </Route>
 
-        {/* Employee Self-Service Portal */}
-        <Route path="/employee" element={<EmployeePortalLayout />}>
-          <Route path="dashboard" element={<EmployeeDashboard />} />
-          <Route path="payslips" element={<div className="p-8 text-center">Payslips - Coming Soon</div>} />
-          <Route path="leave" element={<LeaveRequestsPage />} />
-          <Route path="attendance" element={<AttendancePage />} />
-          <Route path="documents" element={<div className="p-8 text-center">My Documents - Coming Soon</div>} />
-          <Route path="profile" element={<MyProfilePage />} />
-        </Route>
+      {/* Employee Self-Service Portal */}
+      <Route path="/employee" element={<EmployeePortalLayout />}>
+        <Route path="dashboard" element={<EmployeeDashboard />} />
+        <Route path="payslips" element={<div className="p-8 text-center text-gray-500 font-medium">Payslips - Coming Soon</div>} />
+        <Route path="leave" element={<LeaveRequestsPage />} />
+        <Route path="attendance" element={<AttendancePage />} />
+        <Route path="documents" element={<div className="p-8 text-center text-gray-500 font-medium">My Documents - Coming Soon</div>} />
+        <Route path="profile" element={<MyProfilePage />} />
       </Route>
 
       {/* Default Redirect */}

@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Plus, Eye, CheckCircle, XCircle, Clock, Calendar, DollarSign } from 'lucide-react';
+import {
+    Plus, Eye, CheckCircle, XCircle, Clock, Calendar, DollarSign,
+    Zap, Activity, ShieldCheck, TrendingUp, Filter, Loader2,
+    ArrowUpRight, Target, Flame, Timer, Coins, HardHat,
+    Briefcase, MessageSquare, MoreVertical, Search
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../../utils/cn';
 
 const OvertimePage = () => {
     const [showForm, setShowForm] = useState(false);
@@ -19,48 +26,23 @@ const OvertimePage = () => {
         project: ''
     });
 
-    // Mock overtime data
     const overtimeRecords = [
         {
-            id: 1,
-            date: '2025-12-15',
-            start_time: '18:00',
-            end_time: '22:00',
-            hours: 4,
-            rate: 1.5,
-            amount: 180000,
-            reason: 'System maintenance',
-            project: 'Infrastructure Upgrade',
-            status: 'approved',
-            submitted_date: '2025-12-16',
-            approved_date: '2025-12-16'
+            id: 1, date: '2025-12-15', start_time: '18:00', end_time: '22:00',
+            hours: 4, rate: 1.5, amount: 180000, reason: 'Neural link maintenance',
+            project: 'Infrastructure Alpha', status: 'approved',
+            submitted_date: '2025-12-16', approved_date: '2025-12-16'
         },
         {
-            id: 2,
-            date: '2025-12-10',
-            start_time: '17:30',
-            end_time: '20:30',
-            hours: 3,
-            rate: 1.5,
-            amount: 135000,
-            reason: 'Client presentation preparation',
-            project: 'Q4 Business Review',
-            status: 'pending',
-            submitted_date: '2025-12-11'
+            id: 2, date: '2025-12-10', start_time: '17:30', end_time: '20:30',
+            hours: 3, rate: 1.5, amount: 135000, reason: 'Operational readiness prep',
+            project: 'Mission Q4', status: 'pending', submitted_date: '2025-12-11'
         },
         {
-            id: 3,
-            date: '2025-11-28',
-            start_time: '19:00',
-            end_time: '23:00',
-            hours: 4,
-            rate: 2.0,
-            amount: 240000,
-            reason: 'Holiday support',
-            project: 'Customer Support',
-            status: 'approved',
-            submitted_date: '2025-11-29',
-            approved_date: '2025-11-30'
+            id: 3, date: '2025-11-28', start_time: '19:00', end_time: '23:00',
+            hours: 4, rate: 2.0, amount: 240000, reason: 'Holiday node support',
+            project: 'Grid Guard', status: 'approved',
+            submitted_date: '2025-11-29', approved_date: '2025-11-30'
         }
     ];
 
@@ -71,381 +53,281 @@ const OvertimePage = () => {
 
     const calculateHours = () => {
         if (!formData.start_time || !formData.end_time) return 0;
-
         const start = new Date(`2000-01-01T${formData.start_time}`);
         const end = new Date(`2000-01-01T${formData.end_time}`);
-
-        let diff = (end - start) / (1000 * 60 * 60); // hours
-
-        // Handle overnight shifts
+        let diff = (end - start) / (1000 * 60 * 60);
         if (diff < 0) diff += 24;
-
         return Math.max(0, diff);
     };
 
     const calculateAmount = () => {
         const hours = calculateHours();
-        const baseRate = 75000; // UGX per hour (assuming 3M monthly / 160 hours / 2.5 for 40hr week)
-        const overtimeRate = 1.5; // 1.5x for regular overtime
-        return Math.round(hours * baseRate * overtimeRate);
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Here you would submit to API
-        console.log('Submitting overtime request:', { ...formData, hours: calculateHours(), amount: calculateAmount() });
-        setShowForm(false);
-        setFormData({
-            date: new Date().toISOString().split('T')[0],
-            start_time: '',
-            end_time: '',
-            reason: '',
-            project: ''
-        });
+        const baseRate = 75000;
+        return Math.round(hours * baseRate * 1.5);
     };
 
     const formatCurrency = (value) => {
         return new Intl.NumberFormat('en-UG', {
-            style: 'currency',
-            currency: 'UGX',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+            style: 'currency', currency: 'UGX', minimumFractionDigits: 0, maximumFractionDigits: 0,
         }).format(value);
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'approved': return 'bg-green-100 text-green-700';
-            case 'pending': return 'bg-yellow-100 text-yellow-700';
-            case 'rejected': return 'bg-red-100 text-red-700';
-            default: return 'bg-gray-100 text-gray-700';
-        }
-    };
-
-    const OvertimeDetailsModal = ({ overtime, onClose }) => {
-        if (!overtime) return null;
-
-        return (
-            <Dialog open={!!overtime} onOpenChange={onClose}>
-                <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <Clock className="h-5 w-5" />
-                            Overtime Details
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Date</label>
-                                <p className="font-semibold">{new Date(overtime.date).toLocaleDateString()}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Status</label>
-                                <Badge className={getStatusColor(overtime.status)}>
-                                    {overtime.status}
-                                </Badge>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Time</label>
-                                <p>{overtime.start_time} - {overtime.end_time}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Hours</label>
-                                <p className="font-semibold">{overtime.hours}h</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Rate</label>
-                                <p>{overtime.rate}x normal rate</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Amount</label>
-                                <p className="font-semibold text-green-600">{formatCurrency(overtime.amount)}</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Project</label>
-                                <p>{overtime.project}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-gray-600">Submitted</label>
-                                <p>{new Date(overtime.submitted_date).toLocaleDateString()}</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="text-sm font-medium text-gray-600">Reason</label>
-                            <p className="mt-1">{overtime.reason}</p>
-                        </div>
-
-                        {overtime.approved_date && (
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                                <p className="text-green-700">
-                                    ✅ Approved on {new Date(overtime.approved_date).toLocaleDateString()}
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={onClose}>Close</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-        );
-    };
-
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Overtime Management</h1>
-                    <p className="text-gray-600 mt-2">Request and track your overtime hours</p>
-                </div>
-                <Button onClick={() => setShowForm(true)} className="gap-2">
-                    <Plus className="h-4 w-4" />
-                    Log Overtime
-                </Button>
-            </div>
+        <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="space-y-12 pb-24"
+        >
+            {/* Dark Overtime Hero */}
+            <div className="relative rounded-[4rem] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 border-none p-12 lg:p-20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden">
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/5 rounded-full -mt-96 -mr-96 blur-[120px] pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full -mb-96 -ml-96 blur-[120px] pointer-events-none"></div>
 
-            {/* Info Card */}
-            <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                        <div className="p-2 bg-blue-100 rounded-lg">
-                            <Clock className="h-5 w-5 text-blue-600" />
+                <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-16">
+                    <div className="flex-1 space-y-10 text-center xl:text-left">
+                        <div className="space-y-4">
+                            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full">
+                                Personnel Flux & Overclocking
+                            </Badge>
+                            <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
+                                Tactical <br />
+                                <span className="text-emerald-500">Overtime</span>
+                            </h1>
                         </div>
-                        <div>
-                            <h3 className="font-semibold text-blue-900 mb-2">Overtime Policy</h3>
-                            <ul className="text-sm text-blue-800 space-y-1">
-                                <li>• Regular overtime: 1.5x normal rate</li>
-                                <li>• Weekend/Holiday: 2.0x normal rate</li>
-                                <li>• Maximum 8 hours per day</li>
-                                <li>• Pre-approval required for extended overtime</li>
-                            </ul>
+
+                        <div className="flex flex-wrap items-center justify-center xl:justify-start gap-8">
+                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-xl">
+                                <Flame className="h-4 w-4 text-emerald-500 animate-pulse" />
+                                <span className="text-xs font-black text-white uppercase tracking-widest">Core Status: Overclocked</span>
+                            </div>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-blue-100 rounded-lg">
-                                <Clock className="h-6 w-6 text-blue-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Total Hours</p>
-                                <p className="text-2xl font-bold">11h</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <CheckCircle className="h-6 w-6 text-green-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Approved</p>
-                                <p className="text-2xl font-bold text-green-600">2</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-yellow-100 rounded-lg">
-                                <Clock className="h-6 w-6 text-yellow-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Pending</p>
-                                <p className="text-2xl font-bold text-yellow-600">1</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-green-100 rounded-lg">
-                                <DollarSign className="h-6 w-6 text-green-600" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-600">Total Earnings</p>
-                                <p className="text-2xl font-bold text-green-600">{formatCurrency(555000)}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                    <div className="flex flex-col gap-4 w-full xl:w-auto">
+                        <Button
+                            onClick={() => setShowForm(true)}
+                            className="h-24 px-12 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.3em] text-sm rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.3)] transition-all flex items-center justify-center gap-4"
+                        >
+                            <Plus className="h-6 w-6" /> INITIALIZE LOG
+                        </Button>
+                    </div>
+                </div>
             </div>
 
-            {/* Overtime Table */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>My Overtime Records</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Time</TableHead>
-                                <TableHead>Hours</TableHead>
-                                <TableHead>Rate</TableHead>
-                                <TableHead className="text-right">Amount</TableHead>
-                                <TableHead>Project</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {overtimeRecords.map((record) => (
-                                <TableRow key={record.id} className="hover:bg-gray-50">
-                                    <TableCell className="font-medium">
-                                        {new Date(record.date).toLocaleDateString()}
-                                    </TableCell>
-                                    <TableCell>{record.start_time} - {record.end_time}</TableCell>
-                                    <TableCell className="font-semibold">{record.hours}h</TableCell>
-                                    <TableCell>{record.rate}x</TableCell>
-                                    <TableCell className="text-right font-semibold text-green-600">
-                                        {formatCurrency(record.amount)}
-                                    </TableCell>
-                                    <TableCell className="max-w-xs truncate">{record.project}</TableCell>
-                                    <TableCell>
-                                        <Badge className={getStatusColor(record.status)}>
-                                            {record.status}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setSelectedOvertime(record)}
-                                            className="flex items-center gap-1"
-                                        >
-                                            <Eye className="h-4 w-4" />
-                                            View
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
+            {/* Tactical Policies Section */}
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <MetricCard icon={Timer} label="Total Overclock" val="11h" sub="Hours Accumulated" color="emerald" />
+                        <MetricCard icon={ShieldCheck} label="Authorized" val="2" sub="Verified Sprints" color="blue" />
+                        <MetricCard icon={Coins} label="Flux Credit" val={formatCurrency(555000)} sub="Total Earnings" color="indigo" />
+                    </div>
 
-            {/* Log Overtime Modal */}
+                    {/* Records Surface */}
+                    <Card className="rounded-[3.5rem] border-none shadow-2xl bg-white overflow-hidden">
+                        <CardHeader className="bg-slate-900 px-12 py-10">
+                            <CardTitle className="text-xl font-black text-white tracking-tighter uppercase italic leading-none flex items-center gap-4">
+                                <Activity className="h-6 w-6 text-emerald-500" /> Personal <span className="text-emerald-500">Flux Logs</span>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="overflow-x-auto">
+                                <Table>
+                                    <TableHeader className="bg-slate-50">
+                                        <TableRow className="border-none">
+                                            <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Temporal Coord</TableHead>
+                                            <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Burst Duration</TableHead>
+                                            <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Multiplier</TableHead>
+                                            <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic text-right">Credit Yield</TableHead>
+                                            <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic text-right">Status</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {overtimeRecords.map((record) => (
+                                            <TableRow key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => setSelectedOvertime(record)}>
+                                                <TableCell className="px-12 py-8 font-black text-slate-900 italic">{new Date(record.date).toLocaleDateString()}</TableCell>
+                                                <TableCell className="px-12 py-8 font-bold text-slate-500 text-xs italic">{record.start_time} - {record.end_time} ({record.hours}H)</TableCell>
+                                                <TableCell className="px-12 py-8">
+                                                    <Badge className="bg-slate-900 text-white border-none text-[8px] font-black italic px-3 py-1 rounded-full">{record.rate}x</Badge>
+                                                </TableCell>
+                                                <TableCell className="px-12 py-8 text-right font-black text-emerald-500 italic">{formatCurrency(record.amount)}</TableCell>
+                                                <TableCell className="px-12 py-8 text-right">
+                                                    <Badge className={cn(
+                                                        "border-none text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full italic",
+                                                        record.status === 'approved' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+                                                    )}>
+                                                        {record.status}
+                                                    </Badge>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <aside className="space-y-8">
+                    <Card className="rounded-[3.5rem] border-none shadow-xl bg-slate-900 text-white p-12 space-y-10 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mt-32 -mr-32 group-hover:scale-150 transition-transform duration-1000"></div>
+                        <h4 className="text-xl font-black uppercase italic tracking-tighter relative z-10 flex items-center gap-4">
+                            <ShieldCheck className="h-6 w-6 text-emerald-400" /> Flux <span className="text-emerald-500">Protocols</span>
+                        </h4>
+                        <div className="space-y-6 relative z-10">
+                            <div className="p-6 bg-white/5 rounded-2xl border border-white/5">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Standard Overclock</p>
+                                <p className="text-lg font-black text-white italic">1.5x Multiplier</p>
+                            </div>
+                            <div className="p-6 bg-white/5 rounded-2xl border border-white/5">
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Critical / Holiday</p>
+                                <p className="text-lg font-black text-emerald-400 italic">2.0x Hyper-Yield</p>
+                            </div>
+                            <div className="pt-4 border-t border-white/10 space-y-3">
+                                <p className="text-[9px] font-bold text-slate-400 leading-relaxed italic">Max daily flux limit: 8.0 units. Extended bursts require Senior Command authorization.</p>
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card className="rounded-[3.5rem] border-none shadow-xl bg-emerald-500 p-12 text-white overflow-hidden relative group">
+                        <div className="absolute -bottom-12 -right-12 h-40 w-40 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+                        <h4 className="text-lg font-black uppercase italic tracking-tighter mb-4">Target Projections</h4>
+                        <div className="space-y-2">
+                            <p className="text-4xl font-black italic tracking-tighter">₵1.2M</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80">Next Cycle Yield</p>
+                        </div>
+                    </Card>
+                </aside>
+            </section>
+
+            {/* Overtime Request Dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle>Log Overtime Hours</DialogTitle>
+                <DialogContent className="max-w-3xl bg-white rounded-[3rem] p-0 border-none shadow-2xl overflow-hidden">
+                    <DialogHeader className="bg-slate-900 p-12">
+                        <DialogTitle className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">
+                            Log <span className="text-emerald-500">Burst</span>
+                        </DialogTitle>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-3 italic font-bold">Operational Performance Overclock</p>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium">Date *</label>
-                                <Input
-                                    name="date"
-                                    type="date"
-                                    value={formData.date}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+
+                    <form className="p-12 space-y-8" onSubmit={(e) => { e.preventDefault(); setShowForm(false); }}>
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Temporal Coord (Date)</label>
+                                <Input type="date" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900 px-6" value={formData.date} onChange={handleInputChange} name="date" />
                             </div>
-                            <div>
-                                <label className="text-sm font-medium">Project/Task *</label>
-                                <Input
-                                    name="project"
-                                    value={formData.project}
-                                    onChange={handleInputChange}
-                                    placeholder="e.g., System Maintenance"
-                                    required
-                                />
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Target Operation (Project)</label>
+                                <Input className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900 px-6" placeholder="BATTLE-STATION DELTA" value={formData.project} onChange={handleInputChange} name="project" />
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-sm font-medium">Start Time *</label>
-                                <Input
-                                    name="start_time"
-                                    type="time"
-                                    value={formData.start_time}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Start Mark (Time)</label>
+                                <Input type="time" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900 px-6" value={formData.start_time} onChange={handleInputChange} name="start_time" />
                             </div>
-                            <div>
-                                <label className="text-sm font-medium">End Time *</label>
-                                <Input
-                                    name="end_time"
-                                    type="time"
-                                    value={formData.end_time}
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">End Mark (Time)</label>
+                                <Input type="time" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900 px-6" value={formData.end_time} onChange={handleInputChange} name="end_time" />
                             </div>
                         </div>
 
-                        <div>
-                            <label className="text-sm font-medium">Reason *</label>
-                            <textarea
-                                name="reason"
-                                value={formData.reason}
-                                onChange={handleInputChange}
-                                rows="3"
-                                className="w-full p-2 border rounded-md"
-                                placeholder="Describe what you worked on..."
-                                required
-                            />
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Strategic Justification (Reason)</label>
+                            <textarea className="w-full p-6 bg-slate-50 border-none rounded-[2rem] font-medium min-h-[120px] focus:ring-2 focus:ring-emerald-500 outline-none text-slate-600 shadow-inner resize-none" placeholder="Detail the operational necessity..." value={formData.reason} onChange={handleInputChange} name="reason" />
                         </div>
 
                         {(formData.start_time && formData.end_time) && (
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <h4 className="font-medium text-blue-900 mb-2">Overtime Summary</h4>
-                                <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                        <span className="text-blue-700">Hours:</span>
-                                        <span className="font-semibold ml-2 text-blue-900">
-                                            {calculateHours()} hours
-                                        </span>
-                                    </div>
-                                    <div>
-                                        <span className="text-blue-700">Estimated Amount:</span>
-                                        <span className="font-semibold ml-2 text-blue-900">
-                                            {formatCurrency(calculateAmount())}
-                                        </span>
-                                    </div>
+                            <div className="p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100 flex items-center justify-between">
+                                <div>
+                                    <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest italic leading-none mb-2">Yield Projection</p>
+                                    <p className="text-2xl font-black text-emerald-900 italic tracking-tighter">{formatCurrency(calculateAmount())}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] font-black text-emerald-400 uppercase tracking-widest italic leading-none mb-2">Burst Delta</p>
+                                    <p className="text-2xl font-black text-emerald-900 italic tracking-tighter">{calculateHours()}H Units</p>
                                 </div>
                             </div>
                         )}
 
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                                Cancel
+                        <div className="pt-6 flex gap-4">
+                            <Button type="button" onClick={() => setShowForm(false)} variant="ghost" className="flex-1 h-16 rounded-2xl font-black text-slate-400 uppercase text-[10px]">ABORT</Button>
+                            <Button type="submit" className="flex-1 h-16 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-2xl">
+                                COMMIT LOG
                             </Button>
-                            <Button type="submit">
-                                Submit Request
-                            </Button>
-                        </DialogFooter>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>
 
-            {/* Overtime Details Modal */}
-            <OvertimeDetailsModal overtime={selectedOvertime} onClose={() => setSelectedOvertime(null)} />
-        </div>
+            {/* View Record Dialog */}
+            <Dialog open={!!selectedOvertime} onOpenChange={() => setSelectedOvertime(null)}>
+                <DialogContent className="max-w-2xl bg-white rounded-[3rem] p-0 border-none shadow-2xl overflow-hidden">
+                    <DialogHeader className="bg-slate-900 p-12">
+                        <DialogTitle className="text-3xl font-black text-white tracking-tighter uppercase italic leading-none">
+                            Burst <span className="text-emerald-500">Manifest</span>
+                        </DialogTitle>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-3 italic font-bold">Historical Performance Telemetry</p>
+                    </DialogHeader>
+                    {selectedOvertime && (
+                        <div className="p-12 space-y-10">
+                            <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mb-1">Temporal ID</p>
+                                    <p className="text-xl font-black text-slate-900 italic">{new Date(selectedOvertime.date).toLocaleDateString()}</p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mb-1">Operational Status</p>
+                                    <Badge className="bg-emerald-500 text-white border-none uppercase italic text-[8px] font-black px-4 py-1.5 rounded-full">{selectedOvertime.status}</Badge>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-8 p-8 bg-slate-50 rounded-[2.5rem]">
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mb-1">Delta</p>
+                                    <p className="text-lg font-black text-slate-900 italic">{selectedOvertime.hours}H</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mb-1">Yield</p>
+                                    <p className="text-lg font-black text-emerald-500 italic">{formatCurrency(selectedOvertime.amount)}</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic mb-1">Mark</p>
+                                    <p className="text-lg font-black text-slate-900 italic">{selectedOvertime.rate}x</p>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Mission Parameter (Project)</p>
+                                <p className="text-sm font-bold text-slate-900 uppercase italic bg-slate-50 p-6 rounded-2xl">{selectedOvertime.project}</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Operational Justification</p>
+                                <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-emerald-500 pl-6 py-2">{selectedOvertime.reason}</p>
+                            </div>
+                            <Button onClick={() => setSelectedOvertime(null)} className="w-full h-16 bg-slate-900 font-black uppercase tracking-widest rounded-2xl italic text-[10px]">CLOSE MANIFEST</Button>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </motion.div>
     );
 };
+
+const MetricCard = ({ icon: Icon, label, val, sub, color }) => (
+    <Card className="rounded-[2.5rem] border-none shadow-xl bg-white p-10 group hover:-translate-y-2 transition-all duration-500">
+        <div className="flex flex-col items-center text-center space-y-6">
+            <div className={`h-20 w-20 rounded-[1.75rem] flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-12
+                ${color === 'emerald' ? 'bg-emerald-50 text-emerald-500' : ''}
+                ${color === 'blue' ? 'bg-blue-50 text-blue-500' : ''}
+                ${color === 'indigo' ? 'bg-indigo-50 text-indigo-500' : ''}`}>
+                <Icon className="h-10 w-10" />
+            </div>
+            <div className="space-y-2">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{label}</p>
+                <p className={`text-3xl font-black tracking-tighter ${color === 'emerald' ? 'text-emerald-500' : 'text-slate-900'}`}>{val}</p>
+                <p className="text-[8px] font-black text-slate-300 uppercase tracking-tight">{sub}</p>
+            </div>
+        </div>
+    </Card>
+);
 
 export default OvertimePage;

@@ -48,9 +48,9 @@ const LeaveBalances = () => {
                                         <p className="text-xs text-gray-600 mb-1">{balance.year} Balance</p>
                                         <h3 className="font-semibold text-lg text-gray-900">{balance.leave_type_name}</h3>
                                     </div>
-                                    <div className={`p-2 rounded-lg ${isCritical ? 'bg-red-100' : 'bg-blue-100'
+                                    <div className={`p-2 rounded-lg ${isCritical ? 'bg-red-100' : 'bg-primary-100'
                                         }`}>
-                                        <TrendingUp className={`h-5 w-5 ${isCritical ? 'text-red-600' : 'text-blue-600'
+                                        <TrendingUp className={`h-5 w-5 ${isCritical ? 'text-red-600' : 'text-primary-600'
                                             }`} />
                                     </div>
                                 </div>
@@ -76,7 +76,7 @@ const LeaveBalances = () => {
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${Math.min(percentageUsed, 100)}%` }}
                                                 transition={{ duration: 1, ease: "easeOut", delay: 0.2 + (index * 0.1) }}
-                                                className={`h-full rounded-full ${isCritical ? 'bg-red-600' : 'bg-blue-600'
+                                                className={`h-full rounded-full ${isCritical ? 'bg-red-600' : 'bg-primary-600'
                                                     }`}
                                             />
                                         </div>

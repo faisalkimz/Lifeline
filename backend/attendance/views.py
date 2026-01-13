@@ -57,7 +57,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def clock_in(self, request):
         """Clock in for the day"""
-        if not hasattr(request.user, 'employee'):
+        if not getattr(request.user, 'employee', None):
             return Response(
                 {"error": "User does not have an employee record"},
                 status=status.HTTP_400_BAD_REQUEST

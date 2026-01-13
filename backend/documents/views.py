@@ -1,4 +1,6 @@
 from rest_framework import viewsets, filters
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Folder, Document, EmployeeDocument
 from .serializers import FolderSerializer, DocumentSerializer, EmployeeDocumentSerializer
@@ -39,7 +41,39 @@ class DocumentViewSet(viewsets.ModelViewSet):
         return queryset.order_by('-created_at')
 
     def perform_create(self, serializer):
-        serializer.save(company=self.request.user.company, uploaded_by=self.request.user)
+        file = self.request.FILES.get('file')
+        file_size = file.size if file else 0
+        serializer.save(
+            company=self.request.user.company, 
+            uploaded_by=self.request.user,
+            file_size=file_size
+        )
+
+    @action(detail=False, methods=['get'])
+    def storage_stats(self, request):
+        from django.db.models import Sum
+        user = request.user
+        
+        company_docs_size = Document.objects.filter(company=user.company).aggregate(total=Sum('file_size'))['total'] or 0
+        emp_docs_size = EmployeeDocument.objects.filter(employee__company=user.company).aggregate(total=Sum('file_size'))['total'] or 0
+        
+        total_used = company_docs_size + emp_docs_size
+        limit = 5 * 1024 * 1024 * 1024 # 5GB Beta Limit
+        
+        return Response({
+            'used_bytes': total_used,
+            'limit_bytes': limit,
+            'used_display': self._format_size(total_used),
+            'limit_display': self._format_size(limit),
+            'percentage': round((total_used / limit) * 100, 1) if limit > 0 else 0
+        })
+
+    def _format_size(self, bytes):
+        for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+            if bytes < 1024.0:
+                return f"{bytes:.1f} {unit}"
+            bytes /= 1024.0
+        return f"{bytes:.1f} PB"
 
 class EmployeeDocumentViewSet(viewsets.ModelViewSet):
     serializer_class = EmployeeDocumentSerializer
@@ -56,4 +90,6 @@ class EmployeeDocumentViewSet(viewsets.ModelViewSet):
         return queryset.order_by('-created_at')
 
     def perform_create(self, serializer):
-        serializer.save(uploaded_by=self.request.user)
+        file = self.request.FILES.get('file')
+        file_size = file.size if file else 0
+        serializer.save(uploaded_by=self.request.user, file_size=file_size)

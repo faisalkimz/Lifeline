@@ -31,6 +31,7 @@ class Document(models.Model):
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='policy')
     
     file = models.FileField(upload_to='company_docs/')
+    file_size = models.BigIntegerField(default=0, help_text="Size in bytes")
     description = models.TextField(blank=True)
     
     version = models.CharField(max_length=20, default='1.0')
@@ -50,6 +51,7 @@ class EmployeeDocument(models.Model):
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='personal_documents')
     title = models.CharField(max_length=255)
     file = models.FileField(upload_to='employee_docs/')
+    file_size = models.BigIntegerField(default=0, help_text="Size in bytes")
     
     version = models.CharField(max_length=20, default='1.0')
     expiry_date = models.DateField(null=True, blank=True)

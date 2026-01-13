@@ -183,6 +183,7 @@ class InterviewViewSet(viewsets.ModelViewSet):
 class IntegrationSettingsViewSet(viewsets.ModelViewSet):
     serializer_class = IntegrationSettingsSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
+    ordering = ['id']
 
     def get_queryset(self):
         return IntegrationSettings.objects.filter(company=self.request.user.company)

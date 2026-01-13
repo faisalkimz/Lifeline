@@ -12,9 +12,10 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/ui/Tabs';
 import { Badge } from '../../components/ui/Badge';
+import { Input } from '../../components/ui/Input';
 import {
     Target, FileText, Plus, CheckCircle, Clock,
-    TrendingUp, BarChart3, Star, Trash2
+    TrendingUp, BarChart3, Star, Trash2, Calendar, ChevronRight, Flag
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
 import toast from 'react-hot-toast';
@@ -24,67 +25,72 @@ const PerformancePage = () => {
     const { data: stats } = useGetReviewStatsQuery();
 
     return (
-        <div className="space-y-6 pb-12">
+        <div className="space-y-8 pb-12 animate-fade-in">
             {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Performance</h1>
-                <p className="text-gray-600 mt-1">Track your goals and reviews</p>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Performance</h1>
+                    <p className="text-gray-600 mt-1">Track your goals, achievements, and reviews.</p>
+                </div>
+                <div className="flex gap-3">
+                    {/* Actions if needed */}
+                </div>
             </div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card className="border border-gray-200">
+                <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <BarChart3 className="h-5 w-5 text-blue-600" />
+                            <div className="p-2.5 bg-primary-50 rounded-xl">
+                                <BarChart3 className="h-5 w-5 text-primary-600" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats?.average_rating || '4.2'}</p>
-                            <p className="text-sm text-gray-600">Avg Rating</p>
+                            <p className="text-3xl font-bold text-gray-900 tracking-tight">{stats?.average_rating || '4.2'}</p>
+                            <p className="text-sm font-medium text-gray-500 mt-1">Average Rating</p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200">
+                <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-2 bg-green-100 rounded-lg">
+                            <div className="p-2.5 bg-green-50 rounded-xl">
                                 <Target className="h-5 w-5 text-green-600" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats?.active_goals ?? 0}</p>
-                            <p className="text-sm text-gray-600">Active Goals</p>
+                            <p className="text-3xl font-bold text-gray-900 tracking-tight">{stats?.active_goals ?? 0}</p>
+                            <p className="text-sm font-medium text-gray-500 mt-1">Active Goals</p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200">
+                <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-2 bg-purple-100 rounded-lg">
+                            <div className="p-2.5 bg-purple-50 rounded-xl">
                                 <CheckCircle className="h-5 w-5 text-purple-600" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats?.completed_reviews ?? 0}</p>
-                            <p className="text-sm text-gray-600">Completed Reviews</p>
+                            <p className="text-3xl font-bold text-gray-900 tracking-tight">{stats?.completed_reviews ?? 0}</p>
+                            <p className="text-sm font-medium text-gray-500 mt-1">Completed Reviews</p>
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card className="border border-gray-200">
+                <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-2 bg-orange-100 rounded-lg">
-                                <Clock className="h-5 w-5 text-orange-600" />
+                            <div className="p-2.5 bg-amber-50 rounded-xl">
+                                <Clock className="h-5 w-5 text-amber-600" />
                             </div>
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats?.pending_reviews ?? 0}</p>
-                            <p className="text-sm text-gray-600">Pending</p>
+                            <p className="text-3xl font-bold text-gray-900 tracking-tight">{stats?.pending_reviews ?? 0}</p>
+                            <p className="text-sm font-medium text-gray-500 mt-1">Pending Actions</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -92,20 +98,26 @@ const PerformancePage = () => {
 
             {/* Tabs */}
             <Tabs defaultValue="goals" className="space-y-6">
-                <TabsList className="bg-gray-100 p-1">
-                    <TabsTrigger value="goals" className="data-[state=active]:bg-white">
+                <TabsList className="bg-white p-1 border border-gray-200 rounded-xl shadow-sm inline-flex h-auto w-auto">
+                    <TabsTrigger
+                        value="goals"
+                        className="data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700 px-6 py-2.5 rounded-lg text-gray-600 font-medium transition-all"
+                    >
                         <Target className="h-4 w-4 mr-2" /> Goals
                     </TabsTrigger>
-                    <TabsTrigger value="reviews" className="data-[state=active]:bg-white">
+                    <TabsTrigger
+                        value="reviews"
+                        className="data-[state=active]:bg-primary-50 data-[state=active]:text-primary-700 px-6 py-2.5 rounded-lg text-gray-600 font-medium transition-all"
+                    >
                         <FileText className="h-4 w-4 mr-2" /> Reviews
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="goals">
+                <TabsContent value="goals" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <GoalsSection user={user} />
                 </TabsContent>
 
-                <TabsContent value="reviews">
+                <TabsContent value="reviews" className="animate-in fade-in slide-in-from-bottom-2 duration-300">
                     <ReviewsSection user={user} />
                 </TabsContent>
             </Tabs>
@@ -116,7 +128,7 @@ const PerformancePage = () => {
 const GoalsSection = ({ user }) => {
     const { data: goalsData, isLoading } = useGetGoalsQuery({ my_goals: true });
     const goals = goalsData?.results || goalsData || [];
-    const [createGoal] = useCreateGoalMutation();
+    const [createGoal, { isLoading: isCreating }] = useCreateGoalMutation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -140,68 +152,82 @@ const GoalsSection = ({ user }) => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900">My Goals</h3>
+            <div className="flex justify-between items-center bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <div>
+                    <h3 className="text-lg font-bold text-gray-900">My Goals</h3>
+                    <p className="text-sm text-gray-500">Set and track your professional objectives</p>
+                </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button>
+                        <Button className="bg-primary-600 hover:bg-primary-700 text-white shadow-md shadow-primary-200">
                             <Plus className="h-4 w-4 mr-2" /> New Goal
                         </Button>
                     </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Create Goal</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    <DialogContent className="max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 p-0 overflow-hidden">
+                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-bold text-gray-900">Create New Goal</DialogTitle>
+                                <p className="text-gray-500 text-sm mt-1">Define clear objectives to track your progress.</p>
+                            </DialogHeader>
+                        </div>
+                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Goal Title</label>
+                                <Input
+                                    className="bg-white"
                                     value={formData.title}
                                     onChange={e => setFormData({ ...formData, title: e.target.value })}
                                     required
-                                    placeholder="e.g. Complete project milestone"
+                                    placeholder="e.g. Master Advanced React Patterns"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <div className="space-y-1.5">
+                                <label className="text-sm font-medium text-gray-700">Description</label>
                                 <textarea
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                                    className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
                                     rows="3"
                                     value={formData.description}
                                     onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Describe your goal..."
+                                    placeholder="Describe what you want to achieve..."
+                                    required
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                                    <select
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        value={formData.priority}
-                                        onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                                    >
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                    </select>
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Priority</label>
+                                    <div className="relative">
+                                        <select
+                                            className="w-full h-10 pl-3 pr-8 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 outline-none appearance-none"
+                                            value={formData.priority}
+                                            onChange={e => setFormData({ ...formData, priority: e.target.value })}
+                                        >
+                                            <option value="low">Low Priority</option>
+                                            <option value="medium">Medium Priority</option>
+                                            <option value="high">High Priority</option>
+                                        </select>
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                            <Flag className="h-4 w-4 text-gray-400" />
+                                        </div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-                                    <input
+                                <div className="space-y-1.5">
+                                    <label className="text-sm font-medium text-gray-700">Due Date</label>
+                                    <Input
                                         type="date"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                        className="bg-white"
                                         value={formData.due_date}
                                         onChange={e => setFormData({ ...formData, due_date: e.target.value })}
                                         required
                                     />
                                 </div>
                             </div>
-                            <div className="flex gap-3">
-                                <Button type="button" onClick={() => setIsDialogOpen(false)} variant="outline" className="flex-1">
+                            <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-4">
+                                <Button type="button" onClick={() => setIsDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900">
                                     Cancel
                                 </Button>
-                                <Button type="submit" className="flex-1">Create Goal</Button>
+                                <Button type="submit" disabled={isCreating} className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
+                                    {isCreating ? 'Creating...' : 'Create Goal'}
+                                </Button>
                             </div>
                         </form>
                     </DialogContent>
@@ -209,20 +235,22 @@ const GoalsSection = ({ user }) => {
             </div>
 
             {isLoading ? (
-                <div className="grid gap-4">
-                    {[1, 2, 3].map(i => <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>)}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[1, 2, 3, 4].map(i => <div key={i} className="h-48 bg-gray-100 rounded-xl animate-pulse"></div>)}
                 </div>
             ) : !goals?.length ? (
-                <Card className="p-12 text-center border-dashed">
-                    <Target className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals yet</h3>
-                    <p className="text-gray-600 mb-4">Create your first goal to start tracking progress</p>
-                    <Button onClick={() => setIsDialogOpen(true)}>
-                        <Plus className="h-4 w-4 mr-2" /> Create Goal
+                <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                        <Target className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">No goals set</h3>
+                    <p className="text-gray-500 mb-6 max-w-sm mx-auto">Goals help you stay focused and track your professional growth.</p>
+                    <Button onClick={() => setIsDialogOpen(true)} className="bg-primary-600 hover:bg-primary-700 text-white">
+                        <Plus className="h-4 w-4 mr-2" /> Create First Goal
                     </Button>
-                </Card>
+                </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {goals.map(goal => (
                         <GoalCard key={goal.id} goal={goal} />
                     ))}
@@ -256,57 +284,77 @@ const GoalCard = ({ goal }) => {
     const isCompleted = goal.status === 'completed';
 
     const priorityColors = {
-        low: 'bg-gray-100 text-gray-700',
-        medium: 'bg-blue-100 text-blue-700',
-        high: 'bg-red-100 text-red-700'
+        low: 'bg-gray-100 text-gray-700 border-gray-200',
+        medium: 'bg-blue-50 text-blue-700 border-blue-100',
+        high: 'bg-red-50 text-red-700 border-red-100'
     };
 
     return (
-        <Card className="hover:shadow-md transition-shadow border border-gray-200">
+        <Card className="hover:shadow-lg transition-all duration-200 border-gray-200 hover:border-primary-200 group">
             <CardContent className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h4 className={`font-semibold text-gray-900 mb-2 ${isCompleted ? 'line-through text-gray-400' : ''}`}>
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                            <Badge className={`${priorityColors[goal.priority]} border font-medium px-2 py-0.5 capitalize`}>
+                                {goal.priority}
+                            </Badge>
+                            {goal.due_date && (
+                                <span className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    {new Date(goal.due_date).toLocaleDateString()}
+                                </span>
+                            )}
+                        </div>
+                        <h4 className={`text-lg font-bold text-gray-900 ${isCompleted ? 'line-through text-gray-400' : ''}`}>
                             {goal.title}
                         </h4>
-                        <Badge className={`${priorityColors[goal.priority]} border-0 text-xs`}>
-                            {goal.priority}
-                        </Badge>
                     </div>
-                    {isCompleted && (
-                        <div className="p-2 bg-green-100 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                    {isCompleted ? (
+                        <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                            <CheckCircle className="h-5 w-5" />
                         </div>
+                    ) : (
+                        <Button size="icon" variant="ghost" className="h-8 w-8 text-red-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-opacity" onClick={handleDelete}>
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
                     )}
                 </div>
 
-                <p className="text-sm text-gray-600 mb-4">{goal.description}</p>
+                <p className="text-sm text-gray-600 mb-6 line-clamp-2 min-h-[2.5em]">
+                    {goal.description || "No description provided."}
+                </p>
 
                 <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-semibold text-gray-900">{goal.progress}%</span>
+                    <div className="flex justify-between items-center text-xs font-medium">
+                        <span className="text-gray-500">Progress</span>
+                        <span className={`px-2 py-0.5 rounded-full ${isCompleted ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-900'}`}>
+                            {goal.progress}%
+                        </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
                         <div
-                            className={`h-full rounded-full ${isCompleted ? 'bg-green-500' : 'bg-blue-600'}`}
+                            className={`h-full rounded-full transition-all duration-500 ${isCompleted ? 'bg-green-500' : 'bg-primary-600'}`}
                             style={{ width: `${goal.progress}%` }}
                         />
                     </div>
                 </div>
 
                 {!isCompleted && (
-                    <div className="flex justify-between items-center pt-4 mt-4 border-t border-gray-100">
-                        <div className="flex gap-2">
-                            <Button size="sm" variant="outline" onClick={() => handleProgress(Math.min(100, goal.progress + 10))}>
-                                +10%
-                            </Button>
-                            <Button size="sm" onClick={() => handleProgress(100)}>
-                                Complete
-                            </Button>
-                        </div>
-                        <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700" onClick={handleDelete}>
-                            <Trash2 className="h-4 w-4" />
+                    <div className="flex justify-between items-center pt-5 mt-5 border-t border-gray-100">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-xs border-gray-200 hover:bg-gray-50"
+                            onClick={() => handleProgress(Math.min(100, goal.progress + 10))}
+                        >
+                            +10% Progress
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="text-xs bg-green-600 hover:bg-green-700 text-white shadow-sm shadow-green-200"
+                            onClick={() => handleProgress(100)}
+                        >
+                            Mark Complete
                         </Button>
                     </div>
                 )}
@@ -321,47 +369,63 @@ const ReviewsSection = ({ user }) => {
 
     if (isLoading) {
         return (
-            <div className="grid gap-4">
-                {[1, 2].map(i => <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse"></div>)}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2].map(i => <div key={i} className="h-40 bg-gray-100 rounded-xl animate-pulse"></div>)}
             </div>
         );
     }
 
     if (!reviews?.length) {
         return (
-            <Card className="p-12 text-center border-dashed">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No reviews yet</h3>
-                <p className="text-gray-600">Your performance reviews will appear here</p>
-            </Card>
+            <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50/50">
+                <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-gray-100">
+                    <FileText className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">No reviews yet</h3>
+                <p className="text-gray-500">Performance reviews initiated by your manager will appear here.</p>
+            </div>
         );
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {reviews.map(review => (
-                <Card key={review.id} className="hover:shadow-md transition-shadow border border-gray-200">
+                <Card key={review.id} className="hover:shadow-md transition-shadow border border-gray-200 overflow-hidden">
+                    <div className="h-2 bg-gradient-to-r from-primary-500 to-primary-600"></div>
                     <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h4 className="font-semibold text-gray-900">{review.cycle_name || 'Review'}</h4>
-                                <p className="text-sm text-gray-600 mt-1">By: {review.reviewer_name || 'Manager'}</p>
-                            </div>
-                            <div className="text-right">
-                                <div className="text-2xl font-bold text-blue-600">
-                                    {review.overall_rating > 0 ? review.overall_rating : '--'}
+                                <h4 className="font-bold text-gray-900 text-lg">{review.cycle_name || 'Performance Review'}</h4>
+                                <div className="flex items-center gap-2 mt-1">
+                                    <div className="h-6 w-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-600">
+                                        {(review.reviewer_name || 'M').charAt(0)}
+                                    </div>
+                                    <p className="text-sm text-gray-600">Reviewer: <span className="font-medium text-gray-900">{review.reviewer_name || 'Manager'}</span></p>
                                 </div>
-                                <div className="text-xs text-gray-600">Rating</div>
+                            </div>
+                            <div className="flex flex-col items-end">
+                                <div className="text-3xl font-bold text-primary-600 tracking-tighter">
+                                    {review.overall_rating > 0 ? review.overall_rating.toFixed(1) : '--'}
+                                </div>
+                                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">Rating</div>
                             </div>
                         </div>
-                        <Badge className={`
-                            ${review.status === 'scheduled' ? 'bg-blue-100 text-blue-700' : ''}
-                            ${review.status === 'submitted' ? 'bg-purple-100 text-purple-700' : ''}
-                            ${review.status === 'acknowledged' ? 'bg-green-100 text-green-700' : ''}
-                            border-0
-                        `}>
-                            {review.status}
-                        </Badge>
+
+                        <div className="flex items-center justify-between">
+                            <Badge className={`
+                                ${review.status === 'scheduled' ? 'bg-blue-50 text-blue-700 border-blue-200' : ''}
+                                ${review.status === 'in_progress' ? 'bg-amber-50 text-amber-700 border-amber-200' : ''}
+                                ${review.status === 'submitted' ? 'bg-purple-50 text-purple-700 border-purple-200' : ''}
+                                ${review.status === 'acknowledged' ? 'bg-green-50 text-green-700 border-green-200' : ''}
+                                border px-2.5 py-0.5
+                            `}>
+                                {review.status.replace('_', ' ')}
+                            </Badge>
+
+                            <Button variant="ghost" size="sm" className="text-gray-500 hover:text-primary-600">
+                                View Full Report <ChevronRight className="h-4 w-4 ml-1" />
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             ))}

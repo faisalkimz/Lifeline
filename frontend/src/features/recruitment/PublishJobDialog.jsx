@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
 import { useUpdateJobMutation, useGetRecruitmentIntegrationsQuery } from '../../store/api';
-import { CheckCircle, XCircle, Loader, ExternalLink, Activity, Calendar, Clock, Linkedin, Search, Globe, Sun } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { CheckCircle, XCircle, Loader2, ExternalLink, Activity, Calendar, Clock, Linkedin, Search, Globe, Sun, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { cn } from '../../utils/cn';
 
 const PublishJobDialog = ({ job, isOpen, onClose }) => {
     const [selectedPlatforms, setSelectedPlatforms] = useState([]);
@@ -21,13 +23,15 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
             name: 'LinkedIn',
             icon: Linkedin,
             color: 'bg-[#0077b5]/10 border-[#0077b5]/20 text-[#0077b5]',
+            activeColor: 'bg-[#0077b5] border-[#0077b5] text-white',
             description: 'Professional network - Best for corporate roles'
         },
         {
             id: 'indeed',
             name: 'Indeed',
-            icon: Search, // Indeed is a search engine
+            icon: Search,
             color: 'bg-[#2164f3]/10 border-[#2164f3]/20 text-[#2164f3]',
+            activeColor: 'bg-[#2164f3] border-[#2164f3] text-white',
             description: 'World\'s #1 job site - Maximum reach'
         },
         {
@@ -35,13 +39,15 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
             name: 'Fuzu',
             icon: Globe,
             color: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+            activeColor: 'bg-emerald-600 border-emerald-600 text-white',
             description: 'East African jobs - Local talent'
         },
         {
             id: 'brightermonday',
             name: 'BrighterMonday',
-            icon: Sun, // Brighter
+            icon: Sun,
             color: 'bg-orange-50 border-orange-200 text-orange-600',
+            activeColor: 'bg-orange-500 border-orange-500 text-white',
             description: 'Uganda\'s #1 job site - Top local reach'
         },
     ];
@@ -78,7 +84,6 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
         setPublishResults(null);
 
         try {
-            // If scheduled, update the job with scheduled date
             if (publishDate && publishTime) {
                 const scheduledDateTime = new Date(`${publishDate}T${publishTime}`).toISOString();
                 await updateJob({
@@ -90,7 +95,6 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                 return;
             }
 
-            // Otherwise, publish immediately
             const response = await fetch(`/api/recruitment/jobs/${job.id}/publish/`, {
                 method: 'POST',
                 headers: {
@@ -105,7 +109,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
             if (data.status === 'published') {
                 toast.success(data.message);
-                await updateJob({ id: job.id, status: 'published' });
+                updateJob({ id: job.id, status: 'published' });
             } else {
                 toast.warning(data.message);
             }
@@ -119,213 +123,191 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="text-xl font-semibold text-gray-900">
-                        Publish Job: {job?.title}
-                    </DialogTitle>
-                    <p className="text-sm text-gray-600 mt-1">
-                        Select platforms to publish your job posting or schedule for later
-                    </p>
+            <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 bg-white rounded-3xl">
+                <DialogHeader className="p-8 pb-4 border-b border-slate-100">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <DialogTitle className="text-2xl font-bold text-slate-900">
+                                Publish Job
+                            </DialogTitle>
+                            <p className="text-sm text-slate-500 mt-1">
+                                Choose platforms to publish <strong>{job?.title}</strong>
+                            </p>
+                        </div>
+                        <Link to={`/recruitment/jobs/${job.id}`} target="_blank">
+                            <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:text-slate-900 font-bold rounded-xl">
+                                <Eye className="h-4 w-4 mr-2" />
+                                Preview
+                            </Button>
+                        </Link>
+                    </div>
                 </DialogHeader>
 
-                <div className="space-y-6 pt-4">
+                <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Scheduled Publishing */}
-                    <div className="bg-primary-50 border border-primary-200 rounded-lg p-6">
-                        <div className="flex items-center gap-2 mb-4">
-                            <Calendar className="h-5 w-5 text-primary-600" />
-                            <h3 className="font-semibold text-gray-900">Schedule Publishing</h3>
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm">
+                                <Calendar className="h-5 w-5 text-slate-900" />
+                            </div>
+                            <div>
+                                <h3 className="font-bold text-slate-900 text-sm">Schedule Publishing</h3>
+                                <p className="text-xs text-slate-500">Automatically publish at a later date.</p>
+                            </div>
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">
-                            Set a specific date and time to automatically publish this job
-                        </p>
+
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Publish Date
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                    Date
                                 </label>
                                 <input
                                     type="date"
                                     value={publishDate}
                                     onChange={(e) => setPublishDate(e.target.value)}
                                     min={new Date().toISOString().split('T')[0]}
-                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Publish Time
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                                    Time
                                 </label>
                                 <input
                                     type="time"
                                     value={publishTime}
                                     onChange={(e) => setPublishTime(e.target.value)}
-                                    className="w-full h-10 px-3 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
                                 />
                             </div>
                         </div>
                         {publishDate && publishTime && (
-                            <div className="mt-4 p-3 bg-white border border-primary-200 rounded-lg">
-                                <div className="flex items-center gap-2 text-sm text-primary-700">
-                                    <Clock className="h-4 w-4" />
-                                    <span>
-                                        Will publish on {new Date(`${publishDate}T${publishTime}`).toLocaleString()}
-                                    </span>
-                                </div>
+                            <div className="mt-4 p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-3 shadow-sm">
+                                <Clock className="h-4 w-4 text-emerald-500" />
+                                <span className="text-xs font-bold text-slate-700">
+                                    Scheduled for {new Date(`${publishDate}T${publishTime}`).toLocaleString()}
+                                </span>
                             </div>
                         )}
                     </div>
 
-                    {/* Quick Actions */}
-                    <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-gray-900">Or Publish Immediately</h3>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleSelectAll}
-                            disabled={publishing}
-                            className="border border-gray-200"
-                        >
-                            Select All Active
-                        </Button>
-                    </div>
+                    {/* Platforms */}
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                            <h3 className="font-bold text-slate-900">Publish Immediately</h3>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleSelectAll}
+                                disabled={publishing}
+                                className="text-slate-500 hover:text-slate-900"
+                            >
+                                Select All Active
+                            </Button>
+                        </div>
 
-                    {/* Platform Cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {platforms.map(platform => {
-                            const isActive = isIntegrationActive(platform.id);
-                            const isSelected = selectedPlatforms.includes(platform.id);
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {platforms.map(platform => {
+                                const isActive = isIntegrationActive(platform.id);
+                                const isSelected = selectedPlatforms.includes(platform.id);
 
-                            return (
-                                <div
-                                    key={platform.id}
-                                    onClick={() => isActive && handlePlatformToggle(platform.id)}
-                                    className={`
-                                        relative p-4 rounded-lg border-2 transition-all cursor-pointer
-                                        ${isSelected
-                                            ? 'border-primary-500 bg-primary-50'
-                                            : 'border-gray-200 hover:border-gray-300'
-                                        }
-                                        ${!isActive && 'opacity-50 cursor-not-allowed'}
-                                    `}
-                                >
-                                    {/* Selection Checkbox */}
-                                    <div className="absolute top-3 right-3">
-                                        {isSelected ? (
-                                            <div className="h-5 w-5 bg-primary-600 rounded-full flex items-center justify-center">
-                                                <CheckCircle className="h-4 w-4 text-white" />
+                                return (
+                                    <div
+                                        key={platform.id}
+                                        onClick={() => isActive && handlePlatformToggle(platform.id)}
+                                        className={cn(
+                                            "relative p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-4 active:scale-95",
+                                            isSelected ? "border-slate-900 bg-slate-50 shadow-md" : "border-slate-200 bg-white hover:border-slate-300",
+                                            !isActive && "opacity-50 cursor-not-allowed grayscale"
+                                        )}
+                                    >
+                                        <div className="flex-1 flex gap-4">
+                                            <div className={cn("p-3 rounded-xl border", platform.color)}>
+                                                <platform.icon className="h-6 w-6" />
                                             </div>
-                                        ) : (
-                                            <div className="h-5 w-5 border-2 border-gray-300 rounded-full" />
+                                            <div>
+                                                <h3 className="font-bold text-slate-900">{platform.name}</h3>
+                                                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{platform.description}</p>
+                                                <div className="mt-2">
+                                                    {isActive ? (
+                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                                                            <CheckCircle className="h-3 w-3" />
+                                                            Ready
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
+                                                            <XCircle className="h-3 w-3" />
+                                                            Not Connected
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {isSelected && (
+                                            <div className="absolute top-4 right-4">
+                                                <div className="h-6 w-6 bg-slate-900 rounded-full flex items-center justify-center shadow-lg">
+                                                    <CheckCircle className="h-3.5 w-3.5 text-white" />
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
-
-                                    {/* Platform Info */}
-                                    <div className="flex items-start gap-3">
-                                        <div className={`p-2 rounded-lg border ${platform.color}`}>
-                                            <platform.icon className="h-6 w-6" />
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold text-gray-900">{platform.name}</h3>
-                                            <p className="text-xs text-gray-600 mt-1">{platform.description}</p>
-
-                                            {/* Status Badge */}
-                                            <div className="mt-2">
-                                                {isActive ? (
-                                                    <span className="inline-flex items-center gap-1 text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                                                        <CheckCircle className="h-3 w-3" />
-                                                        Configured
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 text-xs text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
-                                                        <XCircle className="h-3 w-3" />
-                                                        Not Configured
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    {/* Publishing Results */}
+                    {/* Results */}
                     {publishResults && (
-                        <div className="space-y-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-primary-600" />
+                        <div className="space-y-3 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                <Activity className="h-5 w-5 text-emerald-500" />
                                 Publishing Results
                             </h3>
                             {Object.entries(publishResults.platforms).map(([platform, result]) => (
-                                <div
-                                    key={platform}
-                                    className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200"
-                                >
+                                <div key={platform} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
                                     <div className="flex items-center gap-3">
                                         {result.success ? (
-                                            <CheckCircle className="h-5 w-5 text-green-600" />
+                                            <CheckCircle className="h-5 w-5 text-emerald-500" />
                                         ) : (
-                                            <XCircle className="h-5 w-5 text-red-600" />
+                                            <XCircle className="h-5 w-5 text-red-500" />
                                         )}
                                         <div>
-                                            <p className="font-medium text-gray-900 capitalize">{platform}</p>
+                                            <p className="font-bold text-slate-900 text-sm capitalize">{platform}</p>
                                             {result.success && result.url && (
-                                                <a
-                                                    href={result.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-xs text-primary-600 hover:underline flex items-center gap-1"
-                                                >
-                                                    View on {platform}
-                                                    <ExternalLink className="h-3 w-3" />
+                                                <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:underline flex items-center gap-1 font-medium">
+                                                    View Listing <ExternalLink className="h-3 w-3" />
                                                 </a>
                                             )}
-                                            {!result.success && (
-                                                <p className="text-xs text-red-600">{result.error}</p>
-                                            )}
+                                            {!result.success && <p className="text-xs text-red-500">{result.error}</p>}
                                         </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
+                </div>
 
-                    {/* Action Buttons */}
-                    <div className="flex gap-3 pt-4 border-t border-gray-200">
-                        <Button
-                            variant="ghost"
-                            onClick={onClose}
-                            disabled={publishing}
-                            className="flex-1"
-                        >
-                            {publishResults ? 'Close' : 'Cancel'}
-                        </Button>
-                        {!publishResults && (
-                            <Button
-                                onClick={handlePublish}
-                                disabled={publishing || (selectedPlatforms.length === 0 && !publishDate)}
-                                className="flex-1 bg-primary-600 hover:bg-primary-700"
-                            >
-                                {publishing ? (
-                                    <>
-                                        <Loader className="h-4 w-4 mr-2 animate-spin" />
-                                        Publishing...
-                                    </>
-                                ) : publishDate && publishTime ? (
-                                    'Schedule Publishing'
-                                ) : (
-                                    `Publish to ${selectedPlatforms.length} Platform${selectedPlatforms.length !== 1 ? 's' : ''}`
-                                )}
-                            </Button>
-                        )}
-                    </div>
-
-                    {/* Help Text */}
+                <div className="p-6 border-t border-slate-100 bg-white flex gap-3">
+                    <Button variant="ghost" onClick={onClose} disabled={publishing} className="flex-1 h-12 rounded-xl text-slate-500 hover:text-slate-900 font-bold">
+                        {publishResults ? 'Close' : 'Cancel'}
+                    </Button>
                     {!publishResults && (
-                        <p className="text-xs text-gray-500 text-center">
-                            💡 Tip: Configure platform integrations in Settings to enable publishing
-                        </p>
+                        <Button
+                            onClick={handlePublish}
+                            disabled={publishing || (selectedPlatforms.length === 0 && !publishDate)}
+                            className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20 rounded-xl font-bold"
+                        >
+                            {publishing ? (
+                                <>
+                                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                    Publishing...
+                                </>
+                            ) : publishDate && publishTime ? (
+                                'Schedule Publish'
+                            ) : (
+                                `Publish Now (${selectedPlatforms.length})`
+                            )}
+                        </Button>
                     )}
                 </div>
             </DialogContent>

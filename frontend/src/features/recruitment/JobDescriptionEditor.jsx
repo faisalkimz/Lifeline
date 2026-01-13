@@ -3,26 +3,40 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useUpdateJobMutation } from '../../store/api';
 import { Button } from '../../components/ui/Button';
-import { Calendar, Clock, Save, X, Loader, CheckCircle } from 'lucide-react';
+import { Calendar, Clock, Save, X, Loader2, CheckCircle, Info } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import { Input } from '../../components/ui/Input';
 
 const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
-    const [description, setDescription] = useState(job?.description || '');
+    const [formData, setFormData] = useState({
+        title: '',
+        location: '',
+        employment_type: 'full_time',
+        description: '',
+        requirements: '',
+    });
     const [publishDate, setPublishDate] = useState('');
-    const [publishTime, setPublishTime] = useState('');
+    const [publishTime, setPublishTime] = useState('09:00');
     const [isSaving, setIsSaving] = useState(false);
 
     const [updateJob] = useUpdateJobMutation();
 
     useEffect(() => {
-        if (job?.description) {
-            setDescription(job.description);
-        }
-        if (job?.scheduled_publish_date) {
-            const dateObj = new Date(job.scheduled_publish_date);
-            setPublishDate(dateObj.toISOString().split('T')[0]);
-            setPublishTime(dateObj.toTimeString().slice(0, 5));
+        if (job) {
+            setFormData({
+                title: job.title || '',
+                location: job.location || '',
+                employment_type: job.employment_type || 'full_time',
+                description: job.description || '',
+                requirements: job.requirements || '',
+            });
+
+            if (job.scheduled_publish_date) {
+                const dateObj = new Date(job.scheduled_publish_date);
+                setPublishDate(dateObj.toISOString().split('T')[0]);
+                setPublishTime(dateObj.toTimeString().slice(0, 5));
+            }
         }
     }, [job]);
 
@@ -33,7 +47,7 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
         try {
             const updatePayload = {
                 id: job.id,
-                description,
+                ...formData,
             };
 
             if (publishDate && publishTime) {
@@ -69,98 +83,141 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
         'link'
     ];
 
+    const handleFormChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-xl shadow-2xl border border-gray-200 flex flex-col h-[85vh] w-full max-w-5xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col h-[90vh] w-full max-w-6xl overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div className="flex items-center justify-between px-8 py-5 border-b border-gray-100 bg-gray-50/50">
                     <div>
-                        <h2 className="text-xl font-bold text-gray-900">Edit Job Description</h2>
-                        <div className="flex items-center gap-2 mt-1">
-                            <span className="text-sm font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded">{job?.title}</span>
-                            <span className="text-sm text-gray-400">•</span>
-                            <span className="text-sm text-gray-500">{job?.department_name || 'No Department'}</span>
-                        </div>
+                        <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Edit Job Details</h2>
+                        <p className="text-sm text-gray-500 mt-1">Update job information and description for {job?.title}</p>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={onClose} className="hover:bg-gray-200 rounded-full">
+                    <Button variant="ghost" size="icon" onClick={onClose} className="hover:bg-gray-200 rounded-full h-10 w-10">
                         <X className="h-5 w-5 text-gray-500" />
                     </Button>
                 </div>
 
                 <div className="flex-1 flex overflow-hidden">
-                    {/* Main Editor */}
-                    <div className="flex-1 flex flex-col min-w-0 bg-white">
-                        <ReactQuill
-                            theme="snow"
-                            value={description}
-                            onChange={setDescription}
-                            modules={modules}
-                            formats={formats}
-                            className="flex-1 flex flex-col overflow-hidden [&_.ql-toolbar]:border-0 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-gray-200 [&_.ql-toolbar]:bg-white [&_.ql-toolbar]:px-4 [&_.ql-toolbar]:py-3 [&_.ql-container]:border-0 [&_.ql-editor]:p-8 [&_.ql-editor]:text-base [&_.ql-editor]:text-gray-700 [&_.ql-editor]:overflow-y-auto [&_.ql-editor]:font-sans [&_.ql-editor.ql-blank::before]:text-gray-400 [&_.ql-editor.ql-blank::before]:font-normal"
-                            placeholder="Write a compelling job description..."
-                        />
+                    {/* Main Content */}
+                    <div className="flex-1 overflow-y-auto p-12 space-y-8 bg-white">
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700">Job Title</label>
+                                <Input
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleFormChange}
+                                    className="bg-slate-50"
+                                    placeholder="e.g. Senior Software Engineer"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700">Employment Type</label>
+                                <select
+                                    name="employment_type"
+                                    value={formData.employment_type}
+                                    onChange={handleFormChange}
+                                    className="w-full h-10 px-3 bg-slate-50 border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-slate-200 outline-none"
+                                >
+                                    <option value="full_time">Full Time</option>
+                                    <option value="part_time">Part Time</option>
+                                    <option value="contract">Contract</option>
+                                    <option value="internship">Internship</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-slate-700">Location</label>
+                                <Input
+                                    name="location"
+                                    value={formData.location}
+                                    onChange={handleFormChange}
+                                    className="bg-slate-50"
+                                    placeholder="e.g. Remote / Kampala HQ"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700">Description</label>
+                            <div className="border border-slate-200 rounded-xl overflow-hidden min-h-[350px] flex flex-col bg-white">
+                                <ReactQuill
+                                    theme="snow"
+                                    value={formData.description}
+                                    onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                                    modules={modules}
+                                    formats={formats}
+                                    className="flex-1"
+                                    placeholder="Describe the role responsibilities and requirements..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-slate-700">Requirements</label>
+                            <textarea
+                                name="requirements"
+                                value={formData.requirements}
+                                onChange={handleFormChange}
+                                rows="6"
+                                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-sm focus:ring-2 focus:ring-slate-200 outline-none resize-none"
+                                placeholder="List the key requirements for this position..."
+                            />
+                        </div>
                     </div>
 
-                    {/* Sidebar Settings */}
-                    <div className="w-80 border-l border-gray-200 bg-gray-50 p-6 flex flex-col gap-6 overflow-y-auto shrink-0">
-                        {/* Scheduled Publishing Section */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-gray-900 font-bold text-sm">
-                                <Calendar className="h-4 w-4 text-primary-600" />
-                                Publishing Schedule
+                    {/* Sidebar Configuration */}
+                    <div className="w-80 border-l border-slate-100 bg-slate-50/50 p-8 flex flex-col shrink-0 gap-6 overflow-y-auto">
+                        <section className="space-y-4">
+                            <div className="flex items-center gap-2 text-slate-700 font-bold text-sm">
+                                <Calendar className="h-4 w-4" />
+                                <span>Publishing Schedule</span>
                             </div>
-                            <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                                <p className="text-xs text-gray-500 leading-relaxed">
-                                    Set a specific date and time to automatically publish this job posting.
-                                </p>
-
-                                <div className="space-y-3">
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Publish Date</label>
-                                        <input
-                                            type="date"
-                                            value={publishDate}
-                                            onChange={(e) => setPublishDate(e.target.value)}
-                                            min={new Date().toISOString().split('T')[0]}
-                                            className="w-full h-10 px-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-700 mb-1.5 uppercase tracking-wide">Publish Time</label>
-                                        <div className="relative">
-                                            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <input
-                                                type="time"
-                                                value={publishTime}
-                                                onChange={(e) => setPublishTime(e.target.value)}
-                                                className="w-full h-10 pl-10 pr-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
-                                            />
-                                        </div>
-                                    </div>
+                            <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-500">Publish Date</label>
+                                    <Input
+                                        type="date"
+                                        value={publishDate}
+                                        onChange={(e) => setPublishDate(e.target.value)}
+                                        className="bg-slate-50"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label className="text-xs font-semibold text-slate-500">Time</label>
+                                    <Input
+                                        type="time"
+                                        value={publishTime}
+                                        onChange={(e) => setPublishTime(e.target.value)}
+                                        className="bg-slate-50"
+                                    />
                                 </div>
 
                                 {publishDate && publishTime && (
-                                    <div className="flex gap-2 p-3 bg-primary-50 text-primary-700 text-xs rounded-lg border border-primary-100 items-start">
-                                        <CheckCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                                    <div className="flex gap-2 p-3 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg border border-blue-100 items-start">
+                                        <Info className="h-4 w-4 shrink-0 mt-0.5" />
                                         <span>
-                                            Scheduled for <strong>{new Date(`${publishDate}T${publishTime}`).toLocaleDateString()}</strong> at <strong>{new Date(`${publishDate}T${publishTime}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong>
+                                            Scheduled for {new Date(`${publishDate}T${publishTime}`).toLocaleDateString()} at {publishTime}
                                         </span>
                                     </div>
                                 )}
                             </div>
-                        </div>
+                        </section>
 
-                        <div className="mt-auto pt-6 border-t border-gray-200">
+                        <div className="mt-auto pt-6 border-t border-slate-200">
                             <div className="grid gap-3">
                                 <Button
-                                    className="w-full bg-primary-600 hover:bg-primary-700 text-white shadow-lg shadow-primary-600/20 h-11"
+                                    className="w-full bg-slate-900 text-white hover:bg-slate-800 shadow-md font-medium"
                                     onClick={handleSave}
                                     disabled={isSaving}
                                 >
                                     {isSaving ? (
                                         <>
-                                            <Loader className="h-4 w-4 mr-2 animate-spin" />
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                                             Saving...
                                         </>
                                     ) : (
@@ -171,8 +228,8 @@ const JobDescriptionEditor = ({ job, isOpen, onClose }) => {
                                     )}
                                 </Button>
                                 <Button
-                                    variant="outline"
-                                    className="w-full h-11"
+                                    variant="ghost"
+                                    className="w-full text-slate-500 hover:text-slate-900"
                                     onClick={onClose}
                                 >
                                     Cancel

@@ -187,6 +187,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create company and admin user"""
+        from employees.models import Employee
+        from django.utils import timezone
+        from datetime import date
+
         # Extract company data
         company_data = {
             'name': validated_data.pop('company_name'),
@@ -214,6 +218,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             **validated_data
         )
         user.set_password(password)
+        user.save()
+
+        # Create corresponding Employee record for the admin
+        employee = Employee.objects.create(
+            company=company,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
+            phone=user.phone or '0000000000',
+            date_of_birth=date(1990, 1, 1), # Default
+            gender='other', # Default
+            national_id=f'ADM-{user.id}', # Default
+            join_date=timezone.now().date(),
+            job_title='Company Administrator',
+            employment_status='active'
+        )
+        
+        # Link user to employee
+        user.employee = employee
         user.save()
         
         return user

@@ -367,6 +367,10 @@ export const api = createApi({
       }),
       invalidatesTags: ['LeaveRequest']
     }),
+    getMyLeaveRequests: builder.query({
+      query: () => '/leave/requests/my_requests/',
+      providesTags: ['LeaveRequest']
+    }),
     getLeaveBalances: builder.query({
       query: () => '/leave/balances/my_balances/',
       providesTags: ['LeaveRequest'] // Re-fetch on request changes
@@ -903,6 +907,10 @@ export const api = createApi({
       }),
       providesTags: ['Document']
     }),
+    getStorageStats: builder.query({
+      query: () => '/documents/company/storage_stats/',
+      providesTags: ['Document', 'EmployeeDocument']
+    }),
     createDocument: builder.mutation({
       query: (body) => ({
         url: '/documents/company/',
@@ -1099,6 +1107,7 @@ export const {
   useUpdateSalaryAdvanceMutation,
   // leave hooks
   useGetLeaveRequestsQuery,
+  useGetMyLeaveRequestsQuery,
   useCreateLeaveRequestMutation,
   useGetLeaveBalancesQuery,
   useGetLeaveTypesQuery,
@@ -1175,6 +1184,7 @@ export const {
   useDeleteEmployeeBenefitMutation,
   // Documents
   useGetFoldersQuery,
+  useGetStorageStatsQuery,
   useCreateFolderMutation,
   useUpdateFolderMutation,
   useDeleteFolderMutation,

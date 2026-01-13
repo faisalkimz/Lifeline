@@ -400,8 +400,14 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         if request.user.role not in ['company_admin', 'hr_manager', 'super_admin']:
              # Return limited stats for regular employees or just empty
              return Response({
-                 'total': 1, 'active': 1, 'on_leave': 0, 
-                 'upcoming_events': [], 'next_events': []
+                 'total': 1,
+                 'active': 1,
+                 'active_now': 1,
+                 'working_today': 1,
+                 'on_leave': 0,
+                 'departments_count': 1,
+                 'upcoming_events': [],
+                 'next_events': []
              })
 
         queryset = self.get_queryset()

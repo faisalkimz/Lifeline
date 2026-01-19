@@ -57,6 +57,32 @@ export const api = createApi({
       query: () => '/auth/me/',
       providesTags: ['User']
     }),
+    // --- Security Endpoints ---
+    setup2FA: builder.query({
+      query: () => '/security/setup_2fa/'
+    }),
+    enable2FA: builder.mutation({
+      query: (data) => ({
+        url: '/security/enable_2fa/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['User']
+    }),
+    disable2FA: builder.mutation({
+      query: (data) => ({
+        url: '/security/disable_2fa/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: ['User']
+    }),
+    getSecurityLogs: builder.query({
+      query: () => '/security/logs/'
+    }),
+    exportData: builder.query({
+      query: () => '/security/export_data/'
+    }),
     // --- Employees (existing) ---
     getEmployees: builder.query({
       query: (params) => ({
@@ -1439,6 +1465,12 @@ export const {
   useUpdateIntegrationMutation,
   useTestIntegrationMutation,
   useDeleteIntegrationMutation,
+  // Security
+  useSetup2FAQuery,
+  useEnable2FAMutation,
+  useDisable2FAMutation,
+  useGetSecurityLogsQuery,
+  useExportDataQuery,
 } = api;
 
 export default api;

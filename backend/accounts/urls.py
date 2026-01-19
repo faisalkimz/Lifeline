@@ -6,13 +6,14 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     RegisterView, LoginView, LogoutView,
     CurrentUserView, ChangePasswordView,
-    CompanyViewSet, UserViewSet
+    CompanyViewSet, UserViewSet, SecurityViewSet
 )
 
 # Create router for viewsets
 router = DefaultRouter()
 router.register(r'companies', CompanyViewSet, basename='company')
 router.register(r'users', UserViewSet, basename='user')
+router.register(r'security', SecurityViewSet, basename='security')
 
 urlpatterns = [
     # Authentication endpoints

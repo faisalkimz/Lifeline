@@ -17,10 +17,15 @@ import {
     useGetCompanyQuery,
     useUpdateCompanyMutation,
     useGetIntegrationStatusQuery,
+    useSetup2FAQuery,
+    useEnable2FAMutation,
+    useDisable2FAMutation,
+    useGetSecurityLogsQuery,
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge';
 import { getMediaUrl } from '../../config/api';
+import { Fingerprint, Download, History, ShieldCheck, AlertTriangle } from 'lucide-react';
 
 const SettingsPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -138,6 +143,9 @@ const SettingsPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="integrations" className="data-[state=active]:bg-white">
                         <Zap className="h-4 w-4 mr-2" /> Integrations
+                    </TabsTrigger>
+                    <TabsTrigger value="security" className="data-[state=active]:bg-white">
+                        <ShieldCheck className="h-4 w-4 mr-2" /> Security
                     </TabsTrigger>
                 </TabsList>
 
@@ -492,7 +500,211 @@ const SettingsPage = () => {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
+                {/* Security Tab */}
+                <TabsContent value="security">
+                    <SecurityTab user={user} />
+                </TabsContent>
             </Tabs>
+        </div>
+    );
+};
+
+const SecurityTab = ({ user }) => {
+    const { data: setupData, refetch: refetchSetup } = useSetup2FAQuery();
+    const { data: logs } = useGetSecurityLogsQuery();
+    const [enable2FA, { isLoading: isEnabling }] = useEnable2FAMutation();
+    const [otpCode, setOtpCode] = useState('');
+
+    const handleEnable = async () => {
+        try {
+            await enable2FA({ code: otpCode }).unwrap();
+            toast.success('Two-factor authentication enabled!');
+            setOtpCode('');
+            refetchSetup();
+        } catch (error) {
+            toast.error(error?.data?.error || 'Failed to enable 2FA');
+        }
+    };
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
+            <div className="lg:col-span-2 space-y-6">
+                {/* 2FA Card */}
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <ShieldCheck className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <CardTitle className="text-base font-bold text-slate-900">Two-Factor Authentication (2FA)</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="flex flex-col md:flex-row gap-8">
+                            <div className="flex-1">
+                                <p className="text-slate-600 text-sm leading-relaxed mb-6">
+                                    Add an extra layer of security to your account. To sign in, you'll need to provide a 6-digit code from your authenticator app.
+                                </p>
+
+                                {user?.two_factor_enabled ? (
+                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
+                                            <ShieldCheck className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-emerald-900 text-sm">2FA is Enabled</p>
+                                            <p className="text-xs text-emerald-600">Your account is protected with two-factor authentication.</p>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                                                {setupData?.qr_code && (
+                                                    <img src={setupData.qr_code} alt="QR Code" className="h-32 w-32" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 space-y-2">
+                                                <h4 className="font-bold text-slate-900 text-sm">Step 1: Scan QR Code</h4>
+                                                <p className="text-xs text-slate-500">Scan this code with Google Authenticator or Authy on your mobile device.</p>
+                                                <div className="bg-slate-50 p-2 rounded border border-slate-100 font-mono text-[10px] text-slate-400 break-all">
+                                                    Secret: {setupData?.secret}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3 pt-2">
+                                            <h4 className="font-bold text-slate-900 text-sm">Step 2: Enter Verification Code</h4>
+                                            <div className="flex gap-2">
+                                                <Input
+                                                    placeholder="000 000"
+                                                    value={otpCode}
+                                                    onChange={(e) => setOtpCode(e.target.value)}
+                                                    maxLength={6}
+                                                    className="text-center font-bold tracking-[0.3em] font-mono h-11"
+                                                />
+                                                <Button onClick={handleEnable} isLoading={isEnabling} className="font-bold">
+                                                    Verify & Enable
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Audit Logs */}
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4 flex flex-row items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                <History className="h-4 w-4 text-slate-600" />
+                            </div>
+                            <CardTitle className="text-base font-bold text-slate-900">Recent Security Activity</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="divide-y divide-slate-100">
+                            {logs?.map((log, i) => (
+                                <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${log.status === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                            {log.status === 'success' ? <ShieldCheck className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-slate-900 text-sm capitalize">{log.action.replace('_', ' ')}</p>
+                                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
+                                                <span>{log.ip}</span>
+                                                <span>•</span>
+                                                <span>{new Date(log.created_at).toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Badge variant={log.status === 'success' ? 'success' : 'destructive'} className="rounded-full px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                                        {log.status}
+                                    </Badge>
+                                </div>
+                            ))}
+                            {(!logs || logs.length === 0) && (
+                                <div className="p-12 text-center">
+                                    <p className="text-slate-400 text-sm font-medium">No recent security events found.</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            <div className="space-y-6">
+                {/* GDPR Card */}
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
+                        <div className="flex items-center gap-2">
+                            <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center">
+                                <Download className="h-4 w-4 text-orange-600" />
+                            </div>
+                            <CardTitle className="text-base font-bold text-slate-900">Privacy & GDPR</CardTitle>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-6 text-left space-y-6">
+                        <div>
+                            <h4 className="font-bold text-slate-900 text-sm mb-1">Download Personal Data</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                                You can request a copy of all information stored about you in our systems at any time.
+                            </p>
+                            <Button
+                                variant="outline"
+                                className="w-full font-bold h-11 hover:bg-slate-50 border-slate-200 text-slate-700"
+                                onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL || '/api'}/security/export_data/`, '_blank')}
+                            >
+                                <Download className="h-4 w-4 mr-2" />
+                                Export My Information
+                            </Button>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100">
+                            <h4 className="font-bold text-slate-900 text-sm mb-1">Deactivate Account</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                                Temporarily hide your profile and access. This action can be undone by an administrator.
+                            </p>
+                            <Button variant="outline" className="w-full font-bold h-11 border-red-200 text-red-600 hover:bg-red-50">
+                                <Lock className="h-4 w-4 mr-2" />
+                                Deactivate Profile
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Password Policy */}
+                <Card className="bg-indigo-900 text-white overflow-hidden border-0 shadow-xl shadow-indigo-900/10">
+                    <CardContent className="p-6">
+                        <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center mb-4">
+                            <Shield className="h-5 w-5 text-white" />
+                        </div>
+                        <h4 className="font-bold text-lg mb-2">Password Policy</h4>
+                        <ul className="space-y-2 text-indigo-100 text-xs font-medium">
+                            <li className="flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+                                Minimum 8 characters
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+                                Must include symbols & numbers
+                            </li>
+                            <li className="flex items-center gap-2">
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
+                                Change every 90 days recommended
+                            </li>
+                        </ul>
+                        <Button className="w-full mt-6 bg-white text-indigo-900 hover:bg-indigo-50 font-bold border-0 h-11">
+                            Change My Password
+                        </Button>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 };

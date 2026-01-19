@@ -26,13 +26,23 @@ const LoginPage = () => {
     // For now, I'll assume it exists to structure the page.
     const [login, { isLoading, error }] = useLoginMutation();
 
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const [show2FA, setShow2FA] = React.useState(false);
+    const [loginData, setLoginData] = React.useState(null);
+
+    const { register, handleSubmit, formState: { errors }, watch } = useForm({
         resolver: zodResolver(loginSchema),
     });
 
     const onSubmit = async (data) => {
         try {
-            const result = await login(data).unwrap();
+            const result = await login(show2FA ? { ...loginData, otp_code: data.otp_code } : data).unwrap();
+
+            if (result.two_factor_required) {
+                setShow2FA(true);
+                setLoginData(data);
+                return;
+            }
+
             dispatch(setCredentials({
                 user: result.user,
                 token: result.tokens.access,
@@ -71,33 +81,53 @@ const LoginPage = () => {
                     )}
 
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                        <Input
-                            label="Username"
-                            type="text"
-                            placeholder="Enter your username"
-                            error={errors.username?.message}
-                            {...register('username')}
-                        />
-
-                        <div className="space-y-1">
-                            <div className="flex items-center justify-between">
+                        {!show2FA ? (
+                            <>
                                 <Input
-                                    label="Password"
-                                    type="password"
-                                    placeholder="••••••••"
-                                    error={errors.password?.message}
-                                    {...register('password')}
+                                    label="Username"
+                                    type="text"
+                                    placeholder="Enter your username"
+                                    error={errors.username?.message}
+                                    {...register('username')}
                                 />
+
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between">
+                                        <Input
+                                            label="Password"
+                                            type="password"
+                                            placeholder="••••••••"
+                                            error={errors.password?.message}
+                                            {...register('password')}
+                                        />
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <Link
+                                            to="/forgot-password"
+                                            className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="animate-in slide-in-from-bottom-2 duration-300">
+                                <Input
+                                    label="Two-Factor Code"
+                                    type="text"
+                                    placeholder="000000"
+                                    autoFocus
+                                    maxLength={6}
+                                    error={errors.otp_code?.message}
+                                    {...register('otp_code')}
+                                    className="text-center text-3xl tracking-[0.5em] font-bold h-16"
+                                />
+                                <p className="text-sm text-slate-500 mt-4 text-center">
+                                    Open your authenticator app and enter the 6-digit verification code.
+                                </p>
                             </div>
-                            <div className="flex justify-end">
-                                <Link
-                                    to="/forgot-password"
-                                    className="text-sm font-medium text-primary-600 hover:text-primary-700 hover:underline"
-                                >
-                                    Forgot password?
-                                </Link>
-                            </div>
-                        </div>
+                        )}
 
                         <Button
                             type="submit"
@@ -106,8 +136,18 @@ const LoginPage = () => {
                             isLoading={isLoading}
                             className="mt-6"
                         >
-                            Sign in
+                            {show2FA ? 'Verify & Sign in' : 'Sign in'}
                         </Button>
+
+                        {show2FA && (
+                            <button
+                                type="button"
+                                onClick={() => setShow2FA(false)}
+                                className="w-full text-sm text-slate-500 hover:text-slate-900 font-medium py-2"
+                            >
+                                Back to login
+                            </button>
+                        )}
                     </form>
                 </CardContent>
 

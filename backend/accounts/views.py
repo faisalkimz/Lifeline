@@ -17,6 +17,8 @@ from .serializers import (
     RegisterSerializer, ChangePasswordSerializer
 )
 from .permissions import IsCompanyUser, IsCompanyAdmin, IsOwnerOrAdmin
+from .services.security_service import SecurityService
+from .models import SecurityLog
 
 
 class RegisterView(generics.CreateAPIView):
@@ -73,6 +75,7 @@ class LoginView(generics.GenericAPIView):
         user = authenticate(username=username, password=password)
         
         if not user:
+            # Handle failed login tracking?
             return Response(
                 {'error': 'Invalid credentials'},
                 status=status.HTTP_401_UNAUTHORIZED
@@ -83,7 +86,26 @@ class LoginView(generics.GenericAPIView):
                 {'error': 'User account is disabled'},
                 status=status.HTTP_403_FORBIDDEN
             )
+
+        # 2FA Check
+        if user.two_factor_enabled:
+            otp_code = request.data.get('otp_code')
+            if not otp_code:
+                return Response({
+                    'two_factor_required': True,
+                    'message': 'Two-factor authentication code required'
+                }, status=status.HTTP_200_OK) # Or 401/403, but 200 with flag is common for multi-step
+            
+            if not SecurityService.verify_2fa(user, otp_code):
+                SecurityService.log_security_event(user, user.company, 'login_2fa', 'failure', request, "Invalid OTP")
+                return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Update login info
+        user.last_login_ip = request.META.get('REMOTE_ADDR')
+        user.save()
         
+        SecurityService.log_security_event(user, user.company, 'login', 'success', request)
+
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
         
@@ -304,3 +326,62 @@ class UserViewSet(viewsets.ModelViewSet):
         
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+class SecurityViewSet(viewsets.ViewSet):
+    """
+    API endpoints for Security, 2FA, and Compliance.
+    """
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['get'])
+    def setup_2fa(self, request):
+        """Get 2FA setup data (QR code)"""
+        data = SecurityService.generate_2fa_setup(request.user)
+        return Response(data)
+
+    @action(detail=False, methods=['post'])
+    def enable_2fa(self, request):
+        """Verify and enable 2FA"""
+        code = request.data.get('code')
+        if not code:
+            return Response({'error': 'Code is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if SecurityService.verify_2fa(request.user, code):
+            request.user.two_factor_enabled = True
+            request.user.save()
+            SecurityService.log_security_event(request.user, request.user.company, '2fa_enable', 'success', request)
+            return Response({'message': '2FA enabled successfully'})
+        
+        return Response({'error': 'Invalid code'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'])
+    def disable_2fa(self, request):
+        """Disable 2FA"""
+        password = request.data.get('password')
+        if not request.user.check_password(password):
+            return Response({'error': 'Invalid password'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        request.user.two_factor_enabled = False
+        request.user.save()
+        SecurityService.log_security_event(request.user, request.user.company, '2fa_disable', 'success', request)
+        return Response({'message': '2FA disabled successfully'})
+
+    @action(detail=False, methods=['get'])
+    def logs(self, request):
+        """Get security logs for current user"""
+        logs = SecurityLog.objects.filter(user=request.user)[:50]
+        data = [{
+            'action': log.action,
+            'status': log.status,
+            'ip': log.ip_address,
+            'created_at': log.created_at,
+            'description': log.description
+        } for log in logs]
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def export_data(self, request):
+        """GDPR Data Export"""
+        data = SecurityService.get_user_data_export(request.user)
+        SecurityService.log_security_event(request.user, request.user.company, 'gdpr_export', 'success', request)
+        return Response(data)

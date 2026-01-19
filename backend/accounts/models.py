@@ -135,6 +135,23 @@ class User(AbstractUser):
         related_name='user_account',
         help_text="Link to employee record if applicable"
     )
+
+    # Security & 2FA
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+    last_login_device = models.CharField(max_length=255, blank=True)
+    password_changed_at = models.DateTimeField(null=True, blank=True)
+    
+    # GDPR & Compliance
+    data_consent = models.BooleanField(default=False, help_text="Consent to process person data")
+    data_consent_at = models.DateTimeField(null=True, blank=True)
+    marketing_consent = models.BooleanField(default=False)
+    
+    # Account Status
+    is_verified = models.BooleanField(default=False)
+    failed_login_attempts = models.IntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True)
     
     class Meta:
         verbose_name = "User"
@@ -169,3 +186,26 @@ class User(AbstractUser):
             return True
         
         return False
+
+class SecurityLog(models.Model):
+    """
+    Audit log for security-sensitive actions.
+    """
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='security_logs')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='security_logs')
+    action = models.CharField(max_length=100) # e.g., 'login', 'password_change', '2fa_enable'
+    status = models.CharField(max_length=20, default='success') # 'success' or 'failure'
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['company', 'action']),
+            models.Index(fields=['user', 'action']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username if self.user else 'System'} - {self.action} - {self.created_at.date()}"

@@ -1,0 +1,21 @@
+Creating test database for alias 'default'...
+
+......F
+======================================================================
+FAIL: test_security_log_indexes (accounts.tests.test_security.SecurityTests.test_security_log_indexes)
+Test that security log indexes exist
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\Coding-Kimz\Desktop\New folder\Lifeline\backend\accounts\tests\test_security.py", line 118, in test_security_log_indexes
+    self.assertTrue(any('company' in idx and 'action' in idx for idx in indexes))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 7 tests in 3.349s
+
+FAILED (failures=1)
+Destroying test database for alias 'default'...
+
+Found 7 test(s).
+System check identified no issues (0 silenced).

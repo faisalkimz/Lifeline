@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import {
     Clock, Calendar, CheckCircle2,
     Play, Square, Loader2, History, AlertCircle,
-    Coffee, MapPin
+    Coffee, MapPin, QrCode, Settings
 } from 'lucide-react';
 import {
     useClockInMutation,
     useClockOutMutation,
     useGetTodayAttendanceQuery,
-    useGetMyAttendanceQuery
+    useGetMyAttendanceQuery,
+    useGetAttendancePolicyQuery
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
@@ -21,30 +23,80 @@ const AttendancePage = () => {
     const { data: todayStatus, refetch, isLoading: statusLoading } = useGetTodayAttendanceQuery(undefined, {
         pollingInterval: 30000
     });
+    const { data: attendancePolicy } = useGetAttendancePolicyQuery();
     const { data: myAttendance } = useGetMyAttendanceQuery({ month: new Date().getMonth() + 1 });
     const [clockIn, { isLoading: isClockingIn }] = useClockInMutation();
     const [clockOut, { isLoading: isClockingOut }] = useClockOutMutation();
     const [currentTime, setCurrentTime] = useState(new Date());
+    const [qrMode, setQrMode] = useState(false);
+    const [qrCode, setQrCode] = useState('');
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
 
-    const handleClockIn = async () => {
+    const policy = attendancePolicy?.[0] || attendancePolicy;
+
+    const getLocation = () => {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocation not supported'));
+            } else {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                    (err) => reject(err),
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            }
+        });
+    };
+
+    const handleClockIn = async (qrTokenReq = null) => {
         try {
-            await clockIn({ notes: `Clocked in at ${currentTime.toLocaleTimeString()}` }).unwrap();
+            let coords = null;
+            if (policy?.enable_geofencing) {
+                toast.loading('Getting location...', { id: 'geo' });
+                coords = await getLocation();
+                toast.success('Location verified.', { id: 'geo' });
+            }
+
+            if (policy?.enable_qr_clock_in && !qrTokenReq) {
+                setQrMode(true);
+                return;
+            }
+
+            await clockIn({
+                notes: `Clocked in via portal`,
+                latitude: coords?.lat,
+                longitude: coords?.lng,
+                qr_token: qrTokenReq || undefined
+            }).unwrap();
+
             toast.success('Successfully clocked in.');
+            setQrMode(false);
+            setQrCode('');
             refetch();
         } catch (error) {
-            const msg = error?.data?.error || error?.data?.detail || 'Failed to clock in.';
-            toast.error(msg);
+            console.error(error);
+            const msg = error?.data?.error || error?.message || 'Failed to clock in.';
+            toast.error(msg, { id: 'geo' });
         }
     };
 
     const handleClockOut = async () => {
         try {
-            await clockOut({ notes: `Clocked out at ${currentTime.toLocaleTimeString()}` }).unwrap();
+            let coords = null;
+            if (policy?.enable_geofencing) {
+                coords = await getLocation();
+            }
+
+            await clockOut({
+                notes: `Clocked out via portal`,
+                latitude: coords?.lat,
+                longitude: coords?.lng
+            }).unwrap();
+
             toast.success('Successfully clocked out.');
             refetch();
         } catch (error) {
@@ -73,9 +125,21 @@ const AttendancePage = () => {
 
     return (
         <div className="space-y-10 pb-12">
-            <div>
-                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Attendance</h1>
-                <p className="text-slate-500 mt-2">Track your work hours, analyze your schedule, and manage your time effectively.</p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Attendance</h1>
+                    <p className="text-slate-500 mt-2">Track your work hours, analyze your schedule, and manage your time effectively.</p>
+                </div>
+                {['admin', 'hr_manager', 'company_admin'].includes(useSelector(state => state.auth.user?.role)) && (
+                    <Button
+                        onClick={() => window.location.href = '/attendance/admin'}
+                        variant="outline"
+                        className="rounded-2xl border-slate-200 hover:bg-slate-50 text-slate-600 gap-2 h-12 shadow-sm"
+                    >
+                        <Settings className="h-4 w-4" />
+                        Attendance Settings
+                    </Button>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -96,14 +160,48 @@ const AttendancePage = () => {
                                         <Loader2 className="h-8 w-8 text-white/50 animate-spin" />
                                     </div>
                                 ) : !todayStatus?.is_clocked_in && !todayStatus?.clock_out ? (
-                                    <Button
-                                        onClick={handleClockIn}
-                                        disabled={isClockingIn}
-                                        className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-2xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-3"
-                                    >
-                                        {isClockingIn ? <Loader2 className="animate-spin h-5 w-5" /> : <Play className="fill-current h-5 w-5" />}
-                                        Clock In
-                                    </Button>
+                                    qrMode ? (
+                                        <div className="space-y-4 animate-in fade-in zoom-in duration-300">
+                                            <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">Scan Office QR Code</p>
+                                                <input
+                                                    type="text"
+                                                    autoFocus
+                                                    placeholder="Enter QR Token"
+                                                    className="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-center text-white placeholder:text-slate-600 focus:ring-2 focus:ring-emerald-500/50 outline-none"
+                                                    value={qrCode}
+                                                    onChange={e => setQrCode(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    onClick={() => setQrMode(false)}
+                                                    className="flex-1 text-white hover:bg-white/5"
+                                                >
+                                                    Cancel
+                                                </Button>
+                                                <Button
+                                                    onClick={() => handleClockIn(qrCode)}
+                                                    disabled={!qrCode || isClockingIn}
+                                                    className="flex-1 bg-emerald-500 hover:bg-emerald-400"
+                                                >
+                                                    {isClockingIn ? <Loader2 className="animate-spin h-5 w-5" /> : "Verify & Clock In"}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <Button
+                                            onClick={() => handleClockIn()}
+                                            disabled={isClockingIn}
+                                            className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-2xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-3"
+                                        >
+                                            {isClockingIn ? <Loader2 className="animate-spin h-5 w-5" /> : (
+                                                policy?.enable_qr_clock_in ? <QrCode className="h-5 w-5" /> : <Play className="fill-current h-5 w-5" />
+                                            )}
+                                            {policy?.enable_qr_clock_in ? "Scan to Clock In" : "Clock In"}
+                                        </Button>
+                                    )
                                 ) : todayStatus?.is_clocked_in ? (
                                     <div className="space-y-4">
                                         <div className="bg-white/10 rounded-2xl p-4 border border-white/5">

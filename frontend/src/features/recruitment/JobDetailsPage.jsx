@@ -3,15 +3,17 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     useGetJobQuery,
     useGetApplicationsQuery,
-    useUpdateJobMutation
+    useUpdateJobMutation,
+    useRankJobApplicationsMutation
 } from '../../store/api';
+import toast from 'react-hot-toast';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import {
     ArrowLeft, Calendar, MapPin, DollarSign,
     Users, Clock, Briefcase, FileText, Send, Edit, MoreVertical,
-    CheckCircle, XCircle, Share2
+    CheckCircle, XCircle, Share2, TrendingUp, Loader2
 } from 'lucide-react';
 import JobDescriptionEditor from './JobDescriptionEditor';
 import PublishJobDialog from './PublishJobDialog';
@@ -23,7 +25,8 @@ const JobDetailsPage = () => {
     const [isPublishOpen, setIsPublishOpen] = useState(false);
 
     const { data: job, isLoading } = useGetJobQuery(id);
-    const { data: applications } = useGetApplicationsQuery({ job: id });
+    const { data: applications, refetch: refetchApps } = useGetApplicationsQuery({ job: id });
+    const [rankApplications, { isLoading: isRanking }] = useRankJobApplicationsMutation();
 
     const statusColors = {
         published: 'bg-green-100 text-green-700',
@@ -145,6 +148,22 @@ const JobDetailsPage = () => {
                                     {Math.floor((new Date() - new Date(job.created_at)) / (1000 * 60 * 60 * 24))}
                                 </p>
                             </div>
+                            <Button
+                                className="col-span-2 w-full mt-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 font-bold gap-2 text-xs h-10"
+                                onClick={async () => {
+                                    try {
+                                        const res = await rankApplications(id).unwrap();
+                                        toast.success(res.message || `Processed ${res.applications_processed} applications!`);
+                                        refetchApps();
+                                    } catch (err) {
+                                        toast.error("Bulk AI Screening failed.");
+                                    }
+                                }}
+                                disabled={isRanking || !job.application_count}
+                            >
+                                {isRanking ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
+                                AI Rank Candidates
+                            </Button>
                         </CardContent>
                     </Card>
 

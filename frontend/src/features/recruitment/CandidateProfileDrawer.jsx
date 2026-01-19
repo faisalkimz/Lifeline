@@ -5,15 +5,17 @@ import {
   X, Mail, Phone, MapPin, FileText, Download,
   Briefcase, GraduationCap, Calendar, Star,
   ExternalLink, Linkedin, Github, Globe,
-  CheckCircle, Clock
+  CheckCircle, Clock, TrendingUp, Loader2
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { getMediaUrl } from '../../config/api';
 import OfferLetterModal from './OfferLetterModal';
-import { useGetApplicationsQuery } from '../../store/api';
+import { useGetApplicationsQuery, useScreenWithAiMutation } from '../../store/api';
+import toast from 'react-hot-toast';
 
 const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
   const [isOfferModalOpen, setIsOfferModalOpen] = React.useState(false);
+  const [screenWithAi, { isLoading: isScreening }] = useScreenWithAiMutation();
 
   const { data: applications } = useGetApplicationsQuery();
   const applicationsArray = Array.isArray(applications) ? applications : (applications?.results || []);
@@ -75,6 +77,22 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
             <X className="h-5 w-5 text-gray-500" />
           </Button>
         </div>
+
+        {/* AI Score Banner */}
+        {application?.score > 0 && (
+          <div className="mx-6 mt-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center font-bold text-emerald-700">
+                {application.score}%
+              </div>
+              <div>
+                <p className="text-sm font-bold text-emerald-900">AI Compatibility Score</p>
+                <p className="text-xs text-emerald-600 font-medium">Candidate matches {application.score}% of job requirements.</p>
+              </div>
+            </div>
+            <TrendingUp className="h-5 w-5 text-emerald-500" />
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6 space-y-8">
@@ -165,13 +183,31 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
 
         {/* Footer Actions */}
         <div className="p-6 border-t border-gray-100 bg-gray-50 flex gap-3">
+          {application && (
+            <Button
+              variant="outline"
+              className="flex-1 gap-2 border-slate-200 hover:bg-white hover:text-primary-600 font-bold"
+              onClick={async () => {
+                try {
+                  const res = await screenWithAi(application.id).unwrap();
+                  toast.success(res.message || "AI Screening complete!");
+                } catch (err) {
+                  toast.error("AI Screening failed.");
+                }
+              }}
+              disabled={isScreening}
+            >
+              {isScreening ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
+              AI Screen
+            </Button>
+          )}
           <Button
-            className="flex-1 bg-primary-600 hover:bg-primary-700"
+            className="flex-1 bg-primary-600 hover:bg-primary-700 font-bold"
             onClick={() => setIsOfferModalOpen(true)}
           >
             Generate Offer
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button variant="outline" className="flex-1 font-bold border-slate-200">
             Schedule Interview
           </Button>
         </div>

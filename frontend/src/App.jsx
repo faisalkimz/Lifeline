@@ -43,6 +43,7 @@ import SalaryAdvancesPage from './features/payroll/SalaryAdvancesPage';
 import LoansPage from './features/payroll/LoansPage';
 import MyDocumentsPage from './features/employee-portal/MyDocumentsPage';
 import OvertimePage from './features/attendance/OvertimePage';
+import AttendanceAdminPage from './features/attendance/AttendanceAdminPage';
 import HelpCenterPage from './features/help/HelpCenterPage';
 import AnalyticsDashboard from './features/analytics/AnalyticsDashboard';
 
@@ -85,6 +86,7 @@ function App() {
         <Route path="/leave/approvals" element={<LeaveApprovalPage />} />
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/attendance/overtime" element={<OvertimePage />} />
+        <Route path="/attendance/admin" element={<AttendanceAdminPage />} />
         <Route path="/performance" element={<PerformancePage />} />
         <Route path="/disciplinary" element={<DisciplinaryPage />} />
         <Route path="/recruitment" element={<JobListPage />} />

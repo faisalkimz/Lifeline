@@ -636,6 +636,21 @@ export const api = createApi({
       }),
       invalidatesTags: ['Application']
     }),
+    screenWithAi: builder.mutation({
+      query: (id) => ({
+        url: `/recruitment/applications/${id}/screen_with_ai/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Application']
+    }),
+    rankJobApplications: builder.mutation({
+      query: (job_id) => ({
+        url: `/recruitment/applications/rank_job_applications/`,
+        method: 'POST',
+        body: { job_id }
+      }),
+      invalidatesTags: ['Application']
+    }),
     getInterviews: builder.query({
       query: (params) => ({
         url: '/recruitment/interviews/',
@@ -1134,6 +1149,63 @@ export const api = createApi({
       }),
       invalidatesTags: ['Announcement']
     }),
+
+    // ========== ANALYTICS (Scheduled Reports) ==========
+    getReportSchedules: builder.query({
+      query: () => '/analytics/schedules/',
+      providesTags: ['ReportSchedule']
+    }),
+    createReportSchedule: builder.mutation({
+      query: (body) => ({
+        url: '/analytics/schedules/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['ReportSchedule']
+    }),
+    deleteReportSchedule: builder.mutation({
+      query: (id) => ({
+        url: `/analytics/schedules/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['ReportSchedule']
+    }),
+    getDashboardPredictions: builder.query({
+      query: () => '/analytics/schedules/dashboard_predictions/',
+    }),
+
+    // ========== ATTENDANCE ADVANCED ==========
+    getAttendancePolicy: builder.query({
+      query: () => '/attendance/policies/',
+      providesTags: ['AttendancePolicy']
+    }),
+    updateAttendancePolicy: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/attendance/policies/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['AttendancePolicy']
+    }),
+    getWorkLocations: builder.query({
+      query: () => '/attendance/locations/',
+      providesTags: ['WorkLocation']
+    }),
+    createWorkLocation: builder.mutation({
+      query: (body) => ({
+        url: '/attendance/locations/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['WorkLocation']
+    }),
+    refreshWorkLocationQr: builder.mutation({
+      query: (id) => ({
+        url: `/attendance/locations/${id}/refresh_qr/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['WorkLocation']
+    }),
   })
 });
 
@@ -1218,6 +1290,8 @@ export const {
   useGetApplicationsQuery,
   useCreateApplicationMutation,
   useMoveApplicationStageMutation,
+  useScreenWithAiMutation,
+  useRankJobApplicationsMutation,
   useGetInterviewsQuery,
   useCreateInterviewMutation,
   useUpdateInterviewMutation,
@@ -1301,6 +1375,17 @@ export const {
   useCreateAnnouncementMutation,
   useUpdateAnnouncementMutation,
   useDeleteAnnouncementMutation,
+  // Analytics
+  useGetReportSchedulesQuery,
+  useCreateReportScheduleMutation,
+  useDeleteReportScheduleMutation,
+  useGetDashboardPredictionsQuery,
+  // Attendance Advanced
+  useGetAttendancePolicyQuery,
+  useUpdateAttendancePolicyMutation,
+  useGetWorkLocationsQuery,
+  useCreateWorkLocationMutation,
+  useRefreshWorkLocationQrMutation,
 } = api;
 
 export default api;

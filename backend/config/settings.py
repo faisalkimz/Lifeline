@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "disciplinary", # Disciplinary tracking
     "notifications", # Notifications system
     "expense",      # Expense claims
+    "analytics",    # Advanced analytics & reporting
 ]
 
 

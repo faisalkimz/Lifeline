@@ -3,6 +3,31 @@ from accounts.models import Company
 from employees.models import Employee
 from django.utils import timezone
 from datetime import datetime, timedelta
+import uuid
+
+class WorkLocation(models.Model):
+    """Physical office location for geofenced attendance"""
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='work_locations')
+    name = models.CharField(max_length=255)
+    address = models.TextField(blank=True)
+    
+    # Geofencing
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    radius_meters = models.IntegerField(default=100, help_text="Allowed radius in meters")
+    
+    # QR Code
+    qr_token = models.UUIDField(default=uuid.uuid4, unique=True)
+    
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def refresh_qr_token(self):
+        self.qr_token = uuid.uuid4()
+        self.save()
+
+    def __str__(self):
+        return f"{self.name} ({self.company.name})"
 
 
 class AttendancePolicy(models.Model):
@@ -28,6 +53,11 @@ class AttendancePolicy(models.Model):
         default='Monday,Tuesday,Wednesday,Thursday,Friday',
         help_text="Comma-separated working days"
     )
+    
+    # Advanced Features
+    enable_geofencing = models.BooleanField(default=False)
+    enable_qr_clock_in = models.BooleanField(default=False)
+    require_photo_clock_in = models.BooleanField(default=False)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -63,6 +93,19 @@ class Attendance(models.Model):
     late_by_minutes = models.IntegerField(default=0)
     hours_worked = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     overtime_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    
+    # Advanced Data
+    work_location = models.ForeignKey(WorkLocation, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    # Geofencing Data
+    clock_in_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    clock_in_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    clock_out_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    clock_out_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
+    # Metadata
+    device_info = models.JSONField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
     
     # Notes
     notes = models.TextField(blank=True)

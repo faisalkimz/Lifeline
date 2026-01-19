@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CustomReportBuilder from './CustomReportBuilder';
+import ScheduledReports from './ScheduledReports';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { exportToJSON } from '../../utils/exportUtils';
@@ -13,8 +14,10 @@ import {
     useGetEmployeesQuery,
     useGetLeaveRequestsQuery,
     useGetCandidatesQuery,
-    useGetReviewsQuery
+    useGetReviewsQuery,
+    useGetDashboardPredictionsQuery
 } from '../../store/api';
+import { Sparkles, Shield, Zap } from 'lucide-react';
 
 const StatCard = ({ title, value, change, icon: Icon, trend, color = 'primary' }) => {
     const isPositive = trend === 'up';
@@ -82,6 +85,7 @@ const AnalyticsDashboard = () => {
     const { data: employeesData } = useGetEmployeesQuery();
     const { data: leaveData } = useGetLeaveRequestsQuery();
     const { data: candidatesData } = useGetCandidatesQuery();
+    const { data: predictions } = useGetDashboardPredictionsQuery();
 
     const employees = Array.isArray(employeesData?.results) ? employeesData.results : (Array.isArray(employeesData) ? employeesData : []);
     const leaves = Array.isArray(leaveData?.results) ? leaveData.results : (Array.isArray(leaveData) ? leaveData : []);
@@ -354,8 +358,93 @@ const AnalyticsDashboard = () => {
                 </ChartCard>
             </div>
 
+            {/* AI Insights Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="border-none shadow-lg bg-slate-900 text-white overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full -mr-32 -mt-32 blur-3xl" />
+                    <CardHeader className="border-b border-white/10">
+                        <CardTitle className="flex items-center gap-2 text-white">
+                            <Sparkles className="h-5 w-5 text-primary-400" />
+                            AI Talent Insights
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-4">
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary-400/50 transition-colors">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <TrendingDown className="h-5 w-5 text-rose-400" />
+                                        <p className="text-sm font-bold text-white/70">Turnover Risk</p>
+                                    </div>
+                                    <p className="text-3xl font-bold">{predictions?.potential_turnover_rate || '0'}%</p>
+                                    <p className="text-xs text-white/50 mt-1">Predicted exit rate for next quarter</p>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-emerald-400/50 transition-colors">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <Clock className="h-5 w-5 text-emerald-400" />
+                                        <p className="text-sm font-bold text-white/70">Hiring Velocity</p>
+                                    </div>
+                                    <p className="text-3xl font-bold">{predictions?.predicted_hiring_timeline || '25'} Days</p>
+                                    <p className="text-xs text-white/50 mt-1">Avg. time to fill open roles</p>
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div className="p-5 bg-gradient-to-br from-primary-600/20 to-transparent rounded-2xl border border-primary-500/20">
+                                    <h4 className="text-sm font-bold mb-3 flex items-center gap-2">
+                                        <Shield className="h-4 w-4 text-primary-400" />
+                                        Retention Forecast
+                                    </h4>
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-4xl font-black text-primary-400">{predictions?.retention_score || '95'}</div>
+                                        <div className="text-xs text-white/60">
+                                            Health score based on current tenure and engagement trends.
+                                        </div>
+                                    </div>
+                                    <div className="mt-4 w-full bg-white/10 rounded-full h-1.5">
+                                        <div
+                                            className="bg-primary-500 h-full rounded-full"
+                                            style={{ width: `${predictions?.retention_score || 95}%` }}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="p-4 bg-white/5 rounded-xl text-xs text-white/60 italic leading-relaxed">
+                                    "Your current hiring speed is {predictions?.predicted_hiring_timeline < 20 ? 'excellent' : 'steady'}. Retention in Engineering shows positive sentiment."
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Strategic Recommendations */}
+                <ChartCard title="Strategic Recommendations">
+                    <div className="space-y-4">
+                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div className="h-10 w-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+                                <Zap className="h-5 w-5 text-amber-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-900 text-sm">Critical Role Backfill</h4>
+                                <p className="text-xs text-slate-500 mt-1">Senior roles are likely to take {Math.round(predictions?.predicted_hiring_timeline || 25 + 15)} days. Start sourcing early.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div className="h-10 w-10 bg-primary-100 rounded-xl flex items-center justify-center shrink-0">
+                                <Users className="h-5 w-5 text-primary-600" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-slate-900 text-sm">Retention Alert</h4>
+                                <p className="text-xs text-slate-500 mt-1">Potential {predictions?.potential_turnover_rate || '0'}% churn predicted. Recommend conducting stay interviews.</p>
+                            </div>
+                        </div>
+                    </div>
+                </ChartCard>
+            </div>
+
             {/* Custom Report Builder */}
             <CustomReportBuilder />
+
+            {/* Scheduled Reports */}
+            <ScheduledReports />
 
             {/* Recent Activity */}
             <ChartCard title="Recent Activity">

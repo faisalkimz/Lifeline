@@ -41,3 +41,17 @@ export const exportToJSON = (data, filename) => {
         document.body.removeChild(link);
     }
 };
+
+export const exportToExcel = (data, filename) => {
+    try {
+        const XLSX = window.XLSX || import('xlsx');
+        Promise.resolve(XLSX).then((xlsx) => {
+            const worksheet = xlsx.utils.json_to_sheet(data);
+            const workbook = xlsx.utils.book_new();
+            xlsx.utils.book_append_sheet(workbook, worksheet, "Report");
+            xlsx.writeFile(workbook, `${filename}.xlsx`);
+        });
+    } catch (error) {
+        console.error("Export to Excel failed:", error);
+    }
+};

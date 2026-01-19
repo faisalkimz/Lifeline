@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import AttendancePolicy, Attendance, OvertimeRequest, AttendanceReport
+from .models import AttendancePolicy, Attendance, OvertimeRequest, AttendanceReport, WorkLocation
 from employees.models import Employee
 from django.utils import timezone
 from datetime import datetime, date
@@ -12,7 +12,8 @@ class AttendancePolicySerializer(serializers.ModelSerializer):
             'id', 'work_start_time', 'work_end_time', 'break_duration_minutes',
             'grace_period_minutes', 'late_arrival_threshold',
             'overtime_rate_multiplier', 'overtime_auto_approve',
-            'working_days', 'created_at', 'updated_at'
+            'working_days', 'enable_geofencing', 'enable_qr_clock_in',
+            'require_photo_clock_in', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
@@ -43,10 +44,17 @@ class AttendanceSerializer(serializers.ModelSerializer):
     def get_is_clocked_in(self, obj):
         return obj.clock_in is not None and obj.clock_out is None
 
+class WorkLocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkLocation
+        fields = '__all__'
 
 class ClockInSerializer(serializers.Serializer):
     """Serializer for clock-in action"""
     notes = serializers.CharField(required=False, allow_blank=True)
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False)
+    qr_token = serializers.UUIDField(required=False)
     
     def validate(self, data):
         request = self.context['request']
@@ -68,6 +76,8 @@ class ClockInSerializer(serializers.Serializer):
 class ClockOutSerializer(serializers.Serializer):
     """Serializer for clock-out action"""
     notes = serializers.CharField(required=False, allow_blank=True)
+    latitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False)
+    longitude = serializers.DecimalField(max_digits=9, decimal_places=6, required=False)
     
     def validate(self, data):
         request = self.context['request']

@@ -5,12 +5,14 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Sum, Count, Q
 from datetime import datetime, date, timedelta
-from .models import AttendancePolicy, Attendance, OvertimeRequest, AttendanceReport
+from .models import AttendancePolicy, Attendance, OvertimeRequest, AttendanceReport, WorkLocation
 from .serializers import (
     AttendancePolicySerializer, AttendanceSerializer,
     ClockInSerializer, ClockOutSerializer,
-    OvertimeRequestSerializer, AttendanceReportSerializer
+    OvertimeRequestSerializer, AttendanceReportSerializer,
+    WorkLocationSerializer
 )
+from .utils import calculate_distance
 
 
 class AttendancePolicyViewSet(viewsets.ModelViewSet):
@@ -22,6 +24,23 @@ class AttendancePolicyViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
+
+
+class WorkLocationViewSet(viewsets.ModelViewSet):
+    serializer_class = WorkLocationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return WorkLocation.objects.filter(company=self.request.user.company)
+
+    def perform_create(self, serializer):
+        serializer.save(company=self.request.user.company)
+
+    @action(detail=True, methods=['post'])
+    def refresh_qr(self, request, pk=None):
+        location = self.get_object()
+        location.refresh_qr_token()
+        return Response({"qr_token": location.qr_token})
 
 
 class AttendanceViewSet(viewsets.ModelViewSet):
@@ -86,10 +105,47 @@ class AttendanceViewSet(viewsets.ModelViewSet):
                     {"error": "Already clocked in today"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            attendance.clock_in = now
-            attendance.status = 'present'
-            attendance.notes = serializer.validated_data.get('notes', '')
-            attendance.save()
+
+        # Verification Logic
+        policy = request.user.company.attendance_policy
+        lat = serializer.validated_data.get('latitude')
+        lng = serializer.validated_data.get('longitude')
+        qr_token = serializer.validated_data.get('qr_token')
+
+        # 1. Geofencing
+        if policy.enable_geofencing:
+            if not lat or not lng:
+                return Response({"error": "Location coordinates are required for clock-in"}, status=400)
+            
+            # Check against all work locations
+            locations = WorkLocation.objects.filter(company=request.user.company, is_active=True)
+            within_range = False
+            for loc in locations:
+                dist = calculate_distance(lat, lng, loc.latitude, loc.longitude)
+                if dist <= loc.radius_meters:
+                    within_range = True
+                    attendance.work_location = loc
+                    break
+            
+            if not within_range:
+                return Response({"error": "You are outside the allowed work area"}, status=400)
+
+        # 2. QR Code
+        if policy.enable_qr_clock_in:
+            if not qr_token:
+                return Response({"error": "QR code scan is required for clock-in"}, status=400)
+            
+            loc = WorkLocation.objects.filter(company=request.user.company, qr_token=qr_token).first()
+            if not loc:
+                return Response({"error": "Invalid or expired QR code"}, status=400)
+            attendance.work_location = loc
+
+        attendance.clock_in = now
+        attendance.clock_in_lat = lat
+        attendance.clock_in_lng = lng
+        attendance.status = 'present'
+        attendance.notes = serializer.validated_data.get('notes', '')
+        attendance.save()
         
         # Check if late
         attendance.check_late_arrival()
@@ -129,6 +185,9 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             )
         
         attendance.clock_out = now
+        attendance.clock_out_lat = serializer.validated_data.get('latitude')
+        attendance.clock_out_lng = serializer.validated_data.get('longitude')
+        
         if serializer.validated_data.get('notes'):
             attendance.notes += f"\nClock out: {serializer.validated_data['notes']}"
         attendance.save()

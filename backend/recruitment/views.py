@@ -167,6 +167,43 @@ class ApplicationViewSet(viewsets.ModelViewSet):
         app.save()
         return Response({'status': f'moved into {new_stage}'})
 
+    @action(detail=True, methods=['post'])
+    def screen_with_ai(self, request, pk=None):
+        """Screen a single application using AI"""
+        application = self.get_object()
+        from .services.ai_service import RecruitingAIService
+        score = RecruitingAIService.screen_application(application)
+        return Response({
+            'status': 'screened', 
+            'score': score,
+            'message': f"Application screened with score: {score}%"
+        })
+
+    @action(detail=False, methods=['post'])
+    def rank_job_applications(self, request):
+        """Screen all applications for a specific job"""
+        job_id = request.data.get('job_id')
+        if not job_id:
+            return Response({'error': 'job_id is required'}, status=400)
+            
+        try:
+            job = Job.objects.get(id=job_id, company=request.user.company)
+            applications = Application.objects.filter(job=job)
+            
+            from .services.ai_service import RecruitingAIService
+            scores = []
+            for app in applications:
+                score = RecruitingAIService.screen_application(app)
+                scores.append({'application_id': app.id, 'score': score})
+                
+            return Response({
+                'status': 'ranking_complete', 
+                'applications_processed': len(scores),
+                'results': scores
+            })
+        except Job.DoesNotExist:
+            return Response({'error': 'Job not found'}, status=404)
+
 class InterviewViewSet(viewsets.ModelViewSet):
     serializer_class = InterviewSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]

@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/disciplinary/', include('disciplinary.urls')),  # Disciplinary
     path('api/notifications/', include('notifications.urls')),  # Notifications
     path('api/expense/', include('expense.urls')),  # Expense claims
+    path('api/analytics/', include('analytics.urls')),  # Analytics & Reporting
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

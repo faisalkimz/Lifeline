@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Download, FileText, CheckSquare, Square } from 'lucide-react';
-import { exportToCSV, exportToJSON } from '../../utils/exportUtils';
+import { exportToCSV, exportToJSON, exportToExcel } from '../../utils/exportUtils';
+import toast from 'react-hot-toast';
 import {
     useGetEmployeesQuery,
     useGetLeaveRequestsQuery,
@@ -73,7 +73,11 @@ const CustomReportBuilder = () => {
 
         const filename = `${selectedModule}_report_${new Date().toISOString().split('T')[0]}`;
         if (format === 'csv') exportToCSV(reportData, filename);
-        else exportToJSON(reportData, filename);
+        else if (format === 'json') exportToJSON(reportData, filename);
+        else if (format === 'excel') exportToExcel(reportData, filename);
+        else if (format === 'pdf') {
+            toast.error("PDF Export is currently being optimized. Please use Excel/CSV for now.");
+        }
     };
 
     const currentModule = REPORT_MODULES.find(m => m.id === selectedModule);
@@ -96,8 +100,8 @@ const CustomReportBuilder = () => {
                                 key={m.id}
                                 onClick={() => handleModuleChange(m.id)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedModule === m.id
-                                        ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
+                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                                     }`}
                             >
                                 {m.label}
@@ -176,6 +180,28 @@ const CustomReportBuilder = () => {
                                 className="text-primary-600 focus:ring-primary-500"
                             />
                             <span className="text-sm text-slate-700">JSON</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="format"
+                                value="excel"
+                                checked={format === 'excel'}
+                                onChange={() => setFormat('excel')}
+                                className="text-primary-600 focus:ring-primary-500"
+                            />
+                            <span className="text-sm text-slate-700">Excel</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="format"
+                                value="pdf"
+                                checked={format === 'pdf'}
+                                onChange={() => setFormat('pdf')}
+                                className="text-primary-600 focus:ring-primary-500"
+                            />
+                            <span className="text-sm text-slate-700">PDF</span>
                         </label>
                     </div>
 

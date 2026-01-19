@@ -103,19 +103,23 @@ const LeaveRequestsPage = () => {
                                 Request Leave
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-xl bg-white border border-gray-100 rounded-xl p-0 overflow-hidden shadow-2xl">
-                            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                                <DialogHeader>
-                                    <DialogTitle className="text-xl font-bold text-gray-900">New Leave Request</DialogTitle>
-                                    <p className="text-gray-500 text-sm mt-1">Submit your application for review.</p>
-                                </DialogHeader>
+                        <DialogContent className="max-w-xl bg-white border-0 rounded-2xl p-0 overflow-hidden shadow-2xl">
+                            <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                                <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
+                                    <PlaneLanding className="h-6 w-6 text-emerald-600" />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Plan your Time Off</DialogTitle>
+                                    <p className="text-slate-500 mt-1 font-medium text-sm">Submit your application for review.</p>
+                                </div>
                             </div>
-                            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Leave Type</label>
+
+                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Type of Leave</label>
                                     <div className="relative">
                                         <select
-                                            className="w-full h-10 pl-3 pr-8 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none appearance-none cursor-pointer hover:border-gray-300 transition-all"
+                                            className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer hover:border-emerald-300 transition-all"
                                             value={formData.leave_type}
                                             onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
                                             required
@@ -125,26 +129,26 @@ const LeaveRequestsPage = () => {
                                                 <option key={type.id} value={type.id}>{type.name}</option>
                                             ))}
                                         </select>
-                                        <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 rotate-90 pointer-events-none" />
+                                        <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 rotate-90 pointer-events-none" />
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-sm font-medium text-gray-700">Start Date</label>
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">From</label>
                                         <Input
                                             type="date"
-                                            className="bg-white"
+                                            className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
                                             value={formData.start_date}
                                             onChange={e => setFormData({ ...formData, start_date: e.target.value })}
                                             required
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-sm font-medium text-gray-700">End Date</label>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">To</label>
                                         <Input
                                             type="date"
-                                            className="bg-white"
+                                            className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
                                             value={formData.end_date}
                                             onChange={e => setFormData({ ...formData, end_date: e.target.value })}
                                             required
@@ -152,41 +156,55 @@ const LeaveRequestsPage = () => {
                                     </div>
                                 </div>
 
-                                {daysRequested > 0 && (
-                                    <div className="p-3 bg-primary-50 border border-primary-100 rounded-lg flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Calendar className="h-4 w-4 text-primary-600" />
-                                            <span className="text-sm font-medium text-primary-900">Duration</span>
-                                        </div>
-                                        <span className="px-3 py-1 bg-primary-600 text-white rounded-md text-sm font-bold shadow-sm">
-                                            {daysRequested} {daysRequested === 1 ? 'Day' : 'Days'}
-                                        </span>
-                                    </div>
-                                )}
+                                <AnimatePresence>
+                                    {daysRequested > 0 && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-emerald-200 rounded-lg text-emerald-700">
+                                                        <Clock className="h-4 w-4" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Duration</p>
+                                                        <p className="text-sm text-emerald-600">Calculated based on dates</p>
+                                                    </div>
+                                                </div>
+                                                <span className="text-2xl font-bold text-emerald-600">
+                                                    {daysRequested} <span className="text-sm font-medium text-emerald-500">days</span>
+                                                </span>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Reason</label>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-slate-700">Reason</label>
                                     <textarea
-                                        className="w-full min-h-[100px] p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none hover:border-gray-300"
-                                        placeholder="Please provide a reason for your leave request..."
+                                        className="w-full min-h-[120px] p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none hover:border-emerald-300 focus:bg-white"
+                                        placeholder="Why are you taking leave?"
                                         value={formData.reason}
                                         onChange={e => setFormData({ ...formData, reason: e.target.value })}
                                         required
                                     />
                                 </div>
 
-                                <div className="pt-4 flex gap-3 border-t border-gray-100 mt-2">
+                                <div className="pt-4 flex gap-3 border-t border-slate-100">
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         onClick={() => setIsDialogOpen(false)}
-                                        className="flex-1 text-gray-600 hover:text-gray-900 font-medium"
+                                        className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-semibold shadow-md shadow-primary-200"
+                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
                                     >
                                         Submit Request
                                     </Button>

@@ -327,13 +327,12 @@ const LoansPage = () => {
             {/* Apply for Loan Dialog */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
-                    <DialogHeader className="bg-slate-900 p-8 text-white">
-                        <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3">
-                            <PiggyBank className="h-6 w-6 text-primary-400" />
-                            Loan Application
-                        </DialogTitle>
-                        <p className="text-slate-400 text-sm mt-1">Submit a new staff loan request</p>
-                    </DialogHeader>
+                    <div className="bg-white px-10 pt-10 pb-6">
+                        <DialogTitle className="text-3xl font-semibold text-slate-900 tracking-tight">Loan application</DialogTitle>
+                        <p className="text-slate-500 mt-2 text-sm max-w-md leading-relaxed">
+                            Apply for a personal loan from the company. Please ensure you have reviewed the loan policy before submitting.
+                        </p>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
                         {isAdmin && (
@@ -437,13 +436,21 @@ const LoansPage = () => {
                             </div>
                         )}
 
-                        <DialogFooter className="gap-3 pt-4">
-                            <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="rounded-xl">
+                        <DialogFooter className="gap-3 pt-6 border-t border-slate-50">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setShowForm(false)}
+                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isCreating} className="rounded-xl gap-2">
-                                {isCreating ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle className="h-4 w-4" />}
-                                {isCreating ? 'Submitting...' : 'Submit Application'}
+                            <Button
+                                type="submit"
+                                disabled={isCreating}
+                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
+                            >
+                                {isCreating ? 'Submitting...' : 'Submit application'}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -455,13 +462,15 @@ const LoansPage = () => {
                 <DialogContent className="max-w-lg p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
                     {selectedLoan && (
                         <>
-                            <DialogHeader className="bg-slate-900 p-8 text-white">
-                                <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-3">
-                                    <DollarSign className="h-6 w-6 text-primary-400" />
-                                    Loan Details
-                                </DialogTitle>
-                                <p className="text-slate-400 text-sm">{selectedLoan.employee_name}</p>
-                            </DialogHeader>
+                            <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                                    <DollarSign className="h-6 w-6 text-slate-600" />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Loan Details</DialogTitle>
+                                    <p className="text-slate-500 mt-1 font-medium text-sm">{selectedLoan.employee_name}</p>
+                                </div>
+                            </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">

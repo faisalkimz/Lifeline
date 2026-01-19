@@ -6,6 +6,7 @@ import { FileText, Send, Download, Loader2, Briefcase } from 'lucide-react';
 import { useCreateOfferMutation, useGenerateOfferPdfMutation } from '../../store/api';
 import toast from 'react-hot-toast';
 import { getMediaUrl } from '../../config/api';
+import { motion } from 'framer-motion';
 
 const OfferLetterModal = ({ isOpen, onClose, application }) => {
     const [createOffer, { isLoading: isCreating }] = useCreateOfferMutation();
@@ -50,103 +51,117 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-xl bg-white shadow-xl border border-gray-100">
-                <div className="bg-gray-50 px-8 py-6 border-b border-gray-100 flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                        <FileText className="h-5 w-5" />
+            <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden rounded-2xl bg-white shadow-2xl border-0">
+                {/* Header */}
+                <div className="bg-white px-8 py-8 flex items-center gap-6 border-b border-slate-100">
+                    <div className="h-14 w-14 rounded-2xl bg-violet-50 flex items-center justify-center border border-violet-100 shadow-sm">
+                        <FileText className="h-7 w-7 text-violet-600" />
                     </div>
                     <div>
-                        <DialogTitle className="text-xl font-bold text-gray-900">
-                            Draft Offer Letter
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Let's make it official
                         </DialogTitle>
-                        <p className="text-sm text-gray-500 mt-1">
-                            {application?.candidate?.full_name} • {application?.job_title}
+                        <p className="text-slate-500 mt-1 font-medium">
+                            Draft an offer for {application?.candidate?.first_name || 'the candidate'}
                         </p>
                     </div>
                 </div>
 
-                <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+                <div className="p-8 space-y-8 max-h-[65vh] overflow-y-auto">
                     {step === 'form' ? (
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Salary Package (UGX)</label>
-                                    <Input
-                                        type="number"
-                                        className="bg-white"
-                                        value={offerData.salary_offered}
-                                        onChange={e => setOfferData({ ...offerData, salary_offered: e.target.value })}
-                                        placeholder="e.g. 120,000,000"
-                                    />
+                                <div className="space-y-3">
+                                    <label className="text-sm font-semibold text-slate-700">What's the starting salary? (UGX)</label>
+                                    <div className="relative">
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">UGX</div>
+                                        <Input
+                                            type="number"
+                                            className="pl-12 h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                            value={offerData.salary_offered}
+                                            onChange={e => setOfferData({ ...offerData, salary_offered: e.target.value })}
+                                            placeholder="e.g. 120,000,000"
+                                        />
+                                    </div>
                                 </div>
-                                <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Start Date</label>
+                                <div className="space-y-3">
+                                    <label className="text-sm font-semibold text-slate-700">When do they start?</label>
                                     <Input
                                         type="date"
-                                        className="bg-white"
+                                        className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
                                         value={offerData.start_date}
                                         onChange={e => setOfferData({ ...offerData, start_date: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Offer Expiry Date</label>
+                            <div className="space-y-3">
+                                <label className="text-sm font-semibold text-slate-700">When does this offer expire?</label>
                                 <Input
                                     type="date"
-                                    className="bg-white"
+                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
                                     value={offerData.expiry_date}
                                     onChange={e => setOfferData({ ...offerData, expiry_date: e.target.value })}
                                 />
+                                <p className="text-xs text-slate-500">Usually 1-2 weeks from now gives them enough time.</p>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Letter Content</label>
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-sm font-semibold text-slate-700">Personalize the email</label>
+                                    <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-600 font-medium">✨ Pro tip: Be warm and welcoming</span>
+                                </div>
                                 <textarea
-                                    className="w-full h-48 p-4 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none resize-none transition-shadow"
+                                    className="w-full h-48 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:ring-2 focus:ring-violet-500 focus:bg-white focus:border-transparent outline-none resize-none transition-all leading-relaxed"
                                     value={offerData.content}
                                     onChange={e => setOfferData({ ...offerData, content: e.target.value })}
                                 />
-                                <p className="text-xs text-gray-400">
-                                    Use placeholders [Salary], [Date], [Expiry Date] for dynamic insertion.
-                                </p>
+                                <div className="flex gap-2 text-xs text-slate-400">
+                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Salary]</span>
+                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Date]</span>
+                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Expiry Date]</span>
+                                </div>
                             </div>
                         </div>
                     ) : (
                         <div className="text-center py-12 space-y-6">
-                            <div className="bg-green-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto ring-4 ring-green-50/50">
-                                <Briefcase className="h-10 w-10 text-green-600" />
-                            </div>
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="bg-gradient-to-br from-emerald-400 to-teal-500 h-24 w-24 rounded-3xl flex items-center justify-center mx-auto shadow-xl shadow-emerald-200 rotate-3"
+                            >
+                                <Briefcase className="h-10 w-10 text-white" />
+                            </motion.div>
                             <div>
-                                <h3 className="text-2xl font-bold text-gray-900">Offer Letter Ready</h3>
-                                <p className="text-gray-500 mt-2 max-w-sm mx-auto">
-                                    The offer letter has been successfully generated. You can now download the PDF or send it directly.
+                                <h3 className="text-2xl font-bold text-slate-900">Offer Letter Ready! 🎉</h3>
+                                <p className="text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
+                                    We've generated a beautiful PDF for you. Download it to review, then send it over to <span className="font-semibold text-slate-700">{application?.candidate?.first_name}</span>.
                                 </p>
                             </div>
                             <Button
                                 onClick={handleGeneratePdf}
                                 disabled={isGenerating}
-                                className="h-12 px-8 bg-primary-600 hover:bg-primary-700 rounded-lg font-semibold shadow-lg shadow-blue-200"
+                                className="h-14 px-8 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 gap-3"
                             >
-                                {isGenerating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Download className="h-5 w-5 mr-2" />}
-                                Download Offer PDF
+                                {isGenerating ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="h-5 w-5" />}
+                                Download Confirmation PDF
                             </Button>
                         </div>
                     )}
                 </div>
 
-                <DialogFooter className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-                    <Button variant="outline" onClick={onClose} className="border-gray-200 text-gray-700 hover:bg-white text-base h-11 px-6">
-                        Cancel
+                <DialogFooter className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-4">
+                    <Button variant="ghost" onClick={onClose} className="text-slate-500 hover:text-slate-700 font-semibold">
+                        Nevermind
                     </Button>
                     {step === 'form' && (
                         <Button
                             onClick={handleCreate}
                             disabled={isCreating}
-                            className="bg-primary-600 hover:bg-primary-700 text-white font-semibold h-11 px-6"
+                            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all hover:-translate-y-0.5"
                         >
                             {isCreating ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <Send className="h-4 w-4 mr-2" />}
-                            Create Offer
+                            Generate Offer
                         </Button>
                     )}
                 </DialogFooter>

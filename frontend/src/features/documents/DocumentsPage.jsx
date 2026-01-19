@@ -294,9 +294,15 @@ const DocumentsPage = () => {
             {/* Upload Dialog */}
             <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
                 <DialogContent className="max-w-xl bg-white rounded-3xl p-6">
-                    <DialogHeader>
-                        <DialogTitle>Upload File</DialogTitle>
-                    </DialogHeader>
+                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 mb-6 -mx-6 -mt-6">
+                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <Upload className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Upload File</DialogTitle>
+                            <p className="text-slate-500 mt-1 font-medium text-sm">Add a new document to the registry.</p>
+                        </div>
+                    </div>
                     <form onSubmit={handleUpload} className="space-y-4 pt-4">
                         <Input
                             placeholder="File Title"
@@ -319,7 +325,15 @@ const DocumentsPage = () => {
             {/* Folder Dialog */}
             <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
                 <DialogContent className="max-w-md bg-white rounded-3xl p-6">
-                    <DialogHeader><DialogTitle>New Folder</DialogTitle></DialogHeader>
+                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 mb-6 -mx-6 -mt-6">
+                        <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
+                            <FolderIcon className="h-6 w-6 text-emerald-600" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">New Folder</DialogTitle>
+                            <p className="text-slate-500 mt-1 font-medium text-sm">Create a new container for your files.</p>
+                        </div>
+                    </div>
                     <form onSubmit={handleFolderSubmit} className="space-y-4 pt-4">
                         <Input
                             placeholder="Folder Name"

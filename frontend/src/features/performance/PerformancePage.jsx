@@ -164,11 +164,14 @@ const GoalsSection = ({ user }) => {
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 p-0 overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                            <DialogHeader>
-                                <DialogTitle className="text-xl font-bold text-gray-900">Create New Goal</DialogTitle>
-                                <p className="text-gray-500 text-sm mt-1">Define clear objectives to track your progress.</p>
-                            </DialogHeader>
+                        <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                            <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-primary-100 shadow-sm">
+                                <Target className="h-6 w-6 text-primary-600" />
+                            </div>
+                            <div>
+                                <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Create New Goal</DialogTitle>
+                                <p className="text-slate-500 mt-1 font-medium text-sm">Define clear objectives to track your progress.</p>
+                            </div>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-5">
                             <div className="space-y-1.5">

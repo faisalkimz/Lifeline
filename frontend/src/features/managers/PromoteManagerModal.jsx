@@ -96,42 +96,32 @@ const PromoteManagerModal = ({ isOpen, onClose, onPromote }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
-            <DialogContent className="w-[90vw] max-w-[1400px] max-h-[90vh] overflow-hidden flex flex-col bg-white rounded-xl shadow-lg">
-                <DialogHeader className="px-6 pt-6 bg-white">
-                    <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-black">
-                        <Crown className="h-5 w-5 text-primary-600" /> Promote Employees
-                    </DialogTitle>
-                    <DialogDescription className="text-sm text-gray-600 mt-1">
-                        Select employees to promote and optionally assign as department heads.
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="w-[90vw] max-w-[1200px] max-h-[90vh] overflow-hidden flex flex-col bg-white rounded-2xl shadow-2xl border-0 p-0">
+                {/* Header */}
+                <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                    <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
+                        <Crown className="h-6 w-6 text-emerald-600" />
+                    </div>
+                    <div>
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Promote Talent
+                        </DialogTitle>
+                        <p className="text-slate-500 mt-1 font-medium text-sm">
+                            Empower your team members with new responsibilities
+                        </p>
+                    </div>
+                </div>
 
-                <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 flex-1 overflow-x-auto bg-white">
-                    {/* Left Column: Search + Settings */}
-                    <div className="md:w-1/3 flex flex-col gap-3 min-w-[300px]">
-                        <Card className="shadow-sm bg-white">
-                            <CardContent className="p-3 bg-white">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                    <Input
-                                        placeholder="Search employees..."
-                                        className="pl-10 text-sm bg-white text-black"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="shadow-sm bg-white">
-                            <CardHeader>
-                                <CardTitle className="text-md font-semibold text-black">Promotion Settings</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3 bg-white">
-                                <div>
-                                    <label className="block text-sm font-medium text-black mb-1">Manager Role</label>
+                <div className="flex flex-col md:flex-row h-full overflow-hidden bg-slate-50">
+                    {/* Left Panel: Settings */}
+                    <div className="w-full md:w-1/3 bg-white p-6 border-r border-slate-200 overflow-y-auto space-y-6">
+                        <div>
+                            <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4">Configuration</h3>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-semibold text-slate-700">What's their new role?</label>
                                     <select
-                                        className="w-full px-2 py-1 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-primary-500 bg-white text-black"
+                                        className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white transition-all font-medium text-slate-700 outline-none"
                                         value={managerRole}
                                         onChange={(e) => setManagerRole(e.target.value)}
                                     >
@@ -141,113 +131,112 @@ const PromoteManagerModal = ({ isOpen, onClose, onPromote }) => {
                                     </select>
                                 </div>
 
-                                <div className="flex items-center gap-2">
-                                    <Checkbox id="dept-head" checked={assignAsDeptHead} onCheckedChange={setAssignAsDeptHead} />
-                                    <label htmlFor="dept-head" className="text-sm font-medium text-black">
-                                        Assign as Department Head
-                                    </label>
-                                </div>
-
-                                {assignAsDeptHead && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-black mb-1">Department</label>
-                                        {departmentsLoading ? (
-                                            <div className="px-2 py-1 border border-gray-200 rounded-md text-sm text-gray-500 bg-white">
-                                                Loading departments...
-                                            </div>
-                                        ) : departmentsError ? (
-                                            <div className="px-2 py-1 border border-red-300 rounded-md text-sm text-red-600 bg-white">
-                                                Error loading departments
-                                            </div>
-                                        ) : (
-                                            <select
-                                                className="w-full px-2 py-1 border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-primary-500 bg-white text-black"
-                                                value={selectedDepartment}
-                                                onChange={(e) => setSelectedDepartment(e.target.value)}
-                                            >
-                                                <option value="">Choose a department...</option>
-                                                {departmentsArray.map(dept => (
-                                                    <option key={dept.id} value={dept.id}>{dept.name}</option>
-                                                ))}
-                                            </select>
-                                        )}
+                                <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
+                                    <div className="flex items-center gap-3">
+                                        <Checkbox id="dept-head" checked={assignAsDeptHead} onCheckedChange={setAssignAsDeptHead} className="text-emerald-600 border-slate-300 focus:ring-emerald-500" />
+                                        <label htmlFor="dept-head" className="text-sm font-bold text-slate-700 cursor-pointer select-none">
+                                            Make them a Department Head?
+                                        </label>
                                     </div>
-                                )}
-                            </CardContent>
-                        </Card>
+
+                                    {assignAsDeptHead && (
+                                        <div className="animate-in slide-in-from-top-2">
+                                            <label className="text-xs font-semibold text-slate-500 mb-2 block">Leading which department?</label>
+                                            {departmentsLoading ? (
+                                                <div className="p-3 text-xs text-slate-400">Loading...</div>
+                                            ) : (
+                                                <select
+                                                    className="w-full p-3 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none"
+                                                    value={selectedDepartment}
+                                                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                                                >
+                                                    <option value="">Select Department...</option>
+                                                    {departmentsArray.map(dept => (
+                                                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                                                    ))}
+                                                </select>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Right Column: Employee Selection */}
-                    <div className="flex-1 min-w-[400px]">
-                        <Card className="flex-1 overflow-hidden shadow-sm bg-white">
-                            <CardHeader>
-                                <CardTitle className="flex items-center justify-between text-sm font-medium text-black">
-                                    <span className="flex items-center gap-2">
-                                        <Users className="h-5 w-5 text-primary-600" />
-                                        Employees ({selectedEmployees.length} selected)
-                                    </span>
-                                    {availableEmployees.length === 0 && (
-                                        <Badge variant="outline" className="text-orange-600 border-orange-200 flex items-center gap-1 text-xs">
-                                            <AlertCircle className="h-3 w-3" /> No eligible
-                                        </Badge>
-                                    )}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="overflow-x-auto p-2 flex gap-2 bg-white">
-                                {employeesLoading ? (
-                                    <div className="flex gap-2">
-                                        {Array.from({ length: 5 }).map((_, i) => (
-                                            <div key={i} className="flex flex-col gap-1 p-2 border rounded-md animate-pulse bg-white min-w-[200px]">
-                                                <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-                                                <div className="h-3 bg-gray-200 rounded w-24"></div>
-                                                <div className="h-2 bg-gray-200 rounded w-16"></div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : availableEmployees.length === 0 ? (
-                                    <div className="text-center py-6 text-gray-500 text-sm flex-1">
-                                        <Users className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                                        No eligible employees
-                                    </div>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        {availableEmployees.map(emp => (
-                                            <div
-                                                key={emp.id}
-                                                className={`flex flex-col gap-1 p-2 border rounded-md cursor-pointer transition-shadow min-w-[200px] ${
-                                                    selectedEmployees.includes(emp.id) ? 'border-primary-500 bg-primary-50 shadow-sm' : 'border-gray-200 hover:shadow-sm'
-                                                } bg-white`}
-                                                onClick={() => handleEmployeeToggle(emp)}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Checkbox
-                                                        checked={selectedEmployees.includes(emp.id)}
-                                                        onChange={(e) => { e.stopPropagation(); handleEmployeeToggle(emp); }}
-                                                    />
-                                                    <div className="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-xs flex-shrink-0">
-                                                        {(emp.first_name?.[0] || '?')}{(emp.last_name?.[0] || '?')}
-                                                    </div>
+                    {/* Right Panel: Selection */}
+                    <div className="w-full md:w-2/3 p-6 flex flex-col overflow-hidden">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-bold text-slate-800">Who is being promoted?</h3>
+                            <div className="relative w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input
+                                    placeholder="Find employee..."
+                                    className="pl-10 h-10 border-slate-200 bg-white rounded-xl focus:border-emerald-500 focus:ring-emerald-500/20"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 content-start">
+                            {employeesLoading ? (
+                                <p className="text-slate-500 col-span-3 text-center py-10">Loading candidates...</p>
+                            ) : availableEmployees.length === 0 ? (
+                                <div className="col-span-3 flex flex-col items-center justify-center py-20 text-slate-400 opacity-60">
+                                    <Users className="h-16 w-16 mb-4 text-slate-200" />
+                                    <p>No eligible employees found</p>
+                                </div>
+                            ) : (
+                                availableEmployees.map(emp => (
+                                    <div
+                                        key={emp.id}
+                                        onClick={() => handleEmployeeToggle(emp)}
+                                        className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex flex-col gap-2 ${selectedEmployees.includes(emp.id)
+                                            ? 'bg-emerald-50 border-emerald-500 shadow-md transform scale-[1.02]'
+                                            : 'bg-white border-slate-200 hover:border-emerald-300 hover:shadow-sm'
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors ${selectedEmployees.includes(emp.id) ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-700'
+                                                    }`}>
+                                                    {emp.first_name?.[0]}{emp.last_name?.[0]}
                                                 </div>
-                                                <div className="truncate text-sm font-medium">{emp.full_name || 'Unknown'}</div>
-                                                <div className="text-xs text-gray-500 truncate">{emp.employee_number} • {emp.job_title || 'No Title'}</div>
-                                                <div className="text-[10px] text-gray-400 truncate">📧 {emp.email} • {emp.department_name || 'No department'}</div>
+                                                <div>
+                                                    <p className={`font-bold text-sm ${selectedEmployees.includes(emp.id) ? 'text-emerald-900' : 'text-slate-700'}`}>
+                                                        {emp.full_name}
+                                                    </p>
+                                                    <p className="text-xs text-slate-500 truncate max-w-[120px]">{emp.job_title}</p>
+                                                </div>
                                             </div>
-                                        ))}
+                                            <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedEmployees.includes(emp.id) ? 'border-emerald-500 bg-emerald-500' : 'border-slate-300 bg-white'
+                                                }`}>
+                                                {selectedEmployees.includes(emp.id) && <Check className="h-3 w-3 text-white" />}
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
 
-                <DialogFooter className="sticky bottom-0 bg-white z-10 border-t border-white-100 p-4 flex justify-end gap-2">
-                    <Button variant="outline" size="sm" onClick={handleClose}>
-                        <X className="h-4 w-4 mr-1" /> Cancel
-                    </Button>
-                    <Button size="sm" className="bg-primary-600 text-white hover:bg-primary-700" onClick={handlePromote} disabled={!selectedEmployees.length}>
-                        <Crown className="h-4 w-4 mr-1" />
-                        Promote {selectedEmployees.length} Employee{selectedEmployees.length !== 1 ? 's' : ''}
-                    </Button>
+                <DialogFooter className="bg-white border-t border-slate-100 p-4 flex justify-between items-center">
+                    <div className="text-sm font-medium text-slate-500 px-4">
+                        {selectedEmployees.length === 0 ? 'Select at least one employee' : <span><span className="text-emerald-600 font-bold">{selectedEmployees.length}</span> employee(s) selected</span>}
+                    </div>
+                    <div className="flex gap-3">
+                        <Button variant="ghost" onClick={handleClose} className="h-12 px-6 text-slate-500 hover:text-slate-900 font-semibold rounded-xl">
+                            Cancel
+                        </Button>
+                        <Button
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition-all hover:-translate-y-0.5"
+                            onClick={handlePromote}
+                            disabled={!selectedEmployees.length}
+                        >
+                            Promote Selected
+                        </Button>
+                    </div>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

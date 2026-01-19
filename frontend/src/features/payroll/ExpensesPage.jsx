@@ -213,9 +213,12 @@ const ExpensesPage = () => {
 
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl bg-white">
-                    <DialogHeader>
-                        <DialogTitle>Submit New Expense</DialogTitle>
-                    </DialogHeader>
+                    <div className="bg-white px-8 pt-8 pb-4">
+                        <DialogTitle className="text-2xl font-semibold text-slate-900 tracking-tight">Submit an expense claim</DialogTitle>
+                        <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+                            Fill in the details of your expense for reimbursement. Please ensure you have your receipt ready if required.
+                        </p>
+                    </div>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
@@ -282,12 +285,21 @@ const ExpensesPage = () => {
                             />
                         </div>
 
-                        <DialogFooter>
-                            <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                        <DialogFooter className="gap-3 pt-6 border-t border-slate-50">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setShowForm(false)}
+                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
+                            >
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isCreating}>
-                                {isCreating ? 'Submitting...' : 'Submit Expense'}
+                            <Button
+                                type="submit"
+                                disabled={isCreating}
+                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
+                            >
+                                {isCreating ? 'Submitting...' : 'Submit claim'}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -297,12 +309,12 @@ const ExpensesPage = () => {
             {selectedExpense && (
                 <Dialog open={!!selectedExpense} onOpenChange={() => setSelectedExpense(null)}>
                     <DialogContent className="max-w-2xl bg-white">
-                        <DialogHeader>
-                            <DialogTitle className="flex items-center gap-2">
-                                <FileText className="h-5 w-5" />
-                                Expense Details
-                            </DialogTitle>
-                        </DialogHeader>
+                        <div className="bg-white px-8 pt-8 pb-4">
+                            <DialogTitle className="text-2xl font-semibold text-slate-900 tracking-tight">Expense details</DialogTitle>
+                            <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+                                Review the information for this reimbursement claim.
+                            </p>
+                        </div>
                         <div className="space-y-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
@@ -338,8 +350,14 @@ const ExpensesPage = () => {
                                 <p className="mt-1">{selectedExpense.description || 'No description provided.'}</p>
                             </div>
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setSelectedExpense(null)}>Close</Button>
+                        <DialogFooter className="p-8 pt-4 border-t border-slate-50">
+                            <Button
+                                variant="ghost"
+                                onClick={() => setSelectedExpense(null)}
+                                className="h-11 px-8 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
+                            >
+                                Close
+                            </Button>
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>

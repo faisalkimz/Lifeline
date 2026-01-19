@@ -28,81 +28,37 @@ const BenefitsAdminPage = () => {
     const [activeTab, setActiveTab] = useState('catalog');
 
     return (
-        <motion.div
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="space-y-12 pb-24"
-        >
-            {/* Global Admin Hero */}
-            <div className="relative rounded-[4rem] bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 border-none p-12 lg:p-20 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden">
-                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-500/5 rounded-full -mt-96 -mr-96 blur-[120px] pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 rounded-full -mb-96 -ml-96 blur-[120px] pointer-events-none"></div>
-
-                <div className="relative z-10 flex flex-col xl:flex-row items-center justify-between gap-16">
-                    <div className="flex-1 space-y-10 text-center xl:text-left">
-                        <div className="space-y-4">
-                            <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full">
-                                Welfare Governance Command
-                            </Badge>
-                            <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
-                                Admin <br />
-                                <span className="text-emerald-500">Registry</span>
-                            </h1>
-                        </div>
-
-                        <div className="flex flex-wrap items-center justify-center xl:justify-start gap-8">
-                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-xl">
-                                <Command className="h-4 w-4 text-emerald-500 animate-pulse" />
-                                <span className="text-xs font-black text-white uppercase tracking-widest">System Control: Elevated</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div className="space-y-10 pb-20">
+            {/* Professional Header */}
+            <div>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Benefits Administration</h1>
+                <p className="text-slate-500 mt-2">Manage your company's benefit catalog, statutory contributions, and employee enrollments.</p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-12">
-                <TabsList className="bg-slate-900/5 p-2 rounded-[2rem] w-full xl:w-max flex flex-wrap gap-2 backdrop-blur-md border border-white/10">
-                    <TabsTrigger value="catalog" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-2xl px-8 py-4 font-black uppercase tracking-widest text-[10px] transition-all gap-3 italic">
-                        <Gift className="h-4 w-4" /> Protocol Catalog
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+                <TabsList className="bg-slate-100 p-1 rounded-xl w-max flex gap-1 border border-slate-200">
+                    <TabsTrigger value="catalog" className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm rounded-lg px-6 py-2.5 font-semibold text-sm text-slate-600 transition-all gap-2">
+                        <Gift className="h-4 w-4" /> Benefit types
                     </TabsTrigger>
-                    <TabsTrigger value="nssf" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-2xl px-8 py-4 font-black uppercase tracking-widest text-[10px] transition-all gap-3 italic">
-                        <Shield className="h-4 w-4" /> NSSF Governance
+                    <TabsTrigger value="nssf" className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm rounded-lg px-6 py-2.5 font-semibold text-sm text-slate-600 transition-all gap-2">
+                        <Shield className="h-4 w-4" /> NSSF & Statutory
                     </TabsTrigger>
-                    <TabsTrigger value="insurance" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-2xl px-8 py-4 font-black uppercase tracking-widest text-[10px] transition-all gap-3 italic">
-                        <HeartPulse className="h-4 w-4" /> Defense Panels
+                    <TabsTrigger value="insurance" className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm rounded-lg px-6 py-2.5 font-semibold text-sm text-slate-600 transition-all gap-2">
+                        <HeartPulse className="h-4 w-4" /> Insurance policies
                     </TabsTrigger>
-                    <TabsTrigger value="enrollments" className="data-[state=active]:bg-slate-900 data-[state=active]:text-white rounded-2xl px-8 py-4 font-black uppercase tracking-widest text-[10px] transition-all gap-3 italic relative">
-                        <Users className="h-4 w-4" /> Asset Roster
-                        <span className="absolute -top-1 -right-1 h-5 w-5 bg-emerald-500 text-white text-[8px] flex items-center justify-center rounded-full border-2 border-white">2</span>
+                    <TabsTrigger value="enrollments" className="data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm rounded-lg px-6 py-2.5 font-semibold text-sm text-slate-600 transition-all gap-2">
+                        <Users className="h-4 w-4" /> Active enrollments
                     </TabsTrigger>
                 </TabsList>
 
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={activeTab}
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -20, opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                    >
-                        <TabsContent value="catalog">
-                            <BenefitsCatalog />
-                        </TabsContent>
-
-                        <TabsContent value="nssf">
-                            <NSSFManagement />
-                        </TabsContent>
-
-                        <TabsContent value="insurance">
-                            <InsuranceManagement />
-                        </TabsContent>
-
-                        <TabsContent value="enrollments">
-                            <BenefitsEnrollments />
-                        </TabsContent>
-                    </motion.div>
-                </AnimatePresence>
+                <div className="pt-2">
+                    {activeTab === 'catalog' && <BenefitsCatalog />}
+                    {activeTab === 'nssf' && <NSSFManagement />}
+                    {activeTab === 'insurance' && <InsuranceManagement />}
+                    {activeTab === 'enrollments' && <BenefitsEnrollments />}
+                </div>
             </Tabs>
-        </motion.div>
+        </div>
     );
 };
 
@@ -116,59 +72,60 @@ const BenefitsCatalog = () => {
     });
 
     const categories = [
-        { value: 'insurance', label: 'Shield (Insurance)', icon: ShieldCheck },
-        { value: 'allowance', label: 'Flux (Allowance)', icon: DollarSign },
-        { value: 'perk', label: 'E-Boost (Perk)', icon: Sparkles },
-        { value: 'retirement', label: 'Anchor (Retirement)', icon: Anchor }
+        { value: 'insurance', label: 'Insurance', icon: ShieldCheck },
+        { value: 'allowance', label: 'Allowance', icon: DollarSign },
+        { value: 'perk', label: 'Perk', icon: Sparkles },
+        { value: 'retirement', label: 'Retirement', icon: Anchor }
     ];
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             await createBenefitType(formData).unwrap();
-            toast.success('Welfare Protocol Committed.');
+            toast.success('Benefit created successfully');
             setShowForm(false);
             setFormData({ name: '', description: '', category: 'insurance', is_active: true, requires_enrollment: false });
         } catch (error) {
-            toast.error('Commitment Failure: Data Integrity Violation.');
+            toast.error('Failed to create benefit');
         }
     };
 
     const benefitList = Array.isArray(benefitTypes) ? benefitTypes : (benefitTypes?.results || []);
 
     return (
-        <div className="space-y-12">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 px-6">
+        <div className="space-y-8">
+            <div className="flex justify-between items-center">
                 <div>
-                    <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Protocol <span className="text-emerald-500">Manifest</span></h2>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Authorized corporate welfare configurations</p>
+                    <h2 className="text-xl font-bold text-slate-900">Benefit types</h2>
+                    <p className="text-sm text-slate-500 mt-1">Manage the types of benefits available to your employees.</p>
                 </div>
                 <Dialog open={showForm} onOpenChange={setShowForm}>
                     <DialogTrigger asChild>
-                        <Button className="h-20 px-10 bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-2xl hover:bg-slate-800 transition-all gap-4 italic shrink-0">
-                            <Plus className="h-5 w-5 text-emerald-500" /> INITIALIZE PROTOCOL
+                        <Button className="h-11 px-6 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all gap-2">
+                            <Plus className="h-4 w-4" /> Add benefit type
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-3xl bg-white rounded-[3rem] p-0 border-none shadow-2xl overflow-hidden">
-                        <DialogHeader className="bg-slate-900 p-12">
-                            <DialogTitle className="text-4xl font-black text-white tracking-tighter uppercase italic leading-none">
-                                Protocol <span className="text-emerald-500">Entry</span>
-                            </DialogTitle>
-                            <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-3 italic font-bold">Welfare System Definition Console</p>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="p-12 space-y-8">
-                            <div className="grid grid-cols-2 gap-8">
+                    <DialogContent className="max-w-2xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl">
+                        <div className="bg-white px-8 pt-8 pb-4">
+                            <DialogTitle className="text-2xl font-semibold text-slate-900">New benefit type</DialogTitle>
+                            <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+                                Create a new category of benefits that can be assigned to employees.
+                            </p>
+                        </div>
+                        <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 space-y-6">
+                            <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Identifier (Name)</label>
+                                    <label className="text-sm font-semibold text-slate-700">Benefit name</label>
                                     <Input
-                                        className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900 focus:ring-2 focus:ring-emerald-500 px-6"
+                                        className="h-11 rounded-xl border-slate-200 focus:ring-1 focus:ring-slate-900 focus:border-slate-900"
                                         value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required
+                                        placeholder="e.g. Health Insurance"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Classification</label>
+                                    <label className="text-sm font-semibold text-slate-700">Category</label>
                                     <select
-                                        className="w-full h-16 px-6 bg-slate-50 border-none rounded-2xl font-black text-slate-900 focus:ring-2 focus:ring-emerald-500 outline-none uppercase text-xs"
+                                        className="w-full h-11 px-4 bg-white border border-slate-200 rounded-xl font-medium text-slate-900 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none text-sm"
                                         value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}
                                     >
                                         {categories.map(cat => (
@@ -178,27 +135,27 @@ const BenefitsCatalog = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Strategic Context (Description)</label>
+                                <label className="text-sm font-semibold text-slate-700">Description</label>
                                 <textarea
-                                    className="w-full p-6 bg-slate-50 border-none rounded-[2rem] font-medium min-h-[140px] focus:ring-2 focus:ring-emerald-500 outline-none text-slate-600 shadow-inner resize-none"
+                                    className="w-full p-4 border border-slate-200 rounded-xl font-medium min-h-[120px] focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none text-slate-600 text-sm resize-none"
                                     value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Define the scope and utility..."
+                                    placeholder="Explain what this benefit covers..."
                                 />
                             </div>
-                            <div className="flex items-center gap-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-                                <label className="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" className="h-6 w-6 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500" checked={formData.is_active} onChange={e => setFormData({ ...formData, is_active: e.target.checked })} />
-                                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Protocol Active</span>
+                            <div className="space-y-4 pt-2">
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" className="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900" checked={formData.is_active} onChange={e => setFormData({ ...formData, is_active: e.target.checked })} />
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Active and available</span>
                                 </label>
-                                <label className="flex items-center gap-3 cursor-pointer border-l border-slate-200 pl-8">
-                                    <input type="checkbox" className="h-6 w-6 rounded border-slate-200 text-emerald-500 focus:ring-emerald-500" checked={formData.requires_enrollment} onChange={e => setFormData({ ...formData, requires_enrollment: e.target.checked })} />
-                                    <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest text-[#f59e0b]">Requires Synchronization Approval</span>
+                                <label className="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" className="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900" checked={formData.requires_enrollment} onChange={e => setFormData({ ...formData, requires_enrollment: e.target.checked })} />
+                                    <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">Requires manual enrollment approval</span>
                                 </label>
                             </div>
-                            <div className="pt-6 flex gap-4">
-                                <Button type="button" onClick={() => setShowForm(false)} variant="ghost" className="flex-1 h-14 rounded-2xl font-black text-slate-400 uppercase text-[10px]">ABORT</Button>
-                                <Button type="submit" className="flex-1 h-16 bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-2xl">
-                                    ESTABLISH PROTOCOL
+                            <div className="pt-6 flex justify-end gap-3 border-t border-slate-50">
+                                <Button type="button" onClick={() => setShowForm(false)} variant="ghost" className="h-11 px-6 rounded-lg font-semibold text-slate-600 hover:bg-slate-50">Cancel</Button>
+                                <Button type="submit" className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm">
+                                    Create benefit
                                 </Button>
                             </div>
                         </form>
@@ -207,49 +164,44 @@ const BenefitsCatalog = () => {
             </div>
 
             {isLoading ? (
-                <div className="py-20 flex flex-col items-center justify-center space-y-8">
-                    <Loader2 className="h-16 w-16 text-emerald-500 animate-spin" />
-                    <p className="font-black text-slate-400 uppercase tracking-[0.5em] text-xs animate-pulse italic">Scanning Welfare Grid...</p>
+                <div className="py-20 flex flex-col items-center justify-center">
+                    <Loader2 className="h-8 w-8 text-slate-400 animate-spin" />
+                    <p className="text-sm text-slate-500 mt-4">Loading benefits...</p>
                 </div>
             ) : (
-                <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {benefitList.map((benefit) => {
                         const category = categories.find(cat => cat.value === benefit.category) || categories[0];
                         const Icon = category.icon;
                         return (
-                            <Card key={benefit.id} className="rounded-[3.5rem] border border-slate-50 bg-white shadow-xl overflow-hidden group hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-500">
-                                <CardContent className="p-10">
-                                    <div className="flex items-start justify-between mb-8">
+                            <Card key={benefit.id} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-all">
+                                <CardContent className="p-8">
+                                    <div className="flex items-start justify-between mb-6">
                                         <div className={cn(
-                                            "h-16 w-16 rounded-[1.5rem] flex items-center justify-center shadow-lg transition-all group-hover:rotate-12",
-                                            benefit.category === 'insurance' ? 'bg-blue-100 text-blue-600' :
-                                                benefit.category === 'allowance' ? 'bg-emerald-100 text-emerald-600' :
-                                                    benefit.category === 'perk' ? 'bg-indigo-100 text-indigo-600' :
-                                                        'bg-amber-100 text-amber-600'
+                                            "h-12 w-12 rounded-xl flex items-center justify-center",
+                                            benefit.category === 'insurance' ? 'bg-blue-50 text-blue-600' :
+                                                benefit.category === 'allowance' ? 'bg-emerald-50 text-emerald-600' :
+                                                    benefit.category === 'perk' ? 'bg-indigo-50 text-indigo-600' :
+                                                        'bg-amber-50 text-amber-600'
                                         )}>
-                                            <Icon className="h-8 w-8" />
+                                            <Icon className="h-6 w-6" />
                                         </div>
-                                        <div className="flex flex-col items-end gap-2">
-                                            <Badge className={cn("border-none text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full italic",
-                                                benefit.is_active ? 'bg-emerald-500 text-white' : 'bg-slate-300 text-white')}>
-                                                {benefit.is_active ? 'Energized' : 'Dormant'}
-                                            </Badge>
-                                            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic">{benefit.category}</span>
-                                        </div>
+                                        <Badge variant="outline" className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full",
+                                            benefit.is_active ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100')}>
+                                            {benefit.is_active ? 'Active' : 'Inactive'}
+                                        </Badge>
                                     </div>
-                                    <h3 className="text-2xl font-black text-slate-900 mb-2 truncate uppercase italic tracking-tighter group-hover:text-emerald-600 transition-colors leading-none">{benefit.name}</h3>
-                                    <p className="text-xs font-bold text-slate-400 mb-8 line-clamp-2 leading-relaxed opacity-60">{benefit.description || 'Global welfare module for personnel stabilization.'}</p>
-                                    {benefit.requires_enrollment && (
-                                        <div className="flex items-center gap-3 text-[10px] font-black text-amber-500 mb-8 uppercase italic border-l-2 border-amber-500 pl-4 py-1">
-                                            <ShieldAlert className="h-4 w-4" /> REQ: SYNC APPROVAL
-                                        </div>
-                                    )}
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Button variant="ghost" className="h-14 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 gap-3">
-                                            <Edit className="h-4 w-4" /> REVISE
+                                    <h3 className="text-lg font-bold text-slate-900 mb-1">{benefit.name}</h3>
+                                    <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed mb-6">
+                                        {benefit.description || 'No description provided.'}
+                                    </p>
+
+                                    <div className="flex items-center gap-2 pt-6 border-t border-slate-50">
+                                        <Button variant="ghost" size="sm" className="flex-1 h-9 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 gap-2">
+                                            <Edit className="h-3.5 w-3.5" /> Edit
                                         </Button>
-                                        <Button variant="ghost" className="h-14 bg-slate-50 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 gap-3">
-                                            <Users className="h-4 w-4" /> ROSTER
+                                        <Button variant="ghost" size="sm" className="flex-1 h-9 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 gap-2">
+                                            <Users className="h-3.5 w-3.5" /> Enrollees
                                         </Button>
                                     </div>
                                 </CardContent>
@@ -266,71 +218,68 @@ const NSSFManagement = () => {
     const [settings, setSettings] = useState({ employee_rate: 5, employer_rate: 10, max_earnings: 400000, is_active: true });
 
     return (
-        <div className="space-y-12">
-            <div className="px-6">
-                <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">NSSF <span className="text-emerald-500">Security Node</span></h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Configure National Social Security Fund global constants</p>
+        <div className="space-y-8">
+            <div>
+                <h2 className="text-xl font-bold text-slate-900">NSSF & Statutory contributions</h2>
+                <p className="text-sm text-slate-500 mt-1">Configure contribution rates and monthly earnings caps for NSSF.</p>
             </div>
 
-            <div className="grid gap-12 xl:grid-cols-2">
-                <Card className="rounded-[3.5rem] border-none shadow-2xl bg-white overflow-hidden p-0">
-                    <CardHeader className="bg-slate-900 p-12">
-                        <CardTitle className="text-xl font-black text-white tracking-tighter uppercase italic leading-none flex items-center gap-4">
-                            <Anchor className="h-6 w-6 text-emerald-500" /> Rate <span className="text-emerald-500">Configuration</span>
-                        </CardTitle>
+            <div className="grid gap-8 lg:grid-cols-3">
+                <Card className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                    <CardHeader className="border-b border-slate-50 px-8 py-6">
+                        <CardTitle className="text-base font-semibold text-slate-900">Contribution settings</CardTitle>
                     </CardHeader>
-                    <CardContent className="p-12 space-y-10">
-                        <div className="grid grid-cols-2 gap-8">
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Personnel Extract (%)</label>
-                                <Input type="number" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900" value={settings.employee_rate} onChange={e => setSettings({ ...settings, employee_rate: e.target.value })} />
+                    <CardContent className="p-8 space-y-8">
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-700">Employee contribution (%)</label>
+                                <Input type="number" className="h-11 rounded-xl border-slate-200" value={settings.employee_rate} onChange={e => setSettings({ ...settings, employee_rate: e.target.value })} />
                             </div>
-                            <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Corp Contribution (%)</label>
-                                <Input type="number" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900" value={settings.employer_rate} onChange={e => setSettings({ ...settings, employer_rate: e.target.value })} />
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-slate-700">Employer contribution (%)</label>
+                                <Input type="number" className="h-11 rounded-xl border-slate-200" value={settings.employer_rate} onChange={e => setSettings({ ...settings, employer_rate: e.target.value })} />
                             </div>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Max Monthly Sync Cap (UGX)</label>
-                            <Input type="number" className="h-16 bg-slate-50 border-none rounded-2xl font-black text-slate-900" value={settings.max_earnings} />
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-slate-700">Maximum monthly earnings (UGX)</label>
+                            <Input type="number" className="h-11 rounded-xl border-slate-200" value={settings.max_earnings} />
+                            <p className="text-[11px] text-slate-400">The maximum gross pay at which NSSF contributions are calculated.</p>
                         </div>
-                        <div className="flex items-center gap-4 p-8 bg-emerald-50 rounded-[2rem] border border-emerald-100">
-                            <input type="checkbox" className="h-8 w-8 rounded-xl border-emerald-200 text-emerald-500 focus:ring-emerald-500" checked={settings.is_active} id="nssf-active" />
-                            <label htmlFor="nssf-active" className="text-sm font-black text-emerald-900 uppercase tracking-widest italic">NSSF PROTOCOL ACTIVE IN SYSTEMS</label>
+                        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                            <input type="checkbox" className="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900" checked={settings.is_active} id="nssf-active" />
+                            <label htmlFor="nssf-active" className="text-sm font-medium text-slate-700">Enable NSSF calculation in payroll</label>
                         </div>
-                        <Button className="w-full h-20 bg-slate-900 text-white font-black uppercase tracking-widest text-xs rounded-2xl shadow-2xl hover:bg-slate-800 transition-all italic">SAVE CONFIGURATION</Button>
+                        <div className="pt-4 flex justify-end">
+                            <Button className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm">Save configuration</Button>
+                        </div>
                     </CardContent>
                 </Card>
 
-                <div className="grid grid-cols-1 gap-8">
-                    <Card className="rounded-[3.5rem] border-none shadow-xl bg-slate-900 text-white p-12 space-y-10 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl -mt-32 -mr-32 group-hover:scale-150 transition-transform duration-1000"></div>
-                        <div className="flex items-center justify-between relative z-10">
-                            <Target className="h-12 w-12 text-emerald-400" />
-                            <Badge className="bg-white/10 text-white border-white/10 text-[8px] font-black uppercase tracking-widest px-4 py-1 italic">REAL-TIME TELEMETRY</Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-8 relative z-10">
-                            <div className="space-y-2 text-center p-8 bg-white/5 rounded-[2.5rem] backdrop-blur-md border border-white/5">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Contributors</p>
-                                <p className="text-4xl font-black text-white italic tracking-tighter">1,247</p>
+                <div className="space-y-6">
+                    <Card className="rounded-2xl border border-slate-200 bg-slate-900 text-white p-8">
+                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-6">Quick Overview</p>
+                        <div className="space-y-6">
+                            <div>
+                                <p className="text-sm text-slate-400">Total contributors</p>
+                                <p className="text-3xl font-bold mt-1 tracking-tight">1,247</p>
                             </div>
-                            <div className="space-y-2 text-center p-8 bg-white/5 rounded-[2.5rem] backdrop-blur-md border border-white/5">
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Monthly Flux</p>
-                                <p className="text-4xl font-black text-emerald-500 italic tracking-tighter">₵45.2M</p>
+                            <div>
+                                <p className="text-sm text-slate-400">Monthly total (Est.)</p>
+                                <p className="text-3xl font-bold mt-1 tracking-tight text-emerald-400">45,200,000 <span className="text-xs font-medium text-slate-500 ml-1">UGX</span></p>
                             </div>
                         </div>
                     </Card>
 
-                    <Card className="rounded-[3.5rem] border-none shadow-xl bg-white p-12 space-y-8">
-                        <h4 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter">System <span className="text-emerald-500">Log</span></h4>
+                    <Card className="rounded-2xl border border-slate-200 bg-white p-8">
+                        <h4 className="text-sm font-bold text-slate-900 mb-4">Recent activity</h4>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 italic">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">New Sync Nodes</span>
-                                <span className="text-xs font-black text-slate-900">+23 This Cycle</span>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500">New enrollments</span>
+                                <span className="font-semibold text-slate-900">+23 this month</span>
                             </div>
-                            <div className="flex items-center justify-between p-6 bg-slate-50 rounded-2xl border border-slate-100 italic">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Payload Sync</span>
-                                <span className="text-xs font-black text-slate-900">₵36,200 / Unit</span>
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-slate-500">Average per person</span>
+                                <span className="font-semibold text-slate-900">36,200 UGX</span>
                             </div>
                         </div>
                     </Card>
@@ -341,53 +290,53 @@ const NSSFManagement = () => {
 };
 
 const InsuranceManagement = () => (
-    <div className="space-y-12">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 px-6">
+    <div className="space-y-8">
+        <div className="flex justify-between items-center">
             <div>
-                <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Defense <span className="text-emerald-500">Panels</span></h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Enterprise insurance policy orchestration</p>
+                <h2 className="text-xl font-bold text-slate-900">Insurance policies</h2>
+                <p className="text-sm text-slate-500 mt-1">Manage and track company-provided insurance for your team.</p>
             </div>
-            <Button className="h-20 px-10 bg-slate-900 text-white font-black uppercase tracking-[0.2em] text-[10px] rounded-2xl shadow-2xl hover:bg-slate-800 transition-all gap-4 italic shrink-0">
-                <Plus className="h-5 w-5 text-emerald-500" /> INITIALIZE DEFENSE
+            <Button className="h-11 px-6 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all gap-2">
+                <Plus className="h-4 w-4" /> Add policy
             </Button>
         </div>
 
-        <div className="grid gap-8">
+        <div className="grid gap-6">
             {[1, 2].map((i) => (
-                <Card key={i} className="rounded-[3.5rem] border border-slate-50 bg-white shadow-xl overflow-hidden group hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] transition-all duration-500">
-                    <CardContent className="p-12">
+                <Card key={i} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-all">
+                    <CardContent className="p-8">
                         <div className="flex items-start justify-between mb-8">
                             <div className="flex items-center gap-6">
-                                <div className="h-20 w-20 rounded-3xl bg-slate-900 flex items-center justify-center text-emerald-500 shadow-2xl group-hover:rotate-6 transition-transform">
-                                    <ShieldCheck className="h-10 w-10" />
+                                <div className="h-14 w-14 rounded-xl bg-slate-900 flex items-center justify-center text-emerald-500">
+                                    <ShieldCheck className="h-7 w-7" />
                                 </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-2xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">{i === 1 ? 'Health Defense - Jubilee' : 'Life Shield - ICEA'}</h3>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">{i === 1 ? 'Jubilee Multi-Carrier' : 'ICEA Secure Node'}</p>
+                                <div>
+                                    <h3 className="text-xl font-bold text-slate-900">{i === 1 ? 'Health Insurance - Jubilee' : 'Life Insurance - ICEA'}</h3>
+                                    <p className="text-sm text-slate-500 mt-1">{i === 1 ? 'Comprehensive medical cover' : 'Group life assurance'}</p>
                                 </div>
                             </div>
-                            <div className="flex gap-4">
-                                <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl bg-slate-50 text-slate-300 hover:text-slate-900 transition-colors"><Edit className="h-6 w-6" /></Button>
-                                <Button variant="ghost" size="icon" className="h-14 w-14 rounded-2xl bg-slate-50 text-slate-300 hover:text-emerald-500 transition-colors"><Users className="h-6 w-6" /></Button>
+                            <div className="flex gap-2">
+                                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
+                                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-slate-900"><Users className="h-4 w-4" /></Button>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 p-10 bg-slate-50 rounded-[3rem] border border-slate-100">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 p-6 bg-slate-50 rounded-xl border border-slate-100">
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Payload Tier</p>
-                                <p className="text-lg font-black text-slate-900 italic">₵5M / Cycle</p>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Total Monthly</p>
+                                <p className="text-lg font-bold text-slate-900">5,000,000 UGX</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Personnel Extract</p>
-                                <p className="text-lg font-black text-rose-500 italic">₵{i === 1 ? '50,000' : '25,000'} /Mo</p>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Employee Part</p>
+                                <p className="text-lg font-bold text-rose-600">{i === 1 ? '50,000' : '25,000'} UGX</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Synced Assets</p>
-                                <p className="text-lg font-black text-slate-900 italic">{i === 1 ? '234' : '189'} Units</p>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Active Members</p>
+                                <p className="text-lg font-bold text-slate-900">{i === 1 ? '234' : '189'}</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 italic">Grid Status</p>
-                                <Badge className="bg-emerald-500 text-white border-none text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full italic">Operational</Badge>
+                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Status</p>
+                                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 font-bold px-3 py-1 rounded-full">Active</Badge>
                             </div>
                         </div>
                     </CardContent>
@@ -402,73 +351,81 @@ const BenefitsEnrollments = () => {
 
     return (
         <div className="space-y-12">
-            <div className="px-6">
-                <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter">Asset <span className="text-emerald-500">Roster</span></h2>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic font-bold">Comprehensive personnel sync status and request audit</p>
+            <div>
+                <h2 className="text-xl font-bold text-slate-900">Enrollment management</h2>
+                <p className="text-sm text-slate-500 mt-1">Review pending benefit requests and manage active employee enrollments.</p>
             </div>
 
-            {/* Tactical Request Queue */}
-            <Card className="rounded-[3.5rem] border-none shadow-2xl bg-slate-50 p-12 overflow-hidden relative">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl -mt-32 -mr-32"></div>
-                <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter mb-10 flex items-center gap-4">
-                    <Activity className="h-6 w-6 text-amber-500 animate-pulse" /> Pending <span className="text-amber-500">Handshakes</span>
+            {/* Pending Approvals */}
+            <div className="space-y-4">
+                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-amber-500" /> Pending approvals
                 </h3>
-                <div className="space-y-6">
+                <div className="grid gap-4">
                     {[1, 2].map((i) => (
-                        <div key={i} className="flex flex-col md:flex-row items-center justify-between p-8 bg-white border border-slate-100 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 group">
-                            <div className="flex items-center gap-6 mb-6 md:mb-0">
-                                <div className="h-16 w-16 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
-                                    <Users className="h-8 w-8" />
+                        <div key={i} className="flex flex-col md:flex-row items-center justify-between p-6 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all">
+                            <div className="flex items-center gap-4 mb-4 md:mb-0">
+                                <div className="h-12 w-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <Users className="h-6 w-6" />
                                 </div>
-                                <div className="space-y-1">
-                                    <h4 className="text-xl font-black text-slate-900 italic leading-none">{i === 1 ? 'Sarah Mirembe' : 'John Doe'}</h4>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Req: {i === 1 ? 'Health Defense' : 'Dental Component'} // 15 DEC</p>
+                                <div>
+                                    <h4 className="font-bold text-slate-900">{i === 1 ? 'Sarah Mirembe' : 'John Doe'}</h4>
+                                    <p className="text-xs text-slate-500 mt-0.5">Requested {i === 1 ? 'Health Insurance' : 'Dental Benefit'} • 15 Dec</p>
                                 </div>
                             </div>
-                            <div className="flex gap-4 w-full md:w-auto">
-                                <Button className="flex-1 h-14 bg-emerald-500 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl shadow-emerald-500/20 gap-3 hover:bg-emerald-600 transition-all"><CheckCircle className="h-4 w-4" /> AUTHORIZE</Button>
-                                <Button variant="ghost" className="flex-1 h-14 bg-slate-50 text-rose-500 font-black uppercase tracking-widest text-[10px] rounded-2xl gap-3 hover:bg-rose-50 transition-all"><XCircle className="h-4 w-4" /> DENY</Button>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <Button className="flex-1 h-10 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow-sm gap-2">
+                                    <CheckCircle className="h-3.5 w-3.5" /> Approve
+                                </Button>
+                                <Button variant="ghost" className="flex-1 h-10 px-6 text-rose-600 font-semibold text-xs rounded-lg hover:bg-rose-50 gap-2">
+                                    <XCircle className="h-3.5 w-3.5" /> Decline
+                                </Button>
                             </div>
                         </div>
                     ))}
                 </div>
-            </Card>
+            </div>
 
-            {/* Global Registry Table */}
-            <Card className="rounded-[3.5rem] border-none shadow-2xl bg-white overflow-hidden">
-                <CardHeader className="bg-slate-900 p-12">
-                    <CardTitle className="text-xl font-black text-white tracking-tighter uppercase italic leading-none flex items-center gap-4">
-                        <FileText className="h-6 w-6 text-emerald-500" /> Authorized <span className="text-emerald-500">Personnel Units</span>
-                    </CardTitle>
+            {/* Active Enrollments Table */}
+            <Card className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+                <CardHeader className="border-b border-slate-50 px-8 py-6">
+                    <CardTitle className="text-base font-semibold text-slate-900">Active enrollments</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader className="bg-slate-50 border-none">
-                                <TableRow className="border-none">
-                                    <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Asset Identity</TableHead>
-                                    <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Module Protocol</TableHead>
-                                    <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Sync Status</TableHead>
-                                    <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic">Epoch Sync</TableHead>
-                                    <TableHead className="px-12 h-16 font-black text-[10px] uppercase tracking-widest text-slate-400 italic text-right">Console</TableHead>
+                            <TableHeader className="bg-slate-50/50">
+                                <TableRow>
+                                    <TableHead className="px-8 h-12 text-xs font-bold text-slate-500 uppercase tracking-wider">Employee</TableHead>
+                                    <TableHead className="px-8 h-12 text-xs font-bold text-slate-500 uppercase tracking-wider">Benefit</TableHead>
+                                    <TableHead className="px-8 h-12 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</TableHead>
+                                    <TableHead className="px-8 h-12 text-xs font-bold text-slate-500 uppercase tracking-wider">Enrolled Date</TableHead>
+                                    <TableHead className="px-8 h-12 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
-                                    <TableRow><TableCell colSpan={5} className="py-20 text-center"><Loader2 className="h-10 w-10 text-emerald-500 animate-spin mx-auto" /></TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={5} className="py-20 text-center"><Loader2 className="h-8 w-8 text-slate-400 animate-spin mx-auto" /></TableCell></TableRow>
                                 ) : (enrollments?.results || enrollments || []).map((enrollment) => (
                                     <TableRow key={enrollment.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
-                                        <TableCell className="px-12 py-8 font-black text-slate-900 italic">{enrollment.employee_name}</TableCell>
-                                        <TableCell className="px-12 py-8 font-bold text-slate-500 text-xs italic">{enrollment.benefit_name}</TableCell>
-                                        <TableCell className="px-12 py-8">
-                                            <Badge className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[8px] uppercase tracking-widest italic px-4 py-1.5 rounded-full">Operational</Badge>
+                                        <TableCell className="px-8 py-6 font-semibold text-slate-900">{enrollment.employee_name}</TableCell>
+                                        <TableCell className="px-8 py-6 text-sm text-slate-600">{enrollment.benefit_name}</TableCell>
+                                        <TableCell className="px-8 py-6">
+                                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 font-bold px-2.5 py-0.5 rounded-full text-[10px]">Active</Badge>
                                         </TableCell>
-                                        <TableCell className="px-12 py-8 tabular-nums font-bold text-slate-400 text-xs">{new Date(enrollment.enrolled_date).toLocaleDateString()}</TableCell>
-                                        <TableCell className="px-12 py-8 text-right">
-                                            <Button variant="ghost" size="icon" className="h-12 w-12 rounded-2xl bg-white shadow-sm text-slate-300 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
+                                        <TableCell className="px-8 py-6 tabular-nums text-sm text-slate-500">{new Date(enrollment.enrolled_date).toLocaleDateString()}</TableCell>
+                                        <TableCell className="px-8 py-6 text-right">
+                                            <Button variant="ghost" size="icon" className="h-9 w-9 text-slate-400 hover:text-slate-900"><Edit className="h-4 w-4" /></Button>
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {(!isLoading && (!enrollments || enrollments.length === 0)) && (
+                                    <TableRow>
+                                        <TableCell colSpan={5} className="py-12 text-center text-slate-500">
+                                            No active enrollments found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </div>

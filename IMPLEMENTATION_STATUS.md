@@ -162,9 +162,21 @@
    - Smooth animations
    - Better form validation feedback
 
-5. **Bulk Employee Upload** ✨ UPDATE
+5. **Global Modal Redesign** ✨ NEW
+   - Removed colored backgrounds from headers across all modules
+   - Implemented white background with slate-900 typography
+   - Added subtle colored icon accents for a more human-centered feel
+   - Updated Recruitment, Payroll, Leave, and Admin modals
+
+6. **Bulk Employee Upload** ✨ UPDATE
    - Updated modal text to be conversational and friendly
    - Aligned with human-centered design philosophy
+
+7. **Human-Wise UI Refinement** ✨ NEW
+   - **Benefits Admin**: Removed sci-fi terminology and over-the-top styling. Simplified NSSF, Insurance, and Enrollment management.
+   - **Personal Benefits**: Refined the employee benefits view with groundedtypography and a clean enrollment wizard.
+   - **Payroll Run**: Simplified the "Run Payroll" flow and modal to be professional and direct.
+   - **Consistent Buttons**: Standardized button heights, shadows, and hover states across refined pages.
 
 6. **Backend Enhancements** ⚙️
    - ✅ Resume Parser: Implemented and verified with tests

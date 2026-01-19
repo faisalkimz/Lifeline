@@ -108,12 +108,15 @@ const SalaryAdvancesPage = () => {
         return (
             <Dialog open={!!advance} onOpenChange={onClose}>
                 <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2">
-                            <DollarSign className="h-5 w-5" />
-                            Salary Advance Details
-                        </DialogTitle>
-                    </DialogHeader>
+                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 -mx-6 -mt-6 mb-6">
+                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <DollarSign className="h-6 w-6 text-slate-600" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Advance Details</DialogTitle>
+                            <p className="text-slate-500 mt-1 font-medium text-sm">Review your salary advance request.</p>
+                        </div>
+                    </div>
                     <div className="space-y-6">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -368,12 +371,12 @@ const SalaryAdvancesPage = () => {
             {/* Request Advance Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white">
-                    <DialogHeader className="bg-slate-900 p-10 text-white">
-                        <DialogTitle className="text-2xl font-black tracking-tight uppercase italic flex items-center gap-3">
-                            <DollarSign className="h-6 w-6 text-primary-400" /> Request Salary Advance
-                        </DialogTitle>
-                        <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Configure your salary advance request parameters.</p>
-                    </DialogHeader>
+                    <div className="bg-white px-10 pt-10 pb-6">
+                        <DialogTitle className="text-3xl font-semibold text-slate-900 tracking-tight">Request an advance</DialogTitle>
+                        <p className="text-slate-500 mt-2 text-sm max-w-md leading-relaxed">
+                            Specify the amount and repayment period. The requested amount will be deducted from your upcoming payslips.
+                        </p>
+                    </div>
                     <form onSubmit={handleSubmit} className="p-10 space-y-8">
                         {isAdmin && (
                             <div className="space-y-3">
@@ -455,10 +458,21 @@ const SalaryAdvancesPage = () => {
                             </div>
                         )}
 
-                        <DialogFooter className="gap-4">
-                            <Button type="button" variant="ghost" onClick={() => setShowForm(false)} className="h-14 font-black uppercase text-[10px] tracking-widest rounded-2xl px-8">Cancel</Button>
-                            <Button type="submit" disabled={isCreating} className="h-14 bg-slate-900 shadow-2xl shadow-slate-900/20 rounded-2xl px-12 font-black uppercase text-[10px] tracking-widest">
-                                {isCreating ? 'Processing...' : 'Submit Request'}
+                        <DialogFooter className="gap-3 pt-6 border-t border-slate-50">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setShowForm(false)}
+                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={isCreating}
+                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
+                            >
+                                {isCreating ? 'Processing...' : 'Submit request'}
                             </Button>
                         </DialogFooter>
                     </form>

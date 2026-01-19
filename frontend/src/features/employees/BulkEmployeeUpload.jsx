@@ -4,11 +4,12 @@ import { Button } from '../../components/ui/Button';
 import { useCreateEmployeeMutation } from '../../store/api';
 import {
     Upload, Download, FileSpreadsheet, CheckCircle, XCircle,
-    Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck
+    Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck, Edit
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
+import { cn } from '../../utils/cn';
 
 const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
@@ -201,150 +202,118 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     return (
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-white">
-                <DialogHeader>
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-200">
-                            <Users className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                            <DialogTitle className="text-2xl font-bold text-slate-900">
-                                Add Your Team
-                            </DialogTitle>
-                            <p className="text-sm text-slate-600 mt-1">
-                                Let's get everyone onboarded in one go!
-                            </p>
-                        </div>
+                <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                        <Users className="h-6 w-6 text-slate-600" />
                     </div>
-                </DialogHeader>
+                    <div>
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Add Your Team
+                        </DialogTitle>
+                        <p className="text-slate-500 mt-1 font-medium text-sm">
+                            Let's get everyone onboarded in one go!
+                        </p>
+                    </div>
+                </div>
 
-                <div className="flex-1 overflow-y-auto space-y-6 pt-6">
+                <div className="flex-1 overflow-y-auto p-10">
                     {!results ? (
-                        <>
-                            {/* Step 1: Download Template */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-6"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
-                                        <span className="text-white font-bold">1</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-emerald-900 mb-2 text-lg">Grab the cheat sheet</h3>
-                                        <p className="text-sm text-emerald-700 mb-4 leading-relaxed">
-                                            We made a simple spreadsheet for you. It has all the columns set up perfectly, so you don't have to guess.
-                                        </p>
-                                        <Button
-                                            onClick={downloadTemplate}
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-lg shadow-emerald-200 transition-all hover:shadow-emerald-300 hover:-translate-y-0.5"
-                                        >
-                                            <Download className="h-4 w-4" />
-                                            Download Spreadsheet
-                                        </Button>
-                                    </div>
-                                    <FileSpreadsheet className="h-16 w-16 text-emerald-300 opacity-80" />
-                                </div>
-                            </motion.div>
+                        <div className="max-w-2xl mx-auto space-y-12">
+                            {/* Simple, Human Introduction */}
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-semibold text-slate-900">How to get started</h3>
+                                <p className="text-slate-500 leading-relaxed">
+                                    The quickest way to add your team is by using a spreadsheet.
+                                    Download our template, fill in your employee details, and upload it back here.
+                                </p>
+                            </div>
 
-                            {/* Step 2: Fill In Data */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.1 }}
-                                className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6"
-                            >
-                                <div className="flex items-start gap-4">
-                                    <div className="h-10 w-10 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
-                                        <span className="text-white font-bold">2</span>
+                            <div className="grid grid-cols-1 gap-10">
+                                {/* Instructions List */}
+                                <div className="space-y-6">
+                                    <div className="flex gap-4">
+                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">1</div>
+                                        <div>
+                                            <p className="font-semibold text-slate-900">Download the template</p>
+                                            <p className="text-sm text-slate-500 mt-1 mb-3">A pre-formatted Excel file with all the columns you'll need.</p>
+                                            <button
+                                                onClick={downloadTemplate}
+                                                className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                                            >
+                                                <Download className="h-4 w-4" />
+                                                Get template.xlsx
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-blue-900 mb-2 text-lg">Fill in the blank spots</h3>
-                                        <ul className="text-sm text-blue-700 space-y-2">
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                <span>Names and emails are the most important bits.</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                <span>Don't know their phone number yet? No stress, leave it blank.</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                                                <span>Whether it's 5 or 500 people, we can handle it!</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </motion.div>
 
-                            {/* Step 3: Upload File */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 }}
-                                className="bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6"
-                            >
-                                <div className="flex items-start gap-4 mb-4">
-                                    <div className="h-10 w-10 rounded-xl bg-purple-500 flex items-center justify-center flex-shrink-0">
-                                        <span className="text-white font-bold">3</span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-purple-900 mb-1 text-lg">Drop it right here</h3>
-                                        <p className="text-sm text-purple-700">
-                                            Once you're done, drag that file here and watch the magic happen.
-                                        </p>
+                                    <div className="flex gap-4">
+                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">2</div>
+                                        <div>
+                                            <p className="font-semibold text-slate-900">Add your people</p>
+                                            <p className="text-sm text-slate-500 mt-1">
+                                                Only <span className="text-slate-900 font-medium">Name and Email</span> are required for now.
+                                                You can always update phone numbers and IDs later in their profiles.
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="border-2 border-dashed border-purple-300 rounded-xl p-8 text-center hover:border-purple-400 hover:bg-purple-50/50 transition-all cursor-pointer bg-white">
-                                    <input
-                                        type="file"
-                                        id="file-upload"
-                                        accept=".xlsx,.xls,.csv"
-                                        onChange={handleFileChange}
-                                        className="hidden"
-                                    />
-                                    <label htmlFor="file-upload" className="cursor-pointer block">
-                                        {file ? (
-                                            <div className="space-y-3">
-                                                <FileCheck className="h-16 w-16 text-emerald-500 mx-auto" />
-                                                <div>
-                                                    <p className="text-lg font-bold text-slate-900">{file.name}</p>
-                                                    <p className="text-sm text-slate-600 mt-1">
-                                                        {(file.size / 1024).toFixed(2)} KB • Ready to upload
-                                                    </p>
+                                {/* Clean Upload Area */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between px-1">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+                                            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Ready to upload</span>
+                                        </div>
+                                    </div>
+
+                                    <div className={cn(
+                                        "relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-12 text-center",
+                                        file
+                                            ? "bg-emerald-50/30 border-emerald-200"
+                                            : "bg-slate-50/50 border-slate-200 hover:border-slate-300 hover:bg-white"
+                                    )}>
+                                        <input
+                                            type="file"
+                                            id="file-upload"
+                                            accept=".xlsx,.xls,.csv"
+                                            onChange={handleFileChange}
+                                            className="hidden"
+                                        />
+                                        <label htmlFor="file-upload" className="cursor-pointer block">
+                                            {file ? (
+                                                <div className="space-y-4">
+                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
+                                                        <FileCheck className="h-8 w-8" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-slate-900">{file.name}</p>
+                                                        <p className="text-sm text-slate-500 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); setFile(null); }}
+                                                        className="text-xs font-bold text-rose-500 hover:underline"
+                                                    >
+                                                        Remove file
+                                                    </button>
                                                 </div>
-                                                <Button
-                                                    type="button"
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        setFile(null);
-                                                    }}
-                                                    className="text-slate-500 hover:text-slate-700"
-                                                >
-                                                    Pick a different file
-                                                </Button>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-3">
-                                                <Upload className="h-16 w-16 text-purple-400 mx-auto" />
-                                                <div>
-                                                    <p className="text-lg font-semibold text-slate-900 mb-1">
-                                                        Tap to browse or just drop your file
-                                                    </p>
-                                                    <p className="text-sm text-slate-600">
-                                                        We accept Excel (.xlsx) and CSV files
-                                                    </p>
+                                            ) : (
+                                                <div className="space-y-4">
+                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto text-slate-400 group-hover:text-slate-600 transition-colors">
+                                                        <Upload className="h-8 w-8" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-slate-900">Drop your file here</p>
+                                                        <p className="text-sm text-slate-500 mt-1">or click to browse from your computer</p>
+                                                    </div>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Excel or CSV</p>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </label>
+                                            )}
+                                        </label>
+                                    </div>
                                 </div>
-                            </motion.div>
-                        </>
+                            </div>
+                        </div>
                     ) : (
                         /* Results View */
                         <AnimatePresence>
@@ -416,12 +385,12 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-6 border-t-2 border-slate-200">
+                <div className="flex gap-4 p-8 bg-slate-50 border-t border-slate-100">
                     <Button
                         variant="ghost"
                         onClick={handleClose}
                         disabled={uploading}
-                        className="flex-1 h-12 text-slate-600 hover:text-slate-900 font-semibold"
+                        className="flex-1 h-14 text-slate-500 hover:text-slate-900 font-bold uppercase tracking-widest text-[10px] rounded-2xl hover:bg-white transition-all"
                     >
                         {results ? 'Close' : 'Cancel'}
                     </Button>
@@ -429,18 +398,18 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                         <Button
                             onClick={handleUpload}
                             disabled={!file || uploading}
-                            className="flex-1 h-12 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold shadow-lg shadow-primary-200 gap-2"
+                            className="flex-[2] h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-2xl shadow-slate-900/20 gap-3 transition-all enabled:hover:-translate-y-1 disabled:opacity-50"
                         >
                             {uploading ? (
                                 <>
-                                    <Loader2 className="h-5 w-5 animate-spin" />
-                                    Processing {file?.name}...
+                                    <Loader2 className="h-4 w-4 animate-spin text-emerald-400" />
+                                    Processing...
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="h-5 w-5" />
-                                    Upload Team
-                                    <ArrowRight className="h-4 w-4" />
+                                    <Sparkles className="h-4 w-4 text-emerald-400" />
+                                    Sync Your Team
+                                    <ArrowRight className="h-3 w-3 opacity-50" />
                                 </>
                             )}
                         </Button>

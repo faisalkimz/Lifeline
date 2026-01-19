@@ -83,15 +83,15 @@ const BenefitsPage = () => {
         try {
             if (isEditingType) {
                 await updateBenefitType({ id: selectedType.id, ...typeForm }).unwrap();
-                toast.success('Benefit plan updated successfully.');
+                toast.success('Benefit plan updated successfully');
             } else {
                 await createBenefitType(typeForm).unwrap();
-                toast.success('New benefit plan created.');
+                toast.success('New benefit plan created');
             }
             setIsTypeDialogOpen(false);
             resetTypeForm();
         } catch (error) {
-            toast.error('Failed to save benefit plan.');
+            toast.error('Failed to save benefit plan');
         }
     };
 
@@ -99,9 +99,9 @@ const BenefitsPage = () => {
         if (window.confirm('Are you sure you want to delete this benefit plan? This action cannot be undone.')) {
             try {
                 await deleteBenefitType(id).unwrap();
-                toast.success('Benefit plan deleted.');
+                toast.success('Benefit plan deleted');
             } catch (error) {
-                toast.error('Failed to delete plan.');
+                toast.error('Failed to delete plan');
             }
         }
     };
@@ -136,10 +136,10 @@ const BenefitsPage = () => {
         if (window.confirm('Are you sure you want to cancel your coverage? This action is immediate.')) {
             try {
                 await unenrollFromBenefit(enrollmentId).unwrap();
-                toast.success('Coverage cancelled.');
+                toast.success('Coverage cancelled');
                 setIsDetailsDialogOpen(false);
             } catch (error) {
-                toast.error('Cancellation failed.');
+                toast.error('Cancellation failed');
             }
         }
     };
@@ -180,13 +180,13 @@ const BenefitsPage = () => {
         setIsDetailsDialogOpen(true);
     };
 
-    // Category Config - Human Oriented Icons
+    // Category Config
     const CATEGORIES = {
-        insurance: { label: 'Health & Care', icon: Heart, color: 'text-rose-600 bg-rose-50 border-rose-100' },
-        allowance: { label: 'Working Essentials', icon: Briefcase, color: 'text-slate-700 bg-slate-50 border-slate-200' },
-        loan: { label: 'Home & Future', icon: Home, color: 'text-indigo-600 bg-indigo-50 border-indigo-100' },
-        retirement: { label: 'Relaxation', icon: Palmtree, color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
-        perk: { label: 'Celebration', icon: Gift, color: 'text-amber-600 bg-amber-50 border-amber-100' },
+        insurance: { label: 'Health & Care', icon: Heart, color: 'text-rose-600 bg-rose-50' },
+        allowance: { label: 'Working Essentials', icon: Briefcase, color: 'text-slate-700 bg-slate-50' },
+        loan: { label: 'Home & Future', icon: Home, color: 'text-indigo-600 bg-indigo-50' },
+        retirement: { label: 'Relaxation', icon: Palmtree, color: 'text-emerald-600 bg-emerald-50' },
+        perk: { label: 'Celebration', icon: Gift, color: 'text-amber-600 bg-amber-50' },
     };
     const getUiConfig = (catKey) => CATEGORIES[catKey] || CATEGORIES.insurance;
 
@@ -212,85 +212,79 @@ const BenefitsPage = () => {
     const prevStep = () => setEnrollStep(s => s - 1);
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10 pb-12 font-sans">
-            {/* Human Header */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+        <div className="space-y-10 pb-12">
+            {/* Professional Header */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-                        Your Benefits, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">{user?.first_name}</span>.
-                    </h1>
-                    <p className="text-slate-500 mt-2 text-lg font-medium">
-                        Manage your health, wealth, and future with Lifeline.
-                    </p>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Your Benefits</h1>
+                    <p className="text-slate-500 mt-2 text-lg">Manage your health, wealth, and future with corporate benefits.</p>
                 </div>
                 {isAdmin && (
-                    <Button onClick={() => { resetTypeForm(); setIsTypeDialogOpen(true); }} className="rounded-xl px-6 bg-slate-900 text-white shadow-lg hover:scale-105 transition-all">
-                        <Plus className="h-4 w-4 mr-2" /> New Plan
+                    <Button onClick={() => { resetTypeForm(); setIsTypeDialogOpen(true); }} className="h-11 px-6 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all gap-2">
+                        <Plus className="h-4 w-4" /> Add benefit plan
                     </Button>
                 )}
             </div>
 
-            {/* My Enrollments */}
+            {/* Active Enrollments */}
             <section className="space-y-6">
-                <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-                    <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
+                <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-sm">
                         <Check className="h-5 w-5" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">Active Enrollments</h2>
-                        <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Your Current Coverage</p>
+                        <h2 className="text-xl font-bold text-slate-900">Active enrollments</h2>
+                        <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Your current coverage</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    <AnimatePresence>
-                        {myBenefitsArray.length > 0 ? (
-                            myBenefitsArray.map((benefit, idx) => (
-                                <BenefitCard
-                                    key={benefit.id}
-                                    benefit={benefit}
-                                    isEnrolled={true}
-                                    getUiConfig={getUiConfig}
-                                    onClick={() => openDetails(benefit, true)}
-                                    // Pass actions
-                                    onUnenroll={() => handleUnenroll(benefit.id)}
-                                />
-                            ))
-                        ) : (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="col-span-full py-16 flex flex-col items-center justify-center bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 group hover:border-slate-300 transition-colors cursor-pointer" onClick={() => document.getElementById('available-plans').scrollIntoView({ behavior: 'smooth' })}>
-                                <div className="h-16 w-16 bg-white rounded-full shadow-lg shadow-slate-200/50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                    <Umbrella className="h-8 w-8 text-slate-300 group-hover:text-indigo-500 transition-colors" />
-                                </div>
-                                <p className="text-slate-900 font-bold text-lg mb-1">You don't have active plans.</p>
-                                <p className="text-slate-500 font-medium text-sm mb-6 max-w-xs text-center">Protect yourself and your family by enrolling in one of our comprehensive benefits.</p>
-                                <Button className="bg-slate-900 text-white hover:bg-slate-800 rounded-xl px-8 shadow-lg shadow-slate-900/10">
-                                    Start Enrollment <ChevronRight className="h-4 w-4 ml-2" />
-                                </Button>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+                    {myBenefitsArray.length > 0 ? (
+                        myBenefitsArray.map((benefit) => (
+                            <BenefitCard
+                                key={benefit.id}
+                                benefit={benefit}
+                                isEnrolled={true}
+                                getUiConfig={getUiConfig}
+                                onClick={() => openDetails(benefit, true)}
+                                onUnenroll={() => handleUnenroll(benefit.id)}
+                            />
+                        ))
+                    ) : (
+                        <div className="col-span-full py-16 flex flex-col items-center justify-center bg-slate-50 border border-slate-200 border-dashed rounded-2xl">
+                            <Umbrella className="h-12 w-12 text-slate-300 mb-4" />
+                            <p className="text-slate-900 font-bold text-lg">You don't have active plans</p>
+                            <p className="text-slate-500 text-sm mb-6 max-w-xs text-center">Protect yourself and your family by enrolling in one of our comprehensive benefits.</p>
+                            <Button
+                                onClick={() => document.getElementById('available-plans').scrollIntoView({ behavior: 'smooth' })}
+                                className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm"
+                            >
+                                Browse plans
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </section>
 
             {/* Available Plans */}
-            <section id="available-plans" className="space-y-6 pt-8">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-slate-100 pb-4">
+            <section id="available-plans" className="space-y-6 pt-10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                        <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100 shadow-sm">
                             <Search className="h-5 w-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">Available Plans</h2>
-                            <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Explore Options</p>
+                            <h2 className="text-xl font-bold text-slate-900">Available plans</h2>
+                            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Explore options</p>
                         </div>
                     </div>
-                    <div className="relative w-full md:w-72">
+                    <div className="relative w-full md:w-80">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <input
                             placeholder="Find a plan..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full h-11 pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-slate-900/10 transition-all"
+                            className="w-full h-11 pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all"
                         />
                     </div>
                 </div>
@@ -318,119 +312,121 @@ const BenefitsPage = () => {
                                         setIsTypeDialogOpen(true);
                                     }}
                                     onDelete={() => handleDeleteType(benefit.id)}
-                                    // Action
                                     onEnroll={() => openEnrollDialog(benefit)}
                                 />
                             ))
                     ) : (
                         <div className="col-span-full py-16 text-center text-slate-400">
-                            No new plans available matching your search.
+                            No plans available matching your search.
                         </div>
                     )}
                 </div>
             </section>
 
-            {/* ENROLLMENT WIZARD DIALOG */}
+            {/* Enrollment Wizard Dialog */}
             <Dialog open={isEnrollDialogOpen} onOpenChange={(open) => { setIsEnrollDialogOpen(open); if (!open) resetEnrollForm(); }}>
-                <DialogContent className="max-w-xl bg-white rounded-[2rem] p-0 overflow-hidden shadow-2xl border-none">
-                    <div className="bg-slate-900 px-8 py-6 text-white flex justify-between items-center">
-                        <h3 className="text-lg font-bold">Enrollment Wizard</h3>
-                        <Badge variant="outline" className="text-white border-white/20 bg-white/10">Step {enrollStep} of 3</Badge>
+                <DialogContent className="max-w-xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
+                    <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
+                        <div>
+                            <DialogTitle className="text-xl font-bold text-slate-900">Enrollment wizard</DialogTitle>
+                            <p className="text-xs text-slate-500 mt-0.5">Step {enrollStep} of 3</p>
+                        </div>
+                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                            <Umbrella className="h-5 w-5" />
+                        </div>
                     </div>
 
                     <div className="p-8 min-h-[400px] flex flex-col">
                         {enrollStep === 1 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1 space-y-6">
-                                <div className="text-center space-y-2 mb-8">
-                                    <div className={`mx-auto h-16 w-16 rounded-full flex items-center justify-center ${getUiConfig(selectedType?.category).color.replace('border-', '')} text-3xl`}>
+                            <div className="flex-1 space-y-8">
+                                <div className="space-y-4">
+                                    <div className={`h-16 w-16 rounded-2xl flex items-center justify-center ${getUiConfig(selectedType?.category).color} text-3xl shadow-sm border border-slate-100`}>
                                         {React.createElement(getUiConfig(selectedType?.category).icon, { className: 'h-8 w-8' })}
                                     </div>
-                                    <h2 className="text-2xl font-black text-slate-900">{selectedType?.name}</h2>
-                                    <p className="text-slate-500 font-medium max-w-sm mx-auto">{selectedType?.description}</p>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-slate-900">{selectedType?.name}</h2>
+                                        <p className="text-slate-500 leading-relaxed max-w-sm">{selectedType?.description}</p>
+                                    </div>
                                 </div>
-                                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100/50">
-                                    <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                        <Info className="h-4 w-4 text-indigo-500" /> Plan Highlights
+                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
+                                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                        Plan Highlights
                                     </h4>
                                     <ul className="space-y-3">
                                         <li className="flex items-center gap-3 text-sm text-slate-600">
                                             <Check className="h-4 w-4 text-emerald-500" />
-                                            Provider: <span className="font-bold text-slate-900">{selectedType?.provider_name || 'Internal'}</span>
+                                            Provider: <span className="font-semibold text-slate-900">{selectedType?.provider_name || 'Internal'}</span>
                                         </li>
                                         <li className="flex items-center gap-3 text-sm text-slate-600">
                                             <Check className="h-4 w-4 text-emerald-500" />
-                                            Base Value: <span className="font-bold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(selectedType?.default_value)}</span>
+                                            Base Value: <span className="font-semibold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(selectedType?.default_value)}</span>
                                         </li>
                                         <li className="flex items-center gap-3 text-sm text-slate-600">
                                             <Check className="h-4 w-4 text-emerald-500" />
-                                            Tax Status: <span className="font-bold text-slate-900">{selectedType?.is_taxable ? 'Taxable' : 'Tax Exempt'}</span>
+                                            Tax Status: <span className="font-semibold text-slate-900">{selectedType?.is_taxable ? 'Taxable' : 'Tax Exempt'}</span>
                                         </li>
                                     </ul>
                                 </div>
-                            </motion.div>
+                            </div>
                         )}
 
                         {enrollStep === 2 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1 space-y-6">
+                            <div className="flex-1 space-y-6">
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900 mb-2">Who is covered?</h2>
-                                    <p className="text-slate-500 mb-6">Select family members to include in your plan.</p>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Who is covered?</h2>
+                                    <p className="text-slate-500">Select family members to include in your plan.</p>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-4">
-                                    {/* Primary User Card */}
-                                    <div className="aspect-square rounded-2xl bg-slate-100 border-2 border-slate-200 flex flex-col items-center justify-center p-4 text-center cursor-default">
-                                        <div className="h-10 w-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 mb-2 font-bold">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    <div className="aspect-square rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center p-4 text-center cursor-default">
+                                        <div className="h-10 w-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 mb-2 font-bold">
                                             {user?.first_name?.[0]}{user?.last_name?.[0]}
                                         </div>
                                         <p className="text-sm font-bold text-slate-900">You</p>
-                                        <Badge className="mt-1 bg-slate-200 text-slate-600 text-[10px] uppercase">Primary</Badge>
+                                        <Badge className="mt-1 bg-slate-200 text-slate-600 text-[10px] uppercase border-none">Primary</Badge>
                                     </div>
 
-                                    {/* Dependents */}
                                     {enrollForm.dependents_covered.map((dep, i) => (
-                                        <motion.div layout key={i} className="relative aspect-square rounded-2xl bg-indigo-50 border-2 border-indigo-100 flex flex-col items-center justify-center p-4 text-center group">
-                                            <button onClick={() => removeDependent(i)} className="absolute top-2 right-2 text-indigo-300 hover:text-red-500 transition-colors">
-                                                <div className="bg-white rounded-full p-1 shadow-sm"><Trash2 className="h-3 w-3" /></div>
+                                        <div key={i} className="relative aspect-square rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center p-4 text-center group">
+                                            <button onClick={() => removeDependent(i)} className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors">
+                                                <Trash2 className="h-4 w-4" />
                                             </button>
-                                            <div className="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 mb-2 font-bold uppercase">
+                                            <div className="h-10 w-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 mb-2 font-bold uppercase">
                                                 {dep.substring(0, 2)}
                                             </div>
-                                            <p className="text-sm font-bold text-indigo-900 line-clamp-1">{dep}</p>
-                                            <Badge className="mt-1 bg-indigo-100 text-indigo-600 text-[10px] uppercase">Family</Badge>
-                                        </motion.div>
+                                            <p className="text-sm font-bold text-slate-900 line-clamp-1">{dep}</p>
+                                            <Badge className="mt-1 bg-blue-50 text-blue-600 text-[10px] uppercase border-none">Family</Badge>
+                                        </div>
                                     ))}
 
-                                    {/* Add Button */}
-                                    <div className="aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center hover:border-indigo-400 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => document.getElementById('new-dep-input').focus()}>
-                                        <div className="h-10 w-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-2 transition-colors">
+                                    <div className="aspect-square rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center hover:border-slate-400 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => document.getElementById('new-dep-input').focus()}>
+                                        <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-2">
                                             <Plus className="h-5 w-5" />
                                         </div>
                                         <Input
                                             id="new-dep-input"
-                                            placeholder="Add Name"
+                                            placeholder="Add member"
                                             value={newDependent}
                                             onChange={e => setNewDependent(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && addDependent()}
                                             className="h-8 text-center text-sm bg-transparent border-none focus:ring-0 p-0 w-full placeholder:text-slate-400"
                                         />
-                                        <p className="text-[10px] text-slate-400 pointer-events-none mt-1">Press Enter</p>
                                     </div>
                                 </div>
-                            </motion.div>
+                            </div>
                         )}
 
                         {enrollStep === 3 && (
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1 space-y-6">
+                            <div className="flex-1 space-y-6">
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900 mb-2">Review & Confirm</h2>
-                                    <p className="text-slate-500 mb-6">Confirm your benefit selection breakdown.</p>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Review & confirm</h2>
+                                    <p className="text-slate-500">Confirm your benefit selection breakdown.</p>
                                 </div>
 
-                                <div className="bg-slate-50 rounded-[1.5rem] p-6 border border-slate-100 space-y-6">
+                                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-6">
                                     <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                                         <div className="flex items-center gap-3">
-                                            <div className={`h-10 w-10 rounded-xl ${getUiConfig(selectedType?.category).color.split(' ')[1]} flex items-center justify-center ${getUiConfig(selectedType?.category).color.split(' ')[0]}`}>
+                                            <div className={`h-10 w-10 rounded-lg ${getUiConfig(selectedType?.category).color} flex items-center justify-center border border-slate-100`}>
                                                 {React.createElement(getUiConfig(selectedType?.category).icon, { className: 'h-5 w-5' })}
                                             </div>
                                             <div>
@@ -439,63 +435,54 @@ const BenefitsPage = () => {
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-bold text-slate-400 uppercase">Total Value</p>
-                                            <p className="text-lg font-black text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(parseFloat(enrollForm.employee_contribution || 0) + parseFloat(enrollForm.employer_contribution || 0))}<span className="text-xs text-slate-400">/mo</span></p>
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Value</p>
+                                            <p className="text-lg font-bold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(parseFloat(enrollForm.employee_contribution || 0) + parseFloat(enrollForm.employer_contribution || 0))}</p>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
-                                            <p className="text-sm font-medium text-slate-600">Your Contribution</p>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-slate-400">UGX</span>
-                                                <Input
-                                                    type="number"
-                                                    value={enrollForm.employee_contribution}
-                                                    onChange={e => setEnrollForm({ ...enrollForm, employee_contribution: e.target.value })}
-                                                    className="w-24 h-8 text-right font-bold text-slate-900 bg-transparent border-none focus:ring-0 p-0"
-                                                />
-                                            </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Your monthly contribution</label>
+                                            <Input
+                                                type="number"
+                                                value={enrollForm.employee_contribution}
+                                                onChange={e => setEnrollForm({ ...enrollForm, employee_contribution: e.target.value })}
+                                                className="h-11 bg-white border-slate-200 font-bold"
+                                            />
                                         </div>
-                                        <div className="flex justify-between items-center bg-emerald-50/50 p-3 rounded-xl border border-emerald-100/50">
-                                            <p className="text-sm font-medium text-emerald-700">Company Contribution</p>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-sm text-emerald-500">UGX</span>
-                                                <Input
-                                                    type="number"
-                                                    value={enrollForm.employer_contribution}
-                                                    onChange={e => setEnrollForm({ ...enrollForm, employer_contribution: e.target.value })}
-                                                    className="w-24 h-8 text-right font-bold text-emerald-700 bg-transparent border-none focus:ring-0 p-0"
-                                                />
-                                            </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Company contribution</label>
+                                            <Input
+                                                type="number"
+                                                value={enrollForm.employer_contribution}
+                                                onChange={e => setEnrollForm({ ...enrollForm, employer_contribution: e.target.value })}
+                                                className="h-11 bg-slate-100 border-transparent font-bold text-slate-500 cursor-not-allowed"
+                                                disabled
+                                            />
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-xs text-center text-slate-400">
-                                    By clicking confirm, you agree to the deduction from your payroll.
-                                </p>
-                            </motion.div>
+                            </div>
                         )}
 
-                        {/* Wizard Actions */}
-                        <div className="mt-auto pt-8 flex justify-between items-center">
+                        <div className="mt-auto pt-10 flex justify-between items-center">
                             {enrollStep > 1 ? (
-                                <button onClick={prevStep} className="text-slate-400 hover:text-slate-600 font-bold text-sm flex items-center gap-2 transition-colors">
+                                <Button variant="ghost" onClick={prevStep} className="font-semibold text-slate-500 gap-2">
                                     <ChevronLeft className="h-4 w-4" /> Back
-                                </button>
+                                </Button>
                             ) : (
-                                <button onClick={() => setIsEnrollDialogOpen(false)} className="text-slate-400 hover:text-red-500 font-bold text-sm transition-colors">
+                                <Button variant="ghost" onClick={() => setIsEnrollDialogOpen(false)} className="text-slate-400 hover:text-rose-500">
                                     Cancel
-                                </button>
+                                </Button>
                             )}
 
                             {enrollStep < 3 ? (
-                                <Button onClick={nextStep} className="bg-slate-900 text-white hover:bg-slate-800 rounded-full px-8 py-6 text-lg shadow-xl shadow-slate-900/20 hover:scale-105 transition-all">
-                                    Next Step <ChevronRight className="h-5 w-5 ml-2" />
+                                <Button onClick={nextStep} className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm gap-2">
+                                    Next step <ChevronRight className="h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button onClick={handleEnrollSubmit} className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-8 py-6 text-lg shadow-xl shadow-indigo-600/30 hover:scale-105 transition-all">
-                                    Confirm Enrollment <Check className="h-5 w-5 ml-2" />
+                                <Button onClick={handleEnrollSubmit} className="h-11 px-10 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-sm">
+                                    Confirm enrollment
                                 </Button>
                             )}
                         </div>
@@ -506,77 +493,86 @@ const BenefitsPage = () => {
             {/* Details Dialog */}
             <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
                 {viewingBenefit && (
-                    <DialogContent className="max-w-md bg-white rounded-[2rem] p-6 shadow-2xl border-none">
-                        <div className="text-center mb-6">
-                            <div className={`mx-auto h-20 w-20 rounded-full flex items-center justify-center ${getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.color} mb-4`}>
-                                {React.createElement(getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.icon, { className: 'h-10 w-10' })}
+                    <DialogContent className="max-w-md bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
+                        <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
+                            <DialogTitle className="text-xl font-bold text-slate-900">Plan details</DialogTitle>
+                            <div className={`h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center ${getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.color}`}>
+                                {React.createElement(getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.icon, { className: 'h-5 w-5' })}
                             </div>
-                            <h2 className="text-2xl font-black text-slate-900">
-                                {viewingBenefit.benefit_type?.name || viewingBenefit.name}
-                            </h2>
-                            <p className="text-slate-500 font-medium">Provided by {viewingBenefit.benefit_type?.provider_name || viewingBenefit.provider_name}</p>
                         </div>
 
-                        {viewingBenefit.isEnrolled ? (
-                            <div className="space-y-4">
-                                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
-                                    <p className="text-xs font-bold text-slate-400 uppercase">Your Monthly Cost</p>
-                                    <p className="text-2xl font-black text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(viewingBenefit.employee_contribution)}</p>
-                                </div>
+                        <div className="p-8 space-y-8">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-bold text-slate-900">
+                                    {viewingBenefit.benefit_type?.name || viewingBenefit.name}
+                                </h2>
+                                <p className="text-slate-500 mt-1">Provided by {viewingBenefit.benefit_type?.provider_name || viewingBenefit.provider_name}</p>
+                            </div>
 
-                                {viewingBenefit.dependents_covered?.length > 0 && (
-                                    <div>
-                                        <p className="text-xs font-bold text-slate-400 uppercase mb-2">Covered Family Members</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {viewingBenefit.dependents_covered.map((d, i) => (
-                                                <Badge key={i} variant="secondary" className="bg-indigo-50 text-indigo-700">{d}</Badge>
-                                            ))}
-                                        </div>
+                            {viewingBenefit.isEnrolled ? (
+                                <div className="space-y-6">
+                                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 text-center">
+                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Your monthly investment</p>
+                                        <p className="text-3xl font-bold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(viewingBenefit.employee_contribution)}</p>
                                     </div>
-                                )}
 
-                                <Button onClick={() => handleUnenroll(viewingBenefit.id)} className="w-full bg-red-50 text-red-600 hover:bg-red-100 border-none">
-                                    Unenroll
-                                </Button>
-                            </div>
-                        ) : (
-                            <div className="space-y-4">
-                                <p className="text-center text-slate-600 text-sm">{viewingBenefit.description}</p>
-                                <Button onClick={() => { setIsDetailsDialogOpen(false); openEnrollDialog(viewingBenefit); }} className="w-full bg-slate-900 text-white">
-                                    Start Enrollment
-                                </Button>
-                            </div>
-                        )}
+                                    {viewingBenefit.dependents_covered?.length > 0 && (
+                                        <div className="space-y-3">
+                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Covered family members</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {viewingBenefit.dependents_covered.map((d, i) => (
+                                                    <Badge key={i} className="bg-blue-50 text-blue-700 border-none font-semibold px-3 py-1 rounded-full">{d}</Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <Button onClick={() => handleUnenroll(viewingBenefit.id)} className="w-full h-11 bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold rounded-lg shadow-sm border-none">
+                                        Cancel coverage
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="space-y-6">
+                                    <p className="text-center text-slate-600 leading-relaxed">{viewingBenefit.description}</p>
+                                    <Button onClick={() => { setIsDetailsDialogOpen(false); openEnrollDialog(viewingBenefit); }} className="w-full h-11 bg-slate-900 text-white font-semibold rounded-lg shadow-sm">
+                                        Start enrollment
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </DialogContent>
                 )}
             </Dialog>
 
             {/* Create/Edit Admin Dialog */}
             <Dialog open={isTypeDialogOpen} onOpenChange={(open) => { if (!open) resetTypeForm(); setIsTypeDialogOpen(open); }}>
-                <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
-                    <DialogHeader className="p-8 pb-4 border-b border-slate-100 bg-slate-50/50">
-                        <DialogTitle className="text-2xl font-black text-slate-900">
-                            {isEditingType ? 'Edit Benefit Plan' : 'Create Benefit Plan'}
+                <DialogContent className="max-w-xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
+                    <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
+                        <DialogTitle className="text-xl font-bold text-slate-900">
+                            {isEditingType ? 'Edit benefit plan' : 'Create benefit plan'}
                         </DialogTitle>
-                    </DialogHeader>
+                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                            <Plus className="h-5 w-5" />
+                        </div>
+                    </div>
 
                     <form onSubmit={handleCreateOrUpdateType} className="p-8 space-y-6">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Plan Name</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan name</label>
                                 <Input
                                     value={typeForm.name}
                                     onChange={e => setTypeForm({ ...typeForm, name: e.target.value })}
-                                    className="bg-white h-11"
+                                    className="h-11 rounded-xl border-slate-200"
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Category</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category</label>
                                 <select
                                     value={typeForm.category}
                                     onChange={e => setTypeForm({ ...typeForm, category: e.target.value })}
-                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-700 outline-none"
+                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-1 focus:ring-slate-900"
                                 >
                                     <option value="insurance">Insurance</option>
                                     <option value="allowance">Allowance</option>
@@ -589,12 +585,12 @@ const BenefitsPage = () => {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Default Value (UGX)</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Default value (UGX)</label>
                                 <Input
                                     type="number"
                                     value={typeForm.default_value}
                                     onChange={e => setTypeForm({ ...typeForm, default_value: parseFloat(e.target.value) })}
-                                    className="bg-white h-11"
+                                    className="h-11 rounded-xl border-slate-200"
                                 />
                             </div>
                             <div className="space-y-2 flex items-center pt-6">
@@ -605,36 +601,36 @@ const BenefitsPage = () => {
                                         onChange={e => setTypeForm({ ...typeForm, is_taxable: e.target.checked })}
                                         className="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
                                     />
-                                    <span className="text-sm font-bold text-slate-700">Taxable Benefit</span>
+                                    <span className="text-sm font-semibold text-slate-700">Taxable benefit</span>
                                 </label>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Provider Name</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Provider name</label>
                                 <Input
                                     value={typeForm.provider_name}
                                     onChange={e => setTypeForm({ ...typeForm, provider_name: e.target.value })}
-                                    className="bg-white h-11"
+                                    className="h-11 rounded-xl border-slate-200"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Contact / Policy #</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Contact / Policy #</label>
                                 <Input
                                     value={typeForm.provider_contact}
                                     onChange={e => setTypeForm({ ...typeForm, provider_contact: e.target.value })}
-                                    className="bg-white h-11"
+                                    className="h-11 rounded-xl border-slate-200"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wide">Description</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
                             <textarea
                                 value={typeForm.description}
                                 onChange={e => setTypeForm({ ...typeForm, description: e.target.value })}
-                                className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm min-h-[100px] outline-none resize-none"
+                                className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm min-h-[100px] outline-none resize-none focus:ring-1 focus:ring-slate-900"
                                 required
                             />
                         </div>
@@ -643,98 +639,76 @@ const BenefitsPage = () => {
                             <Button type="button" variant="ghost" onClick={() => setIsTypeDialogOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" className="bg-slate-900 text-white hover:bg-slate-800 rounded-xl px-8 h-11">
-                                {isEditingType ? 'Save Changes' : 'Create Plan'}
+                            <Button type="submit" className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm">
+                                {isEditingType ? 'Save changes' : 'Create plan'}
                             </Button>
                         </div>
                     </form>
                 </DialogContent>
             </Dialog>
-
-        </motion.div>
+        </div>
     );
 };
 
 const BenefitCard = ({ benefit, isEnrolled, getUiConfig, onClick, onUnenroll, onEnroll, isAdmin, onEdit, onDelete }) => {
-    // Robustly handle if benefit is the enrollment (has benefit_type object) or the type itself
     const data = isEnrolled ? (benefit.benefit_type || {}) : benefit;
-    // Fallback if data is empty (prevents crash on slow serializer update)
     const category = data.category || 'insurance';
     const config = getUiConfig(category);
 
-    // Extract color for border/text
-    const accentColor = config.color.split(' ')[0];
-
     return (
-        <motion.div
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ y: -8, scale: 1.02 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="h-full"
+        <Card
+            className="flex flex-col h-full bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
             onClick={onClick}
         >
-            <div className="h-full bg-white rounded-[2rem] p-6 shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-indigo-500/10 border border-slate-100 transition-all cursor-pointer flex flex-col relative overflow-hidden group">
-
-                {/* Status Pill - Floating */}
-                {isEnrolled && (
-                    <div className="absolute top-6 right-6 px-3 py-1 bg-emerald-100/50 text-emerald-700 text-xs font-bold rounded-full backdrop-blur-sm border border-emerald-100">
-                        Active Plan
+            <div className="p-6 flex flex-col h-full">
+                <div className="flex justify-between items-start mb-6">
+                    <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${config.color} border border-slate-50 shadow-sm`}>
+                        {React.createElement(config.icon, { className: 'h-6 w-6' })}
                     </div>
-                )}
-
-                {/* Friendly Icon Bubble */}
-                <div className={`h-16 w-16 rounded-2xl ${config.color.split(' ')[1]} flex items-center justify-center mb-6 transition-transform group-hover:rotate-6 ${accentColor}`}>
-                    {React.createElement(config.icon, { className: 'h-8 w-8' })}
+                    {isEnrolled && (
+                        <Badge className="bg-emerald-50 text-emerald-700 border-none font-bold px-3 py-1 rounded-full text-[10px]">ACTIVE</Badge>
+                    )}
                 </div>
 
-                {/* Content */}
                 <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 leading-tight group-hover:text-indigo-900 transition-colors">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">
                         {data.name}
                     </h3>
-                    <p className="text-sm font-medium text-slate-500 line-clamp-2 leading-relaxed mb-6">
+                    <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
                         {data.description || 'Access comprehensive coverage designed for your well-being.'}
                     </p>
                 </div>
 
-                {/* Human-centric Footer */}
-                <div className="pt-6 border-t border-slate-50 flex items-center justify-between mt-auto">
+                <div className="pt-6 mt-6 border-t border-slate-50 flex items-center justify-between">
                     <div>
-                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-0.5">
-                            {isEnrolled ? 'Your Investment' : 'Value'}
+                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                            {isEnrolled ? 'Monthly cost' : 'Monthly value'}
                         </p>
-                        <p className={`text-lg font-black ${isEnrolled ? 'text-emerald-600' : 'text-slate-900'}`}>
+                        <p className="text-lg font-bold text-slate-900">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX', maximumSignificantDigits: 3 }).format(isEnrolled ? benefit.employee_contribution : data.default_value)}
-                            <span className="text-xs text-slate-400 font-bold ml-0.5">/mo</span>
                         </p>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                         {isAdmin && !isEnrolled ? (
                             <>
-                                <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); onEdit(); }} className="h-10 w-10 text-slate-400 hover:text-slate-900 rounded-full hover:bg-slate-100"><Edit className="h-4 w-4" /></Button>
-                                <Button size="icon" variant="ghost" onClick={(e) => { e.stopPropagation(); onDelete(); }} className="h-10 w-10 text-slate-400 hover:text-red-500 rounded-full hover:bg-red-50"><Trash2 className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" onClick={onEdit} className="h-9 w-9 text-slate-400 hover:text-slate-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" onClick={onDelete} className="h-9 w-9 text-slate-400 hover:text-rose-500 rounded-lg"><Trash2 className="h-4 w-4" /></Button>
                             </>
                         ) : (
-                            <button
+                            <Button
+                                size="sm"
+                                variant={isEnrolled ? "ghost" : "default"}
                                 onClick={(e) => { e.stopPropagation(); isEnrolled ? onUnenroll() : onEnroll(); }}
-                                className={`h-12 w-12 rounded-full flex items-center justify-center transition-all ${isEnrolled
-                                    ? 'bg-slate-50 text-slate-400 hover:bg-red-50 hover:text-red-500'
-                                    : 'bg-slate-900 text-white shadow-lg shadow-slate-900/20 group-hover:scale-110 group-hover:bg-indigo-600'
-                                    }`}
+                                className={`h-9 px-4 font-semibold text-xs rounded-lg ${!isEnrolled && 'bg-slate-900 text-white hover:bg-slate-800'}`}
                             >
-                                {isEnrolled ? <Trash2 className="h-5 w-5" /> : <ChevronRight className="h-6 w-6" />}
-                            </button>
+                                {isEnrolled ? 'Cancel' : 'Enroll'}
+                            </Button>
                         )}
                     </div>
                 </div>
-
-                {/* Decorative Organic Shape */}
-                <div className={`absolute -bottom-8 -right-8 w-32 h-32 bg-gradient-to-br from-current to-transparent opacity-[0.05] rounded-full blur-2xl ${accentColor}`} />
             </div>
-        </motion.div>
+        </Card>
     );
 };
 

@@ -175,9 +175,15 @@ const InterviewSchedulingPage = () => {
             {/* Schedule Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
-                    <DialogHeader className="p-8 pb-4 border-b border-slate-100">
-                        <DialogTitle className="text-2xl font-bold text-slate-900">Schedule Interview</DialogTitle>
-                    </DialogHeader>
+                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                        <div className="h-12 w-12 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm">
+                            <Calendar className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Schedule Interview</DialogTitle>
+                            <p className="text-slate-500 mt-1 font-medium text-sm">Select a candidate and set a time for assessment.</p>
+                        </div>
+                    </div>
 
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
                         <div className="grid grid-cols-2 gap-6">

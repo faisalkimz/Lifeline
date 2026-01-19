@@ -44,82 +44,82 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl border border-slate-100">
-                <DialogHeader className="p-8 pb-4 border-b border-slate-100 bg-slate-50/50">
-                    <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-900 flex items-center justify-center shadow-lg shadow-slate-900/10">
-                            <AlertTriangle className="h-6 w-6 text-white" />
-                        </div>
-                        <div>
-                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">New Case Record</DialogTitle>
-                            <p className="text-slate-500 text-sm mt-1 font-medium">Document a new disciplinary incident.</p>
-                        </div>
+            <DialogContent className="max-w-2xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-0">
+                {/* Header */}
+                <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                        <AlertTriangle className="h-6 w-6 text-slate-600" />
                     </div>
-                </DialogHeader>
+                    <div>
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+                            Open Case File
+                        </DialogTitle>
+                        <p className="text-slate-500 mt-1 font-medium text-sm">
+                            Document a disciplinary incident
+                        </p>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                <User className="h-3.5 w-3.5" /> Employee Involved
-                            </label>
-                            <select
-                                className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 outline-none transition-all"
-                                value={formData.employee}
-                                onChange={(e) => handleInputChange('employee', e.target.value)}
-                                required
-                            >
-                                <option value="">Select Employee...</option>
-                                {employees?.map(emp => (
-                                    <option key={emp.id} value={emp.id}>{emp.full_name}</option>
-                                ))}
-                            </select>
+                            <label className="text-sm font-bold text-slate-700">Who is involved?</label>
+                            <div className="relative">
+                                <select
+                                    className="w-full h-12 pl-3 pr-8 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer"
+                                    value={formData.employee}
+                                    onChange={(e) => handleInputChange('employee', e.target.value)}
+                                    required
+                                >
+                                    <option value="">Select Employee...</option>
+                                    {employees?.map(emp => (
+                                        <option key={emp.id} value={emp.id}>{emp.full_name}</option>
+                                    ))}
+                                </select>
+                                <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                                <Calendar className="h-3.5 w-3.5" /> Incident Date
-                            </label>
-                            <input
-                                type="date"
-                                className="w-full h-11 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 outline-none transition-all text-slate-900"
-                                value={formData.incident_date}
-                                onChange={(e) => handleInputChange('incident_date', e.target.value)}
-                                required
-                            />
+                            <label className="text-sm font-bold text-slate-700">When did it happen?</label>
+                            <div className="relative">
+                                <input
+                                    type="date"
+                                    className="w-full h-12 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-slate-900"
+                                    value={formData.incident_date}
+                                    onChange={(e) => handleInputChange('incident_date', e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                            <Info className="h-3.5 w-3.5" /> Reason / Violation title
-                        </label>
+                        <label className="text-sm font-bold text-slate-700">What is the violation?</label>
                         <Input
                             placeholder="e.g. Unexcused Absence, Code of Conduct Violation"
                             value={formData.reason}
                             onChange={(e) => handleInputChange('reason', e.target.value)}
                             required
-                            className="h-11 bg-white border-slate-200 rounded-xl text-slate-900 font-medium placeholder:text-slate-400"
+                            className="h-12 bg-slate-50 border-slate-200 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:bg-white transition-all"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                            <FileText className="h-3.5 w-3.5" /> Incident Details
-                        </label>
+                        <label className="text-sm font-bold text-slate-700">The Details</label>
                         <textarea
-                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 focus:border-slate-300 outline-none transition-all font-medium text-slate-900 min-h-[120px] resize-none text-sm leading-relaxed"
-                            placeholder="Provide a detailed description of the incident, effectively documenting what occurred..."
+                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium text-slate-900 min-h-[140px] resize-none text-sm leading-relaxed focus:bg-white"
+                            placeholder="Provide a detailed, objective description of the incident..."
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
                             required
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="grid grid-cols-2 gap-6 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Severity Level</label>
+                            <label className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Severity</label>
                             <select
-                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-900/10 outline-none"
+                                className="w-full h-10 px-3 bg-white border border-emerald-200 rounded-xl text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-200 outline-none cursor-pointer"
                                 value={formData.severity}
                                 onChange={(e) => handleInputChange('severity', e.target.value)}
                             >
@@ -130,9 +130,9 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Initial Status</label>
+                            <label className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Initial Status</label>
                             <select
-                                className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-900/10 outline-none"
+                                className="w-full h-10 px-3 bg-white border border-emerald-200 rounded-xl text-sm font-bold text-emerald-700 focus:ring-2 focus:ring-emerald-200 outline-none cursor-pointer"
                                 value={formData.status}
                                 onChange={(e) => handleInputChange('status', e.target.value)}
                             >
@@ -142,14 +142,14 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2">
-                        <Button type="button" variant="ghost" onClick={onClose} className="text-slate-500 hover:text-slate-900 font-medium">
+                    <div className="flex justify-end gap-3 pt-2">
+                        <Button type="button" variant="ghost" onClick={onClose} className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl">
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-8 h-11 font-bold shadow-lg shadow-slate-900/20">
+                        <Button type="submit" disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all">
                             {isLoading ? (
                                 <>
-                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Creating...
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processing...
                                 </>
                             ) : (
                                 'Create Record'

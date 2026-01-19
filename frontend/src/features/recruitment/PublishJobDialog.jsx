@@ -124,24 +124,27 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 bg-white rounded-3xl">
-                <DialogHeader className="p-8 pb-4 border-b border-slate-100">
-                    <div className="flex items-start justify-between">
+                <div className="bg-white px-8 py-6 flex items-center justify-between border-b border-slate-100">
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <Globe className="h-6 w-6 text-slate-600" />
+                        </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold text-slate-900">
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
                                 Publish Job
                             </DialogTitle>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-sm text-slate-500 mt-1 font-medium">
                                 Choose platforms to publish <strong>{job?.title}</strong>
                             </p>
                         </div>
-                        <Link to={`/recruitment/jobs/${job.id}`} target="_blank">
-                            <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:text-slate-900 font-bold rounded-xl">
-                                <Eye className="h-4 w-4 mr-2" />
-                                Preview
-                            </Button>
-                        </Link>
                     </div>
-                </DialogHeader>
+                    <Link to={`/recruitment/jobs/${job.id}`} target="_blank">
+                        <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:text-slate-900 font-bold rounded-xl shadow-sm">
+                            <Eye className="h-4 w-4 mr-2" />
+                            Preview
+                        </Button>
+                    </Link>
+                </div>
 
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Scheduled Publishing */}

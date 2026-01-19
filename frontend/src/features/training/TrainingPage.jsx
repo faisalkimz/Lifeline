@@ -109,9 +109,14 @@ const TrainingPage = () => {
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-xl bg-white rounded-xl shadow-xl border border-gray-100 p-0 overflow-hidden">
-                                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                                        <DialogTitle className="text-xl font-bold text-gray-900">Schedule Session</DialogTitle>
-                                        <p className="text-sm text-gray-500 mt-1">Plan a new training session for an existing program.</p>
+                                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
+                                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
+                                            <Calendar className="h-6 w-6 text-gray-600" />
+                                        </div>
+                                        <div>
+                                            <DialogTitle className="text-xl font-bold text-gray-900 tracking-tight">Schedule Session</DialogTitle>
+                                            <p className="text-sm text-gray-500 mt-1 font-medium">Plan a new training session for an existing program.</p>
+                                        </div>
                                     </div>
                                     <form onSubmit={handleCreateSession} className="p-6 space-y-4">
                                         <div className="space-y-1.5">
@@ -204,9 +209,14 @@ const TrainingPage = () => {
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-xl bg-white rounded-xl shadow-xl border border-gray-100 p-0 overflow-hidden">
-                                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
-                                        <DialogTitle className="text-xl font-bold text-gray-900">Create Training Program</DialogTitle>
-                                        <p className="text-sm text-gray-500 mt-1">Define a new course or curriculum for employees.</p>
+                                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
+                                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
+                                            <BookOpen className="h-6 w-6 text-gray-600" />
+                                        </div>
+                                        <div>
+                                            <DialogTitle className="text-xl font-bold text-gray-900 tracking-tight">Create Training Program</DialogTitle>
+                                            <p className="text-sm text-gray-500 mt-1 font-medium">Define a new course or curriculum for employees.</p>
+                                        </div>
                                     </div>
                                     <form onSubmit={handleCreateProgram} className="p-6 space-y-4">
                                         <div className="space-y-1.5">

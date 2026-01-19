@@ -9,7 +9,7 @@ import { setCredentials } from './authSlice';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 // Validation Schema
 const registerSchema = z.object({
@@ -48,7 +48,6 @@ const RegisterPage = () => {
                 tax_id: data.tax_id || ''
             };
 
-            console.log('Sending registration data:', registrationData);
             const result = await registerUser(registrationData).unwrap();
             dispatch(setCredentials({
                 user: result.user,
@@ -64,7 +63,7 @@ const RegisterPage = () => {
     return (
         <div className="animate-fade-in py-8">
             <div className="text-center mb-8 lg:hidden">
-                <h2 className="text-3xl font-bold text-gray-900">LahHR</h2>
+                <h2 className="text-3xl font-bold text-gray-900">Lifeline</h2>
                 <p className="mt-2 text-gray-600">Start your free trial</p>
             </div>
 
@@ -72,7 +71,7 @@ const RegisterPage = () => {
                 <CardHeader className="text-center lg:text-left px-0 lg:px-6">
                     <CardTitle className="text-2xl lg:text-3xl">Create your account</CardTitle>
                     <CardDescription className="text-base mt-2">
-                        Get started with LahHR for your company today.
+                        Get started with Lifeline for your company today.
                     </CardDescription>
                 </CardHeader>
 

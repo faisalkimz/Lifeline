@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation, useGetEmployeeStatsQuery } from '../store/api';
 import NotificationsPopover from '../components/notifications/NotificationsPopover';
+import { getMediaUrl } from '../config/api';
 import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
@@ -26,7 +27,7 @@ const DashboardLayout = () => {
     pollingInterval: 30000, // Refresh stats every 30s
   });
 
-  const getFullPhotoUrl = (path) => {
+  const getImageUrl = (path) => {
     return getMediaUrl(path);
   };
 

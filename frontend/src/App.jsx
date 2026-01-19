@@ -40,8 +40,11 @@ import EmployeeDashboard from './features/employee-portal/EmployeeDashboard';
 import ExpensesPage from './features/payroll/ExpensesPage';
 import MyPayslipsPage from './features/payroll/MyPayslipsPage';
 import SalaryAdvancesPage from './features/payroll/SalaryAdvancesPage';
+import LoansPage from './features/payroll/LoansPage';
+import MyDocumentsPage from './features/employee-portal/MyDocumentsPage';
 import OvertimePage from './features/attendance/OvertimePage';
 import HelpCenterPage from './features/help/HelpCenterPage';
+import AnalyticsDashboard from './features/analytics/AnalyticsDashboard';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -60,6 +63,7 @@ function App() {
       {/* Protected Routes (Dashboard) */}
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/analytics" element={<AnalyticsDashboard />} />
         <Route path="/my-profile" element={<MyProfilePage />} />
         {/* Add more routes here later */}
         <Route path="/employees" element={<EmployeeListPage />} />
@@ -97,7 +101,7 @@ function App() {
 
         {/* Finance Routes */}
         <Route path="/expenses" element={<ExpensesPage />} />
-        <Route path="/finance/loans" element={<div>Loans Page (Coming Soon)</div>} />
+        <Route path="/finance/loans" element={<LoansPage />} />
 
         {/* Payroll Routes */}
         <Route path="/payroll/my-payslips" element={<MyPayslipsPage />} />
@@ -113,10 +117,10 @@ function App() {
       {/* Employee Self-Service Portal */}
       <Route path="/employee" element={<EmployeePortalLayout />}>
         <Route path="dashboard" element={<EmployeeDashboard />} />
-        <Route path="payslips" element={<div className="p-8 text-center text-gray-500 font-medium">Payslips - Coming Soon</div>} />
+        <Route path="payslips" element={<MyPayslipsPage />} />
         <Route path="leave" element={<LeaveRequestsPage />} />
         <Route path="attendance" element={<AttendancePage />} />
-        <Route path="documents" element={<div className="p-8 text-center text-gray-500 font-medium">My Documents - Coming Soon</div>} />
+        <Route path="documents" element={<MyDocumentsPage />} />
         <Route path="profile" element={<MyProfilePage />} />
       </Route>
 

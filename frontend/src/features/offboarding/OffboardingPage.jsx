@@ -310,7 +310,7 @@ const OffboardingPage = () => {
                                     <div>
                                         <p className="text-xs font-bold text-emerald-100 uppercase">Handover Status</p>
                                         <p className="text-xl font-black mt-1">
-                                            {resignation.handover_completed ? 'Dcoumented & Signed' : 'In Progress'}
+                                            {resignation.handover_completed ? 'Documented & Signed' : 'In Progress'}
                                         </p>
                                     </div>
                                     <div className="p-3 bg-white/20 rounded-xl">

@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "notifications", # Notifications system
     "expense",      # Expense claims
     "analytics",    # Advanced analytics & reporting
+    "core_integrations", # External API integrations
 ]
 
 

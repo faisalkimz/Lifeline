@@ -701,6 +701,12 @@ export const api = createApi({
       }),
       invalidatesTags: ['RecruitmentIntegration']
     }),
+    testRecruitmentIntegration: builder.mutation({
+      query: (id) => ({
+        url: `/recruitment/integrations/${id}/test_connection/`,
+        method: 'POST'
+      })
+    }),
     getPublicJobs: builder.query({
       query: (params) => ({
         url: '/recruitment/public/jobs/',
@@ -1206,6 +1212,45 @@ export const api = createApi({
       }),
       invalidatesTags: ['WorkLocation']
     }),
+
+    // ========== GLOBAL INTEGRATIONS ==========
+    getIntegrations: builder.query({
+      query: () => '/integrations/',
+      providesTags: ['Integration']
+    }),
+    getIntegrationStatus: builder.query({
+      query: () => '/integrations/status/',
+      providesTags: ['Integration']
+    }),
+    createIntegration: builder.mutation({
+      query: (body) => ({
+        url: '/integrations/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Integration']
+    }),
+    updateIntegration: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/integrations/${id}/`,
+        method: 'PATCH',
+        body
+      }),
+      invalidatesTags: ['Integration']
+    }),
+    testIntegration: builder.mutation({
+      query: (id) => ({
+        url: `/integrations/${id}/test_connection/`,
+        method: 'POST'
+      })
+    }),
+    deleteIntegration: builder.mutation({
+      query: (id) => ({
+        url: `/integrations/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: ['Integration']
+    }),
   })
 });
 
@@ -1299,6 +1344,7 @@ export const {
   useGetRecruitmentIntegrationsQuery,
   useCreateRecruitmentIntegrationMutation,
   useUpdateRecruitmentIntegrationMutation,
+  useTestRecruitmentIntegrationMutation,
   usePublishJobMutation,
   useGetPublicJobsQuery,
   useSubmitJobApplicationMutation,
@@ -1386,6 +1432,13 @@ export const {
   useGetWorkLocationsQuery,
   useCreateWorkLocationMutation,
   useRefreshWorkLocationQrMutation,
+  // Global Integrations
+  useGetIntegrationsQuery,
+  useGetIntegrationStatusQuery,
+  useCreateIntegrationMutation,
+  useUpdateIntegrationMutation,
+  useTestIntegrationMutation,
+  useDeleteIntegrationMutation,
 } = api;
 
 export default api;

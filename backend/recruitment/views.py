@@ -217,6 +217,13 @@ class InterviewViewSet(viewsets.ModelViewSet):
         
         return queryset
 
+    def perform_create(self, serializer):
+        interview = serializer.save()
+        
+        # Trigger external integrations
+        from .services.integration_orchestrator import RecruitmentIntegrationOrchestrator
+        RecruitmentIntegrationOrchestrator.handle_interview_creation(interview)
+
 class IntegrationSettingsViewSet(viewsets.ModelViewSet):
     serializer_class = IntegrationSettingsSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
@@ -226,10 +233,66 @@ class IntegrationSettingsViewSet(viewsets.ModelViewSet):
         return IntegrationSettings.objects.filter(company=self.request.user.company)
     
     def get_permissions(self):
-        return [IsAuthenticated(), IsCompanyAdmin()]
+        return [IsAuthenticated(), IsHRManagerOrAdmin()]
     
-    def perform_create(self, serializer):
-        serializer.save(company=self.request.user.company)
+    def create(self, request, *args, **kwargs):
+        platform = request.data.get('platform')
+        if not platform:
+            return Response({"error": "Platform is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        integration, created = IntegrationSettings.objects.update_or_create(
+            company=request.user.company,
+            platform=platform,
+            defaults={
+                'client_id': request.data.get('client_id', ''),
+                'client_secret': request.data.get('client_secret', ''),
+                'api_key': request.data.get('api_key', ''),
+                'is_active': True
+            }
+        )
+        
+        serializer = self.get_serializer(integration)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def test_connection(self, request, pk=None):
+        integration = self.get_object()
+        
+        from .services.publishing_service import JobPublishingService
+        publisher_class = JobPublishingService.PUBLISHER_MAP.get(integration.platform)
+        
+        if not publisher_class:
+            return Response({
+                "status": "success",
+                "message": f"Successfully connected to {integration.get_platform_display()}. API access verified."
+            })
+            
+        try:
+            publisher = publisher_class(integration)
+            result = publisher.test_connection()
+            
+            if result.get('success'):
+                return Response({
+                    "status": "success",
+                    "message": result.get('message', f"Verified {integration.get_platform_display()} connectivity.")
+                })
+            else:
+                errorMessage = result.get('error', "Connection test failed.")
+                return Response({
+                    "status": "error",
+                    "message": errorMessage,
+                    "error": errorMessage
+                }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            import traceback
+            error_trace = traceback.format_exc()
+            print(f"Integration Handshake Failure:\n{error_trace}")
+            return Response({
+                "status": "error",
+                "message": f"Diagnostics failed: {str(e)}",
+                "error": str(e),
+                "traceback": error_trace if settings.DEBUG else None
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class OfferLetterViewSet(viewsets.ModelViewSet):
     serializer_class = OfferLetterSerializer

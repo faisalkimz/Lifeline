@@ -41,6 +41,7 @@ urlpatterns = [
     path('api/notifications/', include('notifications.urls')),  # Notifications
     path('api/expense/', include('expense.urls')),  # Expense claims
     path('api/analytics/', include('analytics.urls')),  # Analytics & Reporting
+    path('api/integrations/', include('core_integrations.urls')), # External Integrations
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

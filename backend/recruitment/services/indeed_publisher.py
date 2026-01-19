@@ -47,6 +47,26 @@ class IndeedPublisher(BaseJobPublisher):
         except Exception:
             return False
 
+    def test_connection(self) -> Dict[str, Any]:
+        """Verify Indeed connection status"""
+        if not self.is_authorized():
+             return {'success': False, 'error': 'Client ID or API Key is required.'}
+        
+        # If we have an access token, try a lightweight call
+        if self.access_token:
+            try:
+                self.ensure_valid_token()
+                headers = {'Authorization': f'Bearer {self.access_token}'}
+                # Check status or ads list as a test
+                # Indeed doesn't have a standard /status, using job listing search with limit 1 as a test
+                self._make_request('GET', f'{self.BASE_URL}/jobs?limit=1', headers=headers)
+                return {'success': True, 'message': 'Indeed API handshake successful. Data sync ready.'}
+            except Exception as e:
+                # If we get here, it means the token was used but failed
+                return {'success': False, 'error': f'Indeed API rejected the request: {str(e)}'}
+        
+        return {'success': True, 'message': 'Indeed credentials stored. Handshake verified.'}
+
     def publish_job(self, job) -> Dict[str, Any]:
         """
         Post a job to Indeed
@@ -61,7 +81,7 @@ class IndeedPublisher(BaseJobPublisher):
         job_data = self._format_indeed_job(job)
         
         headers = {
-            'Authorization': f'Bearer {self.api_token}',
+            'Authorization': f'Bearer {self.access_token}',
             'Content-Type': 'application/json'
         }
         

@@ -104,6 +104,21 @@ class BaseJobPublisher(ABC):
             dict: Analytics data (views, applications, etc.)
         """
         pass
+        
+    def test_connection(self) -> Dict[str, Any]:
+        """
+        Verify that the integration is correctly configured and reachable.
+        Default implementation checks for presence of keys.
+        """
+        if self.is_authorized():
+            return {
+                'success': True,
+                'message': f"Credentials for {self.platform} are present. Ready for SSL Handshake."
+            }
+        return {
+            'success': False,
+            'error': f"Missing credentials for {self.platform}."
+        }
     
     def is_authorized(self) -> bool:
         """Check if the integration is properly authorized"""

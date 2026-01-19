@@ -187,9 +187,20 @@ class Interview(models.Model):
     date_time = models.DateTimeField()
     duration_minutes = models.IntegerField(default=30)
     interview_type = models.CharField(max_length=20, choices=TYPE_CHOICES, default='video')
-    location = models.CharField(max_length=255, blank=True, help_text="Meeting link or physical address")
+    location = models.CharField(max_length=255, blank=True, default='', help_text="Meeting link or physical address")
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    
+    # External Integration Data
+    meeting_link = models.URLField(blank=True, null=True)
+    meeting_id = models.CharField(max_length=255, blank=True, null=True)
+    external_event_id = models.CharField(max_length=255, blank=True, null=True)
+    sync_status = models.CharField(max_length=50, default='none', choices=[
+        ('none', 'None'),
+        ('synced', 'Synced'),
+        ('failed', 'Failed')
+    ])
+    
     feedback = models.TextField(blank=True)
     rating = models.IntegerField(default=0, help_text="Rating 1-5")
     

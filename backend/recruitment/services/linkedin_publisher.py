@@ -49,6 +49,24 @@ class LinkedInPublisher(BaseJobPublisher):
         except Exception:
             return False
 
+    def test_connection(self) -> Dict[str, Any]:
+        """Verify LinkedIn connection status"""
+        if not self.is_authorized():
+             return {'success': False, 'error': 'Client ID or API Key is required.'}
+        
+        # If we have an access token, try a lightweight profile call
+        if self.access_token:
+            try:
+                self.ensure_valid_token()
+                headers = {'Authorization': f'Bearer {self.access_token}'}
+                # lightweight call to me API
+                self._make_request('GET', f'{self.BASE_URL}/me', headers=headers)
+                return {'success': True, 'message': 'LinkedIn API handshake successful. Account verified.'}
+            except Exception as e:
+                return {'success': False, 'error': f'LinkedIn API rejected the token: {str(e)}'}
+        
+        return {'success': True, 'message': 'LinkedIn credentials configured. OAuth Handshake pending user login.'}
+
     def publish_job(self, job) -> Dict[str, Any]:
         """
         Post a job to LinkedIn

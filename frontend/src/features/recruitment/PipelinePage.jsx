@@ -17,11 +17,14 @@ import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
 import { getMediaUrl } from '../../config/api';
 import CandidateProfileDrawer from './CandidateProfileDrawer';
+import InterviewSchedulerModal from './InterviewSchedulerModal';
 import { motion } from 'framer-motion';
 
 const PipelinePage = () => {
     const [selectedCandidate, setSelectedCandidate] = useState(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [isSchedulerOpen, setIsSchedulerOpen] = useState(false);
+    const [pendingApplication, setPendingApplication] = useState(null);
 
     const stages = [
         { id: 'applied', name: 'New', color: 'blue', icon: Users },
@@ -43,6 +46,14 @@ const PipelinePage = () => {
         if (destination.droppableId === source.droppableId && destination.index === source.index) return;
 
         const newStage = destination.droppableId;
+
+        if (newStage === 'interview') {
+            const app = applicationsArray.find(a => String(a.id) === draggableId);
+            setPendingApplication(app);
+            setIsSchedulerOpen(true);
+            return;
+        }
+
         try {
             await moveStage({ id: draggableId, stage: newStage }).unwrap();
             toast.success(`Candidate moved to ${stages.find(s => s.id === newStage)?.name}`);
@@ -156,6 +167,15 @@ const PipelinePage = () => {
                 candidate={selectedCandidate}
                 open={isDrawerOpen}
                 onClose={() => setIsDrawerOpen(false)}
+            />
+
+            <InterviewSchedulerModal
+                isOpen={isSchedulerOpen}
+                onClose={() => {
+                    setIsSchedulerOpen(false);
+                    refetch();
+                }}
+                application={pendingApplication}
             />
         </div>
     );

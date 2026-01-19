@@ -16,6 +16,22 @@ class BrighterMondayPublisher(BaseJobPublisher):
     def __init__(self, integration_settings):
         super().__init__(integration_settings)
         self.api_key = integration_settings.api_key
+
+    def test_connection(self) -> Dict[str, Any]:
+        """Verify BrighterMonday connection status"""
+        if not self.is_authorized():
+             return {'success': False, 'error': 'API Key is required.'}
+        
+        try:
+            headers = {
+                'X-API-Key': self.api_key,
+                'Content-Type': 'application/json'
+            }
+            # Lightweight call to verify key
+            self._make_request('GET', f'{self.BASE_URL}/me', headers=headers)
+            return {'success': True, 'message': 'BrighterMonday API handshake successful.'}
+        except Exception as e:
+            return {'success': False, 'error': f'BrighterMonday API error: {str(e)}'}
     
     def publish_job(self, job) -> Dict[str, Any]:
         """Post a job to BrighterMonday"""

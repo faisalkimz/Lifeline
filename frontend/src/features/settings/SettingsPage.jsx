@@ -6,7 +6,8 @@ import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
 import {
     Building, Users, Shield, Bell, Lock,
-    Mail, Globe, Phone, Save, UserPlus
+    Mail, Globe, Phone, Save, UserPlus,
+    Zap, Calendar, Video, Cloud
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
@@ -15,6 +16,7 @@ import {
     useGetUsersQuery,
     useGetCompanyQuery,
     useUpdateCompanyMutation,
+    useGetIntegrationStatusQuery,
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge';
@@ -113,6 +115,8 @@ const SettingsPage = () => {
         }
     };
 
+    const { data: integrationStatus } = useGetIntegrationStatusQuery();
+
     return (
         <div className="space-y-6 pb-12">
             {/* Header */}
@@ -131,6 +135,9 @@ const SettingsPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="users" className="data-[state=active]:bg-white">
                         <Users className="h-4 w-4 mr-2" /> Users
+                    </TabsTrigger>
+                    <TabsTrigger value="integrations" className="data-[state=active]:bg-white">
+                        <Zap className="h-4 w-4 mr-2" /> Integrations
                     </TabsTrigger>
                 </TabsList>
 
@@ -425,6 +432,62 @@ const SettingsPage = () => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Integrations Tab */}
+                <TabsContent value="integrations">
+                    <Card className="border border-gray-200">
+                        <CardHeader className="border-b border-gray-100 p-8">
+                            <div className="flex justify-between items-center text-left">
+                                <div>
+                                    <CardTitle className="text-xl font-bold text-slate-900">Connected Applications</CardTitle>
+                                    <p className="text-slate-500 mt-1 text-sm">Sync Lifeline with external tools like Google Calendar, Zoom, and AWS.</p>
+                                </div>
+                                <Button
+                                    onClick={() => navigate('/recruitment/integrations')}
+                                    className="rounded-xl h-12 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold gap-2 shadow-lg shadow-slate-900/10"
+                                >
+                                    <Globe className="h-4 w-4" />
+                                    Manage Connections
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-8 text-left">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {[
+                                    { id: 'google_calendar', name: 'Google Calendar', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+                                    { id: 'microsoft_outlook', icon: Mail, color: 'text-blue-500', bg: 'bg-blue-50' },
+                                    { id: 'zoom', name: 'Zoom Meetings', icon: Video, color: 'text-indigo-500', bg: 'bg-indigo-50' },
+                                    { id: 'aws_s3', name: 'AWS S3 Storage', icon: Cloud, color: 'text-amber-500', bg: 'bg-amber-50' }
+                                ].map((int, i) => {
+                                    const isConnected = integrationStatus?.[int.id]?.connected;
+                                    return (
+                                        <div key={i} className={`flex items-center gap-4 p-5 rounded-2xl border transition-all group ${isConnected ? 'border-emerald-100 bg-emerald-50/20' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
+                                            <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${isConnected ? 'bg-emerald-100 text-emerald-600' : `${int.bg} ${int.color}`}`}>
+                                                <int.icon className="h-6 w-6" />
+                                            </div>
+                                            <div>
+                                                <p className="font-bold text-slate-900 text-sm">{int.name}</p>
+                                                <p className={`text-[11px] font-bold uppercase tracking-wider ${isConnected ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                    {isConnected ? 'Connected' : 'Ready to sync'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-6">
+                                <div className="h-14 w-14 rounded-full bg-white flex items-center justify-center shadow-sm">
+                                    <Shield className="h-6 w-6 text-slate-400" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="font-bold text-slate-900">Enterprise Security</h4>
+                                    <p className="text-sm text-slate-500">All external connections use secure OAuth 2.0 and industry-standard encryption for data in transit.</p>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

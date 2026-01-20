@@ -49,6 +49,7 @@ import AnalyticsDashboard from './features/analytics/AnalyticsDashboard';
 import AssetsPage from './features/assets/AssetsPage';
 import FormsPage from './features/forms/FormsPage';
 import SurveysPage from './features/surveys/SurveysPage';
+import GCCCompliancePage from './features/payroll/GCCCompliancePage';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -83,6 +84,7 @@ function App() {
 
         <Route path="/payroll/runs/:id" element={<PayrollRunDetailsPage />} />
         <Route path="/payroll/*" element={<PayrollIndex />} />
+        <Route path="/gcc" element={<GCCCompliancePage />} />
 
         <Route path="/leave" element={<LeaveRequestsPage />} />
         <Route path="/leave/calendar" element={<LeaveCalendar />} />

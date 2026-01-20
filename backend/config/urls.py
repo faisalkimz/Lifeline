@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/forms/', include('digital_forms.urls')), # Digital Forms
     path('api/surveys/', include('surveys.urls')),   # Surveys & Pulse
     path('api/bot/', include('ai_assistant.urls')),  # AI Bot Assistant
+    path('api/gcc/', include('gcc_compliance.urls')), # GCC Compliance
 
     
     # JWT Token endpoints

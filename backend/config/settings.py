@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "digital_forms",
     "surveys",
     "ai_assistant",
+    "gcc_compliance",
 ]
 
 

@@ -13,7 +13,9 @@ import {
     useUpdateEmployeeDocumentMutation,
     useDeleteEmployeeDocumentMutation,
     useGetCurrentUserQuery,
-    useGetStorageStatsQuery
+    useGetStorageStatsQuery,
+    useSignDocumentMutation,
+    useGetDocumentSignaturesQuery
 } from '../../store/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -24,8 +26,10 @@ import { Tabs, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 import {
     FileText, Download, Upload, Folder as FolderIcon, Search,
     Filter, Edit, Trash2, File, Image, Video, Archive,
-    Plus, Cloud, HardDrive, Share2, Grid, List, MoreVertical
+    Plus, Cloud, HardDrive, Share2, Grid, List, MoreVertical,
+    PenTool, ShieldCheck
 } from 'lucide-react';
+import SignaturePad from '../../components/common/SignaturePad';
 import toast from 'react-hot-toast';
 import { getMediaUrl } from '../../config/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -42,6 +46,8 @@ const DocumentsPage = () => {
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingFolder, setIsEditingFolder] = useState(false);
+    const [signingDoc, setSigningDoc] = useState(null);
+    const [isSigningPadOpen, setIsSigningPadOpen] = useState(false);
 
     // 2. API Data
     const { data: storage } = useGetStorageStatsQuery(undefined, { pollingInterval: 60000 });
@@ -68,6 +74,8 @@ const DocumentsPage = () => {
     const [createFolder] = useCreateFolderMutation();
     const [updateFolder] = useUpdateFolderMutation();
     const [deleteFolder] = useDeleteFolderMutation();
+    const [signDoc] = useSignDocumentMutation();
+    const { data: signatures } = useGetDocumentSignaturesQuery();
 
     const [uploadForm, setUploadForm] = useState({
         title: '',
@@ -157,6 +165,25 @@ const DocumentsPage = () => {
                 toast.error('Delete failed.');
             }
         }
+    };
+
+    const handleSignDocument = async (signatureBase64) => {
+        try {
+            const data = {
+                signature_base64: signatureBase64,
+                ...(activeTab === 'personal' ? { employee_document: signingDoc.id } : { document: signingDoc.id })
+            };
+            await signDoc(data).unwrap();
+            toast.success('Document signed legally!');
+            setIsSigningPadOpen(false);
+            setSigningDoc(null);
+        } catch (error) {
+            toast.error('Failed to sign document');
+        }
+    };
+
+    const isSigned = (docId) => {
+        return signatures?.some(s => (s.document === docId || s.employee_document === docId));
     };
 
     const filteredDocs = useMemo(() => {
@@ -283,6 +310,8 @@ const DocumentsPage = () => {
                                     doc={doc}
                                     viewMode={viewMode}
                                     onDelete={() => handleDeleteDocument(doc.id)}
+                                    onSign={() => { setSigningDoc(doc); setIsSigningPadOpen(true); }}
+                                    isSigned={isSigned(doc.id)}
                                     icon={getFileIcon(doc.file || doc.title)}
                                 />
                             ))}
@@ -290,6 +319,13 @@ const DocumentsPage = () => {
                     )}
                 </div>
             </div>
+
+            {isSigningPadOpen && (
+                <SignaturePad
+                    onSave={handleSignDocument}
+                    onCancel={() => setIsSigningPadOpen(false)}
+                />
+            )}
 
             {/* Upload Dialog */}
             <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
@@ -351,12 +387,17 @@ const DocumentsPage = () => {
     );
 };
 
-const FileCard = ({ doc, viewMode, onDelete, icon: Icon }) => {
+const FileCard = ({ doc, viewMode, onDelete, onSign, isSigned, icon: Icon }) => {
     return (
         <div className={`group bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all rounded-2xl ${viewMode === 'grid' ? 'p-6 flex flex-col gap-4' : 'p-4 flex items-center justify-between'}`}>
             <div className="flex items-start gap-4">
-                <div className="p-3 bg-slate-50 rounded-xl text-slate-500">
+                <div className="p-3 bg-slate-50 rounded-xl text-slate-500 relative">
                     <Icon className="h-6 w-6" />
+                    {isSigned && (
+                        <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5 border-2 border-white shadow-sm">
+                            <ShieldCheck className="h-2.5 w-2.5 text-white" />
+                        </div>
+                    )}
                 </div>
                 <div>
                     <h3 className="font-bold text-slate-900 line-clamp-1">{doc.title}</h3>
@@ -364,6 +405,16 @@ const FileCard = ({ doc, viewMode, onDelete, icon: Icon }) => {
                 </div>
             </div>
             <div className={`flex items-center gap-2 ${viewMode === 'grid' ? 'mt-auto justify-end' : ''}`}>
+                {!isSigned && (
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-2 text-[10px] font-black uppercase tracking-wider border-primary-100 text-primary-600 hover:bg-primary-50"
+                        onClick={onSign}
+                    >
+                        <PenTool className="h-3 w-3" /> Sign
+                    </Button>
+                )}
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-emerald-600" onClick={() => window.open(getMediaUrl(doc.file))}>
                     <Download className="h-4 w-4" />
                 </Button>

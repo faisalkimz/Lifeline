@@ -2,8 +2,8 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Folder, Document, EmployeeDocument
-from .serializers import FolderSerializer, DocumentSerializer, EmployeeDocumentSerializer
+from .models import Folder, Document, EmployeeDocument, DocumentSignature
+from .serializers import FolderSerializer, DocumentSerializer, EmployeeDocumentSerializer, DocumentSignatureSerializer
 
 class FolderViewSet(viewsets.ModelViewSet):
     serializer_class = FolderSerializer
@@ -93,3 +93,17 @@ class EmployeeDocumentViewSet(viewsets.ModelViewSet):
         file = self.request.FILES.get('file')
         file_size = file.size if file else 0
         serializer.save(uploaded_by=self.request.user, file_size=file_size)
+
+class DocumentSignatureViewSet(viewsets.ModelViewSet):
+    serializer_class = DocumentSignatureSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return DocumentSignature.objects.filter(signer=self.request.user).order_by('-signed_at')
+
+    def perform_create(self, serializer):
+        serializer.save(
+            signer=self.request.user,
+            ip_address=self.request.META.get('REMOTE_ADDR'),
+            user_agent=self.request.META.get('HTTP_USER_AGENT')
+        )

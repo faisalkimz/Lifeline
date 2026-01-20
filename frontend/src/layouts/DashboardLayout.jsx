@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
   Briefcase, BookOpen, Shield, FileText, Search, ChevronDown, HelpCircle,
-  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun, Laptop, Box, FileEdit, Heart
+  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun, Laptop, Box, FileEdit, Heart, Globe
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import ChatWidget from '../components/common/ChatWidget';
@@ -52,6 +52,7 @@ const DashboardLayout = () => {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Employees', href: '/employees', icon: Users },
     { name: 'Payroll', href: '/payroll', icon: CreditCard },
+    { name: 'GCC Compliance', href: '/gcc', icon: Globe },
     { name: 'Leave', href: '/leave', icon: Calendar },
     { name: 'Attendance', href: '/attendance', icon: Clock },
     { name: 'Performance', href: '/performance', icon: TrendingUp },

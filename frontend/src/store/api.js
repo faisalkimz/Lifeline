@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession', 'GCCSettings', 'Gratuity', 'DocumentSignature'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -1379,6 +1379,28 @@ export const api = createApi({
       query: (id) => ({ url: `/surveys/surveys/${id}/`, method: 'DELETE' }),
       invalidatesTags: ['Survey']
     }),
+    // --- GCC Compliance ---
+    getGCCSettings: builder.query({
+      query: () => '/gcc/settings/',
+      providesTags: ['GCCSettings']
+    }),
+    updateGCCSettings: builder.mutation({
+      query: (data) => ({ url: '/gcc/settings/', method: 'POST', body: data }),
+      invalidatesTags: ['GCCSettings']
+    }),
+    getGratuityRecords: builder.query({
+      query: () => '/gcc/gratuity/',
+      providesTags: ['Gratuity']
+    }),
+    // --- Digital Signatures ---
+    getDocumentSignatures: builder.query({
+      query: () => '/documents/signatures/',
+      providesTags: ['DocumentSignature']
+    }),
+    signDocument: builder.mutation({
+      query: (data) => ({ url: '/documents/signatures/', method: 'POST', body: data }),
+      invalidatesTags: ['DocumentSignature', 'EmployeeDocument', 'Document']
+    }),
     // --- AI Assistant ---
     getChatSessions: builder.query({
       query: () => '/bot/chats/',
@@ -1613,6 +1635,13 @@ export const {
   useCreateSurveyResponseMutation,
   useUpdateSurveyMutation,
   useDeleteSurveyMutation,
+  // GCC
+  useGetGCCSettingsQuery,
+  useUpdateGCCSettingsMutation,
+  useGetGratuityRecordsQuery,
+  // Signatures
+  useGetDocumentSignaturesQuery,
+  useSignDocumentMutation,
   // AI Bot
   useGetChatSessionsQuery,
   useCreateChatSessionMutation,

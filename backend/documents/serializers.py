@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Folder, Document, EmployeeDocument
+from .models import Folder, Document, EmployeeDocument, DocumentSignature
 
 class FolderSerializer(serializers.ModelSerializer):
     subfolders = serializers.SerializerMethodField()
@@ -42,3 +42,14 @@ class EmployeeDocumentSerializer(serializers.ModelSerializer):
             'version', 'expiry_date', 'uploaded_by', 'uploaded_by_name', 'created_at'
         ]
         read_only_fields = ['created_at']
+
+class DocumentSignatureSerializer(serializers.ModelSerializer):
+    signer_name = serializers.CharField(source='signer.get_full_name', read_only=True)
+
+    class Meta:
+        model = DocumentSignature
+        fields = [
+            'id', 'document', 'employee_document', 'signer', 'signer_name',
+            'signed_at', 'signature_base64', 'ip_address', 'user_agent', 'is_verified'
+        ]
+        read_only_fields = ['signed_at', 'signer', 'ip_address', 'user_agent']

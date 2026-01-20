@@ -61,3 +61,19 @@ class EmployeeDocument(models.Model):
 
     def __str__(self):
         return f"{self.employee.full_name} - {self.title}"
+
+class DocumentSignature(models.Model):
+    """Tracking digital signatures on documents"""
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, null=True, blank=True)
+    employee_document = models.ForeignKey(EmployeeDocument, on_delete=models.CASCADE, null=True, blank=True)
+    signer = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    signed_at = models.DateTimeField(auto_now_add=True)
+    signature_base64 = models.TextField(help_text="Base64 encoded signature image")
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.TextField(blank=True)
+    
+    is_verified = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"Signed by {self.signer.username} at {self.signed_at}"

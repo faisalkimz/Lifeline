@@ -48,6 +48,7 @@ const DocumentsPage = () => {
     const [isEditingFolder, setIsEditingFolder] = useState(false);
     const [signingDoc, setSigningDoc] = useState(null);
     const [isSigningPadOpen, setIsSigningPadOpen] = useState(false);
+    const [signAfterUpload, setSignAfterUpload] = useState(false);
 
     // 2. API Data
     const { data: storage } = useGetStorageStatsQuery(undefined, { pollingInterval: 60000 });
@@ -59,11 +60,13 @@ const DocumentsPage = () => {
         activeTab === 'personal' ? { my_docs: true } : undefined,
         { skip: activeTab !== 'personal' }
     );
+    const { data: signaturesData } = useGetDocumentSignaturesQuery();
 
     // 3. Normalization
     const folders = useMemo(() => Array.isArray(foldersData) ? foldersData : (foldersData?.results || []), [foldersData]);
     const documents = useMemo(() => Array.isArray(documentsData) ? documentsData : (documentsData?.results || []), [documentsData]);
     const employeeDocuments = useMemo(() => Array.isArray(employeeDocumentsData) ? employeeDocumentsData : (employeeDocumentsData?.results || []), [employeeDocumentsData]);
+    const signatures = useMemo(() => Array.isArray(signaturesData) ? signaturesData : (signaturesData?.results || []), [signaturesData]);
 
     const [createDocument] = useCreateDocumentMutation();
     const [updateDocument] = useUpdateDocumentMutation();
@@ -75,7 +78,6 @@ const DocumentsPage = () => {
     const [updateFolder] = useUpdateFolderMutation();
     const [deleteFolder] = useDeleteFolderMutation();
     const [signDoc] = useSignDocumentMutation();
-    const { data: signatures } = useGetDocumentSignaturesQuery();
 
     const [uploadForm, setUploadForm] = useState({
         title: '',
@@ -117,22 +119,28 @@ const DocumentsPage = () => {
         e.preventDefault();
         try {
             const formData = new FormData();
-            formData.append('title', uploadForm.title);
+            formData.append('title', uploadForm.title || uploadForm.file?.name);
             if (activeTab === 'company') formData.append('category', uploadForm.category);
             formData.append('file', uploadForm.file);
             formData.append('description', uploadForm.description || '');
             if (activeTab === 'company') formData.append('is_public', uploadForm.is_public.toString());
-            if (uploadForm.expiry_date) formData.append('expiry_date', uploadForm.expiry_date);
-            if (uploadForm.version) formData.append('version', uploadForm.version);
-            if (activeTab === 'company' && currentFolderId) formData.append('folder', currentFolderId);
 
+            let res;
             if (activeTab === 'personal') {
-                await createEmployeeDocument(formData).unwrap();
+                res = await createEmployeeDocument(formData).unwrap();
             } else {
-                await createDocument(formData).unwrap();
+                res = await createDocument(formData).unwrap();
             }
+
             toast.success('Document uploaded successfully.');
             setIsUploadDialogOpen(false);
+
+            if (signAfterUpload) {
+                setSigningDoc(res);
+                setIsSigningPadOpen(true);
+                setSignAfterUpload(false);
+            }
+
             setUploadForm({ title: '', category: 'policy', file: null, description: '', is_public: true, expiry_date: '', version: '1.0' });
         } catch (error) {
             toast.error(error?.data?.detail || 'Upload failed.');
@@ -183,7 +191,7 @@ const DocumentsPage = () => {
     };
 
     const isSigned = (docId) => {
-        return signatures?.some(s => (s.document === docId || s.employee_document === docId));
+        return (signatures || []).some(s => (s.document == docId || s.employee_document == docId));
     };
 
     const filteredDocs = useMemo(() => {
@@ -203,12 +211,22 @@ const DocumentsPage = () => {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Documents</h1>
                     <p className="text-slate-500 mt-2">Centralized file storage and document management.</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="rounded-xl h-11 border-slate-200">
-                        <Plus className="h-4 w-4 mr-2" /> New Folder
+                <div className="flex flex-wrap items-center gap-3">
+                    <Button onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="gap-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-sm">
+                        <Plus className="h-4 w-4" /> New Folder
                     </Button>
-                    <Button onClick={() => setIsUploadDialogOpen(true)} className="rounded-xl h-11 bg-slate-900 text-white font-medium shadow-lg shadow-slate-900/20">
-                        <Upload className="h-4 w-4 mr-2" /> Upload File
+                    <Button onClick={() => setIsUploadDialogOpen(true)} className="gap-2 bg-slate-900 text-white shadow-lg shadow-slate-900/20">
+                        <Upload className="h-4 w-4" /> Upload File
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setUploadForm(prev => ({ ...prev, category: 'contract' }));
+                            setSignAfterUpload(true);
+                            setIsUploadDialogOpen(true);
+                        }}
+                        className="gap-2 bg-primary-600 text-white shadow-lg shadow-primary-600/20"
+                    >
+                        <PenTool className="h-4 w-4" /> Sign & Upload
                     </Button>
                 </div>
             </div>

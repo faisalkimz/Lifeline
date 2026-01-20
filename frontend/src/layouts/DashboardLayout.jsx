@@ -14,6 +14,7 @@ import {
   Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun, Laptop, Box, FileEdit, Heart
 } from 'lucide-react';
 import { cn } from '../utils/cn';
+import ChatWidget from '../components/common/ChatWidget';
 
 const DashboardLayout = () => {
   const user = useSelector(selectCurrentUser);
@@ -261,6 +262,7 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
+      <ChatWidget />
     </div>
   );
 };

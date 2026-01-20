@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "assets",
     "digital_forms",
     "surveys",
+    "ai_assistant",
 ]
 
 

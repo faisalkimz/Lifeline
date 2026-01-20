@@ -45,6 +45,8 @@ urlpatterns = [
     path('api/assets/', include('assets.urls')), # Assets Management
     path('api/forms/', include('digital_forms.urls')), # Digital Forms
     path('api/surveys/', include('surveys.urls')),   # Surveys & Pulse
+    path('api/bot/', include('ai_assistant.urls')),  # AI Bot Assistant
+
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

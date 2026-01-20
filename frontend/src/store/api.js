@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -1379,6 +1379,19 @@ export const api = createApi({
       query: (id) => ({ url: `/surveys/surveys/${id}/`, method: 'DELETE' }),
       invalidatesTags: ['Survey']
     }),
+    // --- AI Assistant ---
+    getChatSessions: builder.query({
+      query: () => '/bot/chats/',
+      providesTags: ['ChatSession']
+    }),
+    createChatSession: builder.mutation({
+      query: (data) => ({ url: '/bot/chats/', method: 'POST', body: data }),
+      invalidatesTags: ['ChatSession']
+    }),
+    sendChatMessage: builder.mutation({
+      query: ({ id, content }) => ({ url: `/bot/chats/${id}/send_message/`, method: 'POST', body: { content } }),
+      invalidatesTags: ['ChatSession']
+    }),
   })
 });
 
@@ -1600,6 +1613,10 @@ export const {
   useCreateSurveyResponseMutation,
   useUpdateSurveyMutation,
   useDeleteSurveyMutation,
+  // AI Bot
+  useGetChatSessionsQuery,
+  useCreateChatSessionMutation,
+  useSendChatMessageMutation,
 } = api;
 
 export default api;

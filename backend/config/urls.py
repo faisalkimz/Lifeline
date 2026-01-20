@@ -42,6 +42,9 @@ urlpatterns = [
     path('api/expense/', include('expense.urls')),  # Expense claims
     path('api/analytics/', include('analytics.urls')),  # Analytics & Reporting
     path('api/integrations/', include('core_integrations.urls')), # External Integrations
+    path('api/assets/', include('assets.urls')), # Assets Management
+    path('api/forms/', include('digital_forms.urls')), # Digital Forms
+    path('api/surveys/', include('surveys.urls')),   # Surveys & Pulse
     
     # JWT Token endpoints
     path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

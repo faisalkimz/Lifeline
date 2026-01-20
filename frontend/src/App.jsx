@@ -46,6 +46,9 @@ import OvertimePage from './features/attendance/OvertimePage';
 import AttendanceAdminPage from './features/attendance/AttendanceAdminPage';
 import HelpCenterPage from './features/help/HelpCenterPage';
 import AnalyticsDashboard from './features/analytics/AnalyticsDashboard';
+import AssetsPage from './features/assets/AssetsPage';
+import FormsPage from './features/forms/FormsPage';
+import SurveysPage from './features/surveys/SurveysPage';
 
 function App() {
   // Theme removed — app renders without theme side-effects
@@ -99,6 +102,9 @@ function App() {
         <Route path="/benefits" element={<BenefitsPage />} />
         <Route path="/benefits/admin" element={<BenefitsAdminPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/assets" element={<AssetsPage />} />
+        <Route path="/forms" element={<FormsPage />} />
+        <Route path="/surveys" element={<SurveysPage />} />
         <Route path="/offboarding" element={<OffboardingPage />} />
 
         {/* Finance Routes */}

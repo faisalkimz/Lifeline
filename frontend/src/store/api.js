@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -1284,6 +1284,101 @@ export const api = createApi({
       }),
       invalidatesTags: ['Integration']
     }),
+    // --- Assets ---
+    getAssetCategories: builder.query({
+      query: (params) => ({ url: '/assets/categories/', params }),
+      providesTags: ['AssetCategory']
+    }),
+    createAssetCategory: builder.mutation({
+      query: (data) => ({ url: '/assets/categories/', method: 'POST', body: data }),
+      invalidatesTags: ['AssetCategory']
+    }),
+    getAssets: builder.query({
+      query: (params) => ({ url: '/assets/items/', params }),
+      providesTags: ['Asset']
+    }),
+    getAsset: builder.query({
+      query: (id) => `/assets/items/${id}/`,
+      providesTags: ['Asset']
+    }),
+    createAsset: builder.mutation({
+      query: (data) => ({ url: '/assets/items/', method: 'POST', body: data }),
+      invalidatesTags: ['Asset']
+    }),
+    updateAsset: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/assets/items/${id}/`, method: 'PATCH', body: data }),
+      invalidatesTags: ['Asset']
+    }),
+    deleteAsset: builder.mutation({
+      query: (id) => ({ url: `/assets/items/${id}/`, method: 'DELETE' }),
+      invalidatesTags: ['Asset']
+    }),
+    assignAsset: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/assets/items/${id}/assign/`, method: 'POST', body: data }),
+      invalidatesTags: ['Asset', 'AssetAssignment']
+    }),
+    returnAsset: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/assets/items/${id}/return_asset/`, method: 'POST', body: data }),
+      invalidatesTags: ['Asset', 'AssetAssignment']
+    }),
+    getAssetAssignments: builder.query({
+      query: (params) => ({ url: '/assets/assignments/', params }),
+      providesTags: ['AssetAssignment']
+    }),
+    // --- Digital Forms ---
+    getFormTemplates: builder.query({
+      query: (params) => ({ url: '/forms/templates/', params }),
+      providesTags: ['FormTemplate']
+    }),
+    createFormTemplate: builder.mutation({
+      query: (data) => ({ url: '/forms/templates/', method: 'POST', body: data }),
+      invalidatesTags: ['FormTemplate']
+    }),
+    getFormSubmissions: builder.query({
+      query: (params) => ({ url: '/forms/submissions/', params }),
+      providesTags: ['FormSubmission']
+    }),
+    createFormSubmission: builder.mutation({
+      query: (data) => ({ url: '/forms/submissions/', method: 'POST', body: data }),
+      invalidatesTags: ['FormSubmission']
+    }),
+    reviewFormSubmission: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/forms/submissions/${id}/review/`, method: 'POST', body: data }),
+      invalidatesTags: ['FormSubmission']
+    }),
+    updateFormTemplate: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/forms/templates/${id}/`, method: 'PATCH', body: data }),
+      invalidatesTags: ['FormTemplate']
+    }),
+    deleteFormTemplate: builder.mutation({
+      query: (id) => ({ url: `/forms/templates/${id}/`, method: 'DELETE' }),
+      invalidatesTags: ['FormTemplate']
+    }),
+    // --- Surveys & Pulse ---
+    getSurveys: builder.query({
+      query: (params) => ({ url: '/surveys/surveys/', params }),
+      providesTags: ['Survey']
+    }),
+    createSurvey: builder.mutation({
+      query: (data) => ({ url: '/surveys/surveys/', method: 'POST', body: data }),
+      invalidatesTags: ['Survey']
+    }),
+    getSurveyAnalytics: builder.query({
+      query: (id) => `/surveys/surveys/${id}/analytics/`,
+      providesTags: (result, error, id) => [{ type: 'Survey', id }]
+    }),
+    createSurveyResponse: builder.mutation({
+      query: (data) => ({ url: '/surveys/responses/', method: 'POST', body: data }),
+      invalidatesTags: ['Survey', 'SurveyResponse']
+    }),
+    updateSurvey: builder.mutation({
+      query: ({ id, ...data }) => ({ url: `/surveys/surveys/${id}/`, method: 'PATCH', body: data }),
+      invalidatesTags: ['Survey']
+    }),
+    deleteSurvey: builder.mutation({
+      query: (id) => ({ url: `/surveys/surveys/${id}/`, method: 'DELETE' }),
+      invalidatesTags: ['Survey']
+    }),
   })
 });
 
@@ -1479,6 +1574,32 @@ export const {
   useGetSecurityLogsQuery,
   useExportDataQuery,
   useRegisterPushSubscriptionMutation,
+  // Assets
+  useGetAssetCategoriesQuery,
+  useCreateAssetCategoryMutation,
+  useGetAssetsQuery,
+  useGetAssetQuery,
+  useCreateAssetMutation,
+  useUpdateAssetMutation,
+  useDeleteAssetMutation,
+  useAssignAssetMutation,
+  useReturnAssetMutation,
+  useGetAssetAssignmentsQuery,
+  // Digital Forms
+  useGetFormTemplatesQuery,
+  useCreateFormTemplateMutation,
+  useGetFormSubmissionsQuery,
+  useCreateFormSubmissionMutation,
+  useReviewFormSubmissionMutation,
+  useUpdateFormTemplateMutation,
+  useDeleteFormTemplateMutation,
+  // Surveys
+  useGetSurveysQuery,
+  useCreateSurveyMutation,
+  useGetSurveyAnalyticsQuery,
+  useCreateSurveyResponseMutation,
+  useUpdateSurveyMutation,
+  useDeleteSurveyMutation,
 } = api;
 
 export default api;

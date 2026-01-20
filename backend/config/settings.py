@@ -68,6 +68,9 @@ INSTALLED_APPS = [
     "expense",      # Expense claims
     "analytics",    # Advanced analytics & reporting
     "core_integrations", # External API integrations
+    "assets",
+    "digital_forms",
+    "surveys",
 ]
 
 

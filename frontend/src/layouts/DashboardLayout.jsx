@@ -6,11 +6,12 @@ import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation, useGetEmployeeStatsQuery } from '../store/api';
 import NotificationsPopover from '../components/notifications/NotificationsPopover';
 import { getMediaUrl } from '../config/api';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
   Briefcase, BookOpen, Shield, FileText, Search, ChevronDown, HelpCircle,
-  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign
+  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -21,6 +22,7 @@ const DashboardLayout = () => {
   const [logoutApi] = useLogoutMutation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const { isDark, toggleTheme } = useTheme();
 
   // Fetch Stats for Sidebar
   const { data: stats } = useGetEmployeeStatsQuery(undefined, {
@@ -87,13 +89,13 @@ const DashboardLayout = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
+    <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* Sidebar - Workpay Dark Theme */}
+      {/* Sidebar - Workpay Dark Theme (Stays Dark in both modes) */}
       <aside
         className={cn(
           'fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col shrink-0',
@@ -101,7 +103,7 @@ const DashboardLayout = () => {
         )}
       >
         {/* Logo Area */}
-        <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900">
+        <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900 shrink-0">
           <Link to="/dashboard" className="flex items-center gap-2">
             <div className="h-8 w-8 bg-primary-500 rounded-lg flex items-center justify-center shadow-lg shadow-primary-900/20">
               <Building className="h-5 w-5 text-white" />
@@ -167,53 +169,11 @@ const DashboardLayout = () => {
             </div>
           )}
 
-          {/* Organization Stats - Premium Widget */}
-          <div className="px-3 pb-8">
-            <div className="p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm space-y-4">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1 flex items-center justify-between">
-                Organization
-                <Zap className="h-3 w-3 text-warning-500" />
-              </p>
 
-              <div className="grid grid-cols-1 gap-2">
-                <StatItem
-                  label="Active Now"
-                  value={stats?.active_now}
-                  trend={stats?.growth_percentage ? `+${stats.growth_percentage}%` : '+5%'}
-                  icon={Activity}
-                  colorClass="bg-primary-500"
-                />
-                <StatItem
-                  label="Present Today"
-                  value={stats?.working_today}
-                  icon={Clock}
-                  colorClass="bg-success-500"
-                />
-                <StatItem
-                  label="On Leave"
-                  value={stats?.on_leave}
-                  icon={Calendar}
-                  colorClass="bg-warning-500"
-                />
-                <StatItem
-                  label="Total Employees"
-                  value={stats?.total}
-                  icon={Users}
-                  colorClass="bg-indigo-500"
-                />
-                <StatItem
-                  label="Departments"
-                  value={stats?.departments_count}
-                  icon={Building2}
-                  colorClass="bg-rose-500"
-                />
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-900">
+        <div className="p-4 border-t border-slate-800 bg-slate-900 shrink-0">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 p-0.5 overflow-hidden transition-transform hover:scale-105">
               {user.photo ? (
@@ -236,23 +196,23 @@ const DashboardLayout = () => {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
-        {/* Top Header - White & Clean */}
-        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 shadow-sm z-10 sticky top-0">
+        {/* Top Header - Fixed & Clean */}
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6 shadow-sm z-20 shrink-0">
           <div className="flex items-center gap-4">
             <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
               <Menu className="h-6 w-6" />
             </button>
 
             {/* Context Switcher (Platform mimic) */}
-            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer hover:border-primary-300 hover:bg-white transition-all group">
+            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300 dark:hover:border-primary-700 hover:bg-white dark:hover:bg-slate-800 transition-all group">
               <div className="h-7 w-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
                 L
               </div>
               <div className="pr-2">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter block leading-none mb-0.5">Company</span>
-                <span className="text-sm font-bold text-slate-700 block leading-none">{user.company_name || 'Lifeline Tech'}</span>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter block leading-none mb-0.5">Company</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200 block leading-none">{user.company_name || 'Lifeline Tech'}</span>
               </div>
               <ChevronDown className="h-4 w-4 text-slate-400 group-hover:text-primary-500 transition-colors" />
             </div>
@@ -265,15 +225,24 @@ const DashboardLayout = () => {
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 text-sm bg-slate-100 border-none rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 w-48 lg:w-64 transition-all focus:bg-white focus:w-80"
+                className="pl-10 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 w-48 lg:w-64 transition-all focus:bg-white dark:focus:bg-slate-900 focus:w-80"
               />
             </div>
 
-            <div className="h-6 w-px bg-slate-200 mx-2"></div>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800 rounded-xl transition-all"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
 
             <Link
               to="/help"
-              className="p-2 text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800 rounded-xl transition-all"
               title="Help & Support"
             >
               <HelpCircle className="h-5 w-5" />
@@ -283,7 +252,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Content Scrollable Area */}
-        <main className="flex-1 overflow-y-auto bg-slate-50/50 p-6 lg:p-10">
+        <main className="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-slate-950 p-6 lg:p-10 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

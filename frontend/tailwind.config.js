@@ -8,10 +8,10 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Updated to Emerald (Green) as requested by user
+        // Standard Tailwind colors will be used for neutrals to allow distinct 'Fixed Dark' vs 'Adaptive' styling using dark: modifier.
         primary: {
           50: '#ecfdf5',
-          100: '#d1fae5',
+          100: 'var(--color-primary-100)',
           200: '#a7f3d0',
           300: '#6ee7b7',
           400: '#34d399',
@@ -22,6 +22,7 @@ export default {
           900: '#064e3b',
           950: '#022c22',
         },
+        // We do not override grays here; we will use standard classes like dark:bg-slate-900
         success: {
           50: '#f0fdf4',
           100: '#dcfce7',

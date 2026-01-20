@@ -7,17 +7,18 @@
 
 /* WorkPay-inspired Professional Color System */
 :root {
-  /* Primary - Blue (WorkPay brand color) */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  /* Primary - Emerald (WorkPay brand color) */
+  --color-primary-50: #ecfdf5;
+  --color-primary-100: #d1fae5;
+  --color-primary-200: #a7f3d0;
+  --color-primary-300: #6ee7b7;
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+  --color-primary-950: #022c22;
 
   /* Neutral - Professional grays */
   --color-gray-50: #f9fafb;
@@ -48,6 +49,31 @@
   --color-info-light: #dbeafe;
 }
 
+/* Dark Mode Overrides */
+.dark {
+  /* Neutral - Dark mode grays (Inverted logic) */
+  --color-gray-50: #111827;
+  /* Dark background */
+  --color-gray-100: #1f2937;
+  /* Card background */
+  --color-gray-200: #374151;
+  /* Borders */
+  --color-gray-300: #4b5563;
+  /* Subtle text */
+  --color-gray-400: #6b7280;
+  /* Text */
+  --color-gray-500: #9ca3af;
+  /* Text */
+  --color-gray-600: #d1d5db;
+  /* Primary text */
+  --color-gray-700: #e5e7eb;
+  /* Headings */
+  --color-gray-800: #f3f4f6;
+  /* Bright Headings */
+  --color-gray-900: #f9fafb;
+  /* White text */
+}
+
 @layer base {
   * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -55,7 +81,8 @@
 
   body {
     @apply font-sans antialiased;
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-slate-50 text-slate-900;
+    @apply dark:bg-slate-950 dark:text-slate-100;
     @apply transition-colors duration-200;
   }
 
@@ -70,49 +97,55 @@
 }
 
 @layer components {
-  /* WorkPay-style Card */
+
+  /* WorkPay-style Card - Enhanced */
   .card-workpay {
-    @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200;
+    @apply bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200;
   }
 
   /* WorkPay-style Primary Button */
   .btn-workpay-primary {
-    @apply bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-sm hover:shadow transition-all duration-200 rounded-lg font-medium px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white shadow-sm hover:shadow-md hover:shadow-primary-600/20 transition-all duration-200 rounded-lg font-medium px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   /* WorkPay-style Secondary Button */
   .btn-workpay-secondary {
-    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 border border-gray-300 shadow-sm transition-all duration-200 rounded-lg font-medium px-4 py-2;
+    @apply bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-300 dark:border-slate-700 shadow-sm transition-all duration-200 rounded-lg font-medium px-4 py-2;
   }
 
   /* WorkPay-style Input */
   .input-workpay {
-    @apply w-full rounded-lg border-gray-300 bg-white text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500 focus:ring-1 focus:outline-none transition-all duration-200 px-3 py-2;
+    @apply w-full rounded-lg border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 focus:border-primary-500 focus:ring-primary-500 focus:ring-1 focus:outline-none transition-all duration-200 px-3 py-2;
   }
 
   /* WorkPay-style Badge */
   .badge-workpay {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ring-1 ring-inset;
   }
 
   .badge-success {
-    @apply bg-green-100 text-green-700 border border-green-200;
+    @apply bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20 dark:ring-green-500/20;
   }
 
   .badge-warning {
-    @apply bg-yellow-100 text-yellow-700 border border-yellow-200;
+    @apply bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20 dark:ring-yellow-500/20;
   }
 
   .badge-error {
-    @apply bg-red-100 text-red-700 border border-red-200;
+    @apply bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20 dark:ring-red-500/20;
   }
 
   .badge-info {
-    @apply bg-blue-100 text-blue-700 border border-blue-200;
+    @apply bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-blue-600/20 dark:ring-blue-500/20;
   }
 
   .badge-neutral {
-    @apply bg-gray-100 text-gray-700 border border-gray-200;
+    @apply bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 ring-gray-500/10 dark:ring-slate-700;
+  }
+
+  /* Glassmorphism Utilities */
+  .glass-panel {
+    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg border border-white/20 dark:border-slate-800/50 shadow-xl;
   }
 }
 
@@ -122,6 +155,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -137,6 +171,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -147,37 +182,33 @@
   animation: slide-up 0.5s ease-out;
 }
 
-/* Professional scrollbar */
+/* Global Professional Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-300 rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-400;
+  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
 }
 
 /* Professional selection */
 ::selection {
-  @apply bg-blue-100 text-blue-900;
+  @apply bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-300;
 }
 
 /* Skeleton loading */
 .skeleton {
-  @apply animate-pulse bg-gray-200 rounded;
+  @apply animate-pulse bg-gray-200 dark:bg-slate-800 rounded;
 }
 
 /* Hover states - WorkPay style */
 .hover-lift {
-  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-md;
+  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:hover:shadow-slate-900/50;
 }
 
 /* Status indicators */
@@ -207,15 +238,15 @@
 }
 
 .table-workpay th {
-  @apply bg-gray-50 px-4 py-3 text-xs font-medium text-gray-700 uppercase tracking-wide border-b border-gray-200;
+  @apply bg-gray-50 dark:bg-slate-800/50 px-4 py-3 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-200 dark:border-slate-700;
 }
 
 .table-workpay td {
-  @apply px-4 py-3 border-b border-gray-100;
+  @apply px-4 py-3 border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300;
 }
 
 .table-workpay tr:hover {
-  @apply bg-gray-50;
+  @apply bg-gray-50 dark:bg-slate-800 transition-colors;
 }
 
 /* Clean shadows - WorkPay style */
@@ -229,6 +260,24 @@
 
 .shadow-workpay-lg {
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Styles for Recharts in Dark Mode */
+.dark .recharts-cartesian-grid-horizontal line,
+.dark .recharts-cartesian-grid-vertical line {
+  stroke: #334155;
+  /* slate-700 */
+}
+
+.dark .recharts-text {
+  fill: #94a3b8;
+  /* slate-400 */
+}
+
+.dark .recharts-tooltip-cursor {
+  fill: #1e293b;
+  /* slate-800 */
+  opacity: 0.4;
 }
 
 /* Professional spacing utilities */

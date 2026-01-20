@@ -1478,6 +1478,7 @@ export const {
   useDisable2FAMutation,
   useGetSecurityLogsQuery,
   useExportDataQuery,
+  useRegisterPushSubscriptionMutation,
 } = api;
 
 export default api;

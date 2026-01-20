@@ -59,3 +59,16 @@ class Announcement(models.Model):
 
     def __str__(self):
         return self.title
+
+class PushSubscription(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='push_subscriptions')
+    endpoint = models.URLField(max_length=500)
+    p256dh = models.CharField(max_length=255)
+    auth = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('endpoint', 'user')
+
+    def __str__(self):
+        return f"{self.user} - {self.endpoint[:20]}..."

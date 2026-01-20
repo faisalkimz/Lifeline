@@ -35,3 +35,31 @@ class AnnouncementViewSet(viewsets.ModelViewSet):
              # Actually, let's just save. Permission class handles company scope.
              pass
         serializer.save(company=self.request.user.company, posted_by=self.request.user)
+
+from .models import PushSubscription
+from .serializers import PushSubscriptionSerializer
+
+class PushSubscriptionViewSet(viewsets.ModelViewSet):
+    serializer_class = PushSubscriptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = PushSubscription.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        # We want to update if endpoint exists for user or create new
+        endpoint = request.data.get('endpoint')
+        p256dh = request.data.get('p256dh')
+        auth = request.data.get('auth')
+
+        if not endpoint or not p256dh or not auth:
+            return Response({'error': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
+
+        subscription, created = PushSubscription.objects.update_or_create(
+            user=request.user,
+            endpoint=endpoint,
+            defaults={
+                'p256dh': p256dh,
+                'auth': auth
+            }
+        )
+        serializer = self.get_serializer(subscription)
+        return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)

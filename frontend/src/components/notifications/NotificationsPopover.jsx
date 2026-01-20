@@ -4,6 +4,8 @@ import { Bell, Check, Info, AlertTriangle, CheckCircle, XCircle } from 'lucide-r
 import { cn } from '../../utils/cn';
 import { formatDistanceToNow } from 'date-fns';
 
+import { usePushNotifications } from '../../hooks/usePushNotifications';
+
 const NotificationsPopover = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { data: notificationsData, isLoading } = useGetNotificationsQuery(undefined, {
@@ -12,6 +14,8 @@ const NotificationsPopover = () => {
     const [markRead] = useMarkNotificationReadMutation();
     const [markAllRead] = useMarkAllNotificationsReadMutation();
     const popoverRef = useRef(null);
+
+    const { isSupported, subscription, subscribeToNotifications } = usePushNotifications();
 
     // Handle Paginated or List data safely
     const notifications = Array.isArray(notificationsData)
@@ -75,7 +79,19 @@ const NotificationsPopover = () => {
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in origin-top-right">
                     <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                        <h3 className="font-bold text-slate-800">Notifications</h3>
+                        <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-slate-800">Notifications</h3>
+                            {isSupported && !subscription && (
+                                <button
+                                    onClick={subscribeToNotifications}
+                                    className="text-[10px] bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full font-semibold hover:bg-primary-200 transition-colors"
+                                    title="Enable Push Notifications"
+                                >
+                                    Enable Push
+                                </button>
+                            )}
+                        </div>
+
                         {unreadCount > 0 && (
                             <button
                                 onClick={handleMarkAllRead}

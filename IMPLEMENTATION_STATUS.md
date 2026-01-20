@@ -204,6 +204,12 @@
     - Implemented **GDPR Data Exports** allowing users to download their personal data.
     - Enhanced **Login Security** with 2FA verification step.
     - Added **Security Dashboard** in Settings for user self-service security.
+    
+11. **PWA & Mobile Readiness** ✨ NEW
+    - **Offline Mode**: Implemented Service Worker using Workbox for caching assets and shell.
+    - **Push Notifications**: Added backend subscription model and frontend integration.
+    - **Installable**: App meets PWA criteria (Manifest, Icons).
+    - **Enable Push UI**: Added "Enable Push" button in Notifications popover.
 
 ---
 
@@ -258,8 +264,8 @@
 #### 8. Mobile Applications (80-100 hours)
 - [ ] iOS Native App
 - [ ] Android Native App
-- [ ] Push Notifications
-- [ ] Offline Mode
+- [x] Push Notifications (Backend support + Frontend integration)
+- [x] Offline Mode (PWA Service Worker implementation)
 
 #### 9. Multi-Language Support (8-10 hours)
 - [ ] i18n Implementation

@@ -83,6 +83,13 @@ export const api = createApi({
     exportData: builder.query({
       query: () => '/security/export_data/'
     }),
+    registerPushSubscription: builder.mutation({
+      query: (subscription) => ({
+        url: '/notifications/subscriptions/',
+        method: 'POST',
+        body: subscription
+      })
+    }),
     // --- Employees (existing) ---
     getEmployees: builder.query({
       query: (params) => ({

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Notification, Announcement
+from .models import Notification, Announcement, PushSubscription
 from accounts.serializers import UserSerializer
 
 class NotificationSerializer(serializers.ModelSerializer):
@@ -18,3 +18,8 @@ class AnnouncementSerializer(serializers.ModelSerializer):
         model = Announcement
         fields = ['id', 'title', 'content', 'posted_by', 'posted_by_name', 'created_at', 'is_active']
         read_only_fields = ['company', 'posted_by', 'created_at']
+
+class PushSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PushSubscription
+        fields = ['endpoint', 'p256dh', 'auth']

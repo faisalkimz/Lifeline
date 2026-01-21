@@ -48,5 +48,5 @@ def send_welcome_email(employee, password):
         )
         return True
     except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+        pass
         return False

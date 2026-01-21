@@ -49,7 +49,7 @@ export const usePushNotifications = () => {
                 auth: keys.auth
             }).unwrap();
 
-            console.log('Push Notification Subscribed and Registered on Backend');
+            // Push notification successfully registered
         } catch (error) {
             console.error('Failed to subscribe to push notifications', error);
             alert('Failed to enable notifications.');

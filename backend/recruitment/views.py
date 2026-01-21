@@ -286,7 +286,9 @@ class IntegrationSettingsViewSet(viewsets.ModelViewSet):
         except Exception as e:
             import traceback
             error_trace = traceback.format_exc()
-            print(f"Integration Handshake Failure:\n{error_trace}")
+            # Log error trace for internal debugging if needed
+            # logger.error(f"Integration Handshake Failure:\n{error_trace}")
+            pass
             return Response({
                 "status": "error",
                 "message": f"Diagnostics failed: {str(e)}",

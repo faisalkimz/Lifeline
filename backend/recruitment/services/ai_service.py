@@ -86,7 +86,7 @@ class RecruitingAIService:
                 elif filename.endswith('.docx'):
                     resume_text = ResumeParsingService.extract_text_from_docx(candidate.resume)
             except Exception as e:
-                print(f"Error reading resume for AI screening: {e}")
+                pass
         
         # Fallback to summary if no resume text could be extracted
         if not resume_text:

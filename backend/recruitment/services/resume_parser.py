@@ -24,7 +24,7 @@ class ResumeParsingService:
                         text += page_text + "\n"
             return text
         except Exception as e:
-            print(f"Error extracting text from PDF: {e}")
+            pass
             return ""
 
     @staticmethod
@@ -34,7 +34,7 @@ class ResumeParsingService:
             text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
             return text
         except Exception as e:
-            print(f"Error extracting text from DOCX: {e}")
+            pass
             return ""
 
     @staticmethod

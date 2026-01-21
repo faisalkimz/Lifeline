@@ -13,9 +13,7 @@ import {
     useUpdateEmployeeDocumentMutation,
     useDeleteEmployeeDocumentMutation,
     useGetCurrentUserQuery,
-    useGetStorageStatsQuery,
-    useSignDocumentMutation,
-    useGetDocumentSignaturesQuery
+    useGetStorageStatsQuery
 } from '../../store/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -26,10 +24,8 @@ import { Tabs, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 import {
     FileText, Download, Upload, Folder as FolderIcon, Search,
     Filter, Edit, Trash2, File, Image, Video, Archive,
-    Plus, Cloud, HardDrive, Share2, Grid, List, MoreVertical,
-    PenTool, ShieldCheck
+    Plus, Cloud, HardDrive, Share2, Grid, List, MoreVertical
 } from 'lucide-react';
-import SignaturePad from '../../components/common/SignaturePad';
 import toast from 'react-hot-toast';
 import { getMediaUrl } from '../../config/api';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -46,9 +42,6 @@ const DocumentsPage = () => {
     const [selectedDocument, setSelectedDocument] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingFolder, setIsEditingFolder] = useState(false);
-    const [signingDoc, setSigningDoc] = useState(null);
-    const [isSigningPadOpen, setIsSigningPadOpen] = useState(false);
-    const [signAfterUpload, setSignAfterUpload] = useState(false);
 
     // 2. API Data
     const { data: storage } = useGetStorageStatsQuery(undefined, { pollingInterval: 60000 });
@@ -60,13 +53,11 @@ const DocumentsPage = () => {
         activeTab === 'personal' ? { my_docs: true } : undefined,
         { skip: activeTab !== 'personal' }
     );
-    const { data: signaturesData } = useGetDocumentSignaturesQuery();
 
     // 3. Normalization
     const folders = useMemo(() => Array.isArray(foldersData) ? foldersData : (foldersData?.results || []), [foldersData]);
     const documents = useMemo(() => Array.isArray(documentsData) ? documentsData : (documentsData?.results || []), [documentsData]);
     const employeeDocuments = useMemo(() => Array.isArray(employeeDocumentsData) ? employeeDocumentsData : (employeeDocumentsData?.results || []), [employeeDocumentsData]);
-    const signatures = useMemo(() => Array.isArray(signaturesData) ? signaturesData : (signaturesData?.results || []), [signaturesData]);
 
     const [createDocument] = useCreateDocumentMutation();
     const [updateDocument] = useUpdateDocumentMutation();
@@ -77,7 +68,6 @@ const DocumentsPage = () => {
     const [createFolder] = useCreateFolderMutation();
     const [updateFolder] = useUpdateFolderMutation();
     const [deleteFolder] = useDeleteFolderMutation();
-    const [signDoc] = useSignDocumentMutation();
 
     const [uploadForm, setUploadForm] = useState({
         title: '',
@@ -119,28 +109,22 @@ const DocumentsPage = () => {
         e.preventDefault();
         try {
             const formData = new FormData();
-            formData.append('title', uploadForm.title || uploadForm.file?.name);
+            formData.append('title', uploadForm.title);
             if (activeTab === 'company') formData.append('category', uploadForm.category);
             formData.append('file', uploadForm.file);
             formData.append('description', uploadForm.description || '');
             if (activeTab === 'company') formData.append('is_public', uploadForm.is_public.toString());
+            if (uploadForm.expiry_date) formData.append('expiry_date', uploadForm.expiry_date);
+            if (uploadForm.version) formData.append('version', uploadForm.version);
+            if (activeTab === 'company' && currentFolderId) formData.append('folder', currentFolderId);
 
-            let res;
             if (activeTab === 'personal') {
-                res = await createEmployeeDocument(formData).unwrap();
+                await createEmployeeDocument(formData).unwrap();
             } else {
-                res = await createDocument(formData).unwrap();
+                await createDocument(formData).unwrap();
             }
-
             toast.success('Document uploaded successfully.');
             setIsUploadDialogOpen(false);
-
-            if (signAfterUpload) {
-                setSigningDoc(res);
-                setIsSigningPadOpen(true);
-                setSignAfterUpload(false);
-            }
-
             setUploadForm({ title: '', category: 'policy', file: null, description: '', is_public: true, expiry_date: '', version: '1.0' });
         } catch (error) {
             toast.error(error?.data?.detail || 'Upload failed.');
@@ -175,25 +159,6 @@ const DocumentsPage = () => {
         }
     };
 
-    const handleSignDocument = async (signatureBase64) => {
-        try {
-            const data = {
-                signature_base64: signatureBase64,
-                ...(activeTab === 'personal' ? { employee_document: signingDoc.id } : { document: signingDoc.id })
-            };
-            await signDoc(data).unwrap();
-            toast.success('Document signed legally!');
-            setIsSigningPadOpen(false);
-            setSigningDoc(null);
-        } catch (error) {
-            toast.error('Failed to sign document');
-        }
-    };
-
-    const isSigned = (docId) => {
-        return (signatures || []).some(s => (s.document == docId || s.employee_document == docId));
-    };
-
     const filteredDocs = useMemo(() => {
         const source = (activeTab === 'company' ? documents : employeeDocuments);
         return source.filter(doc => {
@@ -211,22 +176,12 @@ const DocumentsPage = () => {
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Documents</h1>
                     <p className="text-slate-500 mt-2">Centralized file storage and document management.</p>
                 </div>
-                <div className="flex flex-wrap items-center gap-3">
-                    <Button onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="gap-2 bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-sm">
-                        <Plus className="h-4 w-4" /> New Folder
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="rounded-xl h-11 border-slate-200">
+                        <Plus className="h-4 w-4 mr-2" /> New Folder
                     </Button>
-                    <Button onClick={() => setIsUploadDialogOpen(true)} className="gap-2 bg-slate-900 text-white shadow-lg shadow-slate-900/20">
-                        <Upload className="h-4 w-4" /> Upload File
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            setUploadForm(prev => ({ ...prev, category: 'contract' }));
-                            setSignAfterUpload(true);
-                            setIsUploadDialogOpen(true);
-                        }}
-                        className="gap-2 bg-primary-600 text-white shadow-lg shadow-primary-600/20"
-                    >
-                        <PenTool className="h-4 w-4" /> Sign & Upload
+                    <Button onClick={() => setIsUploadDialogOpen(true)} className="rounded-xl h-11 bg-slate-900 text-white font-medium shadow-lg shadow-slate-900/20">
+                        <Upload className="h-4 w-4 mr-2" /> Upload File
                     </Button>
                 </div>
             </div>
@@ -328,8 +283,6 @@ const DocumentsPage = () => {
                                     doc={doc}
                                     viewMode={viewMode}
                                     onDelete={() => handleDeleteDocument(doc.id)}
-                                    onSign={() => { setSigningDoc(doc); setIsSigningPadOpen(true); }}
-                                    isSigned={isSigned(doc.id)}
                                     icon={getFileIcon(doc.file || doc.title)}
                                 />
                             ))}
@@ -337,13 +290,6 @@ const DocumentsPage = () => {
                     )}
                 </div>
             </div>
-
-            {isSigningPadOpen && (
-                <SignaturePad
-                    onSave={handleSignDocument}
-                    onCancel={() => setIsSigningPadOpen(false)}
-                />
-            )}
 
             {/* Upload Dialog */}
             <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
@@ -405,17 +351,12 @@ const DocumentsPage = () => {
     );
 };
 
-const FileCard = ({ doc, viewMode, onDelete, onSign, isSigned, icon: Icon }) => {
+const FileCard = ({ doc, viewMode, onDelete, icon: Icon }) => {
     return (
         <div className={`group bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all rounded-2xl ${viewMode === 'grid' ? 'p-6 flex flex-col gap-4' : 'p-4 flex items-center justify-between'}`}>
             <div className="flex items-start gap-4">
-                <div className="p-3 bg-slate-50 rounded-xl text-slate-500 relative">
+                <div className="p-3 bg-slate-50 rounded-xl text-slate-500">
                     <Icon className="h-6 w-6" />
-                    {isSigned && (
-                        <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5 border-2 border-white shadow-sm">
-                            <ShieldCheck className="h-2.5 w-2.5 text-white" />
-                        </div>
-                    )}
                 </div>
                 <div>
                     <h3 className="font-bold text-slate-900 line-clamp-1">{doc.title}</h3>
@@ -423,16 +364,6 @@ const FileCard = ({ doc, viewMode, onDelete, onSign, isSigned, icon: Icon }) => 
                 </div>
             </div>
             <div className={`flex items-center gap-2 ${viewMode === 'grid' ? 'mt-auto justify-end' : ''}`}>
-                {!isSigned && (
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        className="h-8 gap-2 text-[10px] font-black uppercase tracking-wider border-primary-100 text-primary-600 hover:bg-primary-50"
-                        onClick={onSign}
-                    >
-                        <PenTool className="h-3 w-3" /> Sign
-                    </Button>
-                )}
                 <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-emerald-600" onClick={() => window.open(getMediaUrl(doc.file))}>
                     <Download className="h-4 w-4" />
                 </Button>

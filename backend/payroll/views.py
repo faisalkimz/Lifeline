@@ -22,6 +22,7 @@ from .serializers import (
     PayslipSerializer, PayslipDetailSerializer,
     SalaryAdvanceSerializer
 )
+from .services.payroll_email_service import PayrollEmailService
 from .utils import calculate_net_salary
 
 
@@ -356,6 +357,14 @@ class PayslipViewSet(viewsets.ModelViewSet):
         from .services.payslip_generator import PayslipGenerator
         pdf_url = PayslipGenerator.generate_pdf(payslip)
         return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+
+    @action(detail=True, methods=['post'])
+    def email_payslip(self, request, pk=None):
+        payslip = self.get_object()
+        success, message = PayrollEmailService.send_payslip_email(payslip)
+        if success:
+            return Response({'message': message})
+        return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # ────────────────────── SALARY STRUCTURES ──────────────────────

@@ -304,6 +304,12 @@ export const api = createApi({
       }),
       invalidatesTags: ['Payslip']
     }),
+    emailPayslip: builder.mutation({
+      query: (id) => ({
+        url: `/payroll/payslips/${id}/email_payslip/`,
+        method: 'POST'
+      })
+    }),
 
     // --- Employee Stats and Managers ---
     getEmployeeStats: builder.query({
@@ -1444,6 +1450,7 @@ export const {
   useGetPayslipsQuery, // Added
   useUpdatePayslipMutation, // Added
   useGeneratePayslipPdfMutation,
+  useEmailPayslipMutation,
   useGetSalaryStructuresQuery,
   useCreateSalaryStructureMutation,
   useUpdateSalaryStructureMutation,

@@ -10,57 +10,53 @@ const PayrollIndex = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
 
     return (
-        <div className="space-y-6">
-            {/* Header */}
-            <div>
-                <h1 className="text-2xl font-bold text-slate-900">Payroll Management</h1>
-                <p className="text-slate-500 mt-1">Complete payroll processing, salary management, and compliance.</p>
+        <div className="space-y-10 animate-in fade-in duration-700">
+            {/* Premium Header */}
+            <div className="relative group">
+                <div className="absolute -left-10 top-0 bottom-0 w-1 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
+                <h1 className="text-5xl font-black tracking-tighter text-slate-900 leading-none">Financial Operations</h1>
+                <p className="text-slate-500 mt-4 text-xl font-medium max-w-2xl">Manage organizational liquidity, payroll compliance, and employee compensation strategies in one unified command center.</p>
             </div>
 
-            {/* Navigation Tabs */}
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="bg-slate-100 p-1 rounded-lg w-full max-w-2xl grid grid-cols-4 mb-8">
-                    <TabsTrigger
-                        value="dashboard"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
-                    >
-                        Dashboard
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="payslips"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
-                    >
-                        Payslips
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="salaries"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
-                    >
-                        Salaries
-                    </TabsTrigger>
-                    <TabsTrigger
-                        value="loans"
-                        className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-sm rounded-md py-2 text-sm font-medium transition-all"
-                    >
-                        Loans
-                    </TabsTrigger>
-                </TabsList>
+            {/* Navigation Tabs - Modern Segmented Control */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <div className="bg-slate-100/50 backdrop-blur-sm p-2 rounded-[2rem] inline-flex mb-10 border border-slate-200/50 shadow-inner">
+                    <TabsList className="bg-transparent border-none p-0 flex gap-1">
+                        {[
+                            { id: 'dashboard', label: 'Overview', icon: DollarSign },
+                            { id: 'payslips', label: 'Payslip Audit', icon: FileText },
+                            { id: 'salaries', label: 'Salary Units', icon: Users },
+                            { id: 'loans', label: 'Credit & Loans', icon: Briefcase }
+                        ].map((tab) => (
+                            <TabsTrigger
+                                key={tab.id}
+                                value={tab.id}
+                                className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-[0_8px_16px_-4px_rgba(0,0,0,0.08)] rounded-[1.5rem] px-8 py-3.5 text-sm font-black transition-all duration-300 flex items-center gap-2 border border-transparent data-[state=active]:border-slate-100"
+                            >
+                                <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-primary-500' : 'text-slate-400'}`} />
+                                {tab.label}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </div>
 
-                <TabsContent value="dashboard" className="mt-0">
-                    <PayrollDashboard />
-                </TabsContent>
+                <div className="mt-2">
+                    <TabsContent value="dashboard" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
+                        <PayrollDashboard />
+                    </TabsContent>
 
-                <TabsContent value="payslips" className="mt-0">
-                    <PayslipPage />
-                </TabsContent>
+                    <TabsContent value="payslips" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
+                        <PayslipPage />
+                    </TabsContent>
 
-                <TabsContent value="salaries" className="mt-0">
-                    <SalaryStructurePage />
-                </TabsContent>
+                    <TabsContent value="salaries" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
+                        <SalaryStructurePage />
+                    </TabsContent>
 
-                <TabsContent value="loans" className="mt-0">
-                    <LoanManagementPage />
-                </TabsContent>
+                    <TabsContent value="loans" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
+                        <LoanManagementPage />
+                    </TabsContent>
+                </div>
             </Tabs>
         </div>
     );

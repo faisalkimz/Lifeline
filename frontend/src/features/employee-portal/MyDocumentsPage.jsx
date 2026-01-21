@@ -8,46 +8,18 @@ import {
     File, FileImage, FileType2, Loader2, Clock, Calendar,
     CheckCircle, AlertCircle
 } from 'lucide-react';
-import { useGetEmployeeDocumentsQuery, useCreateEmployeeDocumentMutation, useSignDocumentMutation, useGetDocumentSignaturesQuery } from '../../store/api';
+import { useGetEmployeeDocumentsQuery, useCreateEmployeeDocumentMutation } from '../../store/api';
 import { getMediaUrl } from '../../config/api';
 import toast from 'react-hot-toast';
-import { PenTool, ShieldCheck } from 'lucide-react';
-import SignaturePad from '../../components/common/SignaturePad';
-import { useMemo } from 'react';
 
 const MyDocumentsPage = () => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [selectedDocument, setSelectedDocument] = useState(null);
 
-    const { data: documentsData, isLoading } = useGetEmployeeDocumentsQuery({ my_docs: true });
+    const { data: documentsData, isLoading } = useGetEmployeeDocumentsQuery({ my_documents: true });
     const [uploadDocument, { isLoading: isUploading }] = useCreateEmployeeDocumentMutation();
-    const [signDoc] = useSignDocumentMutation();
-    const { data: signaturesData } = useGetDocumentSignaturesQuery();
 
-    const [signingDoc, setSigningDoc] = useState(null);
-    const [isSigningPadOpen, setIsSigningPadOpen] = useState(false);
-    const [signAfterUpload, setSignAfterUpload] = useState(false);
-
-    const documents = useMemo(() => Array.isArray(documentsData) ? documentsData : (documentsData?.results || []), [documentsData]);
-    const signatures = useMemo(() => Array.isArray(signaturesData) ? signaturesData : (signaturesData?.results || []), [signaturesData]);
-
-    const isSigned = (docId) => {
-        return (signatures || []).some(s => s.employee_document == docId);
-    };
-
-    const handleSignDocument = async (signatureBase64) => {
-        try {
-            await signDoc({
-                signature_base64: signatureBase64,
-                employee_document: signingDoc.id
-            }).unwrap();
-            toast.success('Document signed legally!');
-            setIsSigningPadOpen(false);
-            setSigningDoc(null);
-        } catch (error) {
-            toast.error('Failed to sign document');
-        }
-    };
+    const documents = Array.isArray(documentsData) ? documentsData : (documentsData?.results || []);
 
     const [uploadForm, setUploadForm] = useState({
         title: '',
@@ -98,21 +70,14 @@ const MyDocumentsPage = () => {
         }
 
         const formData = new FormData();
-        formData.append('title', uploadForm.title || uploadForm.file.name);
+        formData.append('title', uploadForm.title);
         formData.append('document_type', uploadForm.document_type);
         formData.append('file', uploadForm.file);
 
         try {
-            const res = await uploadDocument(formData).unwrap();
+            await uploadDocument(formData).unwrap();
             toast.success('Document uploaded successfully!');
             setShowUploadDialog(false);
-
-            if (signAfterUpload) {
-                setSigningDoc(res);
-                setIsSigningPadOpen(true);
-                setSignAfterUpload(false);
-            }
-
             setUploadForm({ title: '', document_type: 'other', file: null });
         } catch (error) {
             toast.error(error?.data?.error || 'Failed to upload document');
@@ -159,24 +124,10 @@ const MyDocumentsPage = () => {
                     <h1 className="text-3xl font-bold text-gray-900">My Documents</h1>
                     <p className="text-gray-600 mt-2">Manage your personal and employment documents</p>
                 </div>
-                <div className="flex gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            setUploadForm(prev => ({ ...prev, document_type: 'contract' }));
-                            setSignAfterUpload(true);
-                            setShowUploadDialog(true);
-                        }}
-                        className="gap-2 border-primary-200 text-primary-600 hover:bg-primary-50"
-                    >
-                        <PenTool className="h-4 w-4" />
-                        Sign & Upload
-                    </Button>
-                    <Button onClick={() => { setSignAfterUpload(false); setShowUploadDialog(true); }} className="gap-2">
-                        <Upload className="h-4 w-4" />
-                        Upload Document
-                    </Button>
-                </div>
+                <Button onClick={() => setShowUploadDialog(true)} className="gap-2">
+                    <Upload className="h-4 w-4" />
+                    Upload Document
+                </Button>
             </div>
 
             {/* Stats Cards */}
@@ -255,13 +206,8 @@ const MyDocumentsPage = () => {
                         >
                             <CardContent className="p-6">
                                 <div className="flex items-start gap-4">
-                                    <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-slate-100 transition-colors relative">
+                                    <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-slate-100 transition-colors">
                                         {getFileIcon(doc.file)}
-                                        {isSigned(doc.id) && (
-                                            <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-1 border-2 border-white shadow-sm">
-                                                <ShieldCheck className="h-2.5 w-2.5 text-white" />
-                                            </div>
-                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-slate-900 truncate">{doc.title}</h3>
@@ -283,22 +229,6 @@ const MyDocumentsPage = () => {
                                     </span>
                                     <span>{formatFileSize(doc.file_size)}</span>
                                 </div>
-
-                                {!isSigned(doc.id) && (
-                                    <div className="mt-4">
-                                        <Button
-                                            variant="outline"
-                                            className="w-full h-10 gap-2 text-[10px] font-black uppercase tracking-wider border-primary-100 text-primary-600 hover:bg-primary-50"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSigningDoc(doc);
-                                                setIsSigningPadOpen(true);
-                                            }}
-                                        >
-                                            <PenTool className="h-3 w-3" /> Sign Document
-                                        </Button>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                     ))}
@@ -467,13 +397,6 @@ const MyDocumentsPage = () => {
                     )}
                 </DialogContent>
             </Dialog>
-            {/* Signing Pad Overlay */}
-            {isSigningPadOpen && (
-                <SignaturePad
-                    onSave={handleSignDocument}
-                    onCancel={() => setIsSigningPadOpen(false)}
-                />
-            )}
         </div>
     );
 };

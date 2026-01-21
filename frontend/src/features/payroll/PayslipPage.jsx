@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import {
-    Download, Eye, Mail, DollarSign, User, Calendar,
+    Download, Eye, Mail, DollarSign, User, Users, Calendar,
     Loader2, TrendingUp, ShieldCheck, FileText,
     Search, Filter, ChevronRight, MoreHorizontal
 } from 'lucide-react';

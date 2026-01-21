@@ -185,49 +185,67 @@ const EmployeeFormPage = () => {
     const onSubmit = async (data) => {
         try {
             const formData = new FormData();
+
+            // Explicitly handle fields
             Object.keys(data).forEach(key => {
-                if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
-                    if (typeof data[key] === 'boolean') {
-                        formData.append(key, data[key] ? 'true' : 'false');
-                    } else {
-                        formData.append(key, data[key]);
-                    }
+                const value = data[key];
+
+                // Skip null, undefined, and empty string (except specifically handled fields)
+                if (value === null || value === undefined || value === '') {
+                    // For specific fields that can be cleared, we might want to send null
+                    // But FormData stringifies null to "null". 
+                    // DRF handles empty string as null for some fields if configured, 
+                    // but generally it's safer to just omit if we don't want to change it, 
+                    // OR if we strictly want to clear it, we need logic.
+                    // For now, omission is safer for PATCH.
+                    return;
+                }
+
+                if (key === 'photo') return; // Handle photo separately
+
+                if (typeof value === 'boolean') {
+                    formData.append(key, value ? 'true' : 'false');
+                } else {
+                    formData.append(key, value);
                 }
             });
 
-            if (selectedFile) formData.append('photo', selectedFile);
+            if (selectedFile) {
+                formData.append('photo', selectedFile);
+            }
 
-            let employeeId = id;
             if (isEditMode) {
+                // Ensure ID is present
+                if (!id) throw new Error("Employee ID is missing");
+
                 await updateEmployee({ id, formData }).unwrap();
-                toast.success("Employee updated! 🎉");
+                toast.success("Employee updated successfully! 🎉");
             } else {
                 const res = await createEmployee(formData).unwrap();
-                employeeId = res.id;
+                // Handle salary structure creation
+                if (data.basic_salary > 0 && canManageSalaries) {
+                    const salaryData = {
+                        basic_salary: data.basic_salary || 0,
+                        housing_allowance: data.housing_allowance || 0,
+                        transport_allowance: data.transport_allowance || 0,
+                        medical_allowance: data.medical_allowance || 0,
+                        lunch_allowance: data.lunch_allowance || 0,
+                        other_allowances: data.other_allowances || 0,
+                        effective_date: new Date().toISOString().split('T')[0]
+                    };
+                    await createSalaryStructure({ employee: res.id, ...salaryData }).unwrap();
+                }
                 toast.success("Welcome aboard! Employee created 🚀");
             }
 
-            if (data.basic_salary > 0 && canManageSalaries) {
-                const salaryData = {
-                    basic_salary: data.basic_salary || 0,
-                    housing_allowance: data.housing_allowance || 0,
-                    transport_allowance: data.transport_allowance || 0,
-                    medical_allowance: data.medical_allowance || 0,
-                    lunch_allowance: data.lunch_allowance || 0,
-                    other_allowances: data.other_allowances || 0,
-                    effective_date: new Date().toISOString().split('T')[0]
-                };
-
-                if (isEditMode && employeeData?.salary_structure?.id) {
-                    await updateSalaryStructure({ id: employeeData.salary_structure.id, ...salaryData }).unwrap();
-                } else {
-                    await createSalaryStructure({ employee: employeeId, ...salaryData }).unwrap();
-                }
-            }
-
+            // Navigate back
             navigate('/employees');
         } catch (error) {
-            const msg = error?.data?.detail || error?.data?.non_field_errors?.[0] || "Something went wrong";
+            console.error("Form Submission Error:", error);
+            const msg = error?.data?.detail ||
+                error?.data?.non_field_errors?.[0] ||
+                Object.entries(error?.data || {}).map(([k, v]) => `${k}: ${v}`).join(', ') ||
+                "Something went wrong";
             toast.error(msg);
         }
     };

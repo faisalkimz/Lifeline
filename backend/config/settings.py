@@ -200,10 +200,11 @@ CORS_ALLOWED_ORIGINS = os.getenv(
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Trusted Origins for production
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "CSRF_TRUSTED_ORIGINS",
-    "https://lifeline-o725.vercel.app,https://lifeline-backend.onrender.com"
-).split(',')
+CSRF_TRUSTED_ORIGINS = [
+    "https://lifeline-o725.vercel.app",
+    "https://lifeline-k3tt.onrender.com",
+    "https://lifeline-backend.onrender.com"
+]
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://lifeline-o725.vercel.app")
 

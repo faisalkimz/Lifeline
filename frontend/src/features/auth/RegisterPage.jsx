@@ -11,6 +11,7 @@ import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { AlertCircle, CheckCircle2, ShieldCheck, Sparkle, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../../utils/cn';
 
 // Validation Schema
 const registerSchema = z.object({

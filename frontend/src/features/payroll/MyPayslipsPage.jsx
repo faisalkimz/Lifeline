@@ -26,14 +26,25 @@ const MyPayslipsPage = () => {
     };
 
     const handleDownloadPdf = async (payslipId) => {
+        const loadingToast = toast.loading('Generating PDF...');
         try {
             const result = await generatePdf(payslipId).unwrap();
             if (result?.pdf_url) {
-                window.open(getMediaUrl(result.pdf_url), '_blank');
+                const url = getMediaUrl(result.pdf_url);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Payslip-${payslipId}.pdf`);
+                link.setAttribute('target', '_blank');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                toast.success('Payslip PDF generated!', { id: loadingToast });
+            } else {
+                toast.error('PDF URL not found', { id: loadingToast });
             }
-            toast.success('Payslip PDF generated!');
         } catch (error) {
-            toast.error('Failed to generate PDF');
+            console.error('PDF generation error:', error);
+            toast.error('Failed to generate PDF', { id: loadingToast });
         }
     };
 
@@ -197,15 +208,15 @@ const MyPayslipsPage = () => {
 
             {/* Payslip Details Modal */}
             <Dialog open={!!selectedPayslip} onOpenChange={() => setSelectedPayslip(null)}>
-                <DialogContent className="max-w-3xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
+                <DialogContent className="bg-white max-w-3xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
                     {selectedPayslip && (
                         <>
-                            <DialogHeader className="bg-slate-900 p-8 text-white">
-                                <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3">
-                                    <FileText className="h-6 w-6 text-primary-400" />
+                            <DialogHeader className="bg-slate-50 p-8 border-b border-slate-100">
+                                <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3 text-slate-900">
+                                    <FileText className="h-6 w-6 text-primary-600" />
                                     Payslip Details
                                 </DialogTitle>
-                                <p className="text-slate-400 text-sm mt-1">
+                                <p className="text-slate-500 text-sm mt-1">
                                     {new Date(selectedPayslip.year, selectedPayslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
                                 </p>
                             </DialogHeader>
@@ -266,9 +277,9 @@ const MyPayslipsPage = () => {
                                 </div>
 
                                 {/* Net Salary */}
-                                <div className="bg-slate-900 rounded-2xl p-8 text-center">
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Net Salary (Take Home)</p>
-                                    <p className="text-4xl font-black text-white tracking-tight">{formatCurrency(selectedPayslip.net_salary)}</p>
+                                <div className="bg-primary-50 border border-primary-100 rounded-3xl p-8 text-center">
+                                    <p className="text-[10px] font-black text-primary-600 uppercase tracking-widest mb-2">Net Salary (Take Home)</p>
+                                    <p className="text-4xl font-black text-primary-700 tracking-tight">{formatCurrency(selectedPayslip.net_salary)}</p>
                                 </div>
                             </div>
 

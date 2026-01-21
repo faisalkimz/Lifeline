@@ -114,12 +114,25 @@ const PayrollRunDetailsPage = () => {
     };
 
     const handleDownloadPayslip = async (payslipId) => {
+        const loadingToast = toast.loading('Generating PDF...');
         try {
             const result = await generatePayslipPdf(payslipId).unwrap();
-            window.open(getMediaUrl(result.pdf_url), '_blank');
-            toast.success('Payslip generated');
+            if (result?.pdf_url) {
+                const url = getMediaUrl(result.pdf_url);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Payslip-${payslipId}.pdf`);
+                link.setAttribute('target', '_blank');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                toast.success('Payslip generated', { id: loadingToast });
+            } else {
+                toast.error('PDF URL not found', { id: loadingToast });
+            }
         } catch (error) {
-            toast.error('Failed to generate payslip');
+            console.error('PDF generation error:', error);
+            toast.error('Failed to generate payslip', { id: loadingToast });
         }
     };
 

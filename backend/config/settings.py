@@ -39,6 +39,7 @@ CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
 
 # Permissive hosts for Render deployment
 ALLOWED_HOSTS = ['*']
+USE_X_FORWARDED_HOST = True
 
 
 

@@ -9,7 +9,7 @@ import {
     CheckCircle, ChevronRight, Star, Sparkles,
     Building2, Calendar, Phone, Mail, MapPin, Shield,
     Lock, Key, ChevronLeft, Home, Heart, AlertCircle,
-    UserCircle, Globe, Camera, BadgeCheck, Clock, Users
+    UserCircle, Globe, Camera, BadgeCheck, Clock, Users, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {

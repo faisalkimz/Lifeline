@@ -8,13 +8,13 @@ const buttonVariants = cva(
     {
         variants: {
             variant: {
-                primary: "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500 shadow-sm hover:shadow-md",
-                secondary: "bg-white text-neutral-900 border border-neutral-300 hover:bg-neutral-50 hover:border-neutral-400 focus-visible:ring-primary-500 shadow-sm",
+                primary: "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500 shadow-sm hover:shadow-md dark:shadow-primary-900/20",
+                secondary: "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-primary-500 shadow-sm",
                 success: "bg-success-600 text-white hover:bg-success-700 focus-visible:ring-success-500 shadow-sm hover:shadow-md",
                 warning: "bg-warning-600 text-white hover:bg-warning-700 focus-visible:ring-warning-500 shadow-sm hover:shadow-md",
                 destructive: "bg-error-600 text-white hover:bg-error-700 focus-visible:ring-error-500 shadow-sm hover:shadow-md",
-                ghost: "bg-transparent hover:bg-neutral-100 hover:text-neutral-900 text-neutral-600",
-                outline: "border border-primary-600 text-primary-600 hover:bg-primary-50 focus-visible:ring-primary-500",
+                ghost: "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-600 dark:text-slate-400",
+                outline: "border border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/30 focus-visible:ring-primary-500",
                 link: "text-primary-600 hover:text-primary-700 underline-offset-4 hover:underline p-0 h-auto",
             },
             size: {

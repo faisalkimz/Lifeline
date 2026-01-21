@@ -200,6 +200,12 @@ CORS_ALLOWED_ORIGINS = os.getenv(
     "https://lifeline-o725.vercel.app,http://localhost:5173,http://127.0.0.1:5173"
 ).split(',')
 
+# Verify localhost is allowed for development
+if 'http://localhost:5173' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('http://localhost:5173')
+if 'http://127.0.0.1:5173' not in CORS_ALLOWED_ORIGINS:
+    CORS_ALLOWED_ORIGINS.append('http://127.0.0.1:5173')
+
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Trusted Origins for production

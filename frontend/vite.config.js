@@ -30,6 +30,9 @@ export default defineConfig({
           }
         ]
       },
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
+      },
       // Keep PWA disabled in dev unless you are specifically testing it
       devOptions: {
         enabled: false,
@@ -41,15 +44,12 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
-  // If the build still hangs, try commenting out this css block 
-  // to see if PostCSS is the bottleneck
   css: {
     postcss: './postcss.config.cjs',
   },
   build: {
-    // Ensures the build doesn't hang waiting for user input or file watches
     watch: null,
-    sourcemap: false, // Set to false to speed up build and save memory
+    sourcemap: false,
     chunkSizeWarningLimit: 1600,
   },
   server: {

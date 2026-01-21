@@ -9,6 +9,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
+from django.template.loader import render_to_string
 
 from .models import Company, User
 from .serializers import (
@@ -385,3 +391,180 @@ class SecurityViewSet(viewsets.ViewSet):
         data = SecurityService.get_user_data_export(request.user)
         SecurityService.log_security_event(request.user, request.user.company, 'gdpr_export', 'success', request)
         return Response(data)
+
+
+class RequestPasswordResetView(generics.GenericAPIView):
+    """
+    API endpoint to request password reset.
+    Sends an email with a reset link to the user.
+    
+    POST /api/auth/request-password-reset/
+    Body: {"email": "user@example.com"}
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        """Send password reset email"""
+        email = request.data.get('email')
+        
+        if not email:
+            return Response({
+                'error': 'Email is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # Don't reveal if user exists for security
+            return Response({
+                'message': 'If an account exists with this email, you will receive a password reset link.'
+            }, status=status.HTTP_200_OK)
+        
+        # Generate token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        # Create reset link
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')
+        reset_link = f"{frontend_url}/reset-password/{uid}/{token}"
+        
+        # Prepare email
+        subject = 'Password Reset Request - Lifeline HR'
+        html_message = render_to_string('emails/password_reset.html', {
+            'user': user,
+            'reset_link': reset_link,
+            'site_name': 'Lifeline HR',
+            'valid_hours': 24
+        })
+        
+        plain_message = f"""
+        Hi {user.get_full_name()},
+        
+        You requested to reset your password. Click the link below to set a new password:
+        
+        {reset_link}
+        
+        This link will expire in 24 hours.
+        
+        If you didn't request this, please ignore this email.
+        
+        Best regards,
+        Lifeline HR Team
+        """
+        
+        try:
+            send_mail(
+                subject,
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                html_message=html_message,
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Failed to send email: {e}")
+            return Response({
+                'error': 'Failed to send email. Please try again later.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        return Response({
+            'message': 'If an account exists with this email, you will receive a password reset link.'
+        }, status=status.HTTP_200_OK)
+
+
+class ResetPasswordView(generics.GenericAPIView):
+    """
+    API endpoint to reset password using token.
+    
+    POST /api/auth/reset-password/
+    Body: {"uid": "...", "token": "...", "new_password": "..."}
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        """Reset password with token"""
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        
+        if not all([uid, token, new_password]):
+            return Response({
+                'error': 'UID, token, and new password are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Decode UID
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response({
+                'error': 'Invalid reset link'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if token is valid
+        if not default_token_generator.check_token(user, token):
+            return Response({
+                'error': 'Invalid or expired reset link'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate password strength
+        if len(new_password) < 8:
+            return Response({
+                'error': 'Password must be at least 8 characters long'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Set new password
+        user.set_password(new_password)
+        user.save()
+        
+        # Log security event
+        try:
+            SecurityService.log_security_event(user, user.company, 'password_reset', 'success', request)
+        except:
+            pass
+        
+        return Response({
+            'message': 'Password has been reset successfully. You can now log in with your new password.'
+        }, status=status.HTTP_200_OK)
+
+
+class VerifyResetTokenView(generics.GenericAPIView):
+    """
+    API endpoint to verify if a password reset token is valid.
+    
+    POST /api/auth/verify-reset-token/
+    Body: {"uid": "...", "token": "..."}
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        """Verify reset token"""
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        
+        if not all([uid, token]):
+            return Response({
+                'valid': False,
+                'error': 'UID and token are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user_id = force_str(urlsafe_base64_decode(uid))
+            user = User.objects.get(pk=user_id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response({
+                'valid': False,
+                'error': 'Invalid reset link'
+            }, status=status.HTTP_200_OK)
+        
+        if default_token_generator.check_token(user, token):
+            return Response({
+                'valid': True,
+                'email': user.email,
+                'name': user.get_full_name()
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                'valid': False,
+                'error': 'Invalid or expired reset link'
+            }, status=status.HTTP_200_OK)

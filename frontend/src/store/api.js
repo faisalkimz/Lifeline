@@ -83,6 +83,28 @@ export const api = createApi({
     exportData: builder.query({
       query: () => '/security/export_data/'
     }),
+    // --- Password Reset Endpoints ---
+    requestPasswordReset: builder.mutation({
+      query: (data) => ({
+        url: '/auth/request-password-reset/',
+        method: 'POST',
+        body: data
+      })
+    }),
+    resetPassword: builder.mutation({
+      query: (data) => ({
+        url: '/auth/reset-password/',
+        method: 'POST',
+        body: data
+      })
+    }),
+    verifyResetToken: builder.mutation({
+      query: (data) => ({
+        url: '/auth/verify-reset-token/',
+        method: 'POST',
+        body: data
+      })
+    }),
     registerPushSubscription: builder.mutation({
       query: (subscription) => ({
         url: '/notifications/subscriptions/',
@@ -1616,6 +1638,10 @@ export const {
   useGetSecurityLogsQuery,
   useExportDataQuery,
   useRegisterPushSubscriptionMutation,
+  // Password Reset
+  useRequestPasswordResetMutation,
+  useResetPasswordMutation,
+  useVerifyResetTokenMutation,
   // Assets
   useGetAssetCategoriesQuery,
   useCreateAssetCategoryMutation,

@@ -181,7 +181,10 @@ const LoginPage = () => {
                     </form>
                 </CardContent>
 
-                <CardFooter className="flex justify-center p-8 border-t border-slate-50 dark:border-slate-800/50">
+                <CardFooter className="flex flex-col gap-4 p-8 border-t border-slate-50 dark:border-slate-800/50">
+                    <Link to="/forgot-password" className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        Forgot your password?
+                    </Link>
                     <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                         New to the ecosystem?{' '}
                         <Link to="/register" className="font-bold text-primary-600 hover:text-primary-700 transition-colors">

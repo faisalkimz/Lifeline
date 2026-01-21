@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -31,9 +30,9 @@ export default defineConfig({
           }
         ]
       },
+      // Keep PWA disabled in dev unless you are specifically testing it
       devOptions: {
-        enabled: true,
-        type: 'module',
+        enabled: false,
       }
     })
   ],
@@ -42,8 +41,16 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  // If the build still hangs, try commenting out this css block 
+  // to see if PostCSS is the bottleneck
   css: {
-    postcss: './postcss.config.cjs', // <-- ensures PostCSS + Tailwind is loaded
+    postcss: './postcss.config.cjs',
+  },
+  build: {
+    // Ensures the build doesn't hang waiting for user input or file watches
+    watch: null,
+    sourcemap: false, // Set to false to speed up build and save memory
+    chunkSizeWarningLimit: 1600,
   },
   server: {
     port: 5173,

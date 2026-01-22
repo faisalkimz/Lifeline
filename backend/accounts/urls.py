@@ -16,6 +16,7 @@ router.register(r'companies', CompanyViewSet, basename='company')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'security', SecurityViewSet, basename='security')
 
+urlpatterns = [
     # Authentication endpoints (Dual paths to prevent 301 redirects converting POST to GET)
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/register', RegisterView.as_view(), name='register_noslash'),

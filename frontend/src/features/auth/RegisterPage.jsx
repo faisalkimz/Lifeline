@@ -78,6 +78,7 @@ const RegisterPage = () => {
             navigate('/dashboard');
         } catch (err) {
             console.error('Registration failed:', err);
+            // Error is automatically handled by RTK Query and displayed via the error state
         }
     };
 
@@ -108,14 +109,24 @@ const RegisterPage = () => {
                                 <AlertCircle className="h-5 w-5 text-error-600 mt-0.5 flex-shrink-0" />
                                 <div className="text-sm text-error-700 dark:text-error-400">
                                     <p className="font-bold">Execution Failed</p>
-                                    {error?.data && typeof error.data === 'object' ? (
-                                        <div className="mt-1 opacity-90">
-                                            {Object.entries(error.data).map(([field, messages]) => (
-                                                <p key={field}>• {Array.isArray(messages) ? messages[0] : messages}</p>
-                                            ))}
+                                    {error?.data && typeof error.data === 'object' && !Array.isArray(error.data) ? (
+                                        <div className="mt-1 opacity-90 space-y-1">
+                                            {Object.entries(error.data).map(([field, messages]) => {
+                                                const message = Array.isArray(messages) ? messages[0] : messages;
+                                                const fieldLabel = field.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                                                return (
+                                                    <p key={field}>
+                                                        <span className="font-semibold">{fieldLabel}:</span> {message}
+                                                    </p>
+                                                );
+                                            })}
                                         </div>
+                                    ) : error?.data?.detail ? (
+                                        <p className="mt-1 opacity-90">{error.data.detail}</p>
+                                    ) : error?.data?.message ? (
+                                        <p className="mt-1 opacity-90">{error.data.message}</p>
                                     ) : (
-                                        <p className="mt-1 opacity-90">{error?.data?.detail || 'Please check your details.'}</p>
+                                        <p className="mt-1 opacity-90">Please check your details and try again.</p>
                                     )}
                                 </div>
                             </motion.div>

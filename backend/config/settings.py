@@ -201,14 +201,18 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'config.exceptions.custom_exception_handler',
 }
 
 
 # CORS Configuration (for React frontend)
 CORS_ALLOWED_ORIGINS = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "https://lifeline-o725.vercel.app,http://localhost:5173,http://127.0.0.1:5173"
+    "https://lifeline-o725.vercel.app,https://lifeline-mmi7rrwcp-faisals-projects-b1012903.vercel.app,http://localhost:5173,http://127.0.0.1:5173"
 ).split(',')
+
+# Clean up empty strings from split
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS if origin.strip()]
 
 # Verify localhost is allowed for development
 if 'http://localhost:5173' not in CORS_ALLOWED_ORIGINS:
@@ -221,9 +225,17 @@ CORS_ALLOW_CREDENTIALS = True
 # CSRF Trusted Origins for production
 CSRF_TRUSTED_ORIGINS = [
     "https://lifeline-o725.vercel.app",
+    "https://lifeline-mmi7rrwcp-faisals-projects-b1012903.vercel.app",
     "https://lifeline-k3tt.onrender.com",
-    "https://lifeline-backend.onrender.com"
+    "https://lifeline-backend.onrender.com",
 ]
+
+# Add any additional origins from environment
+csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')
+for origin in csrf_origins:
+    origin = origin.strip()
+    if origin and origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "https://lifeline-o725.vercel.app")
 

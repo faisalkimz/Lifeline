@@ -30,21 +30,38 @@ class JSONErrorMiddleware(MiddlewareMixin):
                     is_html = True
             
             if is_html:
-                # Map status codes to error messages
-                error_messages = {
-                    400: 'Bad Request - Invalid data provided',
-                    403: 'Forbidden - CSRF verification failed or insufficient permissions',
-                    404: 'Not Found - The requested resource does not exist',
-                    500: 'Internal Server Error - An unexpected error occurred',
-                }
+                # Try to extract error message from HTML if possible
+                error_detail = None
+                if hasattr(response, 'content') and isinstance(response.content, bytes):
+                    try:
+                        content_str = response.content.decode('utf-8', errors='ignore')
+                        # Try to extract text from <h1> or <p> tags
+                        import re
+                        h1_match = re.search(r'<h1[^>]*>(.*?)</h1>', content_str, re.IGNORECASE | re.DOTALL)
+                        p_match = re.search(r'<p[^>]*>(.*?)</p>', content_str, re.IGNORECASE | re.DOTALL)
+                        if h1_match:
+                            error_detail = h1_match.group(1).strip()
+                        elif p_match and p_match.group(1).strip():
+                            error_detail = p_match.group(1).strip()
+                    except Exception:
+                        pass
                 
-                error_detail = error_messages.get(response.status_code, f'Error {response.status_code}')
+                # Fallback to default messages
+                if not error_detail:
+                    error_messages = {
+                        400: 'Bad Request - Please check your input data and try again',
+                        403: 'Forbidden - CSRF verification failed or insufficient permissions',
+                        404: 'Not Found - The requested resource does not exist',
+                        500: 'Internal Server Error - An unexpected error occurred',
+                    }
+                    error_detail = error_messages.get(response.status_code, f'Error {response.status_code}')
                 
                 return JsonResponse(
                     {
                         'detail': error_detail,
                         'error': 'api_error',
-                        'status_code': response.status_code
+                        'status_code': response.status_code,
+                        'message': 'The server returned an HTML error page. This should be JSON - please check backend configuration.'
                     },
                     status=response.status_code
                 )

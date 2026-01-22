@@ -90,10 +90,10 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 
-MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware", # For serving static files in production
     "corsheaders.middleware.CorsMiddleware",  # CORS - must be before CommonMiddleware
+    "accounts.middleware.rate_limit.RateLimitMiddleware", # Rate Limiting for Auth
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -264,4 +264,22 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Lifeline HR <noreply@lifeline.com>')
 
 
+
 # Validated settings for production compliance - Email Config Updated
+
+# Security Headers (Production recommended)
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# Caching (Required for Rate Limiting)
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}

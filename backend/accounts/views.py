@@ -13,6 +13,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
+from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -508,9 +510,11 @@ class ResetPasswordView(generics.GenericAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Validate password strength
-        if len(new_password) < 8:
+        try:
+            validate_password(new_password, user=user)
+        except ValidationError as e:
             return Response({
-                'error': 'Password must be at least 8 characters long'
+                'error': list(e.messages)
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Set new password

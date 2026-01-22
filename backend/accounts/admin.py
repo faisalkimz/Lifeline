@@ -3,7 +3,7 @@ Django Admin configuration for accounts app.
 """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Company, User
+from .models import Company, User, SecurityLog
 
 
 @admin.register(Company)
@@ -70,3 +70,17 @@ class UserAdmin(BaseUserAdmin):
             'fields': ('username', 'email', 'password1', 'password2', 'company', 'role'),
         }),
     )
+
+@admin.register(SecurityLog)
+class SecurityLogAdmin(admin.ModelAdmin):
+    """Admin interface for Security Logs"""
+    list_display = ['user', 'company', 'action', 'status', 'ip_address', 'created_at']
+    list_filter = ['action', 'status', 'company', 'created_at']
+    search_fields = ['user__username', 'description', 'ip_address']
+    readonly_fields = list_display + ['user_agent', 'description']
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False

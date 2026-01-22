@@ -164,10 +164,33 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             const data = await parseExcelFile(file);
             uploadResults.total = data.length;
 
+            // Check for duplicate emails in the upload batch
+            const emailSet = new Set();
+            const duplicateEmails = new Set();
+
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                const employeeData = mapEmployeeData(row);
+                
+                // Check for duplicates in batch
+                if (employeeData.email) {
+                    if (emailSet.has(employeeData.email.toLowerCase())) {
+                        duplicateEmails.add(employeeData.email.toLowerCase());
+                    } else {
+                        emailSet.add(employeeData.email.toLowerCase());
+                    }
+                }
+            }
+
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
                 const employeeData = mapEmployeeData(row);
                 const validationErrors = validateEmployee(employeeData);
+
+                // Check if email is duplicate in this batch
+                if (employeeData.email && duplicateEmails.has(employeeData.email.toLowerCase())) {
+                    validationErrors.push('Duplicate email in upload file');
+                }
 
                 if (validationErrors.length > 0) {
                     uploadResults.failed++;
@@ -191,11 +214,62 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                     });
                 } catch (error) {
                     uploadResults.failed++;
+                    
+                    // Extract detailed error message with better parsing
+                    let errorMessage = 'Failed to create employee';
+                    
+                    // Log error for debugging
+                    console.error(`Row ${i + 2} error:`, error);
+                    
+                    if (error.data) {
+                        // Handle different error formats
+                        if (typeof error.data === 'string') {
+                            // Check if it's HTML (backend not deployed with middleware yet)
+                            if (error.data.includes('<!doctype html>') || error.data.includes('<html')) {
+                                errorMessage = 'Backend returned HTML error. Please deploy backend changes.';
+                            } else {
+                                errorMessage = error.data;
+                            }
+                        } else if (error.data.detail) {
+                            errorMessage = error.data.detail;
+                        } else if (error.data.message) {
+                            errorMessage = error.data.message;
+                        } else if (typeof error.data === 'object') {
+                            // Extract all validation errors, not just the first
+                            const errorMessages = [];
+                            const errorKeys = Object.keys(error.data);
+                            
+                            errorKeys.forEach(key => {
+                                const fieldError = error.data[key];
+                                if (Array.isArray(fieldError)) {
+                                    fieldError.forEach(msg => {
+                                        errorMessages.push(`${key}: ${msg}`);
+                                    });
+                                } else if (typeof fieldError === 'string') {
+                                    errorMessages.push(`${key}: ${fieldError}`);
+                                } else if (typeof fieldError === 'object') {
+                                    errorMessages.push(`${key}: ${JSON.stringify(fieldError)}`);
+                                }
+                            });
+                            
+                            if (errorMessages.length > 0) {
+                                errorMessage = errorMessages.slice(0, 3).join('; '); // Show first 3 errors
+                                if (errorMessages.length > 3) {
+                                    errorMessage += ` (+${errorMessages.length - 3} more)`;
+                                }
+                            }
+                        }
+                    } else if (error.error) {
+                        errorMessage = error.error;
+                    } else if (error.status === 'PARSING_ERROR') {
+                        errorMessage = 'Server returned invalid response. Backend may need to be deployed.';
+                    }
+                    
                     uploadResults.details.push({
                         row: i + 2,
-                        name: `${employeeData.first_name} ${employeeData.last_name}`,
+                        name: `${employeeData.first_name || 'Unknown'} ${employeeData.last_name || ''}`,
                         status: 'failed',
-                        error: error.data?.message || error.data?.email?.[0] || 'Failed to create employee'
+                        error: errorMessage
                     });
                 }
             }

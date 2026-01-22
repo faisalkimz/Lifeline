@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
-import { useCreateEmployeeMutation } from '../../store/api';
+import { useCreateEmployeeMutation, useGetDepartmentsQuery } from '../../store/api';
 import {
     Upload, Download, FileSpreadsheet, CheckCircle, XCircle,
-    Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck, Edit
+    Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck, Edit, Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -15,7 +15,9 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [results, setResults] = useState(null);
+    const [selectedDepartment, setSelectedDepartment] = useState('');
     const [createEmployee] = useCreateEmployeeMutation();
+    const { data: departments = [], isLoading: departmentsLoading } = useGetDepartmentsQuery();
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -30,6 +32,11 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     };
 
     const downloadTemplate = () => {
+        // Get department name for template if selected
+        const departmentName = selectedDepartment 
+            ? departments.find(d => d.id === parseInt(selectedDepartment))?.name || ''
+            : 'Engineering'; // Default example
+        
         const templateData = [
             {
                 'First Name*': 'Sarah',
@@ -37,7 +44,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 'Email*': 'sarah.johnson@company.com',
                 'Phone': '+256700000000',
                 'Job Title': 'Software Engineer',
-                'Department': 'Engineering',
+                'Department': departmentName || 'Select from available departments',
                 'Date of Birth': '1990-01-15',
                 'Gender': 'Female',
                 'Address': '123 Main St, Kampala',
@@ -53,13 +60,25 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             }
         ];
 
+        // Create main data sheet
         const ws = XLSX.utils.json_to_sheet(templateData);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Employee Template');
+        XLSX.utils.book_append_sheet(wb, ws, 'Employee Data');
+
+        // Create departments reference sheet
+        if (departments.length > 0) {
+            const deptData = departments.map(dept => ({
+                'Department ID': dept.id,
+                'Department Name': dept.name,
+                'Code': dept.code || ''
+            }));
+            const deptWs = XLSX.utils.json_to_sheet(deptData);
+            XLSX.utils.book_append_sheet(wb, deptWs, 'Available Departments');
+        }
 
         ws['!cols'] = [
             { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
-            { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 10 },
+            { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 10 },
             { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 },
             { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
             { wch: 15 }, { wch: 15 }
@@ -89,13 +108,18 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     };
 
     const mapEmployeeData = (row) => {
+        // Use selected department from UI if provided, otherwise use department from Excel
+        let departmentValue = selectedDepartment 
+            ? departments.find(d => d.id === parseInt(selectedDepartment))?.name 
+            : (row['Department'] || row['department'] || null);
+        
         return {
             first_name: row['First Name*'] || row['first_name'],
             last_name: row['Last Name*'] || row['last_name'],
             email: row['Email*'] || row['email'],
             phone: row['Phone'] || row['phone'] || null,
             job_title: row['Job Title'] || row['job_title'] || null,
-            department: row['Department'] || row['department'] || null,
+            department: departmentValue,
             date_of_birth: row['Date of Birth'] || row['date_of_birth'] || null,
             gender: row['Gender'] || row['gender'] || null,
             address: row['Address'] || row['address'] || null,
@@ -196,6 +220,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     const handleClose = () => {
         setFile(null);
         setResults(null);
+        setSelectedDepartment('');
         onClose();
     };
 
@@ -229,13 +254,56 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                             </div>
 
                             <div className="grid grid-cols-1 gap-10">
+                                {/* Department Selector */}
+                                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-100 rounded-2xl p-6">
+                                    <div className="flex items-start gap-4">
+                                        <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                            <Building2 className="h-5 w-5 text-blue-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-sm font-bold text-slate-900 mb-2">
+                                                Default Department (Optional)
+                                            </label>
+                                            <p className="text-xs text-slate-600 mb-3">
+                                                Select a department to apply to all employees in this upload. You can also specify departments individually in the Excel file.
+                                            </p>
+                                            <select
+                                                value={selectedDepartment}
+                                                onChange={(e) => setSelectedDepartment(e.target.value)}
+                                                className="w-full rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                disabled={departmentsLoading}
+                                            >
+                                                <option value="">No default (use Excel file values)</option>
+                                                {departments.map((dept) => (
+                                                    <option key={dept.id} value={dept.id}>
+                                                        {dept.name} {dept.code ? `(${dept.code})` : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            {departments.length === 0 && !departmentsLoading && (
+                                                <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                                                    <AlertCircle className="h-3 w-3" />
+                                                    No departments found. Create departments first or leave blank.
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {/* Instructions List */}
                                 <div className="space-y-6">
                                     <div className="flex gap-4">
                                         <div className="flex-shrink-0 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">1</div>
                                         <div>
                                             <p className="font-semibold text-slate-900">Download the template</p>
-                                            <p className="text-sm text-slate-500 mt-1 mb-3">A pre-formatted Excel file with all the columns you'll need.</p>
+                                            <p className="text-sm text-slate-500 mt-1 mb-3">
+                                                A pre-formatted Excel file with all the columns you'll need.
+                                                {departments.length > 0 && (
+                                                    <span className="block mt-1 text-xs text-blue-600">
+                                                        📋 Includes a "Available Departments" sheet for reference
+                                                    </span>
+                                                )}
+                                            </p>
                                             <button
                                                 onClick={downloadTemplate}
                                                 className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
@@ -252,6 +320,11 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                             <p className="font-semibold text-slate-900">Add your people</p>
                                             <p className="text-sm text-slate-500 mt-1">
                                                 Only <span className="text-slate-900 font-medium">Name and Email</span> are required for now.
+                                                {selectedDepartment && (
+                                                    <span className="block mt-1 text-xs text-blue-600">
+                                                        ✓ All employees will be assigned to: <strong>{departments.find(d => d.id === parseInt(selectedDepartment))?.name}</strong>
+                                                    </span>
+                                                )}
                                                 You can always update phone numbers and IDs later in their profiles.
                                             </p>
                                         </div>

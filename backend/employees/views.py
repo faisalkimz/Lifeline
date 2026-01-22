@@ -191,28 +191,36 @@ class EmployeeViewSet(viewsets.ModelViewSet):
         
         # Handle department name -> ID conversion for bulk uploads
         data = request.data.copy()
-        if 'department' in data and isinstance(data['department'], str) and not data['department'].isdigit():
-            # Try to find department by name
-            try:
-                department = Department.objects.get(
-                    name__iexact=data['department'],
+        if 'department' in data and data['department']:
+            # If it's a string and not a digit, try to find by name
+            if isinstance(data['department'], str) and not data['department'].isdigit():
+                # Try exact match first (case-insensitive)
+                department = Department.objects.filter(
+                    name__iexact=data['department'].strip(),
                     company=request.user.company
-                )
-                data['department'] = department.id
-            except Department.DoesNotExist:
-                return Response(
-                    {
-                        'department': f"Department '{data['department']}' not found. Please use a valid department name or ID."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            except Department.MultipleObjectsReturned:
-                return Response(
-                    {
-                        'department': f"Multiple departments found with name '{data['department']}'. Please use department ID instead."
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+                ).first()
+                
+                # If not found, try partial match (contains)
+                if not department:
+                    department = Department.objects.filter(
+                        name__icontains=data['department'].strip(),
+                        company=request.user.company
+                    ).first()
+                
+                if department:
+                    data['department'] = department.id
+                else:
+                    # Return helpful error with available departments
+                    available_depts = Department.objects.filter(
+                        company=request.user.company
+                    ).values_list('name', flat=True)
+                    
+                    return Response(
+                        {
+                            'department': f"Department '{data['department']}' not found. Available departments: {', '.join(available_depts) if available_depts else 'None'}"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
         
         serializer = self.get_serializer(data=data)
         if not serializer.is_valid():

@@ -35,7 +35,13 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         // Get department name for template if selected
         const departmentName = selectedDepartment 
             ? departments.find(d => d.id === parseInt(selectedDepartment))?.name || ''
-            : 'Engineering'; // Default example
+            : (departments.length > 0 ? departments[0].name : 'Engineering'); // Use first available or default
+        
+        // Use today's date for example
+        const today = new Date().toISOString().split('T')[0];
+        const exampleBirthDate = new Date();
+        exampleBirthDate.setFullYear(exampleBirthDate.getFullYear() - 30);
+        const exampleBirthDateStr = exampleBirthDate.toISOString().split('T')[0];
         
         const templateData = [
             {
@@ -44,13 +50,13 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 'Email*': 'sarah.johnson@company.com',
                 'Phone': '+256700000000',
                 'Job Title': 'Software Engineer',
-                'Department': departmentName || 'Select from available departments',
-                'Date of Birth': '1990-01-15',
+                'Department': departmentName || (departments.length > 0 ? departments[0].name : 'Select from available departments'),
+                'Date of Birth': exampleBirthDateStr, // Use YYYY-MM-DD format
                 'Gender': 'Female',
                 'Address': '123 Main St, Kampala',
                 'Emergency Contact Name': 'John Johnson',
                 'Emergency Contact Phone': '+256700000001',
-                'Hire Date': '2024-01-01',
+                'Hire Date': today, // Use YYYY-MM-DD format
                 'Salary': '5000000',
                 'Bank Name': 'Stanbic Bank',
                 'Bank Account Number': '1234567890',
@@ -94,9 +100,18 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             reader.onload = (e) => {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    // Configure XLSX to parse dates and keep raw values for date conversion
+                    const workbook = XLSX.read(data, { 
+                        type: 'array',
+                        cellDates: false, // Keep as serial numbers so we can convert them
+                        cellNF: false,
+                        cellText: false
+                    });
                     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, {
+                        raw: false, // Get formatted values where possible
+                        defval: null // Use null for empty cells
+                    });
                     resolve(jsonData);
                 } catch (error) {
                     reject(error);
@@ -107,11 +122,96 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         });
     };
 
+    // Helper function to convert Excel date serial number to YYYY-MM-DD format
+    const excelDateToISOString = (excelDate) => {
+        if (excelDate === null || excelDate === undefined || excelDate === '') return null;
+        
+        // If it's already a string in date format, return it
+        if (typeof excelDate === 'string') {
+            // Check if it's already in YYYY-MM-DD format
+            if (/^\d{4}-\d{2}-\d{2}$/.test(excelDate)) {
+                return excelDate;
+            }
+            // Check if it's a string that looks like a number (Excel serial date as string)
+            if (/^\d+\.?\d*$/.test(excelDate.trim())) {
+                const numValue = parseFloat(excelDate);
+                if (!isNaN(numValue) && numValue > 0) {
+                    excelDate = numValue; // Convert to number and process below
+                } else {
+                    return null;
+                }
+            } else {
+                // Try to parse as date string
+                const parsed = new Date(excelDate);
+                if (!isNaN(parsed.getTime())) {
+                    return parsed.toISOString().split('T')[0];
+                }
+                return null;
+            }
+        }
+        
+        // If it's a number (Excel serial date), convert it
+        if (typeof excelDate === 'number' && !isNaN(excelDate) && excelDate > 0) {
+            // Excel date serial number conversion
+            // Excel epoch: January 1, 1900 (serial number 1)
+            // Excel incorrectly treats 1900 as a leap year
+            // Serial number 60 = February 29, 1900 (doesn't exist, so we adjust)
+            
+            // Convert Excel serial date to JavaScript Date
+            // Excel serial 1 = Jan 1, 1900
+            // JavaScript Date(1900, 0, 1) = Jan 1, 1900
+            
+            const excelEpoch = new Date(1900, 0, 1); // January 1, 1900
+            let days = excelDate - 1; // Subtract 1 because Excel serial 1 = Jan 1, 1900
+            
+            // Excel's leap year bug: it treats 1900 as a leap year
+            // Serial numbers 1-59 are correct (Jan 1 - Feb 28, 1900)
+            // Serial number 60 = Feb 29, 1900 (doesn't exist)
+            // Serial number 61 = Mar 1, 1900
+            // So for dates >= 60, we need to subtract 1 more day
+            if (excelDate >= 60) {
+                days = excelDate - 2; // Subtract 2 to account for the non-existent Feb 29, 1900
+            }
+            
+            const jsDate = new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
+            
+            // Format as YYYY-MM-DD
+            const year = jsDate.getFullYear();
+            const month = String(jsDate.getMonth() + 1).padStart(2, '0');
+            const day = String(jsDate.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}`;
+        }
+        
+        return null;
+    };
+
     const mapEmployeeData = (row) => {
         // Use selected department from UI if provided, otherwise use department from Excel
         let departmentValue = selectedDepartment 
             ? departments.find(d => d.id === parseInt(selectedDepartment))?.name 
             : (row['Department'] || row['department'] || null);
+        
+        // Convert Excel date serial numbers to ISO date strings
+        const dateOfBirth = excelDateToISOString(row['Date of Birth'] || row['date_of_birth']);
+        const joinDate = excelDateToISOString(row['Hire Date'] || row['hire_date']);
+        
+        // Normalize gender to lowercase (backend expects 'male', 'female', 'other')
+        let genderValue = row['Gender'] || row['gender'] || null;
+        if (genderValue) {
+            const genderLower = String(genderValue).toLowerCase().trim();
+            // Map common variations to valid values
+            if (genderLower === 'male' || genderLower === 'm') {
+                genderValue = 'male';
+            } else if (genderLower === 'female' || genderLower === 'f') {
+                genderValue = 'female';
+            } else if (genderLower === 'other' || genderLower === 'o') {
+                genderValue = 'other';
+            } else {
+                // Default to 'other' if unrecognized
+                genderValue = 'other';
+            }
+        }
         
         return {
             first_name: row['First Name*'] || row['first_name'],
@@ -120,12 +220,12 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             phone: row['Phone'] || row['phone'] || null,
             job_title: row['Job Title'] || row['job_title'] || null,
             department: departmentValue,
-            date_of_birth: row['Date of Birth'] || row['date_of_birth'] || null,
-            gender: row['Gender'] || row['gender'] || null,
+            date_of_birth: dateOfBirth,
+            gender: genderValue,
             address: row['Address'] || row['address'] || null,
             emergency_contact_name: row['Emergency Contact Name'] || row['emergency_contact_name'] || null,
             emergency_contact_phone: row['Emergency Contact Phone'] || row['emergency_contact_phone'] || null,
-            join_date: row['Hire Date'] || row['hire_date'] || null,
+            join_date: joinDate,
             basic_salary: row['Salary'] || row['salary'] || null,
             bank_name: row['Bank Name'] || row['bank_name'] || null,
             bank_account_number: row['Bank Account Number'] || row['bank_account_number'] || null,

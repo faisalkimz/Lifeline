@@ -38,7 +38,8 @@ CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
 
 
 # Permissive hosts for Render deployment
-ALLOWED_HOSTS = ['*']
+# Permissive hosts for Render deployment (Restrict in production!)
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 USE_X_FORWARDED_HOST = True
 
 
@@ -90,6 +91,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.User'
 
 
+MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware", # For serving static files in production
     "corsheaders.middleware.CorsMiddleware",  # CORS - must be before CommonMiddleware
@@ -268,6 +270,8 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'Lifeline HR <noreply@lifel
 # Validated settings for production compliance - Email Config Updated
 
 # Security Headers (Production recommended)
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True

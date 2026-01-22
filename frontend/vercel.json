@@ -2,11 +2,11 @@
     "rewrites": [
         {
             "source": "/api/:path*",
-            "destination": "https://lifeline-k3tt.onrender.com/api/:path*"
+            "destination": "https://lifeline-backend.onrender.com/api/:path*"
         },
         {
             "source": "/media/:path*",
-            "destination": "https://lifeline-k3tt.onrender.com/media/:path*"
+            "destination": "https://lifeline-backend.onrender.com/media/:path*"
         },
         {
             "source": "/(.*)",

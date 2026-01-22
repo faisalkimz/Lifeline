@@ -16,15 +16,20 @@ router.register(r'companies', CompanyViewSet, basename='company')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'security', SecurityViewSet, basename='security')
 
-urlpatterns = [
-    # Authentication endpoints
+    # Authentication endpoints (Dual paths to prevent 301 redirects converting POST to GET)
     path('auth/register/', RegisterView.as_view(), name='register'),
-    path('auth/login/', LoginView.as_view(), name='login'),
-    path('auth/logout/', LogoutView.as_view(), name='logout'),
-    path('auth/me/', CurrentUserView.as_view(), name='current-user'),
-    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('auth/register', RegisterView.as_view(), name='register_noslash'),
     
-    # Password Reset endpoints
+    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/login', LoginView.as_view(), name='login_noslash'),
+    
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/logout', LogoutView.as_view(), name='logout_noslash'),
+    
+    path('auth/me/', CurrentUserView.as_view(), name='current-user'),
+    path('auth/me', CurrentUserView.as_view(), name='current-user_noslash'),
+    
+    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('auth/request-password-reset/', RequestPasswordResetView.as_view(), name='request-password-reset'),
     path('auth/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
     path('auth/verify-reset-token/', VerifyResetTokenView.as_view(), name='verify-reset-token'),

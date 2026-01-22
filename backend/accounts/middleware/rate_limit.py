@@ -14,10 +14,15 @@ class RateLimitMiddleware:
         self.get_response = get_response
         
     def __call__(self, request):
+        # Normalize path for check
+        path = request.path.rstrip('/')
+        
         # Only rate limit auth endpoints (POST only)
-        if request.method == 'POST' and request.path in ['/api/auth/login/', '/api/auth/register/']:
+        # Check against normalized paths
+        if request.method == 'POST' and path in ['/api/auth/login', '/api/auth/register']:
             ip = self.get_client_ip(request)
-            cache_key = f'rate_limit_{ip}_{request.path}'
+            # Use original path in cache key to be safe, or normalized
+            cache_key = f'rate_limit_{ip}_{path}'
             
             # Get current attempt count
             attempts = cache.get(cache_key, 0)

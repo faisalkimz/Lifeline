@@ -39,7 +39,15 @@ CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
 
 # Permissive hosts for Render deployment
 # Permissive hosts for Render deployment (Restrict in production!)
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+raw_allowed_hosts = os.getenv('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = [host.strip() for host in raw_allowed_hosts.split(',') if host.strip()]
+
+# Ensure localhost/127.0.0.1 are always allowed for health checks
+if '*' not in ALLOWED_HOSTS:
+    if 'localhost' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('localhost')
+    if '127.0.0.1' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('127.0.0.1')
 USE_X_FORWARDED_HOST = True
 
 

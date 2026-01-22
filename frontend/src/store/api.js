@@ -3,7 +3,7 @@ import { logout } from '../features/auth/authSlice';
 
 // Enhanced base query with authentication error handling
 const baseQueryWithAuth = fetchBaseQuery({
-  baseUrl: `${import.meta.env.VITE_API_BASE_URL || '/api'}`,
+  baseUrl: `${(import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '')}`,
   prepareHeaders: (headers, { getState }) => {
     const state = getState();
     const token = state?.auth?.token;

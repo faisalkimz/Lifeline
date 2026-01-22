@@ -14,8 +14,8 @@ class RateLimitMiddleware:
         self.get_response = get_response
         
     def __call__(self, request):
-        # Only rate limit auth endpoints
-        if request.path in ['/api/auth/login/', '/api/auth/register/']:
+        # Only rate limit auth endpoints (POST only)
+        if request.method == 'POST' and request.path in ['/api/auth/login/', '/api/auth/register/']:
             ip = self.get_client_ip(request)
             cache_key = f'rate_limit_{ip}_{request.path}'
             

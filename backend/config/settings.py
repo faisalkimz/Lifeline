@@ -103,6 +103,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware", # For serving static files in production
     "corsheaders.middleware.CorsMiddleware",  # CORS - must be before CommonMiddleware
+    "config.middleware.CSRFExemptAPIViewMiddleware",  # Exempt API routes from CSRF (before CSRF middleware)
     "accounts.middleware.rate_limit.RateLimitMiddleware", # Rate Limiting for Auth
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -110,6 +111,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "config.middleware.JSONErrorMiddleware",  # Convert HTML errors to JSON (after all other middleware)
 ]
 
 

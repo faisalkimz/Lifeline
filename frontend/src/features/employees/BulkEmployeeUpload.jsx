@@ -218,36 +218,41 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                     // Extract detailed error message with better parsing
                     let errorMessage = 'Failed to create employee';
                     
-                    // Log error for debugging
-                    console.error(`Row ${i + 2} error:`, error);
+                    // Log full error for debugging (use JSON.stringify to see full object)
+                    console.error(`Row ${i + 2} Full Error:`, JSON.stringify(error, null, 2));
+                    console.error(`Row ${i + 2} Error Data:`, JSON.stringify(error.data, null, 2));
+                    console.error(`Row ${i + 2} Employee Data Sent:`, JSON.stringify(employeeData, null, 2));
                     
-                    if (error.data) {
+                    // RTK Query error format: {status: number, data: {...}, error: string}
+                    const errorData = error.data;
+                    
+                    if (errorData) {
                         // Handle different error formats
-                        if (typeof error.data === 'string') {
+                        if (typeof errorData === 'string') {
                             // Check if it's HTML (backend not deployed with middleware yet)
-                            if (error.data.includes('<!doctype html>') || error.data.includes('<html')) {
+                            if (errorData.includes('<!doctype html>') || errorData.includes('<html')) {
                                 errorMessage = 'Backend returned HTML error. Please deploy backend changes.';
                             } else {
-                                errorMessage = error.data;
+                                errorMessage = errorData;
                             }
-                        } else if (error.data.detail) {
-                            errorMessage = error.data.detail;
-                        } else if (error.data.message) {
-                            errorMessage = error.data.message;
-                        } else if (typeof error.data === 'object') {
+                        } else if (errorData.detail) {
+                            errorMessage = errorData.detail;
+                        } else if (errorData.message) {
+                            errorMessage = errorData.message;
+                        } else if (typeof errorData === 'object' && errorData !== null) {
                             // Extract all validation errors, not just the first
                             const errorMessages = [];
-                            const errorKeys = Object.keys(error.data);
+                            const errorKeys = Object.keys(errorData);
                             
                             errorKeys.forEach(key => {
-                                const fieldError = error.data[key];
+                                const fieldError = errorData[key];
                                 if (Array.isArray(fieldError)) {
                                     fieldError.forEach(msg => {
                                         errorMessages.push(`${key}: ${msg}`);
                                     });
                                 } else if (typeof fieldError === 'string') {
                                     errorMessages.push(`${key}: ${fieldError}`);
-                                } else if (typeof fieldError === 'object') {
+                                } else if (typeof fieldError === 'object' && fieldError !== null) {
                                     errorMessages.push(`${key}: ${JSON.stringify(fieldError)}`);
                                 }
                             });
@@ -257,12 +262,17 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                 if (errorMessages.length > 3) {
                                     errorMessage += ` (+${errorMessages.length - 3} more)`;
                                 }
+                            } else {
+                                // If no specific errors found, show the whole object
+                                errorMessage = JSON.stringify(errorData);
                             }
                         }
                     } else if (error.error) {
                         errorMessage = error.error;
                     } else if (error.status === 'PARSING_ERROR') {
                         errorMessage = 'Server returned invalid response. Backend may need to be deployed.';
+                    } else if (error.status) {
+                        errorMessage = `Server error (${error.status}). Check console for details.`;
                     }
                     
                     uploadResults.details.push({

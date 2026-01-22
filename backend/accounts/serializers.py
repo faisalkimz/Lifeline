@@ -171,8 +171,20 @@ class RegisterSerializer(serializers.ModelSerializer):
             'first_name', 'last_name', 'phone'
         ]
     
+    def validate_email(self, value):
+        """Ensure email is unique globally"""
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("A user with this email already exists.")
+        return value
+    
+    def validate_company_email(self, value):
+        """Ensure company email is unique"""
+        if Company.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("A company with this email already exists.")
+        return value
+    
     def validate(self, attrs):
-        """Validate passwords match"""
+        """Validate passwords match and check for duplicates"""
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError({"password": "Password fields didn't match."})
         

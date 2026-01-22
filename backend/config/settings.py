@@ -42,6 +42,16 @@ CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'False') == 'True'
 raw_allowed_hosts = os.getenv('ALLOWED_HOSTS', '*')
 ALLOWED_HOSTS = [host.strip() for host in raw_allowed_hosts.split(',') if host.strip()]
 
+# Ensure backend domains are always allowed
+backend_domains = [
+    'lifeline-k3tt.onrender.com',
+    'lifeline-backend.onrender.com',
+]
+
+for domain in backend_domains:
+    if '*' not in ALLOWED_HOSTS and domain not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(domain)
+
 # Ensure localhost/127.0.0.1 are always allowed for health checks
 if '*' not in ALLOWED_HOSTS:
     if 'localhost' not in ALLOWED_HOSTS:

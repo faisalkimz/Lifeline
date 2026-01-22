@@ -42,25 +42,45 @@ class RegisterView(generics.CreateAPIView):
     
     def create(self, request, *args, **kwargs):
         """Register company and return JWT tokens"""
+        # Log incoming request for debugging (remove sensitive data)
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Registration attempt from {request.META.get('REMOTE_ADDR')}")
+        
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
+            # Log validation errors for debugging
+            logger.warning(f"Registration validation failed: {serializer.errors}")
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
             )
-        user = serializer.save()
         
-        # Generate JWT tokens
-        refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'message': 'Company registered successfully!',
-            'user': UserSerializer(user).data,
-            'tokens': {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }
-        }, status=status.HTTP_201_CREATED)
+        try:
+            user = serializer.save()
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            logger.info(f"Registration successful for user: {user.username}")
+            
+            return Response({
+                'message': 'Company registered successfully!',
+                'user': UserSerializer(user).data,
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}", exc_info=True)
+            return Response(
+                {
+                    'detail': 'An error occurred during registration. Please try again.',
+                    'error': 'registration_failed'
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class LoginView(generics.GenericAPIView):

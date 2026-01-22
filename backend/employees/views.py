@@ -184,28 +184,88 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             return EmployeeListSerializer
         return EmployeeSerializer
     
+    def create(self, request, *args, **kwargs):
+        """Create employee with improved error handling and department name resolution"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        # Handle department name -> ID conversion for bulk uploads
+        data = request.data.copy()
+        if 'department' in data and isinstance(data['department'], str) and not data['department'].isdigit():
+            # Try to find department by name
+            try:
+                department = Department.objects.get(
+                    name__iexact=data['department'],
+                    company=request.user.company
+                )
+                data['department'] = department.id
+            except Department.DoesNotExist:
+                return Response(
+                    {
+                        'department': f"Department '{data['department']}' not found. Please use a valid department name or ID."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            except Department.MultipleObjectsReturned:
+                return Response(
+                    {
+                        'department': f"Multiple departments found with name '{data['department']}'. Please use department ID instead."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        serializer = self.get_serializer(data=data)
+        if not serializer.is_valid():
+            # Log validation errors for debugging
+            logger.warning(f"Employee creation validation failed: {serializer.errors}")
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Perform multi-tenant security validation
+            user = request.user
+            
+            # Validate department (if provided) belongs to same company
+            department = serializer.validated_data.get('department')
+            if department and department.company != user.company:
+                return Response(
+                    {'department': 'Cannot assign employee to department from another company.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Validate manager (if provided) belongs to same company
+            manager = serializer.validated_data.get('manager')
+            if manager and manager.company != user.company:
+                return Response(
+                    {'manager': 'Cannot assign manager from another company.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Auto-assign company and create
+            employee = serializer.save(company=user.company)
+            
+            logger.info(f"Employee created successfully: {employee.email}")
+            
+            return Response(
+                EmployeeSerializer(employee, context={'request': request}).data,
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            logger.error(f"Employee creation error: {str(e)}", exc_info=True)
+            return Response(
+                {
+                    'detail': 'An error occurred while creating the employee. Please check your data and try again.',
+                    'error': 'creation_failed'
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
     def perform_create(self, serializer):
-        """Create employee with multi-tenant security validation"""
-        user = self.request.user
-        
-        # Validate department (if provided) belongs to same company
-        department = serializer.validated_data.get('department')
-        if department and department.company != user.company:
-            from rest_framework.exceptions import ValidationError
-            raise ValidationError({
-                'department': 'Cannot assign employee to department from another company.'
-            })
-        
-        # Validate manager (if provided) belongs to same company
-        manager = serializer.validated_data.get('manager')
-        if manager and manager.company != user.company:
-            from rest_framework.exceptions import ValidationError
-            raise ValidationError({
-                'manager': 'Cannot assign manager from another company.'
-            })
-        
-        # Auto-assign company
-        serializer.save(company=user.company)
+        """Legacy method - now handled in create()"""
+        # This method is kept for compatibility but create() handles everything
+        pass
     
     def perform_update(self, serializer):
         """Update employee with multi-tenant security validation"""

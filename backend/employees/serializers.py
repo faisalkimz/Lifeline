@@ -220,6 +220,42 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
             'create_user', 'username', 'password', 'role'
         ]
         read_only_fields = ['id']
+        extra_kwargs = {
+            # Make some fields optional for bulk uploads
+            'date_of_birth': {'required': False, 'allow_null': True},
+            'gender': {'required': False, 'allow_null': True},
+            'national_id': {'required': False, 'allow_blank': True},
+            'phone': {'required': False, 'allow_blank': True},
+            'job_title': {'required': False, 'allow_blank': True},
+            'join_date': {'required': False, 'allow_null': True},
+        }
+    
+    def validate(self, attrs):
+        """Provide defaults for required fields if missing (for bulk uploads)"""
+        from django.utils import timezone
+        from datetime import date
+        
+        # Set defaults for required fields if not provided
+        if not attrs.get('date_of_birth'):
+            attrs['date_of_birth'] = date(1990, 1, 1)  # Default date
+        
+        if not attrs.get('gender'):
+            attrs['gender'] = 'other'  # Default gender
+        
+        if not attrs.get('national_id'):
+            # Generate a temporary ID if not provided
+            attrs['national_id'] = f"TEMP-{timezone.now().timestamp()}"
+        
+        if not attrs.get('phone'):
+            attrs['phone'] = '0000000000'  # Default phone
+        
+        if not attrs.get('job_title'):
+            attrs['job_title'] = 'Employee'  # Default job title
+        
+        if not attrs.get('join_date'):
+            attrs['join_date'] = timezone.now().date()  # Default to today
+        
+        return attrs
     
     def create(self, validated_data):
         """Create employee with optional user account"""

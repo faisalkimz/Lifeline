@@ -16,6 +16,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../auth/authSlice';
 import LeaveBalances from './LeaveBalances';
 import LeaveCalendar from './LeaveCalendar';
 import CreateLeaveTypeModal from './CreateLeaveTypeModal';
@@ -24,17 +25,28 @@ import { Settings2, Trash2, Edit2 } from 'lucide-react';
 
 const LeaveRequestsPage = () => {
     const user = useSelector(selectCurrentUser);
-    const [activeTab, setActiveTab] = useState('dashboard');
-    const [requestTab, setRequestTab] = useState('all');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [showTypeModal, setShowTypeModal] = useState(false);
     const [selectedType, setSelectedType] = useState(null);
-    const [isDeleting, setIsDeleting] = useState(false);
 
     const isCompanyAdmin = user?.role === 'company_admin' || user?.role === 'admin' || user?.role === 'hr_manager';
 
-    const { data: myRequests } = useGetLeaveRequestsQuery('/leave/requests/my_requests/');
+    // Map Workpay statuses to system statuses
+    const statusMap = {
+        'submitted': 'pending',
+        'approved': 'approved',
+        'disapproved': 'rejected',
+        'cancelled': 'cancelled',
+        'all': 'all'
+    };
+
+    const { data: myRequests = [] } = useGetLeaveRequestsQuery('/leave/requests/my_requests/');
+    const { data: allRequests = [] } = useGetLeaveRequestsQuery({
+        status: statusMap[activeTab] === 'all' ? undefined : statusMap[activeTab]
+    });
+
     const { data: leaveTypes } = useGetLeaveTypesQuery();
     const [createRequest] = useCreateLeaveRequestMutation();
 
@@ -43,14 +55,8 @@ const LeaveRequestsPage = () => {
         start_date: '',
         end_date: '',
         reason: '',
+        reliever: '',
         document: null
-    });
-
-    const requestsToDisplay = (myRequests || []).filter(req => {
-        const matchesSearch = req.leave_type_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            req.status?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesTab = requestTab === 'all' || req.status === requestTab;
-        return matchesSearch && matchesTab;
     });
 
     const handleSubmit = async (e) => {
@@ -61,471 +67,358 @@ const LeaveRequestsPage = () => {
             body.append('start_date', formData.start_date);
             body.append('end_date', formData.end_date);
             body.append('reason', formData.reason);
-            if (formData.document) {
-                body.append('document', formData.document);
-            }
+            if (formData.reliever) body.append('reliever', formData.reliever);
+            if (formData.document) body.append('document', formData.document);
 
             await createRequest({ url: '/leave/requests/', body }).unwrap();
             toast.success('Leave request submitted!');
             setIsDialogOpen(false);
-            setFormData({ leave_type: '', start_date: '', end_date: '', reason: '', document: null });
+            setFormData({ leave_type: '', start_date: '', end_date: '', reason: '', reliever: '', document: null });
         } catch (error) {
             toast.error('Submission failed');
         }
     };
 
-    const [deleteLeaveType] = useDeleteLeaveTypeMutation();
-
-    const handleDeleteType = async (id) => {
-        if (!window.confirm('Are you sure? This will not affect existing requests but will prevent new ones.')) return;
-        try {
-            await deleteLeaveType(id).unwrap();
-            toast.success('Leave type deactivated');
-        } catch (error) {
-            toast.error('Failed to delete');
-        }
-    };
-
-    const calculateDays = (startDate, endDate) => {
-        if (!startDate || !endDate) return 0;
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        const diffTime = Math.abs(end - start);
-        return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    };
-
-    const daysRequested = calculateDays(formData.start_date, formData.end_date);
+    const displayedRequests = allRequests.filter(req =>
+        req.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        req.leave_type_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
-        <div className="space-y-6 pb-12 animate-fade-in">
-            {/* Clean Header */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Home className="h-4 w-4" />
-                            <ChevronRight className="h-4 w-4" />
-                            <span>Leave Management</span>
-                        </div>
-                        <h1 className="text-3xl font-bold text-gray-900">
-                            Leave Requests
-                        </h1>
-                        <p className="text-gray-600">
-                            Apply for time off and view your leave history.
-                        </p>
-                    </div>
+        <div className="space-y-8 pb-20 animate-fade-in bg-[#F9FAFB] min-h-screen p-4 md:p-8">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Leave requests</h1>
+                    <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest">Time & Absence Management</p>
+                </div>
+                <div className="flex gap-3">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-primary-600 hover:bg-primary-700 text-white font-black px-6 rounded-xl shadow-xl shadow-primary-500/20 active:scale-95 transition-all">
+                                <Plus className="h-4 w-4 mr-2" />
+                                Apply For Leave
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xl bg-white border-0 rounded-3xl p-0 overflow-hidden shadow-2xl">
+                            <div className="bg-slate-900 px-8 py-6 flex items-center gap-4 border-b border-slate-800">
+                                <div className="h-12 w-12 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/20 shadow-sm">
+                                    <PlaneLanding className="h-6 w-6 text-primary-500" />
+                                </div>
+                                <div className="text-white">
+                                    <DialogTitle className="text-2xl font-black tracking-tight tracking-tight">Plan your Time Off</DialogTitle>
+                                    <p className="text-slate-400 mt-1 font-bold text-sm uppercase tracking-widest">Absence submission</p>
+                                </div>
+                            </div>
 
-                    <div className="flex gap-3">
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                            <DialogTrigger asChild>
-                                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 shadow-md shadow-primary-200">
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Request Leave
-                                </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-xl bg-white border-0 rounded-2xl p-0 overflow-hidden shadow-2xl">
-                                <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                                    <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
-                                        <PlaneLanding className="h-6 w-6 text-emerald-600" />
-                                    </div>
-                                    <div>
-                                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Plan your Time Off</DialogTitle>
-                                        <p className="text-slate-500 mt-1 font-medium text-sm">Submit your application for review.</p>
-                                    </div>
+                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Type of Leave</label>
+                                    <select
+                                        className="w-full h-14 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none appearance-none cursor-pointer transition-all"
+                                        value={formData.leave_type}
+                                        onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                        required
+                                    >
+                                        <option value="">Select leave type...</option>
+                                        {leaveTypes?.map(type => (
+                                            <option key={type.id} value={type.id}>{type.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
 
-                                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                                <div className="grid grid-cols-2 gap-5">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700">Type of Leave</label>
-                                        <div className="relative">
-                                            <select
-                                                className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer hover:border-emerald-300 transition-all"
-                                                value={formData.leave_type}
-                                                onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                                                required
-                                            >
-                                                <option value="">Select leave type...</option>
-                                                {leaveTypes?.map(type => (
-                                                    <option key={type.id} value={type.id}>{type.name}</option>
-                                                ))}
-                                            </select>
-                                            <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 rotate-90 pointer-events-none" />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-5">
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-slate-700">From</label>
-                                            <Input
-                                                type="date"
-                                                className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
-                                                value={formData.start_date}
-                                                onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-sm font-bold text-slate-700">To</label>
-                                            <Input
-                                                type="date"
-                                                className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
-                                                value={formData.end_date}
-                                                onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <AnimatePresence>
-                                        {daysRequested > 0 && (
-                                            <motion.div
-                                                initial={{ opacity: 0, height: 0 }}
-                                                animate={{ opacity: 1, height: 'auto' }}
-                                                exit={{ opacity: 0, height: 0 }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="p-2 bg-emerald-200 rounded-lg text-emerald-700">
-                                                            <Clock className="h-4 w-4" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Duration</p>
-                                                            <p className="text-sm text-emerald-600">Calculated based on dates</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-2xl font-bold text-emerald-600">
-                                                        {daysRequested} <span className="text-sm font-medium text-emerald-500">days</span>
-                                                    </span>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700">Reason</label>
-                                        <textarea
-                                            className="w-full min-h-[120px] p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none hover:border-emerald-300 focus:bg-white"
-                                            placeholder="Why are you taking leave?"
-                                            value={formData.reason}
-                                            onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">From</label>
+                                        <Input
+                                            type="date"
+                                            className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
+                                            value={formData.start_date}
+                                            onChange={e => setFormData({ ...formData, start_date: e.target.value })}
                                             required
                                         />
                                     </div>
-
-                                    <div className="pt-4 flex gap-3 border-t border-slate-100">
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            onClick={() => setIsDialogOpen(false)}
-                                            className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl"
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
-                                        >
-                                            Submit Request
-                                        </Button>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">To</label>
+                                        <Input
+                                            type="date"
+                                            className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
+                                            value={formData.end_date}
+                                            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+                                            required
+                                        />
                                     </div>
-                                </form>
-                            </DialogContent>
-                        </Dialog>
-
-                        {isCompanyAdmin && (
-                            <Button
-                                variant="outline"
-                                onClick={() => { setSelectedType(null); setShowTypeModal(true); }}
-                                className="border-slate-200 text-slate-700 hover:bg-slate-50 font-bold shadow-sm"
-                            >
-                                <Settings2 className="h-4 w-4 mr-2 text-slate-400" />
-                                Manage Types
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                <div className="flex gap-1 p-1 bg-white rounded-xl border border-gray-200 shadow-sm">
-                    {[
-                        { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-                        { id: 'requests', label: 'History', icon: Clock },
-                        { id: 'calendar', label: 'Calendar', icon: Calendar }
-                    ].map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all text-sm font-medium ${activeTab === tab.id
-                                ? 'bg-primary-50 text-primary-700 shadow-sm border border-primary-100'
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                                }`}
-                        >
-                            <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-primary-600' : 'text-gray-400'}`} />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
-
-                {activeTab === 'requests' && (
-                    <div className="relative w-full md:w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                        <Input
-                            placeholder="Search records..."
-                            className="bg-white h-10 pl-10 border-gray-200 focus:border-primary-500 focus:ring-primary-500/20"
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-                )}
-            </div>
-
-            <AnimatePresence mode="wait">
-                {activeTab === 'dashboard' && (
-                    <motion.div
-                        key="dashboard"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-6"
-                    >
-                        <LeaveBalances />
-
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div className="lg:col-span-2">
-                                <Card className="border border-gray-200 shadow-sm h-full">
-                                    <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                                        <div>
-                                            <h3 className="text-lg font-bold text-gray-900">Leave Trend</h3>
-                                            <p className="text-sm text-gray-500 mt-1">Monthly usage analytics</p>
-                                        </div>
-                                    </div>
-                                    <CardContent className="p-6">
-                                        <div className="h-[260px] flex items-end justify-between gap-3">
-                                            {[35, 60, 45, 95, 70, 85, 50, 40, 90, 65, 55, 75].map((val, i) => (
-                                                <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                                                    <div className="w-full relative h-[220px] flex items-end bg-gray-50 rounded-lg overflow-hidden">
-                                                        <motion.div
-                                                            initial={{ height: 0 }}
-                                                            animate={{ height: `${val}%` }}
-                                                            transition={{ delay: i * 0.05, duration: 0.8, ease: "easeOut" }}
-                                                            className={`w-full rounded-t-sm transition-all duration-300 relative ${val > 80 ? 'bg-primary-500' : 'bg-primary-300 group-hover:bg-primary-400'
-                                                                }`}
-                                                        >
-                                                        </motion.div>
-                                                    </div>
-                                                    <span className="text-[10px] uppercase font-bold text-gray-400">{['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'][i]}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </div>
-
-                            <div className="lg:col-span-1">
-                                <Card className="border border-gray-200 shadow-sm h-full">
-                                    <div className="p-6 border-b border-gray-100">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 bg-primary-50 rounded-lg">
-                                                <Clock className="h-5 w-5 text-primary-600" />
-                                            </div>
-                                            <h3 className="text-lg font-bold text-gray-900">Upcoming Leave</h3>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-4 space-y-3">
-                                        {myRequests?.filter(r => new Date(r.start_date) >= new Date()).slice(0, 4).map((req, idx) => (
-                                            <div
-                                                key={idx}
-                                                className="p-3 bg-white border border-gray-100 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all flex items-center justify-between group cursor-default"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex flex-col items-center justify-center text-gray-900 font-bold border border-gray-100 group-hover:bg-primary-50 group-hover:text-primary-700 group-hover:border-primary-100 transition-colors">
-                                                        <span className="text-xs uppercase text-gray-500 group-hover:text-primary-500">{new Date(req.start_date).toLocaleString('default', { month: 'short' })}</span>
-                                                        <span className="text-lg leading-none">{new Date(req.start_date).getDate()}</span>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-bold text-gray-900">{req.leave_type_name}</p>
-                                                        <p className="text-xs text-gray-500 font-medium">{req.days_requested} Days</p>
-                                                    </div>
-                                                </div>
-                                                <div className={`h-2.5 w-2.5 rounded-full ${req.status === 'approved' ? 'bg-green-500 shadow-sm shadow-green-200' : 'bg-amber-400 shadow-sm shadow-amber-200'
-                                                    }`} />
-                                            </div>
-                                        ))}
-                                        {(!myRequests || myRequests.filter(r => new Date(r.start_date) >= new Date()).length === 0) && (
-                                            <div className="py-12 flex flex-col items-center justify-center text-center">
-                                                <div className="bg-gray-50 p-4 rounded-full mb-3">
-                                                    <FileText className="h-6 w-6 text-gray-400" />
-                                                </div>
-                                                <p className="text-sm text-gray-500 font-medium">No upcoming leave scheduled.</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </Card>
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-
-                {activeTab === 'dashboard' && isCompanyAdmin && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="space-y-4"
-                    >
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Active Leave Policies</h3>
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Company wide</p>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {leaveTypes?.map(type => (
-                                <Card key={type.id} className="border-0 shadow-sm bg-white hover:shadow-md transition-all group overflow-hidden">
-                                    <div className="p-5 flex flex-col h-full">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center font-black text-slate-400 text-xs border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-all">
-                                                {type.code}
-                                            </div>
-                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    onClick={() => { setSelectedType(type); setShowTypeModal(true); }}
-                                                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900"
-                                                >
-                                                    <Edit2 className="h-3.5 w-3.5" />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteType(type.id)}
-                                                    className="p-2 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-600"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <h4 className="font-bold text-slate-900 mb-1">{type.name}</h4>
-                                        <p className="text-xs text-slate-500 font-medium mb-4 line-clamp-1">{type.description || 'No description provided'}</p>
-                                        <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-                                            <span className="text-xl font-black text-slate-900">{type.days_per_year}<span className="text-[10px] text-slate-400 uppercase ml-1">Days</span></span>
-                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${type.is_paid ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
-                                                {type.is_paid ? 'Paid' : 'Unpaid'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    </motion.div>
-                )}
-
-                {activeTab === 'requests' && (
-                    <motion.div
-                        key="requests"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <Card className="border border-gray-200 shadow-sm">
-                            <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                                <div className="flex gap-1 p-1 bg-gray-50 rounded-lg border border-gray-100">
-                                    {['all', 'pending', 'approved', 'rejected'].map(tab => (
-                                        <button
-                                            key={tab}
-                                            onClick={() => setRequestTab(tab)}
-                                            className={`px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wide transition-all ${requestTab === tab ? 'bg-white text-primary-700 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
-                                                }`}
-                                        >
-                                            {tab}
-                                        </button>
-                                    ))}
                                 </div>
-                                <Button variant="outline" size="sm" className="bg-white hover:bg-gray-50 text-gray-700">
-                                    <FileText className="h-3.5 w-3.5 mr-2" />
-                                    Export
-                                </Button>
-                            </div>
 
-                            <div className="overflow-x-auto">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="bg-gray-50/50 border-b border-gray-100">
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 text-left uppercase tracking-wider">Type / Dates</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 text-left uppercase tracking-wider">Duration</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 text-left uppercase tracking-wider">Status</th>
-                                            <th className="px-6 py-4 text-xs font-semibold text-gray-500 text-right uppercase tracking-wider">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100">
-                                        {requestsToDisplay.length > 0 ? (
-                                            requestsToDisplay.map((req, idx) => (
-                                                <tr key={req.id} className="hover:bg-gray-50/50 transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="h-10 w-10 rounded-lg bg-primary-50 flex items-center justify-center text-primary-600">
-                                                                <Calendar className="h-5 w-5" />
-                                                            </div>
-                                                            <div>
-                                                                <p className="font-bold text-gray-900 text-sm">{req.leave_type_name}</p>
-                                                                <p className="text-xs text-gray-500 mt-0.5">
-                                                                    {new Date(req.start_date).toLocaleDateString()} — {new Date(req.end_date).toLocaleDateString()}
-                                                                </p>
-                                                            </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Reliever (Optional)</label>
+                                    <Input
+                                        placeholder="Who will cover your duties?"
+                                        className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
+                                        value={formData.reliever}
+                                        onChange={e => setFormData({ ...formData, reliever: e.target.value })}
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Reason</label>
+                                    <textarea
+                                        className="w-full min-h-[120px] p-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all resize-none"
+                                        placeholder="Why are you taking leave?"
+                                        value={formData.reason}
+                                        onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="pt-4 flex gap-3 border-t border-slate-100">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        onClick={() => setIsDialogOpen(false)}
+                                        className="h-14 px-8 text-slate-400 hover:text-slate-900 font-black rounded-2xl uppercase tracking-widest text-xs"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black h-14 rounded-2xl shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all uppercase tracking-widest text-xs"
+                                    >
+                                        Submit Request
+                                    </Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                    {isCompanyAdmin && (
+                        <Button
+                            variant="outline"
+                            onClick={() => { setSelectedType(null); setShowTypeModal(true); }}
+                            className="bg-white border-slate-200 text-slate-700 font-black rounded-xl hover:bg-slate-50 shadow-sm transition-all"
+                        >
+                            <Settings2 className="h-4 w-4 mr-2 text-slate-400" />
+                            Policy Setup
+                        </Button>
+                    )}
+                </div>
+            </div>
+
+            {/* Status Tabs */}
+            <div className="flex gap-1 p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit overflow-x-auto scrollbar-hide">
+                {['submitted', 'approved', 'active', 'disapproved', 'attended', 'cancelled', 'all'].map(status => (
+                    <button
+                        key={status}
+                        onClick={() => setActiveTab(status)}
+                        className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === status
+                            ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                            : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
+                    >
+                        {status} {status === 'submitted' && <span className="ml-1 opacity-50">({allRequests.filter(r => r.status === 'pending').length})</span>}
+                    </button>
+                ))}
+            </div>
+
+            {/* Leave Balances Horizontal Section */}
+            <div className="space-y-4">
+                <div className="flex items-center justify-between px-1">
+                    <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest italic">Personal Entitlements</h2>
+                </div>
+                <LeaveBalances />
+            </div>
+
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Requests Table */}
+                <div className="lg:col-span-3 space-y-6">
+                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
+                        <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Request Log</h2>
+                            <div className="relative w-full md:w-80">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Input
+                                    placeholder="Search entries..."
+                                    className="bg-slate-50/50 h-11 pl-12 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/70">
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Employee</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Policy</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Dates</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Time requested</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Reliever</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {displayedRequests.length > 0 ? (
+                                        displayedRequests.map((req) => (
+                                            <tr key={req.id} className="hover:bg-slate-50/30 transition-colors group">
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-900 text-xs uppercase border border-slate-200">
+                                                            {req.employee_name?.split(' ').map(n => n[0]).join('')}
                                                         </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <Clock className="h-4 w-4 text-gray-400" />
-                                                            <span className="text-sm font-semibold text-gray-700">{req.days_requested} Days</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${req.status === 'approved' ? 'bg-green-50 text-green-700 border border-green-100' :
-                                                            req.status === 'rejected' ? 'bg-red-50 text-red-700 border border-red-100' :
-                                                                'bg-amber-50 text-amber-700 border border-amber-100'
-                                                            }`}>
-                                                            {req.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}
-                                                            {req.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 text-gray-500">
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        </Button>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan="4" className="px-6 py-24 text-center">
-                                                    <div className="max-w-xs mx-auto flex flex-col items-center">
-                                                        <div className="h-12 w-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
-                                                            <Search className="h-6 w-6 text-gray-400" />
-                                                        </div>
-                                                        <p className="text-gray-900 font-medium">No results found</p>
-                                                        <p className="text-sm text-gray-500 mt-1">Try adjusting your filters or search terms.</p>
+                                                        <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{req.employee_name}</span>
                                                     </div>
                                                 </td>
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-tight">{req.leave_type_name}</span>
+                                                </td>
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-bold text-slate-700">{new Date(req.start_date).toLocaleDateString()}</span>
+                                                        <span className="text-[10px] font-bold text-slate-400 uppercase">to {new Date(req.end_date).toLocaleDateString()}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <div className="flex items-center gap-2">
+                                                        <Clock className="h-3.5 w-3.5 text-primary-500" />
+                                                        <span className="text-sm font-black text-slate-900">{parseFloat(req.days_requested).toFixed(0)} Days</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <span className="text-sm font-bold text-slate-500 italic">{req.reliever_name || 'N/A'}</span>
+                                                </td>
+                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                    <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${req.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm shadow-emerald-500/5' :
+                                                        req.status === 'rejected' ? 'bg-rose-50 text-rose-600 border border-rose-100 shadow-sm shadow-rose-500/5' :
+                                                            'bg-amber-50 text-amber-600 border border-amber-100 shadow-sm shadow-amber-500/5'
+                                                        }`}>
+                                                        {req.status}
+                                                    </span>
+                                                </td>
                                             </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </Card>
-                    </motion.div>
-                )}
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="6" className="px-6 py-32 text-center">
+                                                <div className="flex flex-col items-center gap-4 opacity-40">
+                                                    <Search className="h-12 w-12 text-slate-300" />
+                                                    <p className="text-sm font-black text-slate-400 uppercase tracking-widest">There is no available data.</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
 
-                {activeTab === 'calendar' && (
-                    <motion.div
-                        key="calendar"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                    >
-                        <Card className="border border-gray-200 p-6 shadow-sm">
-                            <LeaveCalendar />
-                        </Card>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                        {/* Pagination Styled Footer */}
+                        <div className="p-6 bg-slate-50/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div className="flex items-center gap-4">
+                                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Items per page:</span>
+                                <select className="bg-white border-slate-200 rounded-lg text-xs font-black p-1 outline-none focus:border-primary-500">
+                                    <option>10</option>
+                                    <option>20</option>
+                                    <option>50</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center gap-6">
+                                <span className="text-xs font-black text-slate-900 uppercase tracking-widest">Page 1 of 1</span>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" disabled className="h-9 w-9 p-0 rounded-xl bg-white border-slate-200 text-slate-400">
+                                        <ChevronRight className="h-4 w-4 rotate-180" />
+                                    </Button>
+                                    <Button variant="outline" size="sm" disabled className="h-9 w-9 p-0 rounded-xl bg-white border-slate-200 text-slate-400">
+                                        <ChevronRight className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+
+                    {/* My Leave Requests Section */}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">My Leave Requests</h3>
+                            <div className="h-px flex-1 bg-slate-100 mx-6" />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {myRequests.slice(0, 3).map(req => (
+                                <motion.div key={req.id} whileHover={{ y: -5 }} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div className="p-3 bg-primary-50 rounded-2xl">
+                                            <Calendar className="h-5 w-5 text-primary-600" />
+                                        </div>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${req.status === 'approved' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-white'
+                                            }`}>{req.status}</span>
+                                    </div>
+                                    <h4 className="font-bold text-slate-900 text-lg mb-1">{req.leave_type_name}</h4>
+                                    <p className="text-xs font-black text-slate-400 mb-4">{new Date(req.start_date).toLocaleDateString()} - {new Date(req.end_date).toLocaleDateString()}</p>
+                                    <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
+                                        <span className="text-sm font-black text-slate-900 italic">"{req.reason.substring(0, 20)}..."</span>
+                                        <div className="flex items-center gap-1 text-primary-600 font-black">
+                                            <span className="text-lg">{parseFloat(req.days_requested).toFixed(0)}</span>
+                                            <span className="text-[10px] uppercase">Days</span>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Sidebar Calendar & Employees on Leave */}
+                <div className="lg:col-span-1 space-y-8">
+                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl p-6 bg-white overflow-hidden relative">
+                        <div className="relative z-10 flex flex-col gap-6">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Other Employees on Leave</h3>
+                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h4 className="text-2xl font-black text-slate-900 tracking-tight">January 2026</h4>
+                                    <div className="flex gap-2">
+                                        <button className="h-8 w-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all font-black text-lg">&lt;</button>
+                                        <button className="h-8 w-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all font-black text-lg">&gt;</button>
+                                    </div>
+                                </div>
+                                <LeaveCalendar mini={true} />
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl p-8 bg-slate-900 text-white relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-all">
+                            <Info className="h-40 w-40" />
+                        </div>
+                        <div className="relative space-y-6">
+                            <h4 className="text-xl font-black tracking-tight leading-tight italic">Upcoming Public Holidays</h4>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
+                                    <div className="h-10 w-10 bg-primary-500 text-white rounded-xl flex flex-col items-center justify-center font-black leading-none">
+                                        <span className="text-[10px] uppercase">Jan</span>
+                                        <span className="text-lg">26</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-sm">NRM Liberation Day</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National Holiday</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 opacity-50">
+                                    <div className="h-10 w-10 bg-slate-700 text-white rounded-xl flex flex-col items-center justify-center font-black leading-none">
+                                        <span className="text-[10px] uppercase">Feb</span>
+                                        <span className="text-lg">16</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-sm">Archbishop Janani Luwum Day</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National Holiday</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
 
             <CreateLeaveTypeModal
                 isOpen={showTypeModal}

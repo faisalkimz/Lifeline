@@ -36,6 +36,7 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     employee_number = serializers.CharField(source='employee.employee_number', read_only=True)
     leave_type_name = serializers.CharField(source='leave_type.name', read_only=True)
+    reliever_name = serializers.CharField(source='reliever.full_name', read_only=True)
     approved_by_name = serializers.SerializerMethodField()
     can_approve = serializers.SerializerMethodField()
     can_cancel = serializers.SerializerMethodField()
@@ -49,7 +50,7 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'employee', 'employee_name', 'employee_number',
             'leave_type', 'leave_type_name', 'start_date', 'end_date',
-            'days_requested', 'reason', 'status', 'document',
+            'days_requested', 'reason', 'status', 'document', 'reliever', 'reliever_name',
             'approved_by', 'approved_by_name', 'approved_at', 'rejection_reason',
             'can_approve', 'can_cancel', 'created_at', 'updated_at'
         ]

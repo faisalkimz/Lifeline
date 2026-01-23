@@ -75,6 +75,7 @@ class LeaveRequest(models.Model):
     days_requested = models.DecimalField(max_digits=5, decimal_places=1)
     reason = models.TextField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reliever = models.ForeignKey(Employee, on_delete=models.SET_NULL, null=True, blank=True, related_name='leave_coverages')
     
     # Workflow
     applied_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='leave_requests_applied')

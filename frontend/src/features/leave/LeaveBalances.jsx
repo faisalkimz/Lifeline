@@ -9,91 +9,51 @@ const LeaveBalances = () => {
 
     if (isLoading) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+            <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
                 {[1, 2, 3, 4].map((i) => (
-                    <div key={i} className="h-48 bg-gray-100 rounded-xl border border-gray-200" />
+                    <div key={i} className="min-w-[240px] h-40 bg-gray-50 rounded-xl border border-gray-100 animate-pulse" />
                 ))}
             </div>
         );
     }
 
-    if (!balances || balances.length === 0) {
-        return (
-            <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-                <Calendar className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Leave Balances</h3>
-                <p className="text-sm text-gray-600">No active leave entitlements found for your profile.</p>
-            </div>
-        );
-    }
+    if (!balances || balances.length === 0) return null;
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {balances.map((balance, index) => {
-                const percentageUsed = (balance.used_days / balance.total_days) * 100;
-                const isCritical = balance.available_days < 3;
-
+        <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar">
+            {balances.map((balance) => {
                 return (
                     <motion.div
                         key={balance.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="min-w-[220px] bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-all group"
                     >
-                        <Card className={`border transition-all hover:shadow-md ${isCritical ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white'
-                            }`}>
-                            <CardContent className="p-6">
-                                <div className="flex justify-between items-start mb-6">
-                                    <div>
-                                        <p className="text-xs text-gray-600 mb-1">{balance.year} Balance</p>
-                                        <h3 className="font-semibold text-lg text-gray-900">{balance.leave_type_name}</h3>
-                                    </div>
-                                    <div className={`p-2 rounded-lg ${isCritical ? 'bg-red-100' : 'bg-primary-100'
-                                        }`}>
-                                        <TrendingUp className={`h-5 w-5 ${isCritical ? 'text-red-600' : 'text-primary-600'
-                                            }`} />
-                                    </div>
-                                </div>
+                        <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center justify-between">
+                            {balance.leave_type_name}
+                            <div className="h-2 w-2 rounded-full bg-primary-500" />
+                        </h3>
 
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <div className="flex items-baseline gap-2">
-                                                <p className="text-4xl font-bold text-gray-900">{balance.available_days}</p>
-                                                <span className="text-sm text-gray-600">Days</span>
-                                            </div>
-                                            <p className="text-xs text-gray-600 mt-1">Available</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-medium text-gray-700">{balance.total_days} Total</p>
-                                        </div>
-                                    </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="space-y-2">
-                                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                                            <motion.div
-                                                initial={{ width: 0 }}
-                                                animate={{ width: `${Math.min(percentageUsed, 100)}%` }}
-                                                transition={{ duration: 1, ease: "easeOut", delay: 0.2 + (index * 0.1) }}
-                                                className={`h-full rounded-full ${isCritical ? 'bg-red-600' : 'bg-primary-600'
-                                                    }`}
-                                            />
-                                        </div>
-                                        <div className="flex justify-between items-center text-xs">
-                                            <div className="flex items-center gap-1.5 text-green-600">
-                                                <CheckCircle className="h-3 w-3" />
-                                                <span className="font-medium">{balance.used_days} Used</span>
-                                            </div>
-                                            <div className="flex items-center gap-1.5 text-orange-600">
-                                                <Clock className="h-3 w-3" />
-                                                <span className="font-medium">{balance.pending_days} Pending</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                        <div className="space-y-3">
+                            <div>
+                                <p className="text-2xl font-black text-slate-900 leading-none">
+                                    {parseFloat(balance.total_days).toFixed(2)}
+                                </p>
+                                <div className="flex flex-col mt-3">
+                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Leave balance</span>
+                                    <span className="text-sm font-black text-primary-600">
+                                        {parseFloat(balance.available_days).toFixed(2)}
+                                    </span>
                                 </div>
-                            </CardContent>
-                        </Card>
+                            </div>
+
+                            <div className="pt-3 border-t border-gray-50 flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">Leave taken</span>
+                                <span className="text-sm font-black text-slate-700">
+                                    {parseFloat(balance.used_days).toFixed(0)}
+                                </span>
+                            </div>
+                        </div>
                     </motion.div>
                 );
             })}

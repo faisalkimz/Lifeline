@@ -16,9 +16,11 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../auth/authSlice';
 import LeaveBalances from './LeaveBalances';
 import LeaveCalendar from './LeaveCalendar';
+import CreateLeaveTypeModal from './CreateLeaveTypeModal';
+import { useDeleteLeaveTypeMutation } from '../../store/api';
+import { Settings2, Trash2, Edit2 } from 'lucide-react';
 
 const LeaveRequestsPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -26,6 +28,11 @@ const LeaveRequestsPage = () => {
     const [requestTab, setRequestTab] = useState('all');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [showTypeModal, setShowTypeModal] = useState(false);
+    const [selectedType, setSelectedType] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const isCompanyAdmin = user?.role === 'company_admin' || user?.role === 'admin' || user?.role === 'hr_manager';
 
     const { data: myRequests } = useGetLeaveRequestsQuery('/leave/requests/my_requests/');
     const { data: leaveTypes } = useGetLeaveTypesQuery();
@@ -67,6 +74,18 @@ const LeaveRequestsPage = () => {
         }
     };
 
+    const [deleteLeaveType] = useDeleteLeaveTypeMutation();
+
+    const handleDeleteType = async (id) => {
+        if (!window.confirm('Are you sure? This will not affect existing requests but will prevent new ones.')) return;
+        try {
+            await deleteLeaveType(id).unwrap();
+            toast.success('Leave type deactivated');
+        } catch (error) {
+            toast.error('Failed to delete');
+        }
+    };
+
     const calculateDays = (startDate, endDate) => {
         if (!startDate || !endDate) return 0;
         const start = new Date(startDate);
@@ -96,122 +115,135 @@ const LeaveRequestsPage = () => {
                         </p>
                     </div>
 
-                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 shadow-md shadow-primary-200">
-                                <Plus className="h-4 w-4 mr-2" />
-                                Request Leave
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-xl bg-white border-0 rounded-2xl p-0 overflow-hidden shadow-2xl">
-                            <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                                <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
-                                    <PlaneLanding className="h-6 w-6 text-emerald-600" />
-                                </div>
-                                <div>
-                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Plan your Time Off</DialogTitle>
-                                    <p className="text-slate-500 mt-1 font-medium text-sm">Submit your application for review.</p>
-                                </div>
-                            </div>
-
-                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-700">Type of Leave</label>
-                                    <div className="relative">
-                                        <select
-                                            className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer hover:border-emerald-300 transition-all"
-                                            value={formData.leave_type}
-                                            onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                                            required
-                                        >
-                                            <option value="">Select leave type...</option>
-                                            {leaveTypes?.map(type => (
-                                                <option key={type.id} value={type.id}>{type.name}</option>
-                                            ))}
-                                        </select>
-                                        <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 rotate-90 pointer-events-none" />
+                    <div className="flex gap-3">
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-primary-600 hover:bg-primary-700 text-white px-6 shadow-md shadow-primary-200">
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Request Leave
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-xl bg-white border-0 rounded-2xl p-0 overflow-hidden shadow-2xl">
+                                <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                                    <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
+                                        <PlaneLanding className="h-6 w-6 text-emerald-600" />
+                                    </div>
+                                    <div>
+                                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Plan your Time Off</DialogTitle>
+                                        <p className="text-slate-500 mt-1 font-medium text-sm">Submit your application for review.</p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 gap-5">
+                                <form onSubmit={handleSubmit} className="p-8 space-y-6">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700">From</label>
-                                        <Input
-                                            type="date"
-                                            className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
-                                            value={formData.start_date}
-                                            onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                            required
-                                        />
+                                        <label className="text-sm font-bold text-slate-700">Type of Leave</label>
+                                        <div className="relative">
+                                            <select
+                                                className="w-full h-12 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none appearance-none cursor-pointer hover:border-emerald-300 transition-all"
+                                                value={formData.leave_type}
+                                                onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                                required
+                                            >
+                                                <option value="">Select leave type...</option>
+                                                {leaveTypes?.map(type => (
+                                                    <option key={type.id} value={type.id}>{type.name}</option>
+                                                ))}
+                                            </select>
+                                            <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 rotate-90 pointer-events-none" />
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-bold text-slate-700">To</label>
-                                        <Input
-                                            type="date"
-                                            className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
-                                            value={formData.end_date}
-                                            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
 
-                                <AnimatePresence>
-                                    {daysRequested > 0 && (
-                                        <motion.div
-                                            initial={{ opacity: 0, height: 0 }}
-                                            animate={{ opacity: 1, height: 'auto' }}
-                                            exit={{ opacity: 0, height: 0 }}
-                                            className="overflow-hidden"
-                                        >
-                                            <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-emerald-200 rounded-lg text-emerald-700">
-                                                        <Clock className="h-4 w-4" />
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-slate-700">From</label>
+                                            <Input
+                                                type="date"
+                                                className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
+                                                value={formData.start_date}
+                                                onChange={e => setFormData({ ...formData, start_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-bold text-slate-700">To</label>
+                                            <Input
+                                                type="date"
+                                                className="h-12 bg-slate-50 border-slate-200 rounded-xl focus:ring-emerald-500/20 focus:border-emerald-500"
+                                                value={formData.end_date}
+                                                onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <AnimatePresence>
+                                        {daysRequested > 0 && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: 'auto' }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="p-2 bg-emerald-200 rounded-lg text-emerald-700">
+                                                            <Clock className="h-4 w-4" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Duration</p>
+                                                            <p className="text-sm text-emerald-600">Calculated based on dates</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Duration</p>
-                                                        <p className="text-sm text-emerald-600">Calculated based on dates</p>
-                                                    </div>
+                                                    <span className="text-2xl font-bold text-emerald-600">
+                                                        {daysRequested} <span className="text-sm font-medium text-emerald-500">days</span>
+                                                    </span>
                                                 </div>
-                                                <span className="text-2xl font-bold text-emerald-600">
-                                                    {daysRequested} <span className="text-sm font-medium text-emerald-500">days</span>
-                                                </span>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
 
-                                <div className="space-y-2">
-                                    <label className="text-sm font-bold text-slate-700">Reason</label>
-                                    <textarea
-                                        className="w-full min-h-[120px] p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none hover:border-emerald-300 focus:bg-white"
-                                        placeholder="Why are you taking leave?"
-                                        value={formData.reason}
-                                        onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                        required
-                                    />
-                                </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-slate-700">Reason</label>
+                                        <textarea
+                                            className="w-full min-h-[120px] p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none hover:border-emerald-300 focus:bg-white"
+                                            placeholder="Why are you taking leave?"
+                                            value={formData.reason}
+                                            onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                            required
+                                        />
+                                    </div>
 
-                                <div className="pt-4 flex gap-3 border-t border-slate-100">
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        onClick={() => setIsDialogOpen(false)}
-                                        className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
-                                    >
-                                        Submit Request
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
-                    </Dialog>
+                                    <div className="pt-4 flex gap-3 border-t border-slate-100">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={() => setIsDialogOpen(false)}
+                                            className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl"
+                                        >
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 rounded-xl shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all"
+                                        >
+                                            Submit Request
+                                        </Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
+                        </Dialog>
+
+                        {isCompanyAdmin && (
+                            <Button
+                                variant="outline"
+                                onClick={() => { setSelectedType(null); setShowTypeModal(true); }}
+                                className="border-slate-200 text-slate-700 hover:bg-slate-50 font-bold shadow-sm"
+                            >
+                                <Settings2 className="h-4 w-4 mr-2 text-slate-400" />
+                                Manage Types
+                            </Button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -339,6 +371,54 @@ const LeaveRequestsPage = () => {
                     </motion.div>
                 )}
 
+                {activeTab === 'dashboard' && isCompanyAdmin && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-4"
+                    >
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Active Leave Policies</h3>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Company wide</p>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {leaveTypes?.map(type => (
+                                <Card key={type.id} className="border-0 shadow-sm bg-white hover:shadow-md transition-all group overflow-hidden">
+                                    <div className="p-5 flex flex-col h-full">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center font-black text-slate-400 text-xs border border-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-all">
+                                                {type.code}
+                                            </div>
+                                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => { setSelectedType(type); setShowTypeModal(true); }}
+                                                    className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-900"
+                                                >
+                                                    <Edit2 className="h-3.5 w-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteType(type.id)}
+                                                    className="p-2 hover:bg-red-50 rounded-lg text-slate-400 hover:text-red-600"
+                                                >
+                                                    <Trash2 className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <h4 className="font-bold text-slate-900 mb-1">{type.name}</h4>
+                                        <p className="text-xs text-slate-500 font-medium mb-4 line-clamp-1">{type.description || 'No description provided'}</p>
+                                        <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+                                            <span className="text-xl font-black text-slate-900">{type.days_per_year}<span className="text-[10px] text-slate-400 uppercase ml-1">Days</span></span>
+                                            <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md ${type.is_paid ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-slate-50 text-slate-500 border border-slate-100'}`}>
+                                                {type.is_paid ? 'Paid' : 'Unpaid'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+
                 {activeTab === 'requests' && (
                     <motion.div
                         key="requests"
@@ -446,6 +526,12 @@ const LeaveRequestsPage = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <CreateLeaveTypeModal
+                isOpen={showTypeModal}
+                onClose={() => setShowTypeModal(false)}
+                leaveType={selectedType}
+            />
         </div>
     );
 };

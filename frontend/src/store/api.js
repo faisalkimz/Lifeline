@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession', 'GCCSettings', 'Gratuity', 'DocumentSignature', 'TaxSettings'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveType', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession', 'GCCSettings', 'Gratuity', 'DocumentSignature', 'TaxSettings'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -458,12 +458,48 @@ export const api = createApi({
       providesTags: ['LeaveRequest'] // Re-fetch on request changes
     }),
     getLeaveTypes: builder.query({
-      query: () => '/leave/types/',
+      query: (params) => ({
+        url: '/leave/types/',
+        params
+      }),
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
         return response || [];
       },
+      providesTags: (result) =>
+        result && Array.isArray(result)
+          ? [
+            ...result.map(({ id }) => ({ type: 'LeaveType', id })),
+            { type: 'LeaveType', id: 'LIST' }
+          ]
+          : [{ type: 'LeaveType', id: 'LIST' }]
+    }),
+    createLeaveType: builder.mutation({
+      query: (data) => ({
+        url: '/leave/types/',
+        method: 'POST',
+        body: data
+      }),
+      invalidatesTags: [{ type: 'LeaveType', id: 'LIST' }]
+    }),
+    updateLeaveType: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/leave/types/${id}/`,
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: (result, error, { id }) => [
+        { type: 'LeaveType', id },
+        { type: 'LeaveType', id: 'LIST' }
+      ]
+    }),
+    deleteLeaveType: builder.mutation({
+      query: (id) => ({
+        url: `/leave/types/${id}/`,
+        method: 'DELETE'
+      }),
+      invalidatesTags: [{ type: 'LeaveType', id: 'LIST' }]
     }),
     approveLeaveRequest: builder.mutation({
       query: (id) => ({
@@ -1510,6 +1546,9 @@ export const {
   useCreateLeaveRequestMutation,
   useGetLeaveBalancesQuery,
   useGetLeaveTypesQuery,
+  useCreateLeaveTypeMutation,
+  useUpdateLeaveTypeMutation,
+  useDeleteLeaveTypeMutation,
   useApproveLeaveRequestMutation,
   useRejectLeaveRequestMutation,
   useGetPublicHolidaysQuery,

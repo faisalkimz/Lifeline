@@ -7,7 +7,8 @@ import {
     useProcessPayrollMutation,
     useApprovePayrollMutation,
     useMarkPayrollPaidMutation,
-    useGeneratePayslipPdfMutation
+    useGeneratePayslipPdfMutation,
+    useEmailPayslipMutation
 } from '../../store/api';
 import { getMediaUrl } from '../../config/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
@@ -15,7 +16,7 @@ import { Button } from '../../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
-import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet } from 'lucide-react';
+import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet, Mail } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PayrollRunDetailsPage = () => {
@@ -36,6 +37,7 @@ const PayrollRunDetailsPage = () => {
     const [approvePayroll, { isLoading: isApproving }] = useApprovePayrollMutation();
     const [markPaid, { isLoading: isPaying }] = useMarkPayrollPaidMutation();
     const [generatePayslipPdf, { isLoading: isGeneratingPdf }] = useGeneratePayslipPdfMutation();
+    const [emailPayslip, { isLoading: isEmailing }] = useEmailPayslipMutation();
 
     // Helper functions
     const formatCurrency = (val) => new Intl.NumberFormat('en-UG', {
@@ -136,6 +138,31 @@ const PayrollRunDetailsPage = () => {
         }
     };
 
+    const handleEmailAll = async () => {
+        if (!confirm("Are you sure you want to email payslips to all employees in this run?")) return;
+
+        const loadingToast = toast.loading('Sending emails...');
+        let successCount = 0;
+        let failCount = 0;
+
+        for (const p of payslips) {
+            try {
+                await emailPayslip(p.id).unwrap();
+                successCount++;
+            } catch (e) {
+                console.error(`Failed to email payslip ${p.id}:`, e);
+                failCount++;
+            }
+        }
+
+        toast.dismiss(loadingToast);
+        if (failCount === 0) {
+            toast.success(`Successfully emailed ${successCount} payslips`);
+        } else {
+            toast.success(`Sent ${successCount} payslips. Failed: ${failCount}`, { duration: 5000 });
+        }
+    };
+
     const handleDownloadAll = async () => {
         toast.loading('Generating all payslips... This may take a moment', { duration: 3000 });
         for (const p of payslips) {
@@ -165,17 +192,21 @@ const PayrollRunDetailsPage = () => {
         }
 
         // Generate CSV for Uganda Statutory Returns (PAYE & NSSF)
-        const headers = ["Employee Name", "TIN", "Gross Salary", "PAYE Tax", "NSSF Employee (5%)", "NSSF Employer (10%)", "Total NSSF (15%)", "Net Pay"];
-        const rows = payslips.map(p => [
-            p.employee_name,
-            p.tin || "N/A",
-            p.gross_salary,
-            p.paye_tax,
-            p.nssf_employee || (p.gross_salary * 0.05),
-            p.nssf_employer || (p.gross_salary * 0.10),
-            (Number(p.nssf_employee) || (p.gross_salary * 0.05)) + (Number(p.nssf_employer) || (p.gross_salary * 0.10)),
-            p.net_salary
-        ]);
+        const headers = ["Employee Name", "TIN", "Gross Salary", "PAYE Tax", "NSSF Employee", "NSSF Employer", "Total NSSF", "Net Pay"];
+        const rows = payslips.map(p => {
+            const nssfEmp = Number(p.nssf_employee) || 0;
+            const nssfComp = Number(p.nssf_employer) || 0;
+            return [
+                p.employee_name,
+                p.tin || "N/A",
+                p.gross_salary,
+                p.paye_tax,
+                nssfEmp,
+                nssfComp,
+                nssfEmp + nssfComp,
+                p.net_salary
+            ];
+        });
 
         const csvContent = "data:text/csv;charset=utf-8,"
             + headers.join(",") + "\n"
@@ -237,6 +268,15 @@ const PayrollRunDetailsPage = () => {
                             Mark Paid
                         </Button>
                     )}
+                    <Button
+                        onClick={handleEmailAll}
+                        variant="outline"
+                        className="border-slate-200 text-purple-600 hover:bg-purple-50 font-bold"
+                        disabled={payslips.length === 0 || isEmailing || run.status === 'draft'}
+                    >
+                        {isEmailing ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Mail className="h-4 w-4 mr-2" />}
+                        Email All
+                    </Button>
                     <Button
                         onClick={handleDownloadAll}
                         variant="outline"

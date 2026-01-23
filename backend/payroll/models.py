@@ -34,9 +34,9 @@ class TaxSettings(models.Model):
     pension_fund_relief = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('200000.00'))
 
     # NSSF settings
-    nssf_employee_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('10.00'))
+    nssf_employee_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('5.00'))
     nssf_employer_rate = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('10.00'))
-    nssf_ceiling = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('100000.00'))
+    nssf_ceiling = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))  # 0 means no ceiling
 
     # Local Service Tax (5% for Uganda)
     local_service_tax_enabled = models.BooleanField(default=True)

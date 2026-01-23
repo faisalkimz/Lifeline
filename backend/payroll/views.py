@@ -15,12 +15,12 @@ from accounts.permissions import IsCompanyUser
 from employees.models import Employee
 from django.core.exceptions import ObjectDoesNotExist
 import logging
-from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance
+from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance, TaxSettings
 logger = logging.getLogger(__name__)
 from .serializers import (
     SalaryStructureSerializer, PayrollRunSerializer,
     PayslipSerializer, PayslipDetailSerializer,
-    SalaryAdvanceSerializer
+    SalaryAdvanceSerializer, TaxSettingsSerializer
 )
 from .services.payroll_email_service import PayrollEmailService
 from .utils import calculate_net_salary
@@ -157,6 +157,17 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         # Clear existing payslips for these employees to avoid duplicates
         Payslip.objects.filter(payroll_run=payroll_run, employee__in=employees).delete()
 
+        # Fetch Tax Settings
+        try:
+            tax_settings = payroll_run.company.tax_settings
+            tax_config = {
+                'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
+                'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
+                'nssf_ceiling': tax_settings.nssf_ceiling
+            }
+        except ObjectDoesNotExist:
+            tax_config = {}  # Use defaults
+
         for employee in employees:
             try:
                 try:
@@ -165,7 +176,7 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                     continue
                     
                 gross = structure.gross_salary
-                calculations = calculate_net_salary(gross)
+                calculations = calculate_net_salary(gross, tax_config=tax_config)
                 
                 Payslip.objects.create(
                     payroll_run=payroll_run,
@@ -241,7 +252,7 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         if reset or not payroll_run.payslips.exists():
             if reset:
                 payroll_run.payslips.all().delete()
-            employees = payroll_run.company.employees.filter(is_active=True)
+            employees = payroll_run.company.employees.filter(employment_status='active')
         else:
             employees = Employee.objects.filter(payslips__payroll_run=payroll_run)
 
@@ -430,4 +441,42 @@ class SalaryStructureViewSet(viewsets.ModelViewSet):
                 'employee': 'Cannot update salary structure with employee from another company.'
             })
         
+        serializer.save()
+
+
+class TaxSettingsViewSet(viewsets.ModelViewSet):
+    """
+    Manage tax settings for the company.
+    Restricted to HR Manager and Company Admin.
+    """
+    queryset = TaxSettings.objects.all()
+    serializer_class = TaxSettingsSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             return self.queryset.none()
+        
+        # Ensure it exists
+        if not TaxSettings.objects.filter(company=user.company).exists():
+            TaxSettings.objects.create(company=user.company)
+            
+        return self.queryset.filter(company=user.company)
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             raise PermissionDenied("You do not have permission to manage tax settings.")
+        
+        # Ensure only one setting per company
+        if TaxSettings.objects.filter(company=user.company).exists():
+             raise ValidationError("Tax settings already exist for this company.")
+        
+        serializer.save(company=user.company, created_by=user)
+    
+    def perform_update(self, serializer):
+        user = self.request.user
+        if user.role not in ['hr_manager', 'company_admin', 'super_admin']:
+             raise PermissionDenied("You do not have permission to manage tax settings.")
         serializer.save()

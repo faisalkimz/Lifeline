@@ -205,9 +205,15 @@ const PayslipPage = () => {
                                             <span className="text-slate-900 font-bold">{formatCurrency(payslip.paye_tax)}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-slate-500 font-medium">NSSF Pension (Employee 5%)</span>
+                                            <span className="text-slate-500 font-medium">NSSF Pension (Employee)</span>
                                             <span className="text-slate-900 font-bold">{formatCurrency(payslip.nssf_employee)}</span>
                                         </div>
+                                        {payslip.local_service_tax > 0 && (
+                                            <div className="flex justify-between items-center text-sm">
+                                                <span className="text-slate-500 font-medium">Local Service Tax (LST)</span>
+                                                <span className="text-slate-900 font-bold">{formatCurrency(payslip.local_service_tax)}</span>
+                                            </div>
+                                        )}
                                         <div className="flex justify-between items-center text-sm">
                                             <span className="text-slate-500 font-medium">Financial Obligations / Loans</span>
                                             <span className="text-slate-900 font-bold">{formatCurrency((payslip.loan_deduction || 0) + (payslip.advance_deduction || 0))}</span>

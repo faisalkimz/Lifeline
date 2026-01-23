@@ -27,6 +27,9 @@ from .serializers import (
 from .permissions import IsCompanyUser, IsCompanyAdmin, IsOwnerOrAdmin
 from .services.security_service import SecurityService
 from .models import SecurityLog
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class RegisterView(generics.CreateAPIView):
@@ -154,32 +157,28 @@ class LoginView(generics.GenericAPIView):
 class LogoutView(generics.GenericAPIView):
     """
     API endpoint for user logout.
-    Blacklists the refresh token.
+    Blacklists the refresh token if provided.
     
     POST /api/auth/logout/
-    Body: {"refresh": "..."}
+    Body: {"refresh": "..."} (optional - logout will succeed even if token is missing/invalid)
     """
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
         """Logout user by blacklisting refresh token"""
-        try:
-            refresh_token = request.data.get('refresh')
-            if not refresh_token:
-                return Response(
-                    {'error': 'Refresh token is required'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            
-            return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {'error': 'Invalid token'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        refresh_token = request.data.get('refresh')
+        
+        if refresh_token:
+            try:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            except Exception as e:
+                # Log the error but don't fail the logout
+                # The token might already be blacklisted or invalid
+                logger.warning(f"Failed to blacklist token during logout: {str(e)}")
+        
+        # Always return success - we're clearing local state anyway
+        return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):

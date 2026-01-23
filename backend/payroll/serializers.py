@@ -2,7 +2,7 @@
 Payroll serializers for API endpoints.
 """
 from rest_framework import serializers
-from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance
+from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance, TaxSettings
 from .utils import calculate_net_salary, get_tax_bracket_info
 
 
@@ -172,6 +172,17 @@ class PayslipSerializer(serializers.ModelSerializer):
             gross = salary_structure.gross_salary + validated_data.get('bonus', 0)
             validated_data['gross_salary'] = gross
             
+            # Fetch Tax Settings
+            try:
+                tax_settings = employee.company.tax_settings
+                tax_config = {
+                    'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
+                    'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
+                    'nssf_ceiling': tax_settings.nssf_ceiling
+                }
+            except Exception:
+                tax_config = {}
+
             # Calculate tax and deductions
             calculations = calculate_net_salary(
                 gross,
@@ -179,7 +190,8 @@ class PayslipSerializer(serializers.ModelSerializer):
                     'loan_deduction': validated_data.get('loan_deduction', 0),
                     'advance_deduction': validated_data.get('advance_deduction', 0),
                     'other_deductions': validated_data.get('other_deductions', 0),
-                }
+                },
+                tax_config=tax_config
             )
             
             validated_data.update({
@@ -208,6 +220,17 @@ class PayslipSerializer(serializers.ModelSerializer):
         )
         instance.gross_salary = instance.basic_salary + total_allowances + instance.bonus
         
+        # Fetch Tax Settings
+        try:
+            tax_settings = instance.employee.company.tax_settings
+            tax_config = {
+                'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
+                'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
+                'nssf_ceiling': tax_settings.nssf_ceiling
+            }
+        except Exception:
+            tax_config = {}
+
         # Calculate new deductions/net
         calculations = calculate_net_salary(
             instance.gross_salary,
@@ -215,7 +238,8 @@ class PayslipSerializer(serializers.ModelSerializer):
                 'loan_deduction': instance.loan_deduction,
                 'advance_deduction': instance.advance_deduction,
                 'other_deductions': instance.other_deductions,
-            }
+            },
+            tax_config=tax_config
         )
         
         instance.paye_tax = calculations['paye_tax']
@@ -284,6 +308,27 @@ class PayrollSummarySerializer(serializers.Serializer):
     total_net = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_paye_tax = serializers.DecimalField(max_digits=15, decimal_places=2)
     total_nssf = serializers.DecimalField(max_digits=15, decimal_places=2)
+
+
+class TaxSettingsSerializer(serializers.ModelSerializer):
+    """Serializer for TaxSettings"""
+
+    class Meta:
+        model = TaxSettings
+        fields = [
+            'id', 'company', 'country', 'currency', 'tax_year',
+            'nssf_employee_rate', 'nssf_employer_rate', 'nssf_ceiling',
+            'personal_relief', 'insurance_relief', 'pension_fund_relief',
+            'local_service_tax_enabled', 'local_service_tax_rate',
+            'effective_date'
+        ]
+        read_only_fields = ['id', 'company', 'effective_date', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        # Auto-assign company
+        user = self.context['request'].user
+        validated_data['company'] = user.company
+        return super().create(validated_data)
 
 
 

@@ -20,12 +20,19 @@ const EmployeePortalLayout = () => {
         return <Navigate to="/login" replace />;
     }
 
+    const refresh = useSelector(state => state?.auth?.refresh);
+    
     const handleLogout = async () => {
         try {
-            await logoutApi().unwrap();
+            // Only call logout API if we have a refresh token
+            if (refresh) {
+                await logoutApi(refresh).unwrap();
+            }
         } catch (err) {
-            console.error('Logout failed', err);
+            // Silently fail as we are clearing local state anyway
+            console.warn('Logout API call failed (this is OK):', err);
         } finally {
+            // Always clear local state
             dispatch(logout());
         }
     };

@@ -11,6 +11,7 @@ router.register(r'payroll-runs', views.PayrollRunViewSet, basename='payrollrun')
 router.register(r'salary-structures', views.SalaryStructureViewSet, basename='salarystructure')
 router.register(r'salary-advances', views.SalaryAdvanceViewSet, basename='salaryadvance')
 router.register(r'payslips', views.PayslipViewSet, basename='payslip')
+router.register(r'tax-settings', views.TaxSettingsViewSet, basename='tax-settings')
 # EWA endpoints
 router.register(r'ewa-config', EarlyWageAccessConfigViewSet, basename='ewa-config')
 router.register(r'ewa-requests', WageAccessRequestViewSet, basename='ewa-request')

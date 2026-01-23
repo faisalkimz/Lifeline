@@ -119,7 +119,7 @@ const EmployeeListPage = () => {
             </div>
 
             {/* Enhanced Search & Filters */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4 z-20">
+            <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4 z-20">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />

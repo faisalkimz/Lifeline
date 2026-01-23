@@ -38,57 +38,60 @@ def calculate_paye(gross_salary: Decimal) -> Decimal:
         return (Decimal('2902000') + (gross_salary - Decimal('10000000')) * Decimal('0.40')).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
-def calculate_nssf(gross_salary: Decimal) -> Decimal:
+def calculate_nssf(gross_salary: Decimal, rate: Decimal = Decimal('0.05'), ceiling: Decimal = Decimal('0')) -> Decimal:
     """
-    Calculate NSSF contribution for Uganda.
-
-    NSSF Contribution Rules:
-    - Employee contribution: 10% of gross salary
-    - Employer contribution: 10% of gross salary
-    - Maximum pensionable salary: UGX 100,000 per month
-    - Maximum contribution: UGX 10,000 per month (10% of 100,000)
+    Calculate NSSF contribution.
+    Defaults to 5% with no ceiling (standard Uganda).
 
     Args:
         gross_salary: Monthly gross salary in UGX
+        rate: Contribution rate (default 0.05)
+        ceiling: Maximum contribution amount (default 0 - no limit)
 
     Returns:
-        Employee NSSF contribution amount (UGX 10,000 max)
+        NSSF contribution amount
     """
-    # NSSF is 10% of salary, capped at 10% of maximum pensionable salary (100,000)
-    contribution = min(gross_salary * Decimal('0.10'), Decimal('10000'))
+    contribution = gross_salary * rate
+    if ceiling > Decimal('0'):
+        contribution = min(contribution, ceiling)
     return contribution.quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
 
-def calculate_employer_nssf(gross_salary: Decimal) -> Decimal:
+def calculate_employer_nssf(gross_salary: Decimal, rate: Decimal = Decimal('0.10'), ceiling: Decimal = Decimal('0')) -> Decimal:
     """
-    Calculate employer NSSF contribution (same as employee contribution).
-
-    Args:
-        gross_salary: Monthly gross salary in UGX
-
-    Returns:
-        Employer NSSF contribution amount
+    Calculate employer NSSF contribution.
+    Defaults to 10% with no ceiling.
     """
-    return calculate_nssf(gross_salary)
+    return calculate_nssf(gross_salary, rate, ceiling)
 
 
-def calculate_net_salary(gross_salary: Decimal, deductions: dict = None) -> dict:
+def calculate_net_salary(gross_salary: Decimal, deductions: dict = None, tax_config: dict = None) -> dict:
     """
     Calculate net salary after all deductions.
 
     Args:
         gross_salary: Monthly gross salary
         deductions: Dictionary of deductions (optional)
+        tax_config: Key-value pairs for tax settings (rates, ceilings)
 
     Returns:
         Dictionary with breakdown of earnings, deductions, and net salary
     """
     if deductions is None:
         deductions = {}
+    
+    if tax_config is None:
+        tax_config = {}
 
+    # Extract config with defaults
+    nssf_emp_rate = tax_config.get('nssf_employee_rate', Decimal('0.05'))
+    nssf_emp_ceiling = tax_config.get('nssf_ceiling', Decimal('0'))
+    nssf_employer_rate = tax_config.get('nssf_employer_rate', Decimal('0.10'))
+    
     # Calculate tax and NSSF
     paye_tax = calculate_paye(gross_salary)
-    nssf_employee = calculate_nssf(gross_salary)
+    nssf_employee = calculate_nssf(gross_salary, rate=nssf_emp_rate, ceiling=nssf_emp_ceiling)
+    nssf_employer = calculate_employer_nssf(gross_salary, rate=nssf_employer_rate, ceiling=nssf_emp_ceiling)
 
     # Get other deductions
     loan_deduction = deductions.get('loan_deduction', Decimal('0'))
@@ -111,7 +114,7 @@ def calculate_net_salary(gross_salary: Decimal, deductions: dict = None) -> dict
         'gross_salary': gross_salary,
         'paye_tax': paye_tax,
         'nssf_employee': nssf_employee,
-        'nssf_employer': calculate_employer_nssf(gross_salary),
+        'nssf_employer': nssf_employer,
         'loan_deduction': loan_deduction,
         'advance_deduction': advance_deduction,
         'other_deductions': other_deductions,

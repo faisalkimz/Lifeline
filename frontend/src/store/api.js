@@ -29,7 +29,7 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithReauth,
   // FIXED: Add 'SalaryAdvance' tag
-  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession', 'GCCSettings', 'Gratuity', 'DocumentSignature'],
+  tagTypes: ['User', 'Company', 'Department', 'Employee', 'PayrollRun', 'SalaryStructure', 'SalaryAdvance', 'LeaveRequest', 'Attendance', 'PerformanceCycle', 'Goal', 'PerformanceReview', 'Job', 'JobPost', 'Candidate', 'Application', 'Interview', 'RecruitmentIntegration', 'Course', 'TrainingSession', 'Enrollment', 'BenefitType', 'EmployeeBenefit', 'Document', 'EmployeeDocument', 'Resignation', 'ExitInterview', 'OfferLetter', 'Payslip', 'Announcement', 'Asset', 'AssetCategory', 'AssetAssignment', 'Integration', 'FormTemplate', 'FormSubmission', 'Survey', 'SurveyResponse', 'ChatSession', 'GCCSettings', 'Gratuity', 'DocumentSignature', 'TaxSettings'],
   endpoints: (builder) => ({
     // --- Auth / user endpoints (existing) ---
     login: builder.mutation({
@@ -333,6 +333,23 @@ export const api = createApi({
       })
     }),
 
+    getTaxSettings: builder.query({
+      query: () => '/payroll/tax-settings/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response[0] || {};
+        if (response?.results && Array.isArray(response.results)) return response.results[0] || {};
+        return response || {};
+      },
+      providesTags: ['TaxSettings']
+    }),
+    updateTaxSettings: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/payroll/tax-settings/${id}/`,
+        method: 'PATCH',
+        body: data
+      }),
+      invalidatesTags: ['TaxSettings', 'PayrollRun']
+    }),
     // --- Employee Stats and Managers ---
     getEmployeeStats: builder.query({
       query: () => '/employees/stats/',
@@ -1479,6 +1496,8 @@ export const {
   useDeleteSalaryStructureMutation,
   // employee stats and managers hooks
   useGetEmployeeStatsQuery,
+  useGetTaxSettingsQuery,
+  useUpdateTaxSettingsMutation,
 
   useGetMyProfileQuery,
   // promote to manager hook

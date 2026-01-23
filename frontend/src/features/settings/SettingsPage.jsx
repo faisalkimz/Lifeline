@@ -21,11 +21,13 @@ import {
     useEnable2FAMutation,
     useDisable2FAMutation,
     useGetSecurityLogsQuery,
+    useGetTaxSettingsQuery,
+    useUpdateTaxSettingsMutation,
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { Badge } from '../../components/ui/Badge';
 import { getMediaUrl } from '../../config/api';
-import { Fingerprint, Download, History, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Fingerprint, Download, History, ShieldCheck, AlertTriangle, Landmark, Receipt, Info } from 'lucide-react';
 
 const SettingsPage = () => {
     const user = useSelector(selectCurrentUser);
@@ -146,6 +148,9 @@ const SettingsPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="security" className="data-[state=active]:bg-white">
                         <ShieldCheck className="h-4 w-4 mr-2" /> Security
+                    </TabsTrigger>
+                    <TabsTrigger value="taxes" className="data-[state=active]:bg-white">
+                        <Landmark className="h-4 w-4 mr-2" /> Tax Settings
                     </TabsTrigger>
                 </TabsList>
 
@@ -505,6 +510,11 @@ const SettingsPage = () => {
                 <TabsContent value="security">
                     <SecurityTab user={user} />
                 </TabsContent>
+
+                {/* Tax Settings Tab */}
+                <TabsContent value="taxes">
+                    <TaxSettingsTab />
+                </TabsContent>
             </Tabs>
         </div>
     );
@@ -704,6 +714,257 @@ const SecurityTab = ({ user }) => {
                         </Button>
                     </CardContent>
                 </Card>
+            </div>
+        </div>
+    );
+};
+
+const TaxSettingsTab = () => {
+    const { data: taxSettings, isLoading } = useGetTaxSettingsQuery();
+    const [updateTaxSettings, { isLoading: isUpdating }] = useUpdateTaxSettingsMutation();
+
+    const [form, setForm] = useState({
+        nssf_employee_rate: '5',
+        nssf_employer_rate: '10',
+        nssf_ceiling: '0',
+        personal_relief: '240000',
+        insurance_relief: '50000',
+        pension_fund_relief: '200000',
+        local_service_tax_rate: '5',
+        local_service_tax_enabled: true
+    });
+
+    useEffect(() => {
+        if (taxSettings) {
+            setForm({
+                nssf_employee_rate: taxSettings.nssf_employee_rate?.toString() || '5',
+                nssf_employer_rate: taxSettings.nssf_employer_rate?.toString() || '10',
+                nssf_ceiling: taxSettings.nssf_ceiling?.toString() || '0',
+                personal_relief: taxSettings.personal_relief?.toString() || '240000',
+                insurance_relief: taxSettings.insurance_relief?.toString() || '50000',
+                pension_fund_relief: taxSettings.pension_fund_relief?.toString() || '200000',
+                local_service_tax_rate: taxSettings.local_service_tax_rate?.toString() || '5',
+                local_service_tax_enabled: taxSettings.local_service_tax_enabled !== false
+            });
+        }
+    }, [taxSettings]);
+
+    const handleSave = async () => {
+        try {
+            await updateTaxSettings({
+                id: taxSettings.id,
+                ...form,
+                nssf_employee_rate: parseFloat(form.nssf_employee_rate),
+                nssf_employer_rate: parseFloat(form.nssf_employer_rate),
+                nssf_ceiling: parseFloat(form.nssf_ceiling),
+                personal_relief: parseFloat(form.personal_relief),
+                insurance_relief: parseFloat(form.insurance_relief),
+                pension_fund_relief: parseFloat(form.pension_fund_relief),
+                local_service_tax_rate: parseFloat(form.local_service_tax_rate)
+            }).unwrap();
+            toast.success('Tax settings updated successfully');
+        } catch (error) {
+            toast.error(error?.data?.detail || 'Failed to update tax settings');
+        }
+    };
+
+    if (isLoading) return <div className="p-12 text-center text-gray-500">Loading tax settings...</div>;
+
+    return (
+        <div className="max-w-5xl space-y-8 text-left animate-in fade-in duration-500">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                    <Card className="border border-slate-200 shadow-xl shadow-slate-200/20 rounded-3xl overflow-hidden bg-white">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-6 px-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-inner">
+                                    <Landmark className="h-6 w-6 text-emerald-600" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Uganda Statutory Deductions</CardTitle>
+                                    <p className="text-slate-500 text-sm font-medium">Standard rates for NSSF & PAYE Reliefs</p>
+                                </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-8 space-y-10">
+                            {/* NSSF Section */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                                    <Receipt className="h-4 w-4 text-slate-400" />
+                                    <h3 className="font-bold text-slate-800 text-lg">NSSF Contributions</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Employee Rate</Label>
+                                        <div className="relative group">
+                                            <Input
+                                                type="number"
+                                                value={form.nssf_employee_rate}
+                                                onChange={(e) => setForm({ ...form, nssf_employee_rate: e.target.value })}
+                                                className="pl-4 pr-10 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">Uganda Standard: <span className="text-emerald-600">5.0%</span></p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Employer Rate</Label>
+                                        <div className="relative group">
+                                            <Input
+                                                type="number"
+                                                value={form.nssf_employer_rate}
+                                                onChange={(e) => setForm({ ...form, nssf_employer_rate: e.target.value })}
+                                                className="pl-4 pr-10 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                            />
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">Uganda Standard: <span className="text-emerald-600">10.0%</span></p>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Monthly Ceiling</Label>
+                                        <div className="relative group">
+                                            <Input
+                                                type="number"
+                                                value={form.nssf_ceiling}
+                                                onChange={(e) => setForm({ ...form, nssf_ceiling: e.target.value })}
+                                                className="pl-12 pr-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                            />
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">Shs</span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">0 = <span className="text-slate-900">No Limit (Default)</span></p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* PAYE Reliefs Section */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                                    <ShieldCheck className="h-4 w-4 text-slate-400" />
+                                    <h3 className="font-bold text-slate-800 text-lg">PAYE Tax Reliefs</h3>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Personal Relief</Label>
+                                        <Input
+                                            type="number"
+                                            value={form.personal_relief}
+                                            onChange={(e) => setForm({ ...form, personal_relief: e.target.value })}
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Insurance Relief</Label>
+                                        <Input
+                                            type="number"
+                                            value={form.insurance_relief}
+                                            onChange={(e) => setForm({ ...form, insurance_relief: e.target.value })}
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Pension Relief</Label>
+                                        <Input
+                                            type="number"
+                                            value={form.pension_fund_relief}
+                                            onChange={(e) => setForm({ ...form, pension_fund_relief: e.target.value })}
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Local Service Tax */}
+                            <section className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${form.local_service_tax_enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                                        <Landmark className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-slate-900">Local Service Tax (LST)</h4>
+                                        <p className="text-xs text-slate-500 font-bold">Apply annual LST deductions to payroll</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <input
+                                        type="checkbox"
+                                        id="lst_enabled"
+                                        checked={form.local_service_tax_enabled}
+                                        onChange={(e) => setForm({ ...form, local_service_tax_enabled: e.target.checked })}
+                                        className="h-6 w-6 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                                    />
+                                    {form.local_service_tax_enabled && (
+                                        <div className="w-24 animate-in zoom-in duration-300">
+                                            <Input
+                                                type="number"
+                                                value={form.local_service_tax_rate}
+                                                onChange={(e) => setForm({ ...form, local_service_tax_rate: e.target.value })}
+                                                className="h-10 font-black border-slate-200 focus:border-blue-500 rounded-xl"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            <div className="pt-8 flex justify-end">
+                                <Button
+                                    onClick={handleSave}
+                                    disabled={isUpdating}
+                                    className="px-10 py-7 rounded-2xl font-black bg-slate-900 hover:bg-slate-800 text-white shadow-2xl shadow-slate-900/20 active:scale-95 transition-all text-lg"
+                                >
+                                    <Save className="h-5 w-5 mr-3" />
+                                    {isUpdating ? 'Applying Changes...' : 'Save Tax Profile'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                <div className="space-y-8">
+                    {/* Compliance Alert */}
+                    <Card className="bg-indigo-950 text-white rounded-3xl border-0 shadow-2xl overflow-hidden group">
+                        <CardContent className="p-8 relative">
+                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-all">
+                                <ShieldCheck className="h-32 w-32" />
+                            </div>
+                            <div className="relative space-y-6">
+                                <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center">
+                                    <AlertTriangle className="h-6 w-6" />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="font-black text-xl tracking-tight">Compliance Memo</h4>
+                                    <p className="text-indigo-200 text-sm font-medium leading-relaxed">
+                                        Updated statutory rates will apply to current processing period for <b>Unpaid</b> slips.
+                                    </p>
+                                </div>
+                                <ul className="space-y-3">
+                                    {[
+                                        'PAYE Bracket: 2024 Schedule',
+                                        'NSSF Ceiling: Customizable',
+                                        'Audit Trail: Auto-enabled'
+                                    ].map((item, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-indigo-300">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border border-slate-200 rounded-3xl p-8 bg-slate-50/30">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Info className="h-5 w-5 text-slate-400" />
+                            <h4 className="font-bold text-slate-900">Need Guidance?</h4>
+                        </div>
+                        <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">
+                            Refer to the <b>Uganda Revenue Authority (URA)</b> technical guide for the 2024/25 fiscal year if you are unsure about custom rates.
+                        </p>
+                        <Button variant="outline" className="w-full py-6 rounded-2xl font-bold border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all">
+                            View URA Tax Guide
+                        </Button>
+                    </Card>
+                </div>
             </div>
         </div>
     );

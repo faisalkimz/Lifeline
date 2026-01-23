@@ -40,10 +40,15 @@ const DashboardLayout = () => {
 
   const handleLogout = async () => {
     try {
-      await logoutApi(refresh).unwrap();
+      // Only call logout API if we have a refresh token
+      if (refresh) {
+        await logoutApi(refresh).unwrap();
+      }
     } catch (err) {
       // Silently fail as we are clearing local state anyway
+      console.warn('Logout API call failed (this is OK):', err);
     } finally {
+      // Always clear local state
       dispatch(logout());
     }
   };

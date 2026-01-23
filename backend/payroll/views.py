@@ -134,14 +134,18 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
             })
         
         # If employees were selected in the modal (passed via serializer hack)
-        if hasattr(instance, '_employee_ids_to_process'):
-            ids = instance._employee_ids_to_process
-            employees = Employee.objects.filter(company=instance.company, id__in=ids)
-            self._process_employees(instance, employees)
+        # Determine which employees to process
+        employee_ids = getattr(instance, '_employee_ids_to_process', None)
+        
+        if employee_ids:
+            # Process specific employees
+            employees = Employee.objects.filter(company=instance.company, id__in=employee_ids)
         else:
-            # Default: Process ALL active employees immediately
+            # Process ALL active employees
             employees = instance.company.employees.filter(employment_status='active')
-            self._process_employees(instance, employees)
+        
+        processed_count = self._process_employees(instance, employees)
+        logger.info(f"Payroll run {instance.id} initialized for company {instance.company.id}. Processed {processed_count} employees.")
             
     def _process_employees(self, payroll_run, employees):
         """Helper to calculate and create payslips for given employees"""
@@ -163,7 +167,12 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
             tax_config = {
                 'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
                 'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
-                'nssf_ceiling': tax_settings.nssf_ceiling
+                'nssf_ceiling': tax_settings.nssf_ceiling,
+                'personal_relief': tax_settings.personal_relief,
+                'insurance_relief': tax_settings.insurance_relief,
+                'pension_fund_relief': tax_settings.pension_fund_relief,
+                'local_service_tax_enabled': tax_settings.local_service_tax_enabled,
+                'local_service_tax_rate': tax_settings.local_service_tax_rate / Decimal('100.00'),
             }
         except ObjectDoesNotExist:
             tax_config = {}  # Use defaults
@@ -191,6 +200,7 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                     paye_tax=calculations['paye_tax'],
                     nssf_employee=calculations['nssf_employee'],
                     nssf_employer=calculations['nssf_employer'],
+                    local_service_tax=calculations['local_service_tax'],
                     total_deductions=calculations['total_deductions'],
                     net_salary=calculations['net_salary'],
                     payment_status='pending'
@@ -207,6 +217,10 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
                 logger.error(f"Error processing payroll for employee {employee.id}: {str(e)}")
                 continue
             
+        skipped_count = employees.count() - count
+        if skipped_count > 0:
+            logger.warning(f"Payroll Run {payroll_run.id}: Skipped {skipped_count} employees due to missing SalaryStructure.")
+            
         self._update_run_totals(payroll_run)
         return count
 
@@ -218,6 +232,7 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
             t_paye=Sum('paye_tax'),
             t_nssf_e=Sum('nssf_employee'),
             t_nssf_r=Sum('nssf_employer'),
+            t_lst=Sum('local_service_tax'),
             t_ded=Sum('total_deductions'),
             t_net=Sum('net_salary')
         )
@@ -226,6 +241,7 @@ class PayrollRunViewSet(viewsets.ModelViewSet):
         payroll_run.total_paye = agg['t_paye'] or 0
         payroll_run.total_nssf_employee = agg['t_nssf_e'] or 0
         payroll_run.total_nssf_employer = agg['t_nssf_r'] or 0
+        payroll_run.total_lst = agg['t_lst'] or 0
         payroll_run.total_deductions = agg['t_ded'] or 0
         payroll_run.total_net = agg['t_net'] or 0
         

@@ -139,6 +139,7 @@ class PayrollRun(models.Model):
     total_nssf_employee = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     total_nssf_employer = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     total_deductions = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    total_lst = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     total_net = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
 
     # Run Details
@@ -220,6 +221,7 @@ class Payslip(models.Model):
     nssf_employer = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     loan_deduction = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     advance_deduction = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
+    local_service_tax = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
     other_deductions = models.DecimalField(max_digits=15, decimal_places=2, default=Decimal('0.00'))
 
     # Totals

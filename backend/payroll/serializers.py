@@ -95,13 +95,14 @@ class PayrollRunSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'company', 'company_name', 'month', 'year', 'status',
             'start_date', 'end_date', 'payment_date', 'description',
-            'total_gross', 'total_deductions', 'total_net',
+            'total_gross', 'total_lst', 'total_paye', 'total_nssf_employee', 'total_nssf_employer', 'total_deductions', 'total_net',
             'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
             'approved_by', 'approved_by_name', 'approved_at', 'employee_ids'
         ]
         read_only_fields = [
             'id', 'payslip_count', 'company', 'processed_by', 'processed_at',
-            'approved_by', 'approved_at', 'total_gross', 'total_deductions',
+            'approved_by', 'approved_at', 'total_gross', 'total_lst', 'total_paye', 
+            'total_nssf_employee', 'total_nssf_employer', 'total_deductions',
             'total_net', 'status'
         ]
 
@@ -133,7 +134,7 @@ class PayslipSerializer(serializers.ModelSerializer):
             'transport_allowance', 'medical_allowance', 'lunch_allowance', 
             'other_allowances', 'total_allowances', 'bonus',
             'gross_salary', 'paye_tax', 'nssf_employee', 'nssf_employer',
-            'loan_deduction', 'advance_deduction', 'other_deductions',
+            'local_service_tax', 'loan_deduction', 'advance_deduction', 'other_deductions',
             'total_deductions', 'net_salary', 'payment_method', 'payment_status',
             'payment_date', 'payment_reference', 'pdf_file'
         ]
@@ -178,7 +179,12 @@ class PayslipSerializer(serializers.ModelSerializer):
                 tax_config = {
                     'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
                     'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
-                    'nssf_ceiling': tax_settings.nssf_ceiling
+                    'nssf_ceiling': tax_settings.nssf_ceiling,
+                    'personal_relief': tax_settings.personal_relief,
+                    'insurance_relief': tax_settings.insurance_relief,
+                    'pension_fund_relief': tax_settings.pension_fund_relief,
+                    'local_service_tax_enabled': tax_settings.local_service_tax_enabled,
+                    'local_service_tax_rate': tax_settings.local_service_tax_rate / Decimal('100.00'),
                 }
             except Exception:
                 tax_config = {}
@@ -198,6 +204,7 @@ class PayslipSerializer(serializers.ModelSerializer):
                 'paye_tax': calculations['paye_tax'],
                 'nssf_employee': calculations['nssf_employee'],
                 'nssf_employer': calculations['nssf_employer'],
+                'local_service_tax': calculations['local_service_tax'],
                 'total_deductions': calculations['total_deductions'],
                 'net_salary': calculations['net_salary'],
             })
@@ -226,7 +233,12 @@ class PayslipSerializer(serializers.ModelSerializer):
             tax_config = {
                 'nssf_employee_rate': tax_settings.nssf_employee_rate / Decimal('100.00'),
                 'nssf_employer_rate': tax_settings.nssf_employer_rate / Decimal('100.00'),
-                'nssf_ceiling': tax_settings.nssf_ceiling
+                'nssf_ceiling': tax_settings.nssf_ceiling,
+                'personal_relief': tax_settings.personal_relief,
+                'insurance_relief': tax_settings.insurance_relief,
+                'pension_fund_relief': tax_settings.pension_fund_relief,
+                'local_service_tax_enabled': tax_settings.local_service_tax_enabled,
+                'local_service_tax_rate': tax_settings.local_service_tax_rate / Decimal('100.00'),
             }
         except Exception:
             tax_config = {}
@@ -245,6 +257,7 @@ class PayslipSerializer(serializers.ModelSerializer):
         instance.paye_tax = calculations['paye_tax']
         instance.nssf_employee = calculations['nssf_employee']
         instance.nssf_employer = calculations['nssf_employer']
+        instance.local_service_tax = calculations['local_service_tax']
         instance.total_deductions = calculations['total_deductions']
         instance.net_salary = calculations['net_salary']
         

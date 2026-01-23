@@ -931,16 +931,16 @@ const TaxSettingsTab = () => {
                                     <AlertTriangle className="h-6 w-6" />
                                 </div>
                                 <div className="space-y-2">
-                                    <h4 className="font-black text-xl tracking-tight">Compliance Memo</h4>
+                                    <h4 className="font-black text-xl tracking-tight">Regulatory Update</h4>
                                     <p className="text-indigo-200 text-sm font-medium leading-relaxed">
-                                        Updated statutory rates will apply to current processing period for <b>Unpaid</b> slips.
+                                        Modifications to statutory percentages are automatically synchronized with all <b>Draft</b> and <b>Processing</b> records.
                                     </p>
                                 </div>
                                 <ul className="space-y-3">
                                     {[
-                                        'PAYE Bracket: 2024 Schedule',
-                                        'NSSF Ceiling: Customizable',
-                                        'Audit Trail: Auto-enabled'
+                                        'Tax Brackets: URA 2024 V2',
+                                        'NSSF Caps: Fully Configurable',
+                                        'System Audit: Transactional'
                                     ].map((item, i) => (
                                         <li key={i} className="flex items-center gap-3 text-xs font-black uppercase tracking-widest text-indigo-300">
                                             <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50" />

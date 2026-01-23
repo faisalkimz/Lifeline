@@ -16,7 +16,7 @@ import { Button } from '../../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
-import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet, Mail } from 'lucide-react';
+import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet, Mail, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PayrollRunDetailsPage = () => {
@@ -192,7 +192,7 @@ const PayrollRunDetailsPage = () => {
         }
 
         // Generate CSV for Uganda Statutory Returns (PAYE & NSSF)
-        const headers = ["Employee Name", "TIN", "Gross Salary", "PAYE Tax", "NSSF Employee", "NSSF Employer", "Total NSSF", "Net Pay"];
+        const headers = ["Employee Name", "TIN", "Gross Salary", "PAYE Tax", "NSSF Employee", "NSSF Employer", "LST", "Net Pay"];
         const rows = payslips.map(p => {
             const nssfEmp = Number(p.nssf_employee) || 0;
             const nssfComp = Number(p.nssf_employer) || 0;
@@ -203,7 +203,7 @@ const PayrollRunDetailsPage = () => {
                 p.paye_tax,
                 nssfEmp,
                 nssfComp,
-                nssfEmp + nssfComp,
+                p.local_service_tax || 0,
                 p.net_salary
             ];
         });
@@ -314,11 +314,27 @@ const PayrollRunDetailsPage = () => {
                 </Card>
                 <Card>
                     <CardContent className="p-4">
+                        <p className="text-sm font-medium text-slate-500">Total Statutory (LST+NSSF+PAYE)</p>
+                        <p className="text-2xl font-bold text-indigo-600">{formatCurrency(Number(run.total_paye) + Number(run.total_nssf_employee) + Number(run.total_lst))}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent className="p-4">
                         <p className="text-sm font-medium text-slate-500">Total Net Pay</p>
                         <p className="text-2xl font-bold text-blue-600">{formatCurrency(run.total_net)}</p>
                     </CardContent>
                 </Card>
             </div>
+
+            {Number(run.total_gross) === 0 && run.status !== 'draft' && (
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 flex items-center gap-3">
+                    <AlertTriangle className="h-5 w-5" />
+                    <div>
+                        <p className="font-bold">Missing Salary Data</p>
+                        <p className="text-sm">Processed totals are zero. Ensure all employees have a <b>Salary Structure</b> configured in their profiles.</p>
+                    </div>
+                </div>
+            )}
 
             {/* Main Table */}
             <Card>
@@ -337,6 +353,7 @@ const PayrollRunDetailsPage = () => {
                                 <TableHead className="text-right">Gross</TableHead>
                                 <TableHead className="text-right">PAYE</TableHead>
                                 <TableHead className="text-right">NSSF</TableHead>
+                                <TableHead className="text-right">LST</TableHead>
                                 <TableHead className="text-right font-bold">Net Pay</TableHead>
                                 <TableHead className="text-center">PDF</TableHead>
                                 {isEditable && <TableHead className="text-center">Actions</TableHead>}
@@ -392,7 +409,8 @@ const PayrollRunDetailsPage = () => {
 
                                         <TableCell className="text-right font-medium">{formatCurrency(payslip.gross_salary)}</TableCell>
                                         <TableCell className="text-right text-slate-500">{formatCurrency(payslip.paye_tax)}</TableCell>
-                                        <TableCell className="text-right text-slate-500">{formatCurrency(Number(payslip.nssf_employee) + Number(payslip.nssf_employer))}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(Number(payslip.nssf_employee))}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(payslip.local_service_tax)}</TableCell>
                                         <TableCell className="text-right font-bold text-blue-700 text-lg">{formatCurrency(payslip.net_salary)}</TableCell>
                                         <TableCell className="text-center">
                                             <Button

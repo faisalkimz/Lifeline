@@ -88,10 +88,31 @@ def calculate_net_salary(gross_salary: Decimal, deductions: dict = None, tax_con
     nssf_emp_ceiling = tax_config.get('nssf_ceiling', Decimal('0'))
     nssf_employer_rate = tax_config.get('nssf_employer_rate', Decimal('0.10'))
     
-    # Calculate tax and NSSF
-    paye_tax = calculate_paye(gross_salary)
+    # Uganda Reliefs
+    personal_relief = tax_config.get('personal_relief', Decimal('0'))
+    insurance_relief = tax_config.get('insurance_relief', Decimal('0'))
+    pension_relief = tax_config.get('pension_fund_relief', Decimal('0'))
+    total_reliefs = personal_relief + insurance_relief + pension_relief
+
+    # Local Service Tax (LST)
+    lst_enabled = tax_config.get('local_service_tax_enabled', False)
+    lst_rate = tax_config.get('local_service_tax_rate', Decimal('0.05'))
+    lst_amount = Decimal('0')
+    if lst_enabled:
+        lst_amount = (gross_salary * lst_rate).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+    # 1. Calculate NSSF (NSSF is tax-exempt in Uganda)
     nssf_employee = calculate_nssf(gross_salary, rate=nssf_emp_rate, ceiling=nssf_emp_ceiling)
     nssf_employer = calculate_employer_nssf(gross_salary, rate=nssf_employer_rate, ceiling=nssf_emp_ceiling)
+
+    # 2. Calculate Taxable Income (Gross - NSSF)
+    taxable_income = gross_salary - nssf_employee
+
+    # 3. Calculate PAYE on Taxable Income
+    paye_raw = calculate_paye(taxable_income)
+    
+    # 4. Apply Monthly Reliefs (Reliefs reduce the tax payable, not the taxable income)
+    paye_tax = max(Decimal('0'), paye_raw - total_reliefs)
 
     # Get other deductions
     loan_deduction = deductions.get('loan_deduction', Decimal('0'))
@@ -102,19 +123,22 @@ def calculate_net_salary(gross_salary: Decimal, deductions: dict = None, tax_con
     total_deductions = (
         paye_tax +
         nssf_employee +
+        lst_amount +
         loan_deduction +
         advance_deduction +
         other_deductions
-    )
+    ).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
 
     # Net salary
     net_salary = gross_salary - total_deductions
 
     return {
         'gross_salary': gross_salary,
+        'taxable_income': taxable_income,
         'paye_tax': paye_tax,
         'nssf_employee': nssf_employee,
         'nssf_employer': nssf_employer,
+        'local_service_tax': lst_amount,
         'loan_deduction': loan_deduction,
         'advance_deduction': advance_deduction,
         'other_deductions': other_deductions,

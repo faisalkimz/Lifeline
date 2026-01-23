@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
-import { Calendar, FileText, AlertCircle } from 'lucide-react';
+import { Calendar, FileText, CircleAlert } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
 import CreatePayrollRunModal from './CreatePayrollRunModal';
 import { useGetPayrollRunsQuery } from '../../store/api';
@@ -153,7 +153,7 @@ const PayrollDashboard = () => {
       ) : (
         <Card className="bg-white border">
           <CardContent className="pt-12 pb-12 text-center">
-            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+            <CircleAlert className="h-12 w-12 mx-auto mb-4 text-gray-400" />
             <p className="text-gray-700 mb-4">No payroll run for {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}</p>
             <Button variant="primary" onClick={handleCreatePayrollRun}>Create Payroll Run</Button>
           </CardContent>

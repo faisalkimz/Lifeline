@@ -16,7 +16,7 @@ import { Button } from '../../components/ui/Button';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '../../components/ui/Table';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
-import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet, Mail, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Save, X, Edit2, Loader2, CheckCircle, Upload, DownloadCloud, FileSpreadsheet, Mail, TriangleAlert } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PayrollRunDetailsPage = () => {
@@ -328,7 +328,7 @@ const PayrollRunDetailsPage = () => {
 
             {Number(run.total_gross) === 0 && run.status !== 'draft' && (
                 <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 flex items-center gap-3">
-                    <AlertTriangle className="h-5 w-5" />
+                    <TriangleAlert className="h-5 w-5" />
                     <div>
                         <p className="font-bold">Missing Salary Data</p>
                         <p className="text-sm">Processed totals are zero. Ensure all employees have a <b>Salary Structure</b> configured in their profiles.</p>

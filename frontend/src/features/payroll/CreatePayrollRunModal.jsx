@@ -4,7 +4,7 @@ import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useCreatePayrollRunMutation, useGetEmployeesQuery } from '../../store/api';
-import { Check, Search, Calendar } from 'lucide-react'; // Assuming we have these or standard inputs
+import { Check, Search, Calendar, CircleAlert } from 'lucide-react'; // Assuming we have these or standard inputs
 
 const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -140,7 +140,7 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
         {/* Error Alert */}
         {mutationError && (
           <div className="mx-6 mt-6 p-4 bg-rose-50 text-rose-700 text-sm rounded-xl border border-rose-100 flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 shrink-0" />
+            <CircleAlert className="h-5 w-5 shrink-0" />
             <span>{typeof mutationError === 'string' ? mutationError : (mutationError.data?.non_field_errors?.[0] || 'Failed to create payroll run.')}</span>
           </div>
         )}

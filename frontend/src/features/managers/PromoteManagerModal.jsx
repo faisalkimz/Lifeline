@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Users, Search, Check, X, Crown,
-    AlertCircle
+    CircleAlert
 } from 'lucide-react';
 import { useGetEmployeesQuery, useGetDepartmentsQuery } from '../../store/api';
 import { Button } from '../../components/ui/Button';

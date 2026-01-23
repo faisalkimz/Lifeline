@@ -14,6 +14,7 @@ from django.db.models import Q
 from accounts.permissions import IsCompanyUser
 from employees.models import Employee
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import IntegrityError
 import logging
 from .models import SalaryStructure, PayrollRun, Payslip, SalaryAdvance, TaxSettings
 logger = logging.getLogger(__name__)

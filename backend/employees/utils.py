@@ -3,22 +3,23 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-def send_welcome_email(employee, password):
+def send_welcome_email(employee, password, username=None):
     """
-    Sends a welcome email to the new employee with their auto-generated password.
+    Sends a welcome email to the new employee with their login credentials.
     """
     subject = f'Welcome to {employee.company.name} - Lifeline HRMS'
+    
+    # Use provided username or fallback to email
+    login_username = username or employee.email
     
     context = {
         'employee_name': employee.full_name,
         'company_name': employee.company.name,
-        'username': employee.email,
+        'username': login_username,
         'password': password,
         'login_url': f'{settings.FRONTEND_URL}/login'
     }
     
-    # In a real app, we would use a template
-    # For now, let's use a simple string
     message = f"""
     Hello {employee.full_name},
     
@@ -27,7 +28,7 @@ def send_welcome_email(employee, password):
     Your employee account has been created on the Lifeline HRMS platform.
     
     Below are your login credentials:
-    Username: {employee.email}
+    Username/Email: {login_username}
     Password: {password}
     
     Please log in here: {settings.FRONTEND_URL}/login

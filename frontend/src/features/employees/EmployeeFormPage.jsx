@@ -167,6 +167,12 @@ const EmployeeFormPage = () => {
                 formData.lunch_allowance = employeeData.salary_structure.lunch_allowance;
                 formData.other_allowances = employeeData.salary_structure.other_allowances;
             }
+            if (employeeData.user_details) {
+                formData.create_user = true;
+                formData.username = employeeData.user_details.username;
+                formData.role = employeeData.user_details.role;
+                formData.auto_password = true; // Default to auto-password on edit unless changed
+            }
             reset(formData);
             if (employeeData.photo) setPreviewImage(employeeData.photo);
         }

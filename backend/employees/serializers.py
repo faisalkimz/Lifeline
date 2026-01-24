@@ -85,6 +85,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     years_of_service = serializers.ReadOnlyField()
     is_on_probation = serializers.ReadOnlyField()
     salary_structure = serializers.SerializerMethodField()
+    user_details = serializers.SerializerMethodField()
     
     class Meta:
         model = Employee
@@ -111,12 +112,25 @@ class EmployeeSerializer(serializers.ModelSerializer):
             'marital_status', 'number_of_dependents',
             # Additional
             'notes', 'years_of_service', 'is_on_probation',
-            'created_at', 'updated_at', 'salary_structure'
+            'created_at', 'updated_at', 'salary_structure', 'user_details'
         ]
         read_only_fields = [
             'id', 'employee_number', 'full_name', 'years_of_service', 
-            'is_on_probation', 'created_at', 'updated_at', 'salary_structure'
+            'is_on_probation', 'created_at', 'updated_at', 'salary_structure',
+            'user_details'
         ]
+
+    def get_user_details(self, obj):
+        """Get associated user account details"""
+        if hasattr(obj, 'user_account'):
+            user = obj.user_account
+            return {
+                'id': user.id,
+                'username': user.username,
+                'role': user.role,
+                'is_active': user.is_active
+            }
+        return None
     
     def get_salary_structure(self, obj):
         """Get salary structure details"""
@@ -309,7 +323,7 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
 
             # Send welcome email
             from .utils import send_welcome_email
-            send_welcome_email(employee, password)
+            send_welcome_email(employee, password, username=user.username)
             
         return employee
 
@@ -374,7 +388,22 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
     """
     Serializer for updating employee details.
     Cannot change company or employee number.
+    Supports updating or creating an associated User account.
     """
+    # User Account Fields
+    create_user = serializers.BooleanField(write_only=True, required=False, default=False)
+    username = serializers.CharField(write_only=True, required=False)
+    password = serializers.CharField(write_only=True, required=False)
+    role = serializers.ChoiceField(
+        choices=[
+            ('hr_manager', 'HR Manager'),
+            ('manager', 'Manager'),
+            ('employee', 'Employee'),
+        ],
+        write_only=True, 
+        required=False
+    )
+
     class Meta:
         model = Employee
         fields = [
@@ -396,5 +425,74 @@ class EmployeeUpdateSerializer(serializers.ModelSerializer):
             # Family Information
             'marital_status', 'number_of_dependents',
             # Notes
-            'notes'
+            'notes',
+            # User Account Fields
+            'create_user', 'username', 'password', 'role'
         ]
+
+    def update(self, instance, validated_data):
+        """Update employee and handle associated user account"""
+        # Extract user account data
+        create_user = validated_data.pop('create_user', False)
+        username = validated_data.pop('username', None)
+        password = validated_data.pop('password', None)
+        role = validated_data.pop('role', None)
+
+        # Update Employee record
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # Handle User Account
+        from accounts.models import User
+        
+        # Check if user account already exists
+        user = instance.user_account if hasattr(instance, 'user_account') else None
+
+        if user:
+            # Update existing user
+            if username:
+                user.username = username
+            if role:
+                user.role = role
+            if password:
+                user.set_password(password)
+            
+            # Sync basic info just in case
+            user.email = instance.email
+            user.first_name = instance.first_name
+            user.last_name = instance.last_name
+            user.save()
+        elif create_user:
+            # Create new user if requested
+            if not username:
+                username = instance.email
+            
+            # Ensure unique username
+            original_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{original_username}{counter}"
+                counter += 1
+
+            if not password:
+                from django.utils.crypto import get_random_string
+                password = get_random_string(length=10)
+
+            user = User.objects.create_user(
+                username=username,
+                email=instance.email,
+                password=password,
+                company=instance.company,
+                role=role or 'employee',
+                first_name=instance.first_name,
+                last_name=instance.last_name,
+                employee=instance,
+                phone=instance.phone or ''
+            )
+
+            # Send welcome email if it's a new account
+            from .utils import send_welcome_email
+            send_welcome_email(instance, password, username=user.username)
+
+        return instance

@@ -5,11 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
-import { Calendar, FileText, CircleAlert } from 'lucide-react';
+import { Calendar, FileText, CircleAlert, Users, DollarSign, TrendingDown, CreditCard, Activity } from 'lucide-react';
 import { StatCard } from '../../components/ui/StatCard';
 import CreatePayrollRunModal from './CreatePayrollRunModal';
 import { useGetPayrollRunsQuery } from '../../store/api';
 import toast from 'react-hot-toast';
+import { cn } from '../../utils/cn';
 
 const PayrollDashboard = () => {
   const navigate = useNavigate();
@@ -23,7 +24,6 @@ const PayrollDashboard = () => {
   const handleCreatePayrollRun = () => setShowCreateModal(true);
   const handlePayrollCreated = () => {
     // RTK Query auto-refetches, so we just close the modal.
-    // Optionally we could show a success toast here if not done in the modal.
   };
 
   const currentPayroll = payrollRuns.find(p => p.month === selectedMonth && p.year === selectedYear);
@@ -38,16 +38,24 @@ const PayrollDashboard = () => {
 
   const stats = useMemo(() => {
     if (!currentPayroll) return null;
+    const empCount = currentPayroll.employee_count || 0;
+    const netTotal = parseFloat(currentPayroll.total_net) || 0;
+
     return {
-      total_gross: currentPayroll.total_gross,
-      total_net: currentPayroll.total_net,
-      total_deductions: currentPayroll.total_deductions,
-      employee_count: currentPayroll.employee_count,
-      average_salary: Math.round(currentPayroll.total_net / currentPayroll.employee_count)
+      total_gross: currentPayroll.total_gross || 0,
+      total_net: netTotal,
+      total_deductions: currentPayroll.total_deductions || 0,
+      employee_count: empCount,
+      average_salary: empCount > 0 ? Math.round(netTotal / empCount) : 0
     };
   }, [currentPayroll]);
 
-  const formatCurrency = (value) => new Intl.NumberFormat('en-UG', { style: 'currency', currency: 'UGX', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+  const formatCurrency = (value) => new Intl.NumberFormat('en-UG', {
+    style: 'currency',
+    currency: 'UGX',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value || 0);
 
   const getStatusBadge = (status) => {
     const cfg = statusConfig[status] ?? { color: 'bg-gray-100', text: 'text-gray-800', label: status || 'Unknown' };
@@ -78,34 +86,57 @@ const PayrollDashboard = () => {
     toast.success('Payroll report exported successfully');
   };
 
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading Payroll Data...</div>;
+  }
+
   return (
     <div className="space-y-6 bg-white text-black p-6 rounded-lg">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Payroll Management</h1>
-          <p className="mt-2 text-gray-700">Process and track salaries</p>
+          <p className="mt-2 text-gray-700 font-medium">Process and track salaries for your entire organization</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={handleExport}>Export</Button>
-          <Button variant="primary" onClick={handleCreatePayrollRun}>New Payroll Run</Button>
+          <Button variant="outline" onClick={handleExport} className="font-bold">
+            Export Report
+          </Button>
+          <Button onClick={handleCreatePayrollRun} className="bg-slate-900 text-white font-bold px-6">
+            New Payroll Run
+          </Button>
         </div>
       </div>
 
-      <Card className="bg-white border">
-        <CardContent className="pt-6">
-          <div className="flex gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Month</label>
-              <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))} className="px-3 py-2 border rounded-lg bg-white text-black">
+      <Card className="bg-white border rounded-2xl shadow-sm overflow-hidden">
+        <CardContent className="py-6">
+          <div className="flex flex-col md:flex-row items-end gap-6">
+            <div className="w-full md:w-48">
+              <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Month</label>
+              <select
+                value={selectedMonth}
+                onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))}
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 font-bold appearance-none cursor-pointer focus:ring-2 focus:ring-primary-500/20"
+              >
                 {Array.from({ length: 12 }, (_, i) => <option key={i + 1} value={i + 1}>{new Date(2025, i).toLocaleString('en-US', { month: 'long' })}</option>)}
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Year</label>
-              <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))} className="px-3 py-2 border rounded-lg bg-white text-black">
+            <div className="w-full md:w-32">
+              <label className="block text-xs font-black text-slate-500 uppercase tracking-widest mb-2">Year</label>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value, 10))}
+                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 font-bold appearance-none cursor-pointer focus:ring-2 focus:ring-primary-500/20"
+              >
                 {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
               </select>
+            </div>
+
+            <div className="flex-1 flex justify-end">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-bold text-slate-600">Live Financial Matrix Active</span>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -122,93 +153,121 @@ const PayrollDashboard = () => {
       )}
 
       {currentPayroll ? (
-        <Card className="bg-white border">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2"><Calendar className="h-5 w-5 text-primary-600" />{new Date(currentPayroll.year, currentPayroll.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })} Payroll Summary</span>
+        <Card className="bg-white border rounded-2xl shadow-md border-slate-200 overflow-hidden">
+          <CardHeader className="bg-slate-50/50 border-b border-slate-100 p-6">
+            <CardTitle className="flex items-center justify-between text-xl font-black">
+              <span className="flex items-center gap-3">
+                <div className="p-2 bg-indigo-100 rounded-lg">
+                  <Calendar className="h-5 w-5 text-indigo-600" />
+                </div>
+                {new Date(currentPayroll.year, currentPayroll.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })} Operating Period
+              </span>
               {getStatusBadge(currentPayroll.status)}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8">
             {currentPayroll.employee_count === 0 ? (
-              <div className="py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                <CircleAlert className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-                <p className="font-bold text-slate-800 text-lg">No Financial Data Processed</p>
-                <p className="text-slate-500 text-sm max-w-md mx-auto mt-1">This payroll run was created, but no employees were included. Ensure your active employees have a <b>Salary Structure</b> configured.</p>
-                <Button variant="outline" size="sm" className="mt-4" onClick={() => navigate(`/payroll/runs/${currentPayroll.id}`)}>
-                  Go to Details & Process
-                </Button>
+              <div className="py-12 text-center bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 px-6">
+                <div className="h-20 w-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CircleAlert className="h-10 w-10 text-amber-500" />
+                </div>
+                <p className="font-black text-slate-900 text-2xl tracking-tight">No Financial Data Processed</p>
+                <p className="text-slate-500 text-lg max-w-md mx-auto mt-4 font-medium leading-relaxed">
+                  This payroll run exists, but it hasn't found any employees with a **Salary Structure**.
+                  Please ensure active employees have their pay details configured in the **Salary Units** tab.
+                </p>
+                <div className="flex gap-4 justify-center mt-10">
+                  <Button className="bg-slate-900 text-white font-bold h-12 px-8" onClick={() => navigate(`/payroll/runs/${currentPayroll.id}`)}>
+                    Open Run Details
+                  </Button>
+                  <Button variant="outline" className="font-bold h-12 px-8 border-slate-200" onClick={() => setActiveTab('salaries')}>
+                    Configure Salaries
+                  </Button>
+                </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1 font-medium">Status</p>
-                  <p className="text-lg font-bold text-slate-900">{statusConfig[currentPayroll.status].label}</p>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div className="p-4 rounded-xl bg-slate-50/50">
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Processing Status</p>
+                  <p className="text-2xl font-black text-slate-900">{statusConfig[currentPayroll.status].label}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1 font-medium">Processed For</p>
-                  <p className="text-lg font-bold text-slate-900">{currentPayroll.employee_count} Employees</p>
+                <div className="p-4 rounded-xl bg-slate-50/50">
+                  <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Total Participants</p>
+                  <p className="text-2xl font-black text-slate-900">{currentPayroll.employee_count} Personnel</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1 font-medium">Total Gross</p>
-                  <p className="text-lg font-bold text-emerald-600 font-mono tracking-tight">{formatCurrency(currentPayroll.total_gross)}</p>
+                <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                  <p className="text-xs font-black text-emerald-600/50 uppercase tracking-widest mb-2">Company Obligation</p>
+                  <p className="text-2xl font-black text-emerald-700 font-mono tracking-tighter">{formatCurrency(currentPayroll.total_gross)}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1 font-medium">Total Net Layout</p>
-                  <p className="text-lg font-bold text-blue-700 font-mono tracking-tight">{formatCurrency(currentPayroll.total_net)}</p>
+                <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100">
+                  <p className="text-xs font-black text-blue-600/50 uppercase tracking-widest mb-2">Net Distribution</p>
+                  <p className="text-2xl font-black text-blue-700 font-mono tracking-tighter">{formatCurrency(currentPayroll.total_net)}</p>
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
       ) : (
-        <Card className="bg-white border text-center shadow-none">
-          <CardContent className="pt-16 pb-16">
-            <div className="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Calendar className="h-10 w-10 text-slate-300" />
+        <Card className="bg-white border text-center shadow-none rounded-2xl border-slate-100">
+          <CardContent className="pt-24 pb-24">
+            <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse">
+              <Calendar className="h-12 w-12 text-slate-300" />
             </div>
-            <h2 className="text-2xl font-bold text-slate-900">No active payroll run found</h2>
-            <p className="text-slate-500 mb-8 mt-2 max-w-sm mx-auto text-lg font-medium">There is no payroll data for {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })} yet.</p>
-            <Button size="lg" className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-10 h-14 text-lg font-bold shadow-xl shadow-slate-900/10" onClick={handleCreatePayrollRun}>
-              Start Payroll for {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long' })}
+            <h2 className="text-3xl font-black text-slate-900 tracking-tighter">No Active Payroll Matrix</h2>
+            <p className="text-slate-500 mb-10 mt-4 max-w-sm mx-auto text-xl font-medium leading-relaxed">System found no financial records for {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}.</p>
+            <Button size="lg" className="bg-primary-600 hover:bg-primary-700 text-white rounded-2xl px-12 h-16 text-xl font-black shadow-2xl shadow-primary-900/40 transform transition-transform hover:scale-105 active:scale-95" onClick={handleCreatePayrollRun}>
+              Initialize {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long' })} Protocol
             </Button>
           </CardContent>
         </Card>
       )}
 
-      <Card className="bg-white border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5 text-primary-600" />Recent Payroll Runs</CardTitle>
+      <Card className="bg-white border rounded-2xl border-slate-100 overflow-hidden shadow-sm">
+        <CardHeader className="p-6 border-b border-slate-50">
+          <CardTitle className="flex items-center gap-3 text-lg font-black">
+            <div className="p-2 bg-slate-100 rounded-lg">
+              <FileText className="h-5 w-5 text-slate-600" />
+            </div>
+            Historical Registry
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-slate-50/50">
               <TableRow>
-                <TableHead>Period</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Employees</TableHead>
-                <TableHead className="text-right">Gross</TableHead>
-                <TableHead className="text-right">Deductions</TableHead>
-                <TableHead className="text-right">Net</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead className="font-black text-slate-900 h-14">Period</TableHead>
+                <TableHead className="font-black text-slate-900">Status</TableHead>
+                <TableHead className="text-right font-black text-slate-900">Units</TableHead>
+                <TableHead className="text-right font-black text-slate-900">Gross Vol.</TableHead>
+                <TableHead className="text-right font-black text-slate-900">Deductions</TableHead>
+                <TableHead className="text-right font-black text-slate-900">Net Value</TableHead>
+                <TableHead className="text-center font-black text-slate-900">Operations</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payrollRuns.map(run => (
+              {payrollRuns.length > 0 ? payrollRuns.map(run => (
                 <TableRow
                   key={run.id}
-                  className="hover:bg-gray-50 transition-colors cursor-pointer"
-                  onClick={() => toast(`Viewing details for ${new Date(run.year, run.month - 1).toLocaleString('en-US', { month: 'long' })}`, { icon: '📄' })}
+                  className="hover:bg-slate-50 transition-colors cursor-pointer group"
+                  onClick={() => navigate(`/payroll/runs/${run.id}`)}
                 >
-                  <TableCell>{new Date(run.year, run.month - 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })}</TableCell>
+                  <TableCell className="font-bold text-slate-700 h-16">{new Date(run.year, run.month - 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })}</TableCell>
                   <TableCell>{getStatusBadge(run.status)}</TableCell>
-                  <TableCell className="text-right">{run.employee_count}</TableCell>
-                  <TableCell className="text-right font-semibold text-green-700">{formatCurrency(run.total_gross)}</TableCell>
-                  <TableCell className="text-right text-orange-700">{formatCurrency(run.total_deductions)}</TableCell>
-                  <TableCell className="text-right font-semibold text-blue-700">{formatCurrency(run.total_net)}</TableCell>
-                  <TableCell><Button variant="ghost" size="sm" onClick={() => navigate(`/payroll/runs/${run.id}`)}>View</Button></TableCell>
+                  <TableCell className="text-right font-bold text-slate-600">{run.employee_count}</TableCell>
+                  <TableCell className="text-right font-black text-emerald-600">{formatCurrency(run.total_gross)}</TableCell>
+                  <TableCell className="text-right text-rose-500 font-bold">{formatCurrency(run.total_deductions)}</TableCell>
+                  <TableCell className="text-right font-black text-blue-700 bg-blue-50/20">{formatCurrency(run.total_net)}</TableCell>
+                  <TableCell className="text-center">
+                    <Button variant="ghost" size="sm" className="font-black text-primary-600 group-hover:bg-white border border-transparent group-hover:border-slate-200 rounded-lg">
+                      Details
+                    </Button>
+                  </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-12 text-slate-400 font-medium">No historical records available</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

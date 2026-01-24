@@ -14,17 +14,21 @@ import {
 import toast from 'react-hot-toast';
 
 const AttendanceAdminPage = () => {
-    const { data: policies } = useGetAttendancePolicyQuery();
+    const { data: policies, isLoading: isLoadingPolicies } = useGetAttendancePolicyQuery();
     const { data: locations = [] } = useGetWorkLocationsQuery();
     const [updatePolicy, { isLoading: isUpdating }] = useUpdateAttendancePolicyMutation();
     const [createLocation, { isLoading: isAddingLoc }] = useCreateWorkLocationMutation();
 
-    const policy = policies?.[0] || policies;
+    const policy = Array.isArray(policies) ? policies[0] : (policies?.results?.[0] || policies);
 
     const [newLoc, setNewLoc] = useState({ name: '', latitude: '', longitude: '', radius_meters: 100 });
     const [isAddingMode, setIsAddingMode] = useState(false);
 
     const handleTogglePolicy = async (field, value) => {
+        if (!policy?.id) {
+            toast.error('Policy not found. Please refresh.');
+            return;
+        }
         try {
             await updatePolicy({ id: policy.id, [field]: value }).unwrap();
             toast.success('Policy updated.');
@@ -44,6 +48,14 @@ const AttendanceAdminPage = () => {
             toast.error('Failed to add location.');
         }
     };
+
+    if (isLoadingPolicies) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8 pb-12">

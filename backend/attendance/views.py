@@ -20,7 +20,10 @@ class AttendancePolicyViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        return AttendancePolicy.objects.filter(company=self.request.user.company)
+        company = self.request.user.company
+        # Ensure policy exists
+        AttendancePolicy.objects.get_or_create(company=company)
+        return AttendancePolicy.objects.filter(company=company)
     
     def perform_create(self, serializer):
         serializer.save(company=self.request.user.company)
@@ -88,31 +91,28 @@ class AttendanceViewSet(viewsets.ModelViewSet):
         today = date.today()
         now = timezone.now()
         
-        # Create or update attendance record
+        # 1. Get today's attendance record (or create one with default status)
         attendance, created = Attendance.objects.get_or_create(
             employee=request.user.employee,
             date=today,
-            defaults={
-                'clock_in': now,
-                'status': 'present',
-                'notes': serializer.validated_data.get('notes', '')
-            }
+            defaults={'status': 'absent'}
         )
         
-        if not created:
-            if attendance.clock_in:
-                return Response(
-                    {"error": "Already clocked in today"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        if attendance.clock_in:
+            return Response(
+                {"error": "Already clocked in today"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # Verification Logic
-        policy = request.user.company.attendance_policy
+        # 2. Verification Logic
+        # Ensure policy exists
+        policy, _ = AttendancePolicy.objects.get_or_create(company=request.user.company)
+        
         lat = serializer.validated_data.get('latitude')
         lng = serializer.validated_data.get('longitude')
         qr_token = serializer.validated_data.get('qr_token')
 
-        # 1. Geofencing
+        # Geofencing
         if policy.enable_geofencing:
             if not lat or not lng:
                 return Response({"error": "Location coordinates are required for clock-in"}, status=400)
@@ -130,7 +130,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
             if not within_range:
                 return Response({"error": "You are outside the allowed work area"}, status=400)
 
-        # 2. QR Code
+        # QR Code
         if policy.enable_qr_clock_in:
             if not qr_token:
                 return Response({"error": "QR code scan is required for clock-in"}, status=400)
@@ -140,6 +140,7 @@ class AttendanceViewSet(viewsets.ModelViewSet):
                 return Response({"error": "Invalid or expired QR code"}, status=400)
             attendance.work_location = loc
 
+        # 3. Successful verification - Update the record
         attendance.clock_in = now
         attendance.clock_in_lat = lat
         attendance.clock_in_lng = lng

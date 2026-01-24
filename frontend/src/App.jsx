@@ -53,6 +53,9 @@ import FormsPage from './features/forms/FormsPage';
 import SurveysPage from './features/surveys/SurveysPage';
 import GCCCompliancePage from './features/payroll/GCCCompliancePage';
 
+import ProtectedRoute from './components/common/ProtectedRoute';
+import { ROLES } from './utils/rbac';
+
 function App() {
   // Theme removed — app renders without theme side-effects
 
@@ -74,63 +77,64 @@ function App() {
       {/* Protected Routes (Dashboard) */}
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/analytics" element={<AnalyticsDashboard />} />
         <Route path="/my-profile" element={<MyProfilePage />} />
-        {/* Add more routes here later */}
-        <Route path="/employees" element={<EmployeeListPage />} />
-        <Route path="/employees/new" element={<EmployeeFormPage />} />
-        <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
 
-        <Route path="/departments" element={<DepartmentListPage />} />
-        <Route path="/departments/new" element={<DepartmentFormPage />} />
-        <Route path="/departments/:id/edit" element={<DepartmentFormPage />} />
+        {/* HR & Admin Only Routes */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER]} />}>
+          <Route path="/analytics" element={<AnalyticsDashboard />} />
+          <Route path="/employees/new" element={<EmployeeFormPage />} />
+          <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
+          <Route path="/departments" element={<DepartmentListPage />} />
+          <Route path="/departments/new" element={<DepartmentFormPage />} />
+          <Route path="/departments/:id/edit" element={<DepartmentFormPage />} />
+          <Route path="/managers" element={<ManagerManagementPage />} />
+          <Route path="/payroll/runs/:id" element={<PayrollRunDetailsPage />} />
+          <Route path="/payroll/*" element={<PayrollIndex />} />
+          <Route path="/gcc" element={<GCCCompliancePage />} />
+          <Route path="/disciplinary" element={<DisciplinaryPage />} />
+          <Route path="/recruitment/interviews" element={<InterviewSchedulingPage />} />
+          <Route path="/recruitment/integrations" element={<IntegrationsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/assets" element={<AssetsPage />} />
+          <Route path="/forms" element={<FormsPage />} />
+          <Route path="/attendance/overtime" element={<OvertimePage />} />
+          <Route path="/attendance/admin" element={<AttendanceAdminPage />} />
+          <Route path="/benefits/admin" element={<BenefitsAdminPage />} />
+        </Route>
+
+        {/* Manager & Above */}
+        <Route element={<ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER, ROLES.MANAGER]} />}>
+          <Route path="/employees" element={<EmployeeListPage />} />
+          <Route path="/recruitment" element={<JobListPage />} />
+          <Route path="/recruitment/jobs/:id" element={<JobDetailsPage />} />
+          <Route path="/recruitment/candidates" element={<CandidateManagementPage />} />
+          <Route path="/recruitment/pipeline" element={<PipelinePage />} />
+          <Route path="/leave/approvals" element={<LeaveApprovalPage />} />
+        </Route>
+
         <Route path="/org-chart" element={<OrgChartPage />} />
-
-        <Route path="/managers" element={<ManagerManagementPage />} />
-
-        <Route path="/payroll/runs/:id" element={<PayrollRunDetailsPage />} />
-        <Route path="/payroll/*" element={<PayrollIndex />} />
-        <Route path="/gcc" element={<GCCCompliancePage />} />
-
         <Route path="/leave" element={<LeaveRequestsPage />} />
         <Route path="/leave/calendar" element={<LeaveCalendar />} />
-        <Route path="/leave/approvals" element={<LeaveApprovalPage />} />
         <Route path="/attendance" element={<AttendancePage />} />
-        <Route path="/attendance/overtime" element={<OvertimePage />} />
-        <Route path="/attendance/admin" element={<AttendanceAdminPage />} />
         <Route path="/performance" element={<PerformancePage />} />
-        <Route path="/disciplinary" element={<DisciplinaryPage />} />
-        <Route path="/recruitment" element={<JobListPage />} />
-        <Route path="/recruitment/jobs/:id" element={<JobDetailsPage />} />
-        <Route path="/recruitment/candidates" element={<CandidateManagementPage />} />
-        <Route path="/recruitment/pipeline" element={<PipelinePage />} />
-        <Route path="/recruitment/interviews" element={<InterviewSchedulingPage />} />
-        <Route path="/recruitment/integrations" element={<IntegrationsPage />} />
         <Route path="/training" element={<TrainingPage />} />
         <Route path="/benefits" element={<BenefitsPage />} />
-        <Route path="/benefits/admin" element={<BenefitsAdminPage />} />
         <Route path="/documents" element={<DocumentsPage />} />
-        <Route path="/assets" element={<AssetsPage />} />
-        <Route path="/forms" element={<FormsPage />} />
         <Route path="/surveys" element={<SurveysPage />} />
         <Route path="/offboarding" element={<OffboardingPage />} />
 
-        {/* Finance Routes */}
+        {/* Finance Routes (Shared / Basic) */}
         <Route path="/expenses" element={<ExpensesPage />} />
         <Route path="/finance/loans" element={<LoansPage />} />
 
-        {/* Payroll Routes */}
+        {/* Individual Portal Style Links inside Dashboard */}
         <Route path="/payroll/my-payslips" element={<MyPayslipsPage />} />
         <Route path="/payroll/advances" element={<SalaryAdvancesPage />} />
 
-        {/* Organization Routes */}
-        <Route path="/organization" element={<Navigate to="/org-chart" replace />} />
-
-        <Route path="/settings" element={<SettingsPage />} />
         <Route path="/help" element={<HelpCenterPage />} />
       </Route>
 
-      {/* Employee Self-Service Portal */}
+      {/* Employee Self-Service Portal (Dedicated Layout) */}
       <Route path="/employee" element={<EmployeePortalLayout />}>
         <Route path="dashboard" element={<EmployeeDashboard />} />
         <Route path="payslips" element={<MyPayslipsPage />} />

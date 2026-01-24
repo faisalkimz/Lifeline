@@ -236,6 +236,20 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           <div className="pt-2 border-t border-slate-50">
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <div className="h-5 w-5 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="h-3 w-3 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-blue-900">Entire Company Mode</p>
+                  <p className="text-xs text-blue-800 leading-relaxed mt-0.5">
+                    By default, this run will include all active employees. You'll get an overall tally of the company's total payroll obligation.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center gap-3 mb-4 mt-2">
               <input
                 type="checkbox"
@@ -245,7 +259,7 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
                 onChange={(e) => setSelectSpecific(e.target.checked)}
               />
               <label htmlFor="specific_employees" className="text-sm font-semibold text-slate-700 cursor-pointer select-none">
-                Process for specific employees only
+                I only want to process specific employees (Optional)
               </label>
             </div>
 

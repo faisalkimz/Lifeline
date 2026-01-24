@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import ChatWidget from '../components/common/ChatWidget';
+import { ROLES, PERMISSIONS } from '../utils/rbac';
 
 const DashboardLayout = () => {
   const user = useSelector(selectCurrentUser);
@@ -55,29 +56,30 @@ const DashboardLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Employees', href: '/employees', icon: Users },
-    { name: 'Payroll', href: '/payroll', icon: CreditCard },
-    { name: 'GCC Compliance', href: '/gcc', icon: Globe },
+    { name: 'Analytics', href: '/analytics', icon: TrendingUp, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+    { name: 'Employees', href: '/employees', icon: Users, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER, ROLES.MANAGER] },
+    { name: 'Payroll', href: '/payroll', icon: CreditCard, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+    { name: 'GCC Compliance', href: '/gcc', icon: Globe, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
     { name: 'Leave', href: '/leave', icon: Calendar },
     { name: 'Attendance', href: '/attendance', icon: Clock },
-    { name: 'Performance', href: '/performance', icon: TrendingUp },
-    { name: 'Recruitment', href: '/recruitment', icon: Briefcase },
+    { name: 'Performance', href: '/performance', icon: Activity },
+    { name: 'Recruitment', href: '/recruitment', icon: Briefcase, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER, ROLES.MANAGER] },
     { name: 'Training', href: '/training', icon: BookOpen },
     { name: 'Expenses', href: '/expenses', icon: DollarSign },
     { name: 'Benefits', href: '/benefits', icon: Shield },
     { name: 'Documents', href: '/documents', icon: FileText },
-    { name: 'Assets', href: '/assets', icon: Laptop },
-    { name: 'Forms', href: '/forms', icon: FileEdit },
+    { name: 'Assets', href: '/assets', icon: Laptop, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+    { name: 'Forms', href: '/forms', icon: FileEdit, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
     { name: 'Surveys', href: '/surveys', icon: Heart },
     { name: 'Org Chart', href: '/org-chart', icon: LayoutGrid },
-  ];
+  ].filter(item => !item.roles || item.roles.includes(user.role));
 
   const adminLinks = [
-    { name: 'Company Settings', href: '/settings', icon: Settings },
-    { name: 'Departments', href: '/departments', icon: Building2 },
-    { name: 'Managers', href: '/managers', icon: Crown },
-    { name: 'Disciplinary', href: '/disciplinary', icon: Shield },
-  ];
+    { name: 'Company Settings', href: '/settings', icon: Settings, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN] },
+    { name: 'Departments', href: '/departments', icon: Building2, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+    { name: 'Managers', href: '/managers', icon: Crown, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+    { name: 'Disciplinary', href: '/disciplinary', icon: Shield, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
+  ].filter(item => !item.roles || item.roles.includes(user.role));
 
   const StatItem = ({ label, value, trend, icon: Icon, colorClass }) => (
     <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group cursor-default">

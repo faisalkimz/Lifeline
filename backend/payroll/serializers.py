@@ -63,6 +63,7 @@ class PayrollRunSerializer(serializers.ModelSerializer):
     processed_by_name = serializers.SerializerMethodField()
     approved_by_name = serializers.SerializerMethodField()
     payslip_count = serializers.SerializerMethodField()
+    employee_count = serializers.SerializerMethodField()
     employee_ids = serializers.ListField(
         child=serializers.IntegerField(), write_only=True, required=False
     )
@@ -96,11 +97,11 @@ class PayrollRunSerializer(serializers.ModelSerializer):
             'id', 'company', 'company_name', 'month', 'year', 'status',
             'start_date', 'end_date', 'payment_date', 'description',
             'total_gross', 'total_lst', 'total_paye', 'total_nssf_employee', 'total_nssf_employer', 'total_deductions', 'total_net',
-            'payslip_count', 'processed_by', 'processed_by_name', 'processed_at',
+            'payslip_count', 'employee_count', 'processed_by', 'processed_by_name', 'processed_at',
             'approved_by', 'approved_by_name', 'approved_at', 'employee_ids'
         ]
         read_only_fields = [
-            'id', 'payslip_count', 'company', 'processed_by', 'processed_at',
+            'id', 'payslip_count', 'employee_count', 'company', 'processed_by', 'processed_at',
             'approved_by', 'approved_at', 'total_gross', 'total_lst', 'total_paye', 
             'total_nssf_employee', 'total_nssf_employer', 'total_deductions',
             'total_net', 'status'
@@ -108,6 +109,10 @@ class PayrollRunSerializer(serializers.ModelSerializer):
 
     def get_payslip_count(self, obj):
         """Get count of payslips in this payroll run"""
+        return obj.payslips.count()
+    
+    def get_employee_count(self, obj):
+        """Alias for payslip_count used by frontend"""
         return obj.payslips.count()
 
     def get_processed_by_name(self, obj):

@@ -5,7 +5,7 @@ import { selectCurrentUser, logout } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../store/api';
 import {
     LayoutDashboard, FileText, Calendar, Clock, User, LogOut, Menu, X,
-    Bell, HelpCircle, Building, CreditCard
+    Bell, HelpCircle, Building, CreditCard, Activity, BookOpen, Shield
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
@@ -21,7 +21,7 @@ const EmployeePortalLayout = () => {
     }
 
     const refresh = useSelector(state => state?.auth?.refresh);
-    
+
     const handleLogout = async () => {
         try {
             // Only call logout API if we have a refresh token
@@ -42,6 +42,9 @@ const EmployeePortalLayout = () => {
         { name: 'My Payslips', href: '/employee/payslips', icon: CreditCard },
         { name: 'My Leave', href: '/employee/leave', icon: Calendar },
         { name: 'My Attendance', href: '/employee/attendance', icon: Clock },
+        { name: 'My Performance', href: '/employee/performance', icon: Activity },
+        { name: 'My Training', href: '/employee/training', icon: BookOpen },
+        { name: 'My Benefits', href: '/employee/benefits', icon: Shield },
         { name: 'My Documents', href: '/employee/documents', icon: FileText },
         { name: 'My Profile', href: '/employee/profile', icon: User },
     ];

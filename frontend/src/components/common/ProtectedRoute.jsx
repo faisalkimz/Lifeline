@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import { selectCurrentUser } from '../features/auth/authSlice';
+import { selectCurrentUser } from '../../features/auth/authSlice';
 
 /**
  * Protected Route Component

@@ -9,6 +9,7 @@ import {
     useGetLeaveRequestsQuery,
     useGetPayrollRunsQuery
 } from '../../store/api';
+import { FileText, Download, CheckSquare, Square } from 'lucide-react';
 
 const REPORT_MODULES = [
     { id: 'employees', label: 'Employees', columns: ['first_name', 'last_name', 'email', 'department_name', 'job_title', 'join_date', 'status'] },

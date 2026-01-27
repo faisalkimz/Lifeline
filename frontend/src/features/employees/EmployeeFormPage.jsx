@@ -225,6 +225,33 @@ const EmployeeFormPage = () => {
                 if (!id) throw new Error("Employee ID is missing");
 
                 await updateEmployee({ id, formData }).unwrap();
+
+                // Handle salary structure update/creation during edit
+                if (data.basic_salary > 0 && canManageSalaries) {
+                    const salaryData = {
+                        basic_salary: data.basic_salary || 0,
+                        housing_allowance: data.housing_allowance || 0,
+                        transport_allowance: data.transport_allowance || 0,
+                        medical_allowance: data.medical_allowance || 0,
+                        lunch_allowance: data.lunch_allowance || 0,
+                        other_allowances: data.other_allowances || 0,
+                        effective_date: new Date().toISOString().split('T')[0]
+                    };
+
+                    if (employeeData?.salary_structure?.id) {
+                        await updateSalaryStructure({
+                            id: employeeData.salary_structure.id,
+                            ...salaryData,
+                            employee: id
+                        }).unwrap();
+                    } else {
+                        await createSalaryStructure({
+                            employee: id,
+                            ...salaryData
+                        }).unwrap();
+                    }
+                }
+
                 toast.success("Employee updated successfully! 🎉");
             } else {
                 const res = await createEmployee(formData).unwrap();

@@ -12,7 +12,7 @@ import { useGetPayrollRunsQuery } from '../../store/api';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
 
-const PayrollDashboard = () => {
+const PayrollDashboard = ({ setActiveTab }) => {
   const navigate = useNavigate();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -258,7 +258,15 @@ const PayrollDashboard = () => {
                   <TableCell className="text-right text-rose-500 font-bold">{formatCurrency(run.total_deductions)}</TableCell>
                   <TableCell className="text-right font-black text-blue-700 bg-blue-50/20">{formatCurrency(run.total_net)}</TableCell>
                   <TableCell className="text-center">
-                    <Button variant="ghost" size="sm" className="font-black text-primary-600 group-hover:bg-white border border-transparent group-hover:border-slate-200 rounded-lg">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="font-black text-primary-600 group-hover:bg-white border border-transparent group-hover:border-slate-200 rounded-lg"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/payroll/runs/${run.id}`);
+                      }}
+                    >
                       Details
                     </Button>
                   </TableCell>

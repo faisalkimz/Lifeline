@@ -48,50 +48,56 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         const templateData = [
             {
                 // Identity
-                'First Name*': 'John',
-                'Middle Name': 'Robert',
-                'Last Name*': 'Doe',
-                'Email*': 'john.doe@example.com',
-                'Phone': '+256700000001',
-                'Date of Birth': exampleBirthDateStr,
-                'Gender': 'Male',
+                'First Name*': 'MBABALI',
+                'Middle Name': '',
+                'Last Name*': 'FAISAL',
+                'Email*': 'mbabalifaisal2@gmail.com',
+                'Phone': '0000000000',
+                'Date of Birth': '1990-01-01',
+                'Gender': 'Other',
                 'Marital Status': 'Single',
 
                 // Employment
-                'Job Title': 'Senior Analyst',
+                'Job Title': 'Company Administrator',
                 'Department': departmentName,
                 'Manager Email': '',
                 'Employment Type': 'Full Time',
                 'Employment Status': 'Active',
-                'Join Date': today,
+                'Join Date': '2026-01-27',
                 'Probation End Date': '',
 
-                // Salary & Bank
-                'Basic Salary': '4500000',
-                'Housing Allowance': '500000',
-                'Transport Allowance': '200000',
-                'Medical Allowance': '150000',
-                'Lunch Allowance': '100000',
-                'Other Allowances': '0',
-                'Bank Name': 'Standard Chartered',
-                'Bank Account Number': '9001234567',
-                'Bank Branch': 'Speke Road',
-                'Mobile Money Number': '+256770000002',
+                // Security / System Access
+                'Create User Account? (Yes/No)': 'Yes',
+                'Username': 'Kimz',
+                'Password': 'Minimum8Chars',
+                'Access Role': 'HR Manager',
 
-                // Statutory & Docs
-                'National ID': 'CM90000000XYZ',
+                // Salary & Bank
+                'Basic Salary': '0',
+                'Housing Allowance': '0',
+                'Transport Allowance': '0',
+                'Medical Allowance': '0',
+                'Lunch Allowance': '0',
+                'Other Allowances': '0',
+                'Bank Name': 'Stanbic Bank',
+                'Bank Account Number': 'Account Number',
+                'Bank Branch': 'Main',
+                'Mobile Money Number': '',
+
+                // Statutory & Tax IDs
+                'National ID*': 'ADM-1',
                 'Passport Number': '',
-                'TIN Number': '1000234567',
-                'NSSF Number': 'NS123456789',
+                'TIN Number': '1234567890',
+                'NSSF Number': 'Member ID',
 
                 // Location & Contact
-                'Address': 'Plot 45, Akii Bua Road',
+                'Address': 'Kampala',
                 'City': 'Kampala',
                 'District': 'Kampala',
-                'Emergency Contact Name': 'Jane Doe',
-                'Emergency Contact Phone': '+256700000003',
-                'Emergency Contact Relationship': 'Spouse',
-                'Notes': 'Highly recommended hire.'
+                'Emergency Contact Name': 'Management',
+                'Emergency Contact Phone': '',
+                'Emergency Contact Relationship': 'Other',
+                'Notes': 'System Administrator Account'
             }
         ];
 
@@ -110,17 +116,15 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
         // Set column widths
         ws['!cols'] = [
-            // First Name to Phone
-            { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
-            // DOB to Marital
-            { wch: 15 }, { wch: 10 }, { wch: 15 },
-            // Role to Status
-            { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
-            // Dates
-            { wch: 15 }, { wch: 15 },
-            // Salary fields
+            // Identity
+            { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 10 }, { wch: 15 },
+            // Role to Dates
+            { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+            // System Access
+            { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+            // Salary
             { wch: 15 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 },
-            // Bank info
+            // Bank
             { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 18 },
             // Statutory
             { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
@@ -128,7 +132,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 30 }
         ];
 
-        XLSX.writeFile(wb, 'lifeline_full_onboarding_template.xlsx');
+        XLSX.writeFile(wb, 'lifeline_comprehensive_onboarding.xlsx');
         toast.success('Comprehensive template downloaded! 🚀');
     };
 
@@ -270,6 +274,13 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else if (msLower.includes('widow')) maritalStatus = 'widowed';
         else maritalStatus = 'single';
 
+        // System Access / User Creation
+        const createAccount = (row['Create User Account? (Yes/No)'] || '').toLowerCase().includes('y');
+        let accessRole = 'employee';
+        const roleInput = (row['Access Role'] || '').toLowerCase();
+        if (roleInput.includes('hr') || roleInput.includes('admin')) accessRole = 'hr_manager';
+        else if (roleInput.includes('manage')) accessRole = 'manager';
+
         return {
             // Mapping to backend field names
             first_name: row['First Name*'] || row['first_name'],
@@ -290,8 +301,14 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             join_date: joinDate || new Date().toISOString().split('T')[0],
             probation_end_date: probationEndDate,
 
+            // System Access
+            create_user: createAccount,
+            username: row['Username'] || null,
+            password: row['Password'] || null,
+            role: accessRole,
+
             // Statutory
-            national_id: row['National ID'] || row['national_id'] || null,
+            national_id: row['National ID*'] || row['National ID'] || row['national_id'] || null,
             passport_number: row['Passport Number'] || row['passport_number'] || null,
             tin_number: row['TIN Number'] || row['tin_number'] || null,
             nssf_number: row['NSSF Number'] || row['nssf_number'] || null,

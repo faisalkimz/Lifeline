@@ -91,7 +91,7 @@ const steps = [
     { id: 'employment', label: 'Employment', icon: Briefcase, description: 'Work details' },
     { id: 'salary', label: 'Salary', icon: Wallet, description: 'Compensation' },
     { id: 'security', label: 'Security', icon: Shield, description: 'System access' },
-    { id: 'documents', label: 'Documents', icon: FileText, description: 'ID & papers' },
+    { id: 'tax_ids', label: 'Tax & ID', icon: FileText, description: 'TIN, NSSF & ID' },
     { id: 'emergency', label: 'Emergency', icon: Heart, description: 'Contacts & bank' },
 ];
 

@@ -262,12 +262,23 @@ class EmployeeViewSet(viewsets.ModelViewSet):
             )
         except Exception as e:
             logger.error(f"Employee creation error: {str(e)}", exc_info=True)
+            # Try to extract a more descriptive error if it's a known database issue
+            error_detail = str(e)
+            if 'unique' in error_detail.lower():
+                if 'email' in error_detail.lower():
+                    error_detail = "An employee or user account with this email already exists."
+                elif 'employee_number' in error_detail.lower():
+                    error_detail = "This employee number is already taken."
+                elif 'username' in error_detail.lower():
+                    error_detail = "This username is already taken."
+            
             return Response(
                 {
-                    'detail': 'An error occurred while creating the employee. Please check your data and try again.',
-                    'error': 'creation_failed'
+                    'detail': f'Error: {error_detail}',
+                    'error': 'creation_failed',
+                    'system_error': str(e) if user.role == 'super_admin' else None
                 },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_400_BAD_REQUEST # Return 400 for data issues even if caught as Exception
             )
     
     def perform_create(self, serializer):

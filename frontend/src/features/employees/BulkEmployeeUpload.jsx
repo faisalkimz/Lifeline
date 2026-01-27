@@ -234,27 +234,35 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     };
 
     const mapEmployeeData = (row) => {
-        // Clean and trim all string values from the row to avoid validation errors
+        // Clean and trim all string values from the row
         const clean = (val) => (val === null || val === undefined) ? '' : String(val).trim();
 
-        // Use selected department from UI if provided, otherwise use department from Excel
+        // Flexible key lookup to handle variations (First Name, First Name*, first_name)
+        const get = (keys) => {
+            for (const key of keys) {
+                if (row[key] !== undefined && row[key] !== null) return clean(row[key]);
+            }
+            return '';
+        };
+
+        // Use selected department from UI if provided, otherwise resolve from Excel
         let departmentValue = selectedDepartment
             ? clean(departments.find(d => d.id === parseInt(selectedDepartment))?.name)
-            : (clean(row['Department']) || clean(row['department']) || '');
+            : get(['Department', 'department', 'Dept']);
 
-        const dateOfBirth = excelDateToISOString(row['Date of Birth'] || row['date_of_birth']);
-        const joinDate = excelDateToISOString(row['Join Date'] || row['Hire Date'] || row['join_date'] || row['hire_date']);
-        const probationEndDate = excelDateToISOString(row['Probation End Date'] || row['probation_end_date']);
+        const dateOfBirth = excelDateToISOString(get(['Date of Birth', 'date_of_birth', 'DOB', 'Birth Date']));
+        const joinDate = excelDateToISOString(get(['Join Date', 'Hire Date', 'join_date', 'hire_date', 'Start Date']));
+        const probationEndDate = excelDateToISOString(get(['Probation End Date', 'probation_end_date']));
 
         // Normalize gender
-        let genderValue = clean(row['Gender'] || row['gender']) || 'other';
+        let genderValue = get(['Gender', 'gender']) || 'other';
         const genderLower = genderValue.toLowerCase();
         if (genderLower === 'male' || genderLower === 'm') genderValue = 'male';
         else if (genderLower === 'female' || genderLower === 'f') genderValue = 'female';
         else genderValue = 'other';
 
         // Normalize Employment Type
-        let employmentType = clean(row['Employment Type'] || row['employment_type']) || 'full_time';
+        let employmentType = get(['Employment Type', 'employment_type']) || 'full_time';
         const etLower = employmentType.toLowerCase().replace(/ /g, '_');
         if (etLower.includes('full')) employmentType = 'full_time';
         else if (etLower.includes('part')) employmentType = 'part_time';
@@ -264,7 +272,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else employmentType = 'full_time';
 
         // Normalize Employment Status
-        let employmentStatus = clean(row['Employment Status'] || row['employment_status']) || 'active';
+        let employmentStatus = get(['Employment Status', 'employment_status']) || 'active';
         const esLower = employmentStatus.toLowerCase();
         if (esLower.includes('active')) employmentStatus = 'active';
         else if (esLower.includes('leave')) employmentStatus = 'on_leave';
@@ -274,7 +282,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else employmentStatus = 'active';
 
         // Normalize Marital Status
-        let maritalStatus = clean(row['Marital Status'] || row['marital_status']) || 'single';
+        let maritalStatus = get(['Marital Status', 'marital_status']) || 'single';
         const msLower = maritalStatus.toLowerCase();
         if (msLower.includes('single')) maritalStatus = 'single';
         else if (msLower.includes('marri')) maritalStatus = 'married';
@@ -282,28 +290,28 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else if (msLower.includes('widow')) maritalStatus = 'widowed';
         else maritalStatus = 'single';
 
-        // System Access / User Creation
-        const createAccount = clean(row['Create User Account? (Yes/No)'] || '').toLowerCase().includes('y');
+        // System Access
+        const createAccount = get(['Create User Account? (Yes/No)', 'Create User', 'create_user']).toLowerCase().includes('y');
         let accessRole = 'employee';
-        const roleInput = clean(row['Access Role'] || '').toLowerCase();
+        const roleInput = get(['Access Role', 'role', 'Position Role']).toLowerCase();
         if (roleInput.includes('hr') || roleInput.includes('admin')) accessRole = 'hr_manager';
         else if (roleInput.includes('manage')) accessRole = 'manager';
 
-        return {
-            // Mapping to backend field names
-            first_name: clean(row['First Name*'] || row['first_name']),
-            middle_name: clean(row['Middle Name'] || row['middle_name']),
-            last_name: clean(row['Last Name*'] || row['last_name']),
-            email: clean(row['Email*'] || row['email']),
-            phone: clean(row['Phone'] || row['phone']),
+        const employeeData = {
+            // Identity
+            first_name: get(['First Name*', 'First Name', 'first_name']),
+            middle_name: get(['Middle Name', 'middle_name']),
+            last_name: get(['Last Name*', 'Last Name', 'last_name']),
+            email: get(['Email*', 'Email', 'email']),
+            phone: get(['Phone', 'phone', 'Telephone', 'Contact']),
             date_of_birth: dateOfBirth,
             gender: genderValue,
             marital_status: maritalStatus,
 
             // Employment
-            job_title: clean(row['Job Title'] || row['job_title']) || 'Employee',
+            job_title: get(['Job Title', 'job_title', 'Designation', 'Position']) || 'Employee',
             department: departmentValue,
-            manager_email: clean(row['Manager Email'] || row['manager_email']),
+            manager_email: get(['Manager Email', 'manager_email']),
             employment_type: employmentType,
             employment_status: employmentStatus,
             join_date: joinDate || new Date().toISOString().split('T')[0],
@@ -311,39 +319,41 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
             // System Access
             create_user: createAccount,
-            username: clean(row['Username'] || row['username']),
-            password: clean(row['Password'] || row['password']),
+            username: get(['Username', 'username']),
+            password: get(['Password', 'password']),
             role: accessRole,
 
             // Statutory
-            national_id: clean(row['National ID*'] || row['National ID'] || row['national_id']),
-            passport_number: clean(row['Passport Number'] || row['passport_number']),
-            tin_number: clean(row['TIN Number'] || row['tin_number']),
-            nssf_number: clean(row['NSSF Number'] || row['nssf_number']),
+            national_id: get(['National ID*', 'National ID', 'national_id', 'NIN']),
+            passport_number: get(['Passport Number', 'passport_number']),
+            tin_number: get(['TIN Number', 'tin_number', 'TIN']),
+            nssf_number: get(['NSSF Number', 'nssf_number', 'NSSF']),
 
             // Finance
-            bank_name: clean(row['Bank Name'] || row['bank_name']),
-            bank_account_number: clean(row['Bank Account Number'] || row['bank_account_number']),
-            bank_branch: clean(row['Bank Branch'] || row['bank_branch']),
-            mobile_money_number: clean(row['Mobile Money Number'] || row['mobile_money_number']),
+            bank_name: get(['Bank Name', 'bank_name', 'Bank']),
+            bank_account_number: get(['Bank Account Number', 'bank_account_number', 'Account Number']),
+            bank_branch: get(['Bank Branch', 'bank_branch']),
+            mobile_money_number: get(['Mobile Money Number', 'mobile_money_number', 'Momo']),
 
-            // Contact & Relations
-            address: clean(row['Address'] || row['address']),
-            city: clean(row['City'] || row['city']),
-            district: clean(row['District'] || row['district']),
-            emergency_contact_name: clean(row['Emergency Contact Name'] || row['emergency_contact_name']),
-            emergency_contact_phone: clean(row['Emergency Contact Phone'] || row['emergency_contact_phone']),
-            emergency_contact_relationship: clean(row['Emergency Contact Relationship'] || row['emergency_contact_relationship']),
-            notes: clean(row['Notes'] || row['notes']),
+            // Contact
+            address: get(['Address', 'address']),
+            city: get(['City', 'city']),
+            district: get(['District', 'district']),
+            emergency_contact_name: get(['Emergency Contact Name', 'emergency_contact_name']),
+            emergency_contact_phone: get(['Emergency Contact Phone', 'emergency_contact_phone']),
+            emergency_contact_relationship: get(['Emergency Contact Relationship', 'emergency_contact_relationship']),
+            notes: get(['Notes', 'notes']),
 
-            // Salary fields (for post-creation processing)
-            basic_salary: parseFloat(row['Basic Salary'] || row['basic_salary']) || 0,
-            housing_allowance: parseFloat(row['Housing Allowance'] || row['housing_allowance']) || 0,
-            transport_allowance: parseFloat(row['Transport Allowance'] || row['transport_allowance']) || 0,
-            medical_allowance: parseFloat(row['Medical Allowance'] || row['medical_allowance']) || 0,
-            lunch_allowance: parseFloat(row['Lunch Allowance'] || row['lunch_allowance']) || 0,
-            other_allowances: parseFloat(row['Other Allowances'] || row['other_allowances']) || 0
+            // Salary
+            basic_salary: parseFloat(get(['Basic Salary', 'basic_salary', 'Salary'])) || 0,
+            housing_allowance: parseFloat(get(['Housing Allowance', 'housing_allowance'])) || 0,
+            transport_allowance: parseFloat(get(['Transport Allowance', 'transport_allowance'])) || 0,
+            medical_allowance: parseFloat(get(['Medical Allowance', 'medical_allowance'])) || 0,
+            lunch_allowance: parseFloat(get(['Lunch Allowance', 'lunch_allowance'])) || 0,
+            other_allowances: parseFloat(get(['Other Allowances', 'other_allowances'])) || 0
         };
+
+        return employeeData;
     };
 
     const validateEmployee = (employee) => {

@@ -50,18 +50,30 @@ class JSONErrorMiddleware(MiddlewareMixin):
                 if not error_detail:
                     error_messages = {
                         400: 'Bad Request - Please check your input data and try again',
+                        401: 'Session Expired - Please log in again to continue',
                         403: 'Forbidden - CSRF verification failed or insufficient permissions',
                         404: 'Not Found - The requested resource does not exist',
                         500: 'Internal Server Error - An unexpected error occurred',
                     }
                     error_detail = error_messages.get(response.status_code, f'Error {response.status_code}')
                 
+                # If it's a 401, the message should be simpler
+                if response.status_code == 401:
+                    return JsonResponse(
+                        {
+                            'detail': 'Your session has expired. Please log in again.',
+                            'error': 'unauthorized',
+                            'status_code': 401
+                        },
+                        status=401
+                    )
+
                 return JsonResponse(
                     {
                         'detail': error_detail,
                         'error': 'api_error',
                         'status_code': response.status_code,
-                        'message': 'The server returned an HTML error page. This should be JSON - please check backend configuration.'
+                        'message': 'The server encountered an error. Please try again or contact support.'
                     },
                     status=response.status_code
                 )

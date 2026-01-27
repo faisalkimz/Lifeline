@@ -17,7 +17,10 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     const [results, setResults] = useState(null);
     const [selectedDepartment, setSelectedDepartment] = useState('');
     const [createEmployee] = useCreateEmployeeMutation();
+    const [createSalaryStructure] = useCreateSalaryStructureMutation();
     const { data: departments = [], isLoading: departmentsLoading } = useGetDepartmentsQuery();
+    const { data: allEmployeesData } = useGetEmployeesQuery();
+    const allEmployees = allEmployeesData?.results || allEmployeesData || [];
 
     const handleFileChange = (e) => {
         const selectedFile = e.target.files[0];
@@ -33,48 +36,71 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
     const downloadTemplate = () => {
         // Get department name for template if selected
-        const departmentName = selectedDepartment 
+        const departmentName = selectedDepartment
             ? departments.find(d => d.id === parseInt(selectedDepartment))?.name || ''
-            : (departments.length > 0 ? departments[0].name : 'Engineering'); // Use first available or default
-        
-        // Use today's date for example
+            : (departments.length > 0 ? departments[0].name : 'HR & Administration');
+
         const today = new Date().toISOString().split('T')[0];
         const exampleBirthDate = new Date();
-        exampleBirthDate.setFullYear(exampleBirthDate.getFullYear() - 30);
+        exampleBirthDate.setFullYear(exampleBirthDate.getFullYear() - 25);
         const exampleBirthDateStr = exampleBirthDate.toISOString().split('T')[0];
-        
+
         const templateData = [
             {
-                'First Name*': 'Sarah',
-                'Last Name*': 'Johnson',
-                'Email*': 'sarah.johnson@company.com',
-                'Phone': '+256700000000',
-                'Job Title': 'Software Engineer',
-                'Department': departmentName || (departments.length > 0 ? departments[0].name : 'Select from available departments'),
-                'Date of Birth': exampleBirthDateStr, // Use YYYY-MM-DD format
-                'Gender': 'Female',
-                'Address': '123 Main St, Kampala',
-                'Emergency Contact Name': 'John Johnson',
-                'Emergency Contact Phone': '+256700000001',
-                'Hire Date': today, // Use YYYY-MM-DD format
-                'Salary': '5000000',
-                'Bank Name': 'Stanbic Bank',
-                'Bank Account Number': '1234567890',
-                'National ID': 'CM12345678901',
-                'NSSF Number': 'F123456789',
-                'TIN Number': '1234567890'
+                // Identity
+                'First Name*': 'John',
+                'Middle Name': 'Robert',
+                'Last Name*': 'Doe',
+                'Email*': 'john.doe@example.com',
+                'Phone': '+256700000001',
+                'Date of Birth': exampleBirthDateStr,
+                'Gender': 'Male',
+                'Marital Status': 'Single',
+
+                // Employment
+                'Job Title': 'Senior Analyst',
+                'Department': departmentName,
+                'Manager Email': '',
+                'Employment Type': 'Full Time',
+                'Employment Status': 'Active',
+                'Join Date': today,
+                'Probation End Date': '',
+
+                // Salary & Bank
+                'Basic Salary': '4500000',
+                'Housing Allowance': '500000',
+                'Transport Allowance': '200000',
+                'Medical Allowance': '150000',
+                'Lunch Allowance': '100000',
+                'Other Allowances': '0',
+                'Bank Name': 'Standard Chartered',
+                'Bank Account Number': '9001234567',
+                'Bank Branch': 'Speke Road',
+                'Mobile Money Number': '+256770000002',
+
+                // Statutory & Docs
+                'National ID': 'CM90000000XYZ',
+                'Passport Number': '',
+                'TIN Number': '1000234567',
+                'NSSF Number': 'NS123456789',
+
+                // Location & Contact
+                'Address': 'Plot 45, Akii Bua Road',
+                'City': 'Kampala',
+                'District': 'Kampala',
+                'Emergency Contact Name': 'Jane Doe',
+                'Emergency Contact Phone': '+256700000003',
+                'Emergency Contact Relationship': 'Spouse',
+                'Notes': 'Highly recommended hire.'
             }
         ];
 
-        // Create main data sheet
         const ws = XLSX.utils.json_to_sheet(templateData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Employee Data');
 
-        // Create departments reference sheet
         if (departments.length > 0) {
             const deptData = departments.map(dept => ({
-                'Department ID': dept.id,
                 'Department Name': dept.name,
                 'Code': dept.code || ''
             }));
@@ -82,16 +108,28 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             XLSX.utils.book_append_sheet(wb, deptWs, 'Available Departments');
         }
 
+        // Set column widths
         ws['!cols'] = [
-            { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
-            { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 10 },
-            { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 15 },
-            { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 },
-            { wch: 15 }, { wch: 15 }
+            // First Name to Phone
+            { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 25 }, { wch: 15 },
+            // DOB to Marital
+            { wch: 15 }, { wch: 10 }, { wch: 15 },
+            // Role to Status
+            { wch: 20 }, { wch: 20 }, { wch: 25 }, { wch: 15 }, { wch: 15 },
+            // Dates
+            { wch: 15 }, { wch: 15 },
+            // Salary fields
+            { wch: 15 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 },
+            // Bank info
+            { wch: 20 }, { wch: 20 }, { wch: 15 }, { wch: 18 },
+            // Statutory
+            { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 },
+            // Contact & Notes
+            { wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, { wch: 20 }, { wch: 30 }
         ];
 
-        XLSX.writeFile(wb, 'employee_upload_template.xlsx');
-        toast.success('Template downloaded! 📥');
+        XLSX.writeFile(wb, 'lifeline_full_onboarding_template.xlsx');
+        toast.success('Comprehensive template downloaded! 🚀');
     };
 
     const parseExcelFile = (file) => {
@@ -101,7 +139,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 try {
                     const data = new Uint8Array(e.target.result);
                     // Configure XLSX to parse dates and keep raw values for date conversion
-                    const workbook = XLSX.read(data, { 
+                    const workbook = XLSX.read(data, {
                         type: 'array',
                         cellDates: false, // Keep as serial numbers so we can convert them
                         cellNF: false,
@@ -125,7 +163,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     // Helper function to convert Excel date serial number to YYYY-MM-DD format
     const excelDateToISOString = (excelDate) => {
         if (excelDate === null || excelDate === undefined || excelDate === '') return null;
-        
+
         // If it's already a string in date format, return it
         if (typeof excelDate === 'string') {
             // Check if it's already in YYYY-MM-DD format
@@ -149,21 +187,21 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 return null;
             }
         }
-        
+
         // If it's a number (Excel serial date), convert it
         if (typeof excelDate === 'number' && !isNaN(excelDate) && excelDate > 0) {
             // Excel date serial number conversion
             // Excel epoch: January 1, 1900 (serial number 1)
             // Excel incorrectly treats 1900 as a leap year
             // Serial number 60 = February 29, 1900 (doesn't exist, so we adjust)
-            
+
             // Convert Excel serial date to JavaScript Date
             // Excel serial 1 = Jan 1, 1900
             // JavaScript Date(1900, 0, 1) = Jan 1, 1900
-            
+
             const excelEpoch = new Date(1900, 0, 1); // January 1, 1900
             let days = excelDate - 1; // Subtract 1 because Excel serial 1 = Jan 1, 1900
-            
+
             // Excel's leap year bug: it treats 1900 as a leap year
             // Serial numbers 1-59 are correct (Jan 1 - Feb 28, 1900)
             // Serial number 60 = Feb 29, 1900 (doesn't exist)
@@ -172,66 +210,114 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             if (excelDate >= 60) {
                 days = excelDate - 2; // Subtract 2 to account for the non-existent Feb 29, 1900
             }
-            
+
             const jsDate = new Date(excelEpoch.getTime() + days * 24 * 60 * 60 * 1000);
-            
+
             // Format as YYYY-MM-DD
             const year = jsDate.getFullYear();
             const month = String(jsDate.getMonth() + 1).padStart(2, '0');
             const day = String(jsDate.getDate()).padStart(2, '0');
-            
+
             return `${year}-${month}-${day}`;
         }
-        
+
         return null;
     };
 
     const mapEmployeeData = (row) => {
         // Use selected department from UI if provided, otherwise use department from Excel
-        let departmentValue = selectedDepartment 
-            ? departments.find(d => d.id === parseInt(selectedDepartment))?.name 
+        let departmentValue = selectedDepartment
+            ? departments.find(d => d.id === parseInt(selectedDepartment))?.name
             : (row['Department'] || row['department'] || null);
-        
-        // Convert Excel date serial numbers to ISO date strings
+
         const dateOfBirth = excelDateToISOString(row['Date of Birth'] || row['date_of_birth']);
-        const joinDate = excelDateToISOString(row['Hire Date'] || row['hire_date']);
-        
-        // Normalize gender to lowercase (backend expects 'male', 'female', 'other')
-        let genderValue = row['Gender'] || row['gender'] || null;
-        if (genderValue) {
-            const genderLower = String(genderValue).toLowerCase().trim();
-            // Map common variations to valid values
-            if (genderLower === 'male' || genderLower === 'm') {
-                genderValue = 'male';
-            } else if (genderLower === 'female' || genderLower === 'f') {
-                genderValue = 'female';
-            } else if (genderLower === 'other' || genderLower === 'o') {
-                genderValue = 'other';
-            } else {
-                // Default to 'other' if unrecognized
-                genderValue = 'other';
-            }
-        }
-        
+        const joinDate = excelDateToISOString(row['Join Date'] || row['Hire Date'] || row['join_date'] || row['hire_date']);
+        const probationEndDate = excelDateToISOString(row['Probation End Date'] || row['probation_end_date']);
+
+        // Normalize gender
+        let genderValue = row['Gender'] || row['gender'] || 'other';
+        const genderLower = String(genderValue).toLowerCase().trim();
+        if (genderLower === 'male' || genderLower === 'm') genderValue = 'male';
+        else if (genderLower === 'female' || genderLower === 'f') genderValue = 'female';
+        else genderValue = 'other';
+
+        // Normalize Employment Type
+        let employmentType = row['Employment Type'] || row['employment_type'] || 'full_time';
+        const etLower = String(employmentType).toLowerCase().trim().replace(/ /g, '_');
+        if (etLower.includes('full')) employmentType = 'full_time';
+        else if (etLower.includes('part')) employmentType = 'part_time';
+        else if (etLower.includes('contract')) employmentType = 'contract';
+        else if (etLower.includes('intern')) employmentType = 'intern';
+        else if (etLower.includes('casual')) employmentType = 'casual';
+        else employmentType = 'full_time';
+
+        // Normalize Employment Status
+        let employmentStatus = row['Employment Status'] || row['employment_status'] || 'active';
+        const esLower = String(employmentStatus).toLowerCase().trim();
+        if (esLower.includes('active')) employmentStatus = 'active';
+        else if (esLower.includes('leave')) employmentStatus = 'on_leave';
+        else if (esLower.includes('suspend')) employmentStatus = 'suspended';
+        else if (esLower.includes('terminate')) employmentStatus = 'terminated';
+        else if (esLower.includes('resign')) employmentStatus = 'resigned';
+        else employmentStatus = 'active';
+
+        // Normalize Marital Status
+        let maritalStatus = row['Marital Status'] || row['marital_status'] || 'single';
+        const msLower = String(maritalStatus).toLowerCase().trim();
+        if (msLower.includes('single')) maritalStatus = 'single';
+        else if (msLower.includes('marri')) maritalStatus = 'married';
+        else if (msLower.includes('divorc')) maritalStatus = 'divorced';
+        else if (msLower.includes('widow')) maritalStatus = 'widowed';
+        else maritalStatus = 'single';
+
         return {
+            // Mapping to backend field names
             first_name: row['First Name*'] || row['first_name'],
+            middle_name: row['Middle Name'] || row['middle_name'] || null,
             last_name: row['Last Name*'] || row['last_name'],
             email: row['Email*'] || row['email'],
             phone: row['Phone'] || row['phone'] || null,
-            job_title: row['Job Title'] || row['job_title'] || null,
-            department: departmentValue,
             date_of_birth: dateOfBirth,
             gender: genderValue,
-            address: row['Address'] || row['address'] || null,
-            emergency_contact_name: row['Emergency Contact Name'] || row['emergency_contact_name'] || null,
-            emergency_contact_phone: row['Emergency Contact Phone'] || row['emergency_contact_phone'] || null,
-            join_date: joinDate,
-            basic_salary: row['Salary'] || row['salary'] || null,
+            marital_status: maritalStatus,
+
+            // Employment
+            job_title: row['Job Title'] || row['job_title'] || 'Employee',
+            department: departmentValue,
+            manager_email: row['Manager Email'] || row['manager_email'] || null,
+            employment_type: employmentType,
+            employment_status: employmentStatus,
+            join_date: joinDate || new Date().toISOString().split('T')[0],
+            probation_end_date: probationEndDate,
+
+            // Statutory
+            national_id: row['National ID'] || row['national_id'] || null,
+            passport_number: row['Passport Number'] || row['passport_number'] || null,
+            tin_number: row['TIN Number'] || row['tin_number'] || null,
+            nssf_number: row['NSSF Number'] || row['nssf_number'] || null,
+
+            // Finance
             bank_name: row['Bank Name'] || row['bank_name'] || null,
             bank_account_number: row['Bank Account Number'] || row['bank_account_number'] || null,
-            national_id: row['National ID'] || row['national_id'] || null,
-            nssf_number: row['NSSF Number'] || row['nssf_number'] || null,
-            tin_number: row['TIN Number'] || row['tin_number'] || null,
+            bank_branch: row['Bank Branch'] || row['bank_branch'] || null,
+            mobile_money_number: row['Mobile Money Number'] || row['mobile_money_number'] || null,
+
+            // Contact & Relations
+            address: row['Address'] || row['address'] || null,
+            city: row['City'] || row['city'] || null,
+            district: row['District'] || row['district'] || null,
+            emergency_contact_name: row['Emergency Contact Name'] || row['emergency_contact_name'] || null,
+            emergency_contact_phone: row['Emergency Contact Phone'] || row['emergency_contact_phone'] || null,
+            emergency_contact_relationship: row['Emergency Contact Relationship'] || row['emergency_contact_relationship'] || null,
+            notes: row['Notes'] || row['notes'] || null,
+
+            // Salary fields (for post-creation processing)
+            basic_salary: parseFloat(row['Basic Salary'] || row['basic_salary'] || 0),
+            housing_allowance: parseFloat(row['Housing Allowance'] || row['housing_allowance'] || 0),
+            transport_allowance: parseFloat(row['Transport Allowance'] || row['transport_allowance'] || 0),
+            medical_allowance: parseFloat(row['Medical Allowance'] || row['medical_allowance'] || 0),
+            lunch_allowance: parseFloat(row['Lunch Allowance'] || row['lunch_allowance'] || 0),
+            other_allowances: parseFloat(row['Other Allowances'] || row['other_allowances'] || 0)
         };
     };
 
@@ -271,7 +357,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
                 const employeeData = mapEmployeeData(row);
-                
+
                 // Check for duplicates in batch
                 if (employeeData.email) {
                     if (emailSet.has(employeeData.email.toLowerCase())) {
@@ -304,7 +390,30 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 }
 
                 try {
-                    await createEmployee(employeeData).unwrap();
+                    // Handle Manager Email Lookup
+                    if (employeeData.manager_email) {
+                        const manager = allEmployees.find(e => e.email?.toLowerCase() === employeeData.manager_email.toLowerCase());
+                        if (manager) {
+                            employeeData.manager = manager.id;
+                        }
+                    }
+
+                    const res = await createEmployee(employeeData).unwrap();
+
+                    // Create Salary Structure if basic_salary is provided
+                    if (employeeData.basic_salary > 0) {
+                        await createSalaryStructure({
+                            employee: res.id,
+                            basic_salary: employeeData.basic_salary,
+                            housing_allowance: employeeData.housing_allowance || 0,
+                            transport_allowance: employeeData.transport_allowance || 0,
+                            medical_allowance: employeeData.medical_allowance || 0,
+                            lunch_allowance: employeeData.lunch_allowance || 0,
+                            other_allowances: employeeData.other_allowances || 0,
+                            effective_date: employeeData.join_date || new Date().toISOString().split('T')[0]
+                        }).unwrap();
+                    }
+
                     uploadResults.successful++;
                     uploadResults.details.push({
                         row: i + 2,
@@ -314,18 +423,18 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                     });
                 } catch (error) {
                     uploadResults.failed++;
-                    
+
                     // Extract detailed error message with better parsing
                     let errorMessage = 'Failed to create employee';
-                    
+
                     // Log full error for debugging (use JSON.stringify to see full object)
                     console.error(`Row ${i + 2} Full Error:`, JSON.stringify(error, null, 2));
                     console.error(`Row ${i + 2} Error Data:`, JSON.stringify(error.data, null, 2));
                     console.error(`Row ${i + 2} Employee Data Sent:`, JSON.stringify(employeeData, null, 2));
-                    
+
                     // RTK Query error format: {status: number, data: {...}, error: string}
                     const errorData = error.data;
-                    
+
                     if (errorData) {
                         // Handle different error formats
                         if (typeof errorData === 'string') {
@@ -343,7 +452,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                             // Extract all validation errors, not just the first
                             const errorMessages = [];
                             const errorKeys = Object.keys(errorData);
-                            
+
                             errorKeys.forEach(key => {
                                 const fieldError = errorData[key];
                                 if (Array.isArray(fieldError)) {
@@ -356,7 +465,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                     errorMessages.push(`${key}: ${JSON.stringify(fieldError)}`);
                                 }
                             });
-                            
+
                             if (errorMessages.length > 0) {
                                 errorMessage = errorMessages.slice(0, 3).join('; '); // Show first 3 errors
                                 if (errorMessages.length > 3) {
@@ -374,7 +483,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                     } else if (error.status) {
                         errorMessage = `Server error (${error.status}). Check console for details.`;
                     }
-                    
+
                     uploadResults.details.push({
                         row: i + 2,
                         name: `${employeeData.first_name || 'Unknown'} ${employeeData.last_name || ''}`,

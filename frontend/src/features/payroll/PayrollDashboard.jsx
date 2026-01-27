@@ -144,11 +144,11 @@ const PayrollDashboard = ({ setActiveTab }) => {
 
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <StatCard title="Employees" value={stats.employee_count} icon="Users" />
-          <StatCard title="Total Gross" value={formatCurrency(stats.total_gross)} icon="DollarSign" />
-          <StatCard title="Deductions" value={formatCurrency(stats.total_deductions)} icon="TrendingDown" />
-          <StatCard title="Total Net" value={formatCurrency(stats.total_net)} icon="CreditCard" />
-          <StatCard title="Avg Salary" value={formatCurrency(stats.average_salary)} icon="Activity" />
+          <StatCard title="Employees" value={stats.employee_count} icon={Users} />
+          <StatCard title="Total Gross" value={formatCurrency(stats.total_gross)} icon={DollarSign} />
+          <StatCard title="Deductions" value={formatCurrency(stats.total_deductions)} icon={TrendingDown} />
+          <StatCard title="Total Net" value={formatCurrency(stats.total_net)} icon={CreditCard} />
+          <StatCard title="Avg Salary" value={formatCurrency(stats.average_salary)} icon={Activity} />
         </div>
       )}
 
@@ -180,7 +180,11 @@ const PayrollDashboard = ({ setActiveTab }) => {
                   <Button className="bg-slate-900 text-white font-bold h-12 px-8" onClick={() => navigate(`/payroll/runs/${currentPayroll.id}`)}>
                     Open Run Details
                   </Button>
-                  <Button variant="outline" className="font-bold h-12 px-8 border-slate-200" onClick={() => setActiveTab('salaries')}>
+                  <Button
+                    variant="outline"
+                    className="font-bold h-12 px-8 border-slate-300 hover:border-slate-900 hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                    onClick={() => setActiveTab && setActiveTab('salaries')}
+                  >
                     Configure Salaries
                   </Button>
                 </div>

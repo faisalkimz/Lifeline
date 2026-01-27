@@ -245,6 +245,11 @@ class Payslip(models.Model):
         unique_together = ['payroll_run', 'employee']
         ordering = ['-payroll_run__year', '-payroll_run__month', 'employee__first_name', 'employee__last_name']
 
+    @property
+    def company(self):
+        """Get company from payroll run"""
+        return self.payroll_run.company
+
     def __str__(self):
         return f"{self.employee.full_name} - {self.payroll_run.month:02d}/{self.payroll_run.year}"
 

@@ -68,7 +68,7 @@ class PayslipGenerator:
         employee = payslip.employee
         info_data = [
             [Paragraph("Employee Name:", bold_style), Paragraph(employee.full_name, normal_style), 
-             Paragraph("Employee ID:", bold_style), Paragraph(employee.id, normal_style)],
+             Paragraph("Employee ID:", bold_style), Paragraph(str(employee.employee_number), normal_style)],
             [Paragraph("Bank:", bold_style), Paragraph("Bank Transfer", normal_style), 
              Paragraph("Payment Method:", bold_style), Paragraph(payslip.get_payment_method_display(), normal_style)],
         ]

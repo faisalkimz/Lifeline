@@ -901,7 +901,7 @@ const EmployeeFormPage = () => {
                                     </div>
                                 )}
 
-                                {/* DOCUMENTS STEP */}
+                                {/* TAX & ID STEP */}
                                 {currentStep === 4 && (
                                     <div className="space-y-8">
                                         <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-6 flex items-start gap-4">
@@ -909,9 +909,9 @@ const EmployeeFormPage = () => {
                                                 <FileText className="h-6 w-6 text-white" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-amber-900 mb-1 text-lg">Legal & Statutory</h3>
+                                                <h3 className="font-bold text-amber-900 mb-1 text-lg">Tax & Identification</h3>
                                                 <p className="text-sm text-amber-800 leading-relaxed">
-                                                    We need these identification numbers for tax compliance and insurance.
+                                                    We need these identification numbers for tax compliance, NSSF, and statutory filings.
                                                 </p>
                                             </div>
                                         </div>

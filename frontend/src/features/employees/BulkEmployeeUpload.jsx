@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import { Button } from '../../components/ui/Button';
-import { useCreateEmployeeMutation, useGetDepartmentsQuery } from '../../store/api';
+import {
+    useCreateEmployeeMutation,
+    useGetDepartmentsQuery,
+    useCreateSalaryStructureMutation,
+    useGetEmployeesQuery
+} from '../../store/api';
 import {
     Upload, Download, FileSpreadsheet, CheckCircle, XCircle,
     Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck, Edit, Building2

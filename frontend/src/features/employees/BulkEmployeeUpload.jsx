@@ -234,25 +234,28 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
     };
 
     const mapEmployeeData = (row) => {
+        // Clean and trim all string values from the row to avoid validation errors
+        const clean = (val) => (val === null || val === undefined) ? '' : String(val).trim();
+
         // Use selected department from UI if provided, otherwise use department from Excel
         let departmentValue = selectedDepartment
-            ? departments.find(d => d.id === parseInt(selectedDepartment))?.name
-            : (row['Department'] || row['department'] || null);
+            ? clean(departments.find(d => d.id === parseInt(selectedDepartment))?.name)
+            : (clean(row['Department']) || clean(row['department']) || '');
 
         const dateOfBirth = excelDateToISOString(row['Date of Birth'] || row['date_of_birth']);
         const joinDate = excelDateToISOString(row['Join Date'] || row['Hire Date'] || row['join_date'] || row['hire_date']);
         const probationEndDate = excelDateToISOString(row['Probation End Date'] || row['probation_end_date']);
 
         // Normalize gender
-        let genderValue = row['Gender'] || row['gender'] || 'other';
-        const genderLower = String(genderValue).toLowerCase().trim();
+        let genderValue = clean(row['Gender'] || row['gender']) || 'other';
+        const genderLower = genderValue.toLowerCase();
         if (genderLower === 'male' || genderLower === 'm') genderValue = 'male';
         else if (genderLower === 'female' || genderLower === 'f') genderValue = 'female';
         else genderValue = 'other';
 
         // Normalize Employment Type
-        let employmentType = row['Employment Type'] || row['employment_type'] || 'full_time';
-        const etLower = String(employmentType).toLowerCase().trim().replace(/ /g, '_');
+        let employmentType = clean(row['Employment Type'] || row['employment_type']) || 'full_time';
+        const etLower = employmentType.toLowerCase().replace(/ /g, '_');
         if (etLower.includes('full')) employmentType = 'full_time';
         else if (etLower.includes('part')) employmentType = 'part_time';
         else if (etLower.includes('contract')) employmentType = 'contract';
@@ -261,8 +264,8 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else employmentType = 'full_time';
 
         // Normalize Employment Status
-        let employmentStatus = row['Employment Status'] || row['employment_status'] || 'active';
-        const esLower = String(employmentStatus).toLowerCase().trim();
+        let employmentStatus = clean(row['Employment Status'] || row['employment_status']) || 'active';
+        const esLower = employmentStatus.toLowerCase();
         if (esLower.includes('active')) employmentStatus = 'active';
         else if (esLower.includes('leave')) employmentStatus = 'on_leave';
         else if (esLower.includes('suspend')) employmentStatus = 'suspended';
@@ -271,8 +274,8 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else employmentStatus = 'active';
 
         // Normalize Marital Status
-        let maritalStatus = row['Marital Status'] || row['marital_status'] || 'single';
-        const msLower = String(maritalStatus).toLowerCase().trim();
+        let maritalStatus = clean(row['Marital Status'] || row['marital_status']) || 'single';
+        const msLower = maritalStatus.toLowerCase();
         if (msLower.includes('single')) maritalStatus = 'single';
         else if (msLower.includes('marri')) maritalStatus = 'married';
         else if (msLower.includes('divorc')) maritalStatus = 'divorced';
@@ -280,27 +283,27 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         else maritalStatus = 'single';
 
         // System Access / User Creation
-        const createAccount = (row['Create User Account? (Yes/No)'] || '').toLowerCase().includes('y');
+        const createAccount = clean(row['Create User Account? (Yes/No)'] || '').toLowerCase().includes('y');
         let accessRole = 'employee';
-        const roleInput = (row['Access Role'] || '').toLowerCase();
+        const roleInput = clean(row['Access Role'] || '').toLowerCase();
         if (roleInput.includes('hr') || roleInput.includes('admin')) accessRole = 'hr_manager';
         else if (roleInput.includes('manage')) accessRole = 'manager';
 
         return {
             // Mapping to backend field names
-            first_name: row['First Name*'] || row['first_name'],
-            middle_name: row['Middle Name'] || row['middle_name'] || null,
-            last_name: row['Last Name*'] || row['last_name'],
-            email: row['Email*'] || row['email'],
-            phone: row['Phone'] || row['phone'] || null,
+            first_name: clean(row['First Name*'] || row['first_name']),
+            middle_name: clean(row['Middle Name'] || row['middle_name']),
+            last_name: clean(row['Last Name*'] || row['last_name']),
+            email: clean(row['Email*'] || row['email']),
+            phone: clean(row['Phone'] || row['phone']),
             date_of_birth: dateOfBirth,
             gender: genderValue,
             marital_status: maritalStatus,
 
             // Employment
-            job_title: row['Job Title'] || row['job_title'] || 'Employee',
+            job_title: clean(row['Job Title'] || row['job_title']) || 'Employee',
             department: departmentValue,
-            manager_email: row['Manager Email'] || row['manager_email'] || null,
+            manager_email: clean(row['Manager Email'] || row['manager_email']),
             employment_type: employmentType,
             employment_status: employmentStatus,
             join_date: joinDate || new Date().toISOString().split('T')[0],
@@ -308,38 +311,38 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
             // System Access
             create_user: createAccount,
-            username: row['Username'] || null,
-            password: row['Password'] || null,
+            username: clean(row['Username'] || row['username']),
+            password: clean(row['Password'] || row['password']),
             role: accessRole,
 
             // Statutory
-            national_id: row['National ID*'] || row['National ID'] || row['national_id'] || null,
-            passport_number: row['Passport Number'] || row['passport_number'] || null,
-            tin_number: row['TIN Number'] || row['tin_number'] || null,
-            nssf_number: row['NSSF Number'] || row['nssf_number'] || null,
+            national_id: clean(row['National ID*'] || row['National ID'] || row['national_id']),
+            passport_number: clean(row['Passport Number'] || row['passport_number']),
+            tin_number: clean(row['TIN Number'] || row['tin_number']),
+            nssf_number: clean(row['NSSF Number'] || row['nssf_number']),
 
             // Finance
-            bank_name: row['Bank Name'] || row['bank_name'] || null,
-            bank_account_number: row['Bank Account Number'] || row['bank_account_number'] || null,
-            bank_branch: row['Bank Branch'] || row['bank_branch'] || null,
-            mobile_money_number: row['Mobile Money Number'] || row['mobile_money_number'] || null,
+            bank_name: clean(row['Bank Name'] || row['bank_name']),
+            bank_account_number: clean(row['Bank Account Number'] || row['bank_account_number']),
+            bank_branch: clean(row['Bank Branch'] || row['bank_branch']),
+            mobile_money_number: clean(row['Mobile Money Number'] || row['mobile_money_number']),
 
             // Contact & Relations
-            address: row['Address'] || row['address'] || null,
-            city: row['City'] || row['city'] || null,
-            district: row['District'] || row['district'] || null,
-            emergency_contact_name: row['Emergency Contact Name'] || row['emergency_contact_name'] || null,
-            emergency_contact_phone: row['Emergency Contact Phone'] || row['emergency_contact_phone'] || null,
-            emergency_contact_relationship: row['Emergency Contact Relationship'] || row['emergency_contact_relationship'] || null,
-            notes: row['Notes'] || row['notes'] || null,
+            address: clean(row['Address'] || row['address']),
+            city: clean(row['City'] || row['city']),
+            district: clean(row['District'] || row['district']),
+            emergency_contact_name: clean(row['Emergency Contact Name'] || row['emergency_contact_name']),
+            emergency_contact_phone: clean(row['Emergency Contact Phone'] || row['emergency_contact_phone']),
+            emergency_contact_relationship: clean(row['Emergency Contact Relationship'] || row['emergency_contact_relationship']),
+            notes: clean(row['Notes'] || row['notes']),
 
             // Salary fields (for post-creation processing)
-            basic_salary: parseFloat(row['Basic Salary'] || row['basic_salary'] || 0),
-            housing_allowance: parseFloat(row['Housing Allowance'] || row['housing_allowance'] || 0),
-            transport_allowance: parseFloat(row['Transport Allowance'] || row['transport_allowance'] || 0),
-            medical_allowance: parseFloat(row['Medical Allowance'] || row['medical_allowance'] || 0),
-            lunch_allowance: parseFloat(row['Lunch Allowance'] || row['lunch_allowance'] || 0),
-            other_allowances: parseFloat(row['Other Allowances'] || row['other_allowances'] || 0)
+            basic_salary: parseFloat(row['Basic Salary'] || row['basic_salary']) || 0,
+            housing_allowance: parseFloat(row['Housing Allowance'] || row['housing_allowance']) || 0,
+            transport_allowance: parseFloat(row['Transport Allowance'] || row['transport_allowance']) || 0,
+            medical_allowance: parseFloat(row['Medical Allowance'] || row['medical_allowance']) || 0,
+            lunch_allowance: parseFloat(row['Lunch Allowance'] || row['lunch_allowance']) || 0,
+            other_allowances: parseFloat(row['Other Allowances'] || row['other_allowances']) || 0
         };
     };
 

@@ -1273,6 +1273,11 @@ export const api = createApi({
     // ========== ANALYTICS (Scheduled Reports) ==========
     getReportSchedules: builder.query({
       query: () => '/analytics/schedules/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || [];
+      },
       providesTags: ['ReportSchedule']
     }),
     createReportSchedule: builder.mutation({

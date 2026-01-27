@@ -10,7 +10,8 @@ import {
 import toast from 'react-hot-toast';
 
 const ScheduledReports = () => {
-    const { data: schedules = [], isLoading } = useGetReportSchedulesQuery();
+    const { data: schedulesData, isLoading } = useGetReportSchedulesQuery();
+    const schedules = Array.isArray(schedulesData) ? schedulesData : [];
     const [createSchedule, { isLoading: isCreating }] = useCreateReportScheduleMutation();
     const [deleteSchedule] = useDeleteReportScheduleMutation();
 
@@ -143,7 +144,7 @@ const ScheduledReports = () => {
                                             <span>•</span>
                                             <span>Module: {schedule.module}</span>
                                             <span>•</span>
-                                            <span>Recipients: {schedule.recipients.split(',').length}</span>
+                                            <span>Recipients: {schedule.recipients?.split(',')?.length || 0}</span>
                                         </div>
                                     </div>
                                 </div>

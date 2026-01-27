@@ -249,6 +249,8 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         from django.utils import timezone
         from datetime import date
         from accounts.models import User
+        import logging
+        logger = logging.getLogger(__name__)
         
         # 1. Normalize Email
         if attrs.get('email'):
@@ -258,17 +260,32 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         company = request.user.company if request else None
 
-        # 2. Check for duplicate email in current company (Employee)
+        # 2. Check for duplicate email in current company
         if email and company:
             if Employee.objects.filter(company=company, email=email).exists():
                 raise serializers.ValidationError({"email": "An employee with this email already exists in your company."})
             
-            # 3. Check for duplicate email in User model (Global or per company depending on your User model)
-            # In your User model, unique_email_per_company constraint exists.
             if User.objects.filter(company=company, email=email).exists():
                 raise serializers.ValidationError({"email": "A user account with this email already exists in your company."})
 
-        # 4. Set defaults for required fields if not provided
+        # 3. Conditional validation for User Creation
+        create_user = attrs.get('create_user', False)
+        if create_user:
+            if not attrs.get('username'):
+                # Try to use email as default if not provided
+                if email:
+                    attrs['username'] = email
+                else:
+                    raise serializers.ValidationError({"username": "Username is required when creating a user account."})
+            
+            if not attrs.get('password'):
+                raise serializers.ValidationError({"password": "Password is required when creating a user account."})
+        else:
+            # If not creating a user, remove these fields to avoid validation errors downstream
+            attrs.pop('username', None)
+            attrs.pop('password', None)
+
+        # 4. Set defaults for required fields
         if not attrs.get('date_of_birth'):
             attrs['date_of_birth'] = date(1990, 1, 1)
         

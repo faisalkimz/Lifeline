@@ -233,6 +233,20 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         return null;
     };
 
+    // Helper function to handle Excel scientific notation for phone numbers
+    const cleanPhoneNumber = (val) => {
+        if (!val) return '';
+        const str = String(val).trim();
+        // Check if it's in scientific notation (e.g., 2.56782E+11)
+        if (str.includes('E+') || str.includes('e+')) {
+            const num = Number(str);
+            if (!isNaN(num)) {
+                return String(BigInt(Math.round(num)));
+            }
+        }
+        return str;
+    };
+
     const mapEmployeeData = (row) => {
         // Clean and trim all string values from the row
         const clean = (val) => (val === null || val === undefined) ? '' : String(val).trim();
@@ -303,7 +317,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             middle_name: get(['Middle Name', 'Middle name', 'middle_name']),
             last_name: get(['Last Name*', 'Last name *', 'Last Name', 'last_name']),
             email: get(['Email*', 'Email address *', 'Email', 'email', 'Email Address']).toLowerCase(), // Always lowercase email
-            phone: get(['Phone', 'Phone number *', 'phone', 'Telephone', 'Contact']),
+            phone: cleanPhoneNumber(get(['Phone', 'Phone number *', 'phone', 'Telephone', 'Contact'])),
             date_of_birth: dateOfBirth,
             gender: genderValue,
             marital_status: maritalStatus,
@@ -319,9 +333,6 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
             // System Access
             create_user: createAccount,
-            username: get(['Username', 'username', 'Username (for login) *']),
-            password: get(['Password', 'password', 'Custom Password *']),
-            role: accessRole,
 
             // Statutory
             national_id: get(['National ID*', 'National ID Number (NIN) *', 'National ID', 'national_id', 'NIN']),
@@ -333,14 +344,14 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             bank_name: get(['Bank Name', 'bank_name', 'Bank']),
             bank_account_number: get(['Bank Account Number', 'Account Number', 'bank_account_number']),
             bank_branch: get(['Bank Branch', 'bank_branch']),
-            mobile_money_number: get(['Mobile Money Number', 'mobile_money_number', 'Momo']),
+            mobile_money_number: cleanPhoneNumber(get(['Mobile Money Number', 'mobile_money_number', 'Momo'])),
 
             // Contact
             address: get(['Address', 'Street address', 'address']),
             city: get(['City', 'city']),
             district: get(['District', 'district']),
             emergency_contact_name: get(['Emergency Contact Name', 'Contact Name', 'emergency_contact_name']),
-            emergency_contact_phone: get(['Emergency Contact Phone', 'Phone Number', 'emergency_contact_phone']),
+            emergency_contact_phone: cleanPhoneNumber(get(['Emergency Contact Phone', 'Phone Number', 'emergency_contact_phone'])),
             emergency_contact_relationship: get(['Emergency Contact Relationship', 'Relationship', 'emergency_contact_relationship']),
             notes: get(['Notes', 'Additional Notes', 'notes', 'Internal use only']),
 
@@ -352,6 +363,13 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             lunch_allowance: parseFloat(get(['Lunch Allowance', 'lunch_allowance', 'Lunch'])) || 0,
             other_allowances: parseFloat(get(['Other Allowances', 'other_allowances', 'Other'])) || 0
         };
+
+        // Only include user fields if create_user is true
+        if (createAccount) {
+            employeeData.username = get(['Username', 'username', 'Username (for login) *']);
+            employeeData.password = get(['Password', 'password', 'Custom Password *']);
+            employeeData.role = accessRole;
+        }
 
         return employeeData;
     };

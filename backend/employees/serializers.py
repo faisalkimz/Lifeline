@@ -245,29 +245,47 @@ class EmployeeCreateSerializer(serializers.ModelSerializer):
         }
     
     def validate(self, attrs):
-        """Provide defaults for required fields if missing (for bulk uploads)"""
+        """Provide defaults for required fields if missing and normalize data."""
         from django.utils import timezone
         from datetime import date
+        from accounts.models import User
         
-        # Set defaults for required fields if not provided
+        # 1. Normalize Email
+        if attrs.get('email'):
+            attrs['email'] = attrs['email'].strip().lower()
+            
+        email = attrs.get('email')
+        request = self.context.get('request')
+        company = request.user.company if request else None
+
+        # 2. Check for duplicate email in current company (Employee)
+        if email and company:
+            if Employee.objects.filter(company=company, email=email).exists():
+                raise serializers.ValidationError({"email": "An employee with this email already exists in your company."})
+            
+            # 3. Check for duplicate email in User model (Global or per company depending on your User model)
+            # In your User model, unique_email_per_company constraint exists.
+            if User.objects.filter(company=company, email=email).exists():
+                raise serializers.ValidationError({"email": "A user account with this email already exists in your company."})
+
+        # 4. Set defaults for required fields if not provided
         if not attrs.get('date_of_birth'):
-            attrs['date_of_birth'] = date(1990, 1, 1)  # Default date
+            attrs['date_of_birth'] = date(1990, 1, 1)
         
         if not attrs.get('gender'):
-            attrs['gender'] = 'other'  # Default gender
+            attrs['gender'] = 'other'
         
         if not attrs.get('national_id'):
-            # Generate a temporary ID if not provided
             attrs['national_id'] = f"TEMP-{timezone.now().timestamp()}"
         
         if not attrs.get('phone'):
-            attrs['phone'] = '0000000000'  # Default phone
+            attrs['phone'] = '0000000000'
         
         if not attrs.get('job_title'):
-            attrs['job_title'] = 'Employee'  # Default job title
+            attrs['job_title'] = 'Employee'
         
         if not attrs.get('join_date'):
-            attrs['join_date'] = timezone.now().date()  # Default to today
+            attrs['join_date'] = timezone.now().date()
         
         return attrs
     

@@ -299,19 +299,19 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
         const employeeData = {
             // Identity
-            first_name: get(['First Name*', 'First Name', 'first_name']),
-            middle_name: get(['Middle Name', 'middle_name']),
-            last_name: get(['Last Name*', 'Last Name', 'last_name']),
-            email: get(['Email*', 'Email', 'email']),
-            phone: get(['Phone', 'phone', 'Telephone', 'Contact']),
+            first_name: get(['First Name*', 'First name *', 'First Name', 'first_name']),
+            middle_name: get(['Middle Name', 'Middle name', 'middle_name']),
+            last_name: get(['Last Name*', 'Last name *', 'Last Name', 'last_name']),
+            email: get(['Email*', 'Email address *', 'Email', 'email', 'Email Address']).toLowerCase(), // Always lowercase email
+            phone: get(['Phone', 'Phone number *', 'phone', 'Telephone', 'Contact']),
             date_of_birth: dateOfBirth,
             gender: genderValue,
             marital_status: maritalStatus,
 
             // Employment
-            job_title: get(['Job Title', 'job_title', 'Designation', 'Position']) || 'Employee',
+            job_title: get(['Job Title', "What's their job title? *", 'job_title', 'Designation', 'Position']) || 'Employee',
             department: departmentValue,
-            manager_email: get(['Manager Email', 'manager_email']),
+            manager_email: get(['Manager Email', 'Who do they report to?', 'manager_email']),
             employment_type: employmentType,
             employment_status: employmentStatus,
             join_date: joinDate || new Date().toISOString().split('T')[0],
@@ -319,38 +319,38 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
 
             // System Access
             create_user: createAccount,
-            username: get(['Username', 'username']),
-            password: get(['Password', 'password']),
+            username: get(['Username', 'username', 'Username (for login) *']),
+            password: get(['Password', 'password', 'Custom Password *']),
             role: accessRole,
 
             // Statutory
-            national_id: get(['National ID*', 'National ID', 'national_id', 'NIN']),
+            national_id: get(['National ID*', 'National ID Number (NIN) *', 'National ID', 'national_id', 'NIN']),
             passport_number: get(['Passport Number', 'passport_number']),
             tin_number: get(['TIN Number', 'tin_number', 'TIN']),
             nssf_number: get(['NSSF Number', 'nssf_number', 'NSSF']),
 
             // Finance
             bank_name: get(['Bank Name', 'bank_name', 'Bank']),
-            bank_account_number: get(['Bank Account Number', 'bank_account_number', 'Account Number']),
+            bank_account_number: get(['Bank Account Number', 'Account Number', 'bank_account_number']),
             bank_branch: get(['Bank Branch', 'bank_branch']),
             mobile_money_number: get(['Mobile Money Number', 'mobile_money_number', 'Momo']),
 
             // Contact
-            address: get(['Address', 'address']),
+            address: get(['Address', 'Street address', 'address']),
             city: get(['City', 'city']),
             district: get(['District', 'district']),
-            emergency_contact_name: get(['Emergency Contact Name', 'emergency_contact_name']),
-            emergency_contact_phone: get(['Emergency Contact Phone', 'emergency_contact_phone']),
-            emergency_contact_relationship: get(['Emergency Contact Relationship', 'emergency_contact_relationship']),
-            notes: get(['Notes', 'notes']),
+            emergency_contact_name: get(['Emergency Contact Name', 'Contact Name', 'emergency_contact_name']),
+            emergency_contact_phone: get(['Emergency Contact Phone', 'Phone Number', 'emergency_contact_phone']),
+            emergency_contact_relationship: get(['Emergency Contact Relationship', 'Relationship', 'emergency_contact_relationship']),
+            notes: get(['Notes', 'Additional Notes', 'notes', 'Internal use only']),
 
             // Salary
-            basic_salary: parseFloat(get(['Basic Salary', 'basic_salary', 'Salary'])) || 0,
-            housing_allowance: parseFloat(get(['Housing Allowance', 'housing_allowance'])) || 0,
-            transport_allowance: parseFloat(get(['Transport Allowance', 'transport_allowance'])) || 0,
-            medical_allowance: parseFloat(get(['Medical Allowance', 'medical_allowance'])) || 0,
-            lunch_allowance: parseFloat(get(['Lunch Allowance', 'lunch_allowance'])) || 0,
-            other_allowances: parseFloat(get(['Other Allowances', 'other_allowances'])) || 0
+            basic_salary: parseFloat(get(['Basic Salary', 'basic_salary', 'Salary', 'What is their basic monthly salary? *'])) || 0,
+            housing_allowance: parseFloat(get(['Housing Allowance', 'housing_allowance', 'Housing'])) || 0,
+            transport_allowance: parseFloat(get(['Transport Allowance', 'transport_allowance', 'Transport'])) || 0,
+            medical_allowance: parseFloat(get(['Medical Allowance', 'medical_allowance', 'Medical'])) || 0,
+            lunch_allowance: parseFloat(get(['Lunch Allowance', 'lunch_allowance', 'Lunch'])) || 0,
+            other_allowances: parseFloat(get(['Other Allowances', 'other_allowances', 'Other'])) || 0
         };
 
         return employeeData;
@@ -385,32 +385,20 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
             const data = await parseExcelFile(file);
             uploadResults.total = data.length;
 
-            // Check for duplicate emails in the upload batch
-            const emailSet = new Set();
-            const duplicateEmails = new Set();
-
-            for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                const employeeData = mapEmployeeData(row);
-
-                // Check for duplicates in batch
-                if (employeeData.email) {
-                    if (emailSet.has(employeeData.email.toLowerCase())) {
-                        duplicateEmails.add(employeeData.email.toLowerCase());
-                    } else {
-                        emailSet.add(employeeData.email.toLowerCase());
-                    }
-                }
-            }
+            // Duplicate detection logic: only flag subsequent occurrences
+            const seenInBatch = new Set();
 
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
                 const employeeData = mapEmployeeData(row);
                 const validationErrors = validateEmployee(employeeData);
 
-                // Check if email is duplicate in this batch
-                if (employeeData.email && duplicateEmails.has(employeeData.email.toLowerCase())) {
-                    validationErrors.push('Duplicate email in upload file');
+                // Check for batch duplicates correctly
+                if (employeeData.email) {
+                    if (seenInBatch.has(employeeData.email)) {
+                        validationErrors.push('Duplicate email later in same file');
+                    }
+                    seenInBatch.add(employeeData.email);
                 }
 
                 if (validationErrors.length > 0) {

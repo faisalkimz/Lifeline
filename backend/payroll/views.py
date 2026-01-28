@@ -381,10 +381,17 @@ class PayslipViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def generate_pdf(self, request, pk=None):
-        payslip = self.get_object()
-        from .services.payslip_generator import PayslipGenerator
-        pdf_url = PayslipGenerator.generate_pdf(payslip)
-        return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+        try:
+            payslip = self.get_object()
+            from .services.payslip_generator import PayslipGenerator
+            pdf_url = PayslipGenerator.generate_pdf(payslip)
+            return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+        except Exception as e:
+            logger.error(f"Failed to generate payslip PDF: {str(e)}")
+            return Response(
+                {'error': f'Failed to generate PDF: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     @action(detail=True, methods=['post'])
     def email_payslip(self, request, pk=None):

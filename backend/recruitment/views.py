@@ -305,7 +305,13 @@ class OfferLetterViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def generate_pdf(self, request, pk=None):
-        offer_letter = self.get_object()
-        from .services.offer_letter_generator import OfferLetterGenerator
-        pdf_url = OfferLetterGenerator.generate_pdf(offer_letter)
-        return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+        try:
+            offer_letter = self.get_object()
+            from .services.offer_letter_generator import OfferLetterGenerator
+            pdf_url = OfferLetterGenerator.generate_pdf(offer_letter)
+            return Response({'status': 'PDF generated', 'pdf_url': pdf_url})
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to generate PDF: {str(e)}'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

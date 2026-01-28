@@ -102,7 +102,13 @@ class OfferLetterGenerator:
         elements.append(Paragraph(f"{company.name}", body_style))
 
         # Build PDF
-        doc.build(elements)
+        try:
+            doc.build(elements)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error building PDF for offer letter {offer_letter.id}: {str(e)}")
+            raise e
         
         # Save to FileField
         filename = f"Offer_{offer_letter.application.candidate.last_name}_{offer_letter.id}.pdf"

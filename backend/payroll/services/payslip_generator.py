@@ -134,7 +134,7 @@ class PayslipGenerator:
         qr_img = qr.make_image(fill_color="black", back_color="white")
         
         qr_buffer = BytesIO()
-        qr_img.save(qr_buffer)
+        qr_img.save(qr_buffer, format='PNG')
         qr_buffer.seek(0)
         
         qr_platypus_img = Image(qr_buffer, width=1*inch, height=1*inch)
@@ -143,7 +143,13 @@ class PayslipGenerator:
         elements.append(Paragraph("Scan to Verify", ParagraphStyle('QRLabel', parent=normal_style, alignment=2, fontSize=8)))
 
         # Build PDF
-        doc.build(elements)
+        try:
+            doc.build(elements)
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error building PDF for payslip {payslip.id}: {str(e)}")
+            raise e
         
         # Save to FileField
         filename = f"Payslip_{employee.last_name}_{payslip.payroll_run.month}_{payslip.payroll_run.year}.pdf"

@@ -42,8 +42,13 @@ class FormSubmissionViewSet(viewsets.ModelViewSet):
         employee = getattr(self.request.user, 'employee', None)
         serializer.save(employee=employee)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    @action(detail=True, methods=['post'])
     def review(self, request, pk=None):
+        # Allow super_admin, company_admin, hr_manager to review
+        if request.user.role not in ['super_admin', 'company_admin', 'hr_manager']:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You do not have permission to review forms.")
+        
         submission = self.get_object()
         submission.status = request.data.get('status', submission.status)
         submission.review_notes = request.data.get('review_notes', '')

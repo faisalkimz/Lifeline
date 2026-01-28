@@ -91,26 +91,26 @@ const DepartmentListPage = () => {
                     <DialogTrigger asChild>
                         <Button
                             onClick={handleNewDepartment}
-                            className="bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-900/20"
+                            className="bg-gray-900 text-white hover:bg-gray-800 shadow-lg shadow-slate-900/20"
                         >
                             <Plus className="h-4 w-4 mr-2" /> New Department
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-md bg-white border-0 rounded-2xl p-0 overflow-hidden shadow-2xl">
                         <div className="bg-white px-8 pt-8 pb-4">
-                            <DialogTitle className="text-2xl font-semibold text-slate-900 tracking-tight">
+                            <DialogTitle className="text-2xl font-semibold text-gray-900 tracking-tight">
                                 {isEditMode ? 'Edit department' : 'Create a new department'}
                             </DialogTitle>
-                            <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+                            <p className="text-gray-500 mt-2 text-sm leading-relaxed">
                                 Departments help you organize your team and manage permissions effectively.
                             </p>
                         </div>
 
                         <form onSubmit={handleSubmit} className="px-8 pb-8 pt-4 space-y-8">
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-slate-700">Department Name</label>
+                                <label className="text-sm font-semibold text-gray-700">Department Name</label>
                                 <input
-                                    className="w-full h-12 px-4 border border-slate-200 rounded-xl focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400"
+                                    className="w-full h-12 px-4 border border-gray-200 rounded-xl focus:ring-1 focus:ring-slate-900 focus:border-slate-900 outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                     required
@@ -118,9 +118,9 @@ const DepartmentListPage = () => {
                                 />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-slate-700">What do they do? (Optional)</label>
+                                <label className="text-sm font-semibold text-gray-700">What do they do? (Optional)</label>
                                 <textarea
-                                    className="w-full min-h-[120px] p-4 border border-slate-200 rounded-xl focus:ring-1 focus:ring-slate-900 focus:border-slate-900 resize-none outline-none transition-all font-medium text-slate-900 placeholder:text-slate-400 text-sm leading-relaxed"
+                                    className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl focus:ring-1 focus:ring-slate-900 focus:border-slate-900 resize-none outline-none transition-all font-medium text-gray-900 placeholder:text-gray-400 text-sm leading-relaxed"
                                     rows="3"
                                     value={formData.description}
                                     onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -132,13 +132,13 @@ const DepartmentListPage = () => {
                                     type="button"
                                     onClick={() => setIsDialogOpen(false)}
                                     variant="ghost"
-                                    className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg transition-colors"
+                                    className="h-11 px-6 text-gray-600 font-semibold hover:bg-gray-50 rounded-lg transition-colors"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
-                                    className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm transition-all"
+                                    className="h-11 px-8 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg shadow-sm transition-all"
                                 >
                                     {isEditMode ? 'Update department' : 'Create department'}
                                 </Button>

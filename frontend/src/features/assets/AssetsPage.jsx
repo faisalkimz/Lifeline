@@ -134,8 +134,8 @@ const AssetsPage = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Assets Management</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Track and manage company hardware and licenses</p>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Assets Management</h1>
+                    <p className="text-gray-500 dark:text-gray-400">Track and manage company hardware and licenses</p>
                 </div>
                 <div className="flex gap-2">
                     <button
@@ -164,15 +164,15 @@ const AssetsPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 {/* Toolbar */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                <div className="p-4 border-b border-gray-200 flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div className="flex bg-gray-100 rounded-lg p-1">
                         {['inventory', 'categories'].map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${activeTab === tab ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                                className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${activeTab === tab ? 'bg-white dark:bg-slate-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-slate-300'
                                     }`}
                             >
                                 {tab}
@@ -182,7 +182,7 @@ const AssetsPage = () => {
 
                     <div className="flex gap-2 w-full sm:w-auto">
                         <div className="relative flex-1 sm:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
                                 placeholder="Search assets..."
@@ -192,7 +192,7 @@ const AssetsPage = () => {
                             />
                         </div>
                         <div className="relative">
-                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <select
                                 className="pl-10 input-workpay appearance-none pr-8"
                                 value={filterStatus}
@@ -226,18 +226,18 @@ const AssetsPage = () => {
                                 {isLoading ? (
                                     <tr><td colSpan="6" className="text-center py-8">Loading assets...</td></tr>
                                 ) : filteredAssets?.length === 0 ? (
-                                    <tr><td colSpan="6" className="text-center py-8 text-slate-500">No assets found</td></tr>
+                                    <tr><td colSpan="6" className="text-center py-8 text-gray-500">No assets found</td></tr>
                                 ) : (
                                     filteredAssets?.map(asset => (
                                         <tr key={asset.id} className="group">
                                             <td className="font-medium">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+                                                    <div className="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
                                                         {getIconForCategory(asset.category_details?.name)}
                                                     </div>
                                                     <div>
-                                                        <p className="text-slate-900 dark:text-white font-medium">{asset.name}</p>
-                                                        <p className="text-xs text-slate-500">Purchased: {asset.purchase_date || 'N/A'}</p>
+                                                        <p className="text-gray-900 dark:text-white font-medium">{asset.name}</p>
+                                                        <p className="text-xs text-gray-500">Purchased: {asset.purchase_date || 'N/A'}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -245,7 +245,7 @@ const AssetsPage = () => {
                                             <td>
                                                 <div className="flex flex-col">
                                                     <span className="text-xs font-mono">{asset.serial_number}</span>
-                                                    <span className="text-[10px] text-slate-400">Tag: {asset.asset_tag || '-'}</span>
+                                                    <span className="text-[10px] text-gray-400">Tag: {asset.asset_tag || '-'}</span>
                                                 </div>
                                             </td>
                                             <td>
@@ -260,7 +260,7 @@ const AssetsPage = () => {
                                                         <span className="text-sm">{asset.assigned_to_details.first_name} {asset.assigned_to_details.last_name}</span>
                                                     </div>
                                                 ) : (
-                                                    <span className="text-slate-400 text-xs italic">Unassigned</span>
+                                                    <span className="text-gray-400 text-xs italic">Unassigned</span>
                                                 )}
                                             </td>
                                             <td>
@@ -269,7 +269,7 @@ const AssetsPage = () => {
                                                         <button
                                                             onClick={() => { setSelectedAsset(asset); setIsAssignModalOpen(true); }}
                                                             title="Assign Asset"
-                                                            className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-primary-600 transition-colors"
+                                                            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-primary-600 transition-colors"
                                                         >
                                                             <User className="h-4 w-4" />
                                                         </button>
@@ -278,20 +278,20 @@ const AssetsPage = () => {
                                                         <button
                                                             onClick={() => handleReturn(asset)}
                                                             title="Return Asset"
-                                                            className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-orange-600 transition-colors"
+                                                            className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-orange-600 transition-colors"
                                                         >
                                                             <RotateCcw className="h-4 w-4" />
                                                         </button>
                                                     )}
                                                     <button
                                                         onClick={() => { setSelectedAsset(asset); setIsAddModalOpen(true); }}
-                                                        className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition-colors"
+                                                        className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-blue-600 transition-colors"
                                                     >
                                                         <PenSquare className="h-4 w-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(asset.id)}
-                                                        className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-red-600 transition-colors"
+                                                        className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-red-600 transition-colors"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -319,8 +319,8 @@ const AssetsPage = () => {
                             <tbody>
                                 {categoriesList.map(cat => (
                                     <tr key={cat.id}>
-                                        <td className="font-medium text-slate-900 dark:text-white capitalize">{cat.name}</td>
-                                        <td className="text-slate-500">{cat.description || '-'}</td>
+                                        <td className="font-medium text-gray-900 dark:text-white capitalize">{cat.name}</td>
+                                        <td className="text-gray-500">{cat.description || '-'}</td>
                                         <td>
                                             <span className="badge-workpay badge-neutral">
                                                 {assetsList.filter(a => a.category === cat.id).length} Items
@@ -337,41 +337,41 @@ const AssetsPage = () => {
             {/* Add/Edit Asset Modal */}
             {isAddModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in border border-gray-200">
                         <h2 className="text-xl font-bold mb-4">{selectedAsset ? 'Edit Asset' : 'Add New Asset'}</h2>
                         <form onSubmit={handleCreateAsset} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Name *</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Name *</label>
                                     <input name="name" required defaultValue={selectedAsset?.name} className="input-workpay" placeholder="e.g. MacBook Pro" />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Category</label>
                                     <select name="category" defaultValue={selectedAsset?.category} className="input-workpay">
                                         <option value="">Select Category</option>
                                         {categoriesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Serial Number</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Serial Number</label>
                                     <input name="serial_number" defaultValue={selectedAsset?.serial_number} className="input-workpay" placeholder="S/N 12345" />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Asset Tag</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Asset Tag</label>
                                     <input name="asset_tag" defaultValue={selectedAsset?.asset_tag} className="input-workpay" placeholder="TAG-001" />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Purchase Date</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Purchase Date</label>
                                     <input name="purchase_date" type="date" defaultValue={selectedAsset?.purchase_date} className="input-workpay" />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Cost (UGX)</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Cost (UGX)</label>
                                     <input name="purchase_cost" type="number" defaultValue={selectedAsset?.purchase_cost} className="input-workpay" />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Condition</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Condition</label>
                                 <select name="condition" defaultValue={selectedAsset?.condition || 'new'} className="input-workpay">
                                     <option value="new">New</option>
                                     <option value="excellent">Excellent</option>
@@ -394,13 +394,13 @@ const AssetsPage = () => {
             {/* Assign Modal */}
             {isAssignModalOpen && selectedAsset && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-gray-200">
                         <h2 className="text-xl font-bold mb-1">Assign Asset</h2>
-                        <p className="text-sm text-slate-500 mb-4">Assigning <strong>{selectedAsset.name}</strong> to an employee.</p>
+                        <p className="text-sm text-gray-500 mb-4">Assigning <strong>{selectedAsset.name}</strong> to an employee.</p>
 
                         <form onSubmit={handleAssign} className="space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Employee *</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Select Employee *</label>
                                 <select name="employee_id" required className="input-workpay">
                                     <option value="">-- Choose Employee --</option>
                                     {employees?.map(emp => (
@@ -409,11 +409,11 @@ const AssetsPage = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Assignment Date</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Assignment Date</label>
                                 <input name="assigned_date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="input-workpay" />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes (Optional)</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Notes (Optional)</label>
                                 <textarea name="notes" rows="3" className="input-workpay" placeholder="Any specific notes upon checkout..." />
                             </div>
 
@@ -429,15 +429,15 @@ const AssetsPage = () => {
             {/* Add Category Modal */}
             {isCategoryModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                    <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-gray-200">
                         <h2 className="text-xl font-bold mb-4">Create Asset Category</h2>
                         <form onSubmit={handleCreateCategory} className="space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Category Name *</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Category Name *</label>
                                 <input name="name" required className="input-workpay" placeholder="e.g. Laptops, Furniture" />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+                                <label className="text-sm font-medium text-gray-700 dark:text-slate-300">Description</label>
                                 <textarea name="description" rows="3" className="input-workpay" placeholder="Describe this category..." />
                             </div>
                             <div className="flex justify-end gap-3 mt-6">
@@ -453,13 +453,13 @@ const AssetsPage = () => {
 };
 
 const StatCard = ({ label, value, icon: Icon, color }) => (
-    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
+    <div className="bg-white dark:bg-gray-900 p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-4">
         <div className={`h-12 w-12 rounded-full ${color.replace('bg-', 'bg-').replace('500', '100')} dark:bg-opacity-20 flex items-center justify-center text-${color.replace('bg-', '')}`}>
             <Icon className={`h-6 w-6 text-${color.replace('bg-', 'text-')}`} />
         </div>
         <div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">{label}</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">{label}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
         </div>
     </div>
 );

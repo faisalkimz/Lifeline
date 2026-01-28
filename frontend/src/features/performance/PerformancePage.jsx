@@ -197,8 +197,8 @@ const GoalsSection = ({ user }) => {
                                     <Target className="h-6 w-6 text-primary-600" />
                                 </div>
                                 <div>
-                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Create New Goal</DialogTitle>
-                                    <p className="text-slate-500 mt-1 font-medium text-sm">Define clear objectives to track your progress.</p>
+                                    <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Create New Goal</DialogTitle>
+                                    <p className="text-gray-500 mt-1 font-medium text-sm">Define clear objectives to track your progress.</p>
                                 </div>
                             </div>
                             <form onSubmit={handleSubmit} className="p-6 space-y-5">

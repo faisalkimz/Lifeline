@@ -58,10 +58,10 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                         <FileText className="h-7 w-7 text-violet-600" />
                     </div>
                     <div>
-                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+                        <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">
                             Let's make it official
                         </DialogTitle>
-                        <p className="text-slate-500 mt-1 font-medium">
+                        <p className="text-gray-500 mt-1 font-medium">
                             Draft an offer for {application?.candidate?.first_name || 'the candidate'}
                         </p>
                     </div>
@@ -72,12 +72,12 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                         <div className="space-y-8">
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-slate-700">What's the starting salary? (UGX)</label>
+                                    <label className="text-sm font-semibold text-gray-700">What's the starting salary? (UGX)</label>
                                     <div className="relative">
-                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">UGX</div>
+                                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-semibold">UGX</div>
                                         <Input
                                             type="number"
-                                            className="pl-12 h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                            className="pl-12 h-12 bg-gray-50 border-gray-200 focus:bg-white transition-all"
                                             value={offerData.salary_offered}
                                             onChange={e => setOfferData({ ...offerData, salary_offered: e.target.value })}
                                             placeholder="e.g. 120,000,000"
@@ -85,10 +85,10 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                                     </div>
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-sm font-semibold text-slate-700">When do they start?</label>
+                                    <label className="text-sm font-semibold text-gray-700">When do they start?</label>
                                     <Input
                                         type="date"
-                                        className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                        className="h-12 bg-gray-50 border-gray-200 focus:bg-white transition-all"
                                         value={offerData.start_date}
                                         onChange={e => setOfferData({ ...offerData, start_date: e.target.value })}
                                     />
@@ -96,30 +96,30 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-semibold text-slate-700">When does this offer expire?</label>
+                                <label className="text-sm font-semibold text-gray-700">When does this offer expire?</label>
                                 <Input
                                     type="date"
-                                    className="h-12 bg-slate-50 border-slate-200 focus:bg-white transition-all"
+                                    className="h-12 bg-gray-50 border-gray-200 focus:bg-white transition-all"
                                     value={offerData.expiry_date}
                                     onChange={e => setOfferData({ ...offerData, expiry_date: e.target.value })}
                                 />
-                                <p className="text-xs text-slate-500">Usually 1-2 weeks from now gives them enough time.</p>
+                                <p className="text-xs text-gray-500">Usually 1-2 weeks from now gives them enough time.</p>
                             </div>
 
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-semibold text-slate-700">Personalize the email</label>
+                                    <label className="text-sm font-semibold text-gray-700">Personalize the email</label>
                                     <span className="text-xs px-2 py-1 rounded-full bg-indigo-50 text-indigo-600 font-medium">✨ Pro tip: Be warm and welcoming</span>
                                 </div>
                                 <textarea
-                                    className="w-full h-48 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:ring-2 focus:ring-violet-500 focus:bg-white focus:border-transparent outline-none resize-none transition-all leading-relaxed"
+                                    className="w-full h-48 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 focus:ring-2 focus:ring-violet-500 focus:bg-white focus:border-transparent outline-none resize-none transition-all leading-relaxed"
                                     value={offerData.content}
                                     onChange={e => setOfferData({ ...offerData, content: e.target.value })}
                                 />
-                                <div className="flex gap-2 text-xs text-slate-400">
-                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Salary]</span>
-                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Date]</span>
-                                    <span className="px-2 py-1 bg-slate-100 rounded border border-slate-200">[Expiry Date]</span>
+                                <div className="flex gap-2 text-xs text-gray-400">
+                                    <span className="px-2 py-1 bg-gray-100 rounded border border-gray-200">[Salary]</span>
+                                    <span className="px-2 py-1 bg-gray-100 rounded border border-gray-200">[Date]</span>
+                                    <span className="px-2 py-1 bg-gray-100 rounded border border-gray-200">[Expiry Date]</span>
                                 </div>
                             </div>
                         </div>
@@ -133,15 +133,15 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                                 <Briefcase className="h-10 w-10 text-white" />
                             </motion.div>
                             <div>
-                                <h3 className="text-2xl font-bold text-slate-900">Offer Letter Ready! 🎉</h3>
-                                <p className="text-slate-500 mt-2 max-w-sm mx-auto leading-relaxed">
-                                    We've generated a beautiful PDF for you. Download it to review, then send it over to <span className="font-semibold text-slate-700">{application?.candidate?.first_name}</span>.
+                                <h3 className="text-2xl font-bold text-gray-900">Offer Letter Ready! 🎉</h3>
+                                <p className="text-gray-500 mt-2 max-w-sm mx-auto leading-relaxed">
+                                    We've generated a beautiful PDF for you. Download it to review, then send it over to <span className="font-semibold text-gray-700">{application?.candidate?.first_name}</span>.
                                 </p>
                             </div>
                             <Button
                                 onClick={handleGeneratePdf}
                                 disabled={isGenerating}
-                                className="h-14 px-8 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 gap-3"
+                                className="h-14 px-8 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 gap-3"
                             >
                                 {isGenerating ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="h-5 w-5" />}
                                 Download Confirmation PDF
@@ -150,8 +150,8 @@ const OfferLetterModal = ({ isOpen, onClose, application }) => {
                     )}
                 </div>
 
-                <DialogFooter className="px-8 py-6 bg-slate-50 border-t border-slate-100 flex justify-end gap-4">
-                    <Button variant="ghost" onClick={onClose} className="text-slate-500 hover:text-slate-700 font-semibold">
+                <DialogFooter className="px-8 py-6 bg-gray-50 border-t border-slate-100 flex justify-end gap-4">
+                    <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700 font-semibold">
                         Nevermind
                     </Button>
                     {step === 'form' && (

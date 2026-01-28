@@ -52,11 +52,11 @@ const ForgotPasswordPage = () => {
                             >
                                 <Shield className="h-8 w-8" />
                             </motion.div>
-                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Recovery Mode</h2>
-                            <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">We'll send a secure reset link to your email</p>
+                            <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Recovery Mode</h2>
+                            <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">We'll send a secure reset link to your email</p>
                         </div>
 
-                        <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-slate-900/50 lg:border border-slate-100 dark:border-slate-800 backdrop-blur-sm">
+                        <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-gray-900/50 lg:border border-slate-100 backdrop-blur-sm">
                             <CardContent className="p-0 sm:p-8">
                                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                                     <div className="space-y-2">
@@ -67,7 +67,7 @@ const ForgotPasswordPage = () => {
                                             error={errors.email?.message}
                                             {...register('email')}
                                         />
-                                        <p className="text-xs text-slate-400 px-1 font-medium flex items-center gap-1.5">
+                                        <p className="text-xs text-gray-400 px-1 font-medium flex items-center gap-1.5">
                                             <Mail className="h-3 w-3" />
                                             Enter the email associated with your account
                                         </p>
@@ -90,7 +90,7 @@ const ForgotPasswordPage = () => {
                                                 variant="ghost"
                                                 fullWidth
                                                 size="lg"
-                                                className="rounded-xl h-12 font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+                                                className="rounded-xl h-12 font-bold text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-slate-100"
                                             >
                                                 <ArrowLeft className="h-4 w-4 mr-2" />
                                                 Back to Sign In
@@ -100,10 +100,10 @@ const ForgotPasswordPage = () => {
                                 </form>
                             </CardContent>
 
-                            <CardFooter className="flex justify-center p-8 border-t border-slate-50 dark:border-slate-800/50">
+                            <CardFooter className="flex justify-center p-8 border-t border-slate-50/50">
                                 <div className="text-center space-y-1">
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Security Notice</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+                                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Security Notice</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 max-w-sm">
                                         For your protection, you'll only receive an email if your account exists.
                                     </p>
                                 </div>
@@ -125,15 +125,15 @@ const ForgotPasswordPage = () => {
                             >
                                 <CheckCircle2 className="h-10 w-10" />
                             </motion.div>
-                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Check Your Inbox</h2>
-                            <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">Reset instructions are on the way</p>
+                            <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Check Your Inbox</h2>
+                            <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">Reset instructions are on the way</p>
                         </div>
 
-                        <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-slate-900/50 lg:border border-slate-100 dark:border-slate-800 backdrop-blur-sm">
+                        <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-gray-900/50 lg:border border-slate-100 backdrop-blur-sm">
                             <CardContent className="p-8 sm:p-10">
                                 <div className="space-y-6 text-center">
-                                    <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 space-y-3">
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                    <div className="bg-gray-50/50 rounded-2xl p-6 space-y-3">
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white">
                                             We've sent a password reset link to:
                                         </p>
                                         <p className="text-lg font-black text-primary-600 dark:text-primary-400">
@@ -141,7 +141,7 @@ const ForgotPasswordPage = () => {
                                         </p>
                                     </div>
 
-                                    <div className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                                    <div className="space-y-3 text-sm text-gray-600 dark:text-gray-400">
                                         <div className="flex items-start gap-3 p-4 bg-indigo-50 dark:bg-indigo-900/10 rounded-xl border border-indigo-100 dark:border-indigo-900/20">
                                             <div className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center flex-shrink-0 text-xs font-black mt-0.5">
                                                 1

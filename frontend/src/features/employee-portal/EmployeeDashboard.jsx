@@ -35,7 +35,7 @@ const EmployeeDashboard = () => {
     const formattedDate = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
     const quickActions = [
-        { name: 'My Payslips', href: '/employee/payslips', icon: CreditCard, color: 'bg-emerald-600' },
+        { name: 'My Payslips', href: '/employee/payslips', icon: CreditCard, color: 'bg-primary-600' },
         { name: 'Request Leave', href: '/employee/leave', icon: Calendar, color: 'bg-primary-600' },
         { name: 'Clock In/Out', href: '/employee/attendance', icon: Clock, color: 'bg-indigo-600' },
         { name: 'My Documents', href: '/employee/documents', icon: FileText, color: 'bg-amber-600' },
@@ -55,8 +55,8 @@ const EmployeeDashboard = () => {
             value: todayAttendance?.clock_in ? 'On Duty' : 'Pending',
             unit: '',
             icon: Activity,
-            color: todayAttendance?.clock_in ? 'text-emerald-600' : 'text-slate-400',
-            bg: todayAttendance?.clock_in ? 'bg-emerald-50' : 'bg-slate-50'
+            color: todayAttendance?.clock_in ? 'text-primary-600' : 'text-gray-400',
+            bg: todayAttendance?.clock_in ? 'bg-primary-50' : 'bg-gray-50'
         },
         {
             label: 'Pending Requests',
@@ -74,7 +74,7 @@ const EmployeeDashboard = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-2xl border border-gray-200 shadow-sm overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 rounded-full -mt-20 -mr-20 opacity-50"></div>
                 <div className="relative z-10 flex items-center gap-6">
-                    <div className="h-20 w-20 rounded-2xl bg-slate-900 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-slate-200">
+                    <div className="h-20 w-20 rounded-2xl bg-gray-900 flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-slate-200">
                         {user.first_name?.[0]}
                     </div>
                     <div>
@@ -95,7 +95,7 @@ const EmployeeDashboard = () => {
                 </div>
                 <div className="relative z-10 flex gap-3">
                     <Link to="/employee/attendance">
-                        <Button className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-4 h-auto rounded-xl">
+                        <Button className="bg-gray-900 hover:bg-gray-800 text-white font-bold px-6 py-4 h-auto rounded-xl">
                             <Clock className="h-5 w-5 mr-2" />
                             Attendance Clock
                         </Button>
@@ -151,7 +151,7 @@ const EmployeeDashboard = () => {
                     <Card className="border border-gray-200 shadow-sm overflow-hidden bg-white rounded-2xl">
                         <div className="px-8 py-5 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-emerald-500" />
+                                <Activity className="h-5 w-5 text-primary-500" />
                                 <h3 className="font-bold text-gray-900 font-black uppercase tracking-tight">Today's Timeline</h3>
                             </div>
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -163,7 +163,7 @@ const EmployeeDashboard = () => {
                                 <div className="space-y-2">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Clock In</p>
                                     <div className="flex items-center gap-3">
-                                        <div className={`h-3 w-3 rounded-full ${todayAttendance?.clock_in ? 'bg-emerald-500 animate-pulse' : 'bg-slate-200'}`}></div>
+                                        <div className={`h-3 w-3 rounded-full ${todayAttendance?.clock_in ? 'bg-primary-500 animate-pulse' : 'bg-slate-200'}`}></div>
                                         <p className="text-2xl font-black text-gray-900">
                                             {todayAttendance?.clock_in ? new Date(todayAttendance.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
                                         </p>
@@ -177,7 +177,7 @@ const EmployeeDashboard = () => {
                                 </div>
                                 <div className="hidden lg:block space-y-2 border-l border-gray-100 pl-12">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Duty Status</p>
-                                    <p className="text-sm font-bold text-slate-500 mt-2">
+                                    <p className="text-sm font-bold text-gray-500 mt-2">
                                         {todayAttendance?.clock_in
                                             ? todayAttendance?.clock_out ? "Shift Completed" : "Currently On Duty"
                                             : "Awaiting Clock-in"}
@@ -205,15 +205,15 @@ const EmployeeDashboard = () => {
                                 {payslips.length > 0 ? payslips.map((payslip, i) => (
                                     <div key={payslip.id} className="px-8 py-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
                                         <div className="flex items-center gap-5">
-                                            <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 group-hover:scale-110 transition-transform">
-                                                <DollarSign className="h-6 w-6 text-emerald-600" />
+                                            <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-emerald-100 group-hover:scale-110 transition-transform">
+                                                <DollarSign className="h-6 w-6 text-primary-600" />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-black text-gray-900 group-hover:text-primary-600 transition-colors">
                                                     {payslip.payroll_period || 'Payslip'}
                                                 </p>
                                                 <p className="text-xs font-semibold text-gray-400 mt-1 uppercase tracking-tight flex items-center gap-2">
-                                                    <CheckCircle className="h-3 w-3 text-emerald-500" /> Remitted
+                                                    <CheckCircle className="h-3 w-3 text-primary-500" /> Remitted
                                                 </p>
                                             </div>
                                         </div>
@@ -230,7 +230,7 @@ const EmployeeDashboard = () => {
                                         </div>
                                     </div>
                                 )) : (
-                                    <div className="p-12 text-center text-slate-400">
+                                    <div className="p-12 text-center text-gray-400">
                                         <p className="text-sm font-bold uppercase tracking-widest">No payslips found yet</p>
                                     </div>
                                 )}
@@ -242,7 +242,7 @@ const EmployeeDashboard = () => {
                 {/* Right Sidebar */}
                 <div className="space-y-8">
                     {/* Annual Leave Progress */}
-                    <Card className="bg-slate-900 text-white border-none shadow-2xl relative overflow-hidden group rounded-2xl">
+                    <Card className="bg-gray-900 text-white border-none shadow-2xl relative overflow-hidden group rounded-2xl">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mt-8 -mr-8 blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
                         <CardContent className="p-8 relative z-10">
                             <h3 className="font-black text-sm mb-6 flex items-center gap-2 uppercase tracking-widest text-white/90">
@@ -270,7 +270,7 @@ const EmployeeDashboard = () => {
                                     )}
                             </div>
                             <Link to="/employee/leave">
-                                <Button className="w-full mt-8 bg-white text-slate-900 hover:bg-gray-100 border-none font-black uppercase tracking-widest py-6 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95">
+                                <Button className="w-full mt-8 bg-white text-gray-900 hover:bg-gray-100 border-none font-black uppercase tracking-widest py-6 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95">
                                     Request Time Off
                                 </Button>
                             </Link>
@@ -288,10 +288,10 @@ const EmployeeDashboard = () => {
                                 <div className="relative">
                                     <div className="flex justify-between items-center mb-3">
                                         <span className="text-lg font-black text-gray-900">Live</span>
-                                        <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded">Active Account</span>
+                                        <span className="text-xs font-bold text-primary-500 uppercase tracking-widest bg-primary-50 px-2 py-1 rounded">Active Account</span>
                                     </div>
                                     <div className="w-full bg-gray-100 rounded-full h-3 overflow-hidden p-0.5">
-                                        <div className="bg-emerald-500 h-full rounded-full" style={{ width: '100%' }}></div>
+                                        <div className="bg-primary-500 h-full rounded-full" style={{ width: '100%' }}></div>
                                     </div>
                                 </div>
                                 <Link to="/employee/profile">

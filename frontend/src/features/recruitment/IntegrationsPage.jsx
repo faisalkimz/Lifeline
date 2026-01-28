@@ -39,12 +39,12 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
         <Card className="rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col h-full bg-white group border-b-4 border-b-slate-900/5">
             <div className="p-8 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-8">
-                    <div className={`h-16 w-16 rounded-[1.5rem] ${isConnected ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-400'} flex items-center justify-center transition-all duration-500 shadow-inner ring-4 ring-slate-50`}>
+                    <div className={`h-16 w-16 rounded-[1.5rem] ${isConnected ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-400'} flex items-center justify-center transition-all duration-500 shadow-inner ring-4 ring-slate-50`}>
                         <Icon className="h-8 w-8" />
                     </div>
                     {isConnected && (
-                        <div className="flex items-center gap-3 bg-slate-50 p-1.5 rounded-full border border-slate-100">
-                            <span className={`text-[10px] font-black uppercase tracking-widest pl-3 ${integration.is_active ? 'text-blue-600' : 'text-slate-400'}`}>
+                        <div className="flex items-center gap-3 bg-gray-50 p-1.5 rounded-full border border-slate-100">
+                            <span className={`text-[10px] font-black uppercase tracking-widest pl-3 ${integration.is_active ? 'text-blue-600' : 'text-gray-400'}`}>
                                 {integration.is_active ? 'Live' : 'Stopped'}
                             </span>
                             <Switch
@@ -55,35 +55,35 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
                     )}
                 </div>
 
-                <h3 className="text-2xl font-black text-slate-900 mb-3 tracking-tight flex items-center gap-2">
+                <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight flex items-center gap-2">
                     {platform.name}
-                    {isConnected && integration.is_active && <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />}
+                    {isConnected && integration.is_active && <div className="h-2 w-2 rounded-full bg-primary-500 animate-pulse" />}
                 </h3>
-                <p className="text-slate-500 leading-relaxed mb-6 text-sm font-medium">{platform.description}</p>
+                <p className="text-gray-500 leading-relaxed mb-6 text-sm font-medium">{platform.description}</p>
 
                 {isConnected && (
                     <div className="mb-8 grid grid-cols-2 gap-3">
-                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Handshake</p>
-                            <p className="text-xs font-bold text-slate-700">AES-256 Encrypted</p>
+                        <div className="bg-gray-50/50 p-3 rounded-2xl border border-slate-100">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Handshake</p>
+                            <p className="text-xs font-bold text-gray-700">AES-256 Encrypted</p>
                         </div>
-                        <div className="bg-slate-50/50 p-3 rounded-2xl border border-slate-100">
-                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Data Flow</p>
-                            <p className="text-xs font-bold text-slate-700">Bidirectional</p>
+                        <div className="bg-gray-50/50 p-3 rounded-2xl border border-slate-100">
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Data Flow</p>
+                            <p className="text-xs font-bold text-gray-700">Bidirectional</p>
                         </div>
                     </div>
                 )}
 
                 <div className="flex flex-wrap gap-2.5 mt-auto">
                     {platform.features.map((feature, index) => (
-                        <span key={index} className="px-4 py-1.5 bg-slate-50 text-slate-600 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-100/50">
+                        <span key={index} className="px-4 py-1.5 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-xl border border-slate-100/50">
                             {feature}
                         </span>
                     ))}
                 </div>
             </div>
 
-            <div className={`p-6 border-t border-slate-50 ${isConnected ? 'bg-slate-50/30' : 'bg-white'} transition-colors duration-500`}>
+            <div className={`p-6 border-t border-slate-50 ${isConnected ? 'bg-gray-50/30' : 'bg-white'} transition-colors duration-500`}>
                 {isConnected ? (
                     <div className="flex flex-col gap-3">
                         <div className="flex gap-3">
@@ -91,7 +91,7 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
                                 variant="outline"
                                 disabled={isTesting || !integration.is_active}
                                 onClick={handleTest}
-                                className="flex-1 rounded-2xl border-slate-200 bg-white hover:bg-slate-50 h-14 text-xs font-black uppercase tracking-widest"
+                                className="flex-1 rounded-2xl border-gray-200 bg-white hover:bg-gray-50 h-14 text-xs font-black uppercase tracking-widest"
                             >
                                 {isTesting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Verify Health"}
                             </Button>
@@ -106,7 +106,7 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
                         <Button
                             variant="ghost"
                             onClick={() => onConnect(platform)}
-                            className="w-full h-10 rounded-xl text-slate-400 hover:text-slate-600 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                            className="w-full h-10 rounded-xl text-gray-400 hover:text-gray-600 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
                         >
                             <Settings2 className="h-3.5 w-3.5" />
                             Update Credentials
@@ -115,7 +115,7 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
                 ) : (
                     <Button
                         onClick={() => onConnect(platform)}
-                        className="w-full h-14 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-widest shadow-xl shadow-slate-900/10 transition-transform active:scale-[0.98]"
+                        className="w-full h-14 rounded-2xl bg-gray-900 text-white hover:bg-gray-800 font-black uppercase tracking-widest shadow-xl shadow-slate-900/10 transition-transform active:scale-[0.98]"
                     >
                         <Zap className="h-4 w-4 mr-2" /> Establish Handshake
                     </Button>
@@ -305,13 +305,13 @@ const IntegrationsPage = () => {
         <div className="space-y-10 pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">Integrations Hub</h1>
-                    <p className="text-slate-500 mt-2 text-lg">Centralized management for enterprise external services.</p>
+                    <h1 className="text-4xl font-black text-gray-900 tracking-tight">Integrations Hub</h1>
+                    <p className="text-gray-500 mt-2 text-lg">Centralized management for enterprise external services.</p>
                 </div>
             </div>
 
             {/* Category Tabs */}
-            <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-[1.25rem] w-fit">
+            <div className="flex flex-wrap gap-2 p-1.5 bg-gray-100 rounded-[1.25rem] w-fit">
                 {categories.map(cat => {
                     const Icon = cat.icon;
                     const isActive = activeTab === cat.id;
@@ -320,8 +320,8 @@ const IntegrationsPage = () => {
                             key={cat.id}
                             onClick={() => setActiveTab(cat.id)}
                             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-sm font-bold transition-all duration-300 ${isActive
-                                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/50'
-                                : 'text-slate-500 hover:text-slate-800 hover:bg-white/40'
+                                ? 'bg-white text-gray-900 shadow-sm border border-gray-200/50'
+                                : 'text-gray-500 hover:text-slate-800 hover:bg-white/40'
                                 }`}
                         >
                             <Icon className={`h-4.5 w-4.5 ${isActive ? 'text-blue-600' : ''}`} />
@@ -365,15 +365,15 @@ const IntegrationsPage = () => {
 
             {/* Dialog for connection */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent className="max-w-xl bg-white rounded-[2rem] p-0 overflow-hidden shadow-2xl border border-slate-200">
+                <DialogContent className="max-w-xl bg-white rounded-[2rem] p-0 overflow-hidden shadow-2xl border border-gray-200">
                     <DialogHeader className="p-10 pb-2 bg-white">
                         <div className="flex items-center gap-5">
-                            <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-900">
+                            <div className="h-14 w-14 rounded-2xl bg-gray-50 border border-slate-100 flex items-center justify-center text-gray-900">
                                 {selectedPlatform?.icon && <selectedPlatform.icon className="h-7 w-7" />}
                             </div>
                             <div>
-                                <DialogTitle className="text-2xl font-bold text-slate-900">Configure {selectedPlatform?.name}</DialogTitle>
-                                <p className="text-slate-500 text-sm mt-1">Enterprise-grade secure synchronization.</p>
+                                <DialogTitle className="text-2xl font-bold text-gray-900">Configure {selectedPlatform?.name}</DialogTitle>
+                                <p className="text-gray-500 text-sm mt-1">Enterprise-grade secure synchronization.</p>
                             </div>
                         </div>
                     </DialogHeader>
@@ -383,34 +383,34 @@ const IntegrationsPage = () => {
                             <form onSubmit={handleSubmit} className="space-y-6">
                                 <div className="space-y-4">
                                     <div className="space-y-1.5">
-                                        <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Bucket Name</Label>
+                                        <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Bucket Name</Label>
                                         <Input
-                                            className="h-14 rounded-2xl bg-slate-50 border-slate-200 shadow-sm focus:ring-blue-500/10"
+                                            className="h-14 rounded-2xl bg-gray-50 border-gray-200 shadow-sm focus:ring-blue-500/10"
                                             placeholder="lifeline-production-storage"
                                             value={formData.bucket_name} onChange={e => setFormData({ ...formData, bucket_name: e.target.value })} required
                                         />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">AWS Region</Label>
+                                            <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">AWS Region</Label>
                                             <Input
-                                                className="h-14 rounded-2xl bg-slate-50 border-slate-200 shadow-sm"
+                                                className="h-14 rounded-2xl bg-gray-50 border-gray-200 shadow-sm"
                                                 placeholder="us-east-1"
                                                 value={formData.region} onChange={e => setFormData({ ...formData, region: e.target.value })} required
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Access Key ID</Label>
+                                            <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Access Key ID</Label>
                                             <Input
-                                                className="h-14 rounded-2xl bg-slate-50 border-slate-200 shadow-sm"
+                                                className="h-14 rounded-2xl bg-gray-50 border-gray-200 shadow-sm"
                                                 type="password" value={formData.client_id} onChange={e => setFormData({ ...formData, client_id: e.target.value })} required
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Secret Access Key</Label>
+                                        <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Secret Access Key</Label>
                                         <Input
-                                            className="h-14 rounded-2xl bg-slate-50 border-slate-200 shadow-sm"
+                                            className="h-14 rounded-2xl bg-gray-50 border-gray-200 shadow-sm"
                                             type="password" value={formData.client_secret} onChange={e => setFormData({ ...formData, client_secret: e.target.value })} required
                                         />
                                     </div>
@@ -421,13 +421,13 @@ const IntegrationsPage = () => {
                                         type="button"
                                         variant="ghost"
                                         onClick={() => setIsDialogOpen(false)}
-                                        className="flex-1 h-16 rounded-[1.25rem] font-bold text-slate-500"
+                                        className="flex-1 h-16 rounded-[1.25rem] font-bold text-gray-500"
                                     >
                                         Cancel
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="flex-1 h-16 rounded-[1.25rem] bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all border-none"
+                                        className="flex-1 h-16 rounded-[1.25rem] bg-gray-900 text-white font-bold hover:bg-gray-800 transition-all border-none"
                                     >
                                         Establish Connection
                                     </Button>
@@ -435,12 +435,12 @@ const IntegrationsPage = () => {
                             </form>
                         ) : (
                             <div className="space-y-6">
-                                <div className="p-8 bg-slate-50/50 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center">
+                                <div className="p-8 bg-gray-50/50 rounded-[2.5rem] border border-slate-100 flex flex-col items-center text-center">
                                     <div className="h-24 w-24 bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 flex items-center justify-center mb-6">
                                         {selectedPlatform?.icon && <selectedPlatform.icon className="h-12 w-12 text-blue-600" />}
                                     </div>
-                                    <h4 className="text-xl font-bold text-slate-900 mb-2">Authorize Secure Access</h4>
-                                    <p className="text-sm text-slate-500 leading-relaxed max-w-xs">
+                                    <h4 className="text-xl font-bold text-gray-900 mb-2">Authorize Secure Access</h4>
+                                    <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
                                         Lifeline will securely negotiate access with {selectedPlatform?.name} using industry-standard protocols.
                                     </p>
                                 </div>
@@ -449,25 +449,25 @@ const IntegrationsPage = () => {
                                     {showAdvanced ? (
                                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
                                             <div className="space-y-1.5">
-                                                <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Client ID / API Key</Label>
+                                                <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Client ID / API Key</Label>
                                                 <Input
-                                                    className="h-14 rounded-2xl bg-slate-50 border-slate-200"
+                                                    className="h-14 rounded-2xl bg-gray-50 border-gray-200"
                                                     value={formData.client_id} onChange={e => setFormData({ ...formData, client_id: e.target.value })}
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Client Secret</Label>
+                                                <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Client Secret</Label>
                                                 <Input
-                                                    className="h-14 rounded-2xl bg-slate-50 border-slate-200"
+                                                    className="h-14 rounded-2xl bg-gray-50 border-gray-200"
                                                     type="password"
                                                     value={formData.client_secret} onChange={e => setFormData({ ...formData, client_secret: e.target.value })}
                                                 />
                                             </div>
                                             {(selectedPlatform?.id.includes('microsoft') || selectedPlatform?.id === 'teams') && (
                                                 <div className="space-y-1.5">
-                                                    <Label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider ml-1">Tenant ID (Optional)</Label>
+                                                    <Label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Tenant ID (Optional)</Label>
                                                     <Input
-                                                        className="h-14 rounded-2xl bg-slate-50 border-slate-200 shadow-sm"
+                                                        className="h-14 rounded-2xl bg-gray-50 border-gray-200 shadow-sm"
                                                         placeholder="organizations"
                                                         value={formData.tenant_id} onChange={e => setFormData({ ...formData, tenant_id: e.target.value })}
                                                     />
@@ -479,7 +479,7 @@ const IntegrationsPage = () => {
                                         </motion.div>
                                     ) : (
                                         <div className="flex flex-col items-center">
-                                            <Button variant="outline" size="sm" onClick={() => setShowAdvanced(true)} className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 rounded-xl px-6">
+                                            <Button variant="outline" size="sm" onClick={() => setShowAdvanced(true)} className="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-600 rounded-xl px-6">
                                                 Enter Custom Credentials
                                             </Button>
                                         </div>
@@ -489,7 +489,7 @@ const IntegrationsPage = () => {
                                 <div className="flex flex-col gap-4">
                                     <Button
                                         onClick={handleSubmit}
-                                        className="w-full h-16 rounded-[1.5rem] bg-slate-900 hover:bg-slate-800 text-white font-bold text-lg shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 transition-transform active:scale-[0.98]"
+                                        className="w-full h-16 rounded-[1.5rem] bg-gray-900 hover:bg-gray-800 text-white font-bold text-lg shadow-xl shadow-slate-900/10 flex items-center justify-center gap-3 transition-transform active:scale-[0.98]"
                                         disabled={!selectedPlatform}
                                     >
                                         {selectedPlatform?.icon && <selectedPlatform.icon className="h-5 w-5" />}
@@ -498,7 +498,7 @@ const IntegrationsPage = () => {
                                     <Button
                                         onClick={() => setIsDialogOpen(false)}
                                         variant="ghost"
-                                        className="w-full h-14 rounded-2xl font-bold text-slate-400 hover:text-slate-600"
+                                        className="w-full h-14 rounded-2xl font-bold text-gray-400 hover:text-gray-600"
                                     >
                                         Cancel
                                     </Button>
@@ -509,15 +509,15 @@ const IntegrationsPage = () => {
                 </DialogContent>
             </Dialog>
             {/* System Health / Sync Logs */}
-            <div className="mt-12 p-8 bg-slate-50 rounded-[2.5rem] border border-slate-200/60">
+            <div className="mt-12 p-8 bg-gray-50 rounded-[2.5rem] border border-gray-200/60">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
-                        <h4 className="text-xl font-black text-slate-900 tracking-tight">System Connectivity Hub</h4>
-                        <p className="text-sm text-slate-500 font-medium">Real-time status of all external background sync processes.</p>
+                        <h4 className="text-xl font-black text-gray-900 tracking-tight">System Connectivity Hub</h4>
+                        <p className="text-sm text-gray-500 font-medium">Real-time status of all external background sync processes.</p>
                     </div>
-                    <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-slate-200">
-                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">All Systems Operational</span>
+                    <div className="flex items-center gap-3 px-4 py-2 bg-white rounded-xl border border-gray-200">
+                        <div className="h-2 w-2 rounded-full bg-primary-500 animate-pulse" />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-600">All Systems Operational</span>
                     </div>
                 </div>
 
@@ -529,11 +529,11 @@ const IntegrationsPage = () => {
                     ].map((stat, i) => (
                         <div key={i} className="bg-white p-5 rounded-2xl border border-slate-100 flex justify-between items-center">
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                <p className="text-sm font-bold text-slate-900">{stat.status}</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                                <p className="text-sm font-bold text-gray-900">{stat.status}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Latency</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Latency</p>
                                 <p className="text-sm font-bold text-blue-600">{stat.latency}</p>
                             </div>
                         </div>

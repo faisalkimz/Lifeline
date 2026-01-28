@@ -53,33 +53,38 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="animate-fade-in py-8 sm:py-0">
-            <div className="text-center mb-10">
+        <div className="animate-fade-in-up py-8 sm:py-0 w-full max-w-[420px] mx-auto">
+            <div className="text-center mb-10 relative">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary-500/20 rounded-full blur-3xl" />
                 <motion.div
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100 dark:bg-primary-900/30 text-primary-600 mb-4"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                    className="relative inline-flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-white to-gray-50 border border-gray-100 shadow-premium-lg mb-6"
                 >
-                    <Fingerprint className="h-8 w-8" />
+                    <Fingerprint className="h-10 w-10 text-primary-600" />
                 </motion.div>
-                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Security Checkpoint</h2>
-                <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">Access your enterprise workspace</p>
+                <h2 className="text-4xl font-bold text-gray-900 tracking-tight mb-3">Welcome Back</h2>
+                <p className="text-gray-500 text-lg">Enter your workspace securely</p>
             </div>
 
-            <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-slate-900/50 lg:border border-slate-100 dark:border-slate-800 backdrop-blur-sm overflow-hidden">
-                <CardContent className="p-0 sm:p-8">
+            <Card className="border-none shadow-premium-xl bg-white/80 backdrop-blur-xl border border-white/50 overflow-hidden relative">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500" />
+                <CardContent className="p-8 sm:p-10">
                     <AnimatePresence mode="wait">
                         {error && (
                             <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="mb-6 p-4 rounded-xl bg-error-50 dark:bg-error-900/10 border border-error-100 dark:border-error-900/20 flex items-start gap-3"
+                                className="mb-8 p-4 rounded-xl bg-red-50 border border-red-100 flex items-start gap-4 shadow-sm"
                             >
-                                <ShieldAlert className="h-5 w-5 text-error-600 mt-0.5 flex-shrink-0" />
-                                <div className="text-sm text-error-700 dark:text-error-400 font-medium">
-                                    <p className="font-bold">Access Denied</p>
-                                    <p className="mt-0.5 opacity-90">{error?.data?.error || 'Invalid credentials provided.'}</p>
+                                <div className="p-2 bg-red-100 rounded-lg shrink-0">
+                                    <ShieldAlert className="h-5 w-5 text-red-600" />
+                                </div>
+                                <div className="text-sm text-red-800">
+                                    <p className="font-bold text-base mb-1">Access Denied</p>
+                                    <p className="opacity-90 leading-relaxed text-red-700">{error?.data?.error || 'The credentials you provided are incorrect.'}</p>
                                 </div>
                             </motion.div>
                         )}
@@ -93,31 +98,35 @@ const LoginPage = () => {
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
-                                    className="space-y-5"
+                                    className="space-y-6"
                                 >
-                                    <Input
-                                        label="Identity ID"
-                                        placeholder="johndoe"
-                                        error={errors.username?.message}
-                                        {...register('username')}
-                                    />
-
-                                    <div className="space-y-1">
+                                    <div className="space-y-2">
                                         <Input
-                                            label="Secret Key"
+                                            label="Username"
+                                            placeholder="e.g. johndoe"
+                                            className="h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all text-base"
+                                            error={errors.username?.message}
+                                            {...register('username')}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-sm font-semibold text-gray-700">Password</label>
+                                            <Link
+                                                to="/forgot-password"
+                                                className="text-sm font-semibold text-primary-600 hover:text-primary-700 hover:underline transition-all"
+                                            >
+                                                Forgot password?
+                                            </Link>
+                                        </div>
+                                        <Input
                                             type="password"
                                             placeholder="••••••••"
+                                            className="h-12 bg-gray-50/50 border-gray-200 focus:bg-white transition-all text-base"
                                             error={errors.password?.message}
                                             {...register('password')}
                                         />
-                                        <div className="flex justify-end pt-1">
-                                            <Link
-                                                to="/forgot-password"
-                                                className="text-[11px] font-bold text-slate-400 hover:text-primary-600 uppercase tracking-wider transition-colors"
-                                            >
-                                                Recovery Mode?
-                                            </Link>
-                                        </div>
                                     </div>
                                 </motion.div>
                             ) : (
@@ -126,44 +135,48 @@ const LoginPage = () => {
                                     initial={{ opacity: 0, x: 20 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: -20 }}
-                                    className="space-y-6 py-2"
+                                    className="space-y-8 py-4"
                                 >
-                                    <div className="text-center space-y-2 mb-6">
+                                    <div className="text-center space-y-4">
                                         <div className="flex justify-center">
-                                            <div className="h-12 w-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 mb-2">
-                                                <KeyRound className="h-6 w-6" />
+                                            <div className="h-16 w-16 bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 shadow-inner">
+                                                <KeyRound className="h-8 w-8" />
                                             </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Verify Identity</h3>
-                                        <p className="text-xs text-slate-500 max-w-[240px] mx-auto leading-relaxed">
-                                            A 2FA signal was detected. Please provide your 6-digit authentication token.
-                                        </p>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-gray-900">Two-Factor Authentication</h3>
+                                            <p className="text-sm text-gray-500 mt-2 max-w-[260px] mx-auto">
+                                                Please enter the 6-digit code from your authenticator app.
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <Input
-                                        label="Authorization Token"
-                                        type="text"
-                                        placeholder="000000"
-                                        autoFocus
-                                        maxLength={6}
-                                        error={errors.otp_code?.message}
-                                        {...register('otp_code')}
-                                        className="text-center text-2xl tracking-[0.4em] font-black h-16 bg-slate-50 border-2"
-                                    />
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block text-center">Security Code</label>
+                                        <Input
+                                            type="text"
+                                            placeholder="000 000"
+                                            autoFocus
+                                            maxLength={6}
+                                            error={errors.otp_code?.message}
+                                            {...register('otp_code')}
+                                            className="text-center text-3xl tracking-[0.5em] font-bold h-20 bg-gray-50 border-2 border-gray-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 rounded-2xl shadow-inner transition-all"
+                                        />
+                                    </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        <div className="pt-2">
+                        <div className="pt-4 space-y-4">
                             <Button
                                 type="submit"
                                 fullWidth
                                 size="lg"
                                 isLoading={isLoading}
-                                className="rounded-xl h-14 font-black text-base shadow-xl dark:shadow-none bg-primary-600 hover:bg-primary-700 active:scale-[0.98] transition-all"
+                                className="h-14 text-base font-bold rounded-xl shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-600/40 hover:-translate-y-0.5 transition-all duration-300 bg-gradient-to-r from-primary-600 to-primary-500"
                             >
                                 <span className="flex items-center gap-2">
-                                    {show2FA ? 'Authorize Access' : 'Initialize Session'}
+                                    {show2FA ? 'Verify & Login' : 'Sign In'}
                                     {!isLoading && <LogIn className="h-5 w-5" />}
                                 </span>
                             </Button>
@@ -172,27 +185,28 @@ const LoginPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShow2FA(false)}
-                                    className="w-full text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest py-4 mt-2 transition-colors"
+                                    className="w-full text-sm font-semibold text-gray-500 hover:text-gray-800 py-2 transition-colors flex items-center justify-center gap-2"
                                 >
-                                    Abort 2FA & Return
+                                    Cancel verification
                                 </button>
                             )}
                         </div>
                     </form>
                 </CardContent>
 
-                <CardFooter className="flex flex-col gap-4 p-8 border-t border-slate-50 dark:border-slate-800/50">
-                    <Link to="/forgot-password" className="text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                        Forgot your password?
-                    </Link>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                        New to the ecosystem?{' '}
-                        <Link to="/register" className="font-bold text-primary-600 hover:text-primary-700 transition-colors">
-                            Provision a Workspace
+                <div className="p-6 border-t border-gray-100 bg-gray-50/50 backdrop-blur-sm">
+                    <p className="text-center text-sm font-medium text-gray-600">
+                        Don't have an account yet?{' '}
+                        <Link to="/register" className="font-bold text-primary-600 hover:text-primary-700 hover:underline transition-all">
+                            Create an account
                         </Link>
                     </p>
-                </CardFooter>
+                </div>
             </Card>
+
+            <p className="text-center mt-8 text-xs font-medium text-gray-400">
+                &copy; {new Date().getFullYear()} Lifeline HR. Secure Enterprise Portal.
+            </p>
         </div>
     );
 };

@@ -47,7 +47,8 @@ class AttendanceSerializer(serializers.ModelSerializer):
 class WorkLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkLocation
-        fields = '__all__'
+        fields = ['id', 'company', 'name', 'latitude', 'longitude', 'radius_meters', 'qr_token', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'company', 'qr_token', 'created_at', 'updated_at']
 
 class ClockInSerializer(serializers.Serializer):
     """Serializer for clock-in action"""

@@ -4,24 +4,24 @@ import { cn } from '../../utils/cn';
 import { Loader2 } from 'lucide-react';
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
     {
         variants: {
             variant: {
-                primary: "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500 shadow-sm hover:shadow-md dark:shadow-primary-900/20",
-                secondary: "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 focus-visible:ring-primary-500 shadow-sm",
-                success: "bg-success-600 text-white hover:bg-success-700 focus-visible:ring-success-500 shadow-sm hover:shadow-md",
-                warning: "bg-warning-600 text-white hover:bg-warning-700 focus-visible:ring-warning-500 shadow-sm hover:shadow-md",
-                destructive: "bg-error-600 text-white hover:bg-error-700 focus-visible:ring-error-500 shadow-sm hover:shadow-md",
-                ghost: "bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100 text-slate-600 dark:text-slate-400",
-                outline: "border border-primary-600 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-950/30 focus-visible:ring-primary-500",
+                primary: "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500 shadow-sm",
+                secondary: "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-gray-400 focus-visible:ring-primary-500 shadow-sm",
+                success: "bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-500 shadow-sm",
+                warning: "bg-amber-600 text-white hover:bg-amber-700 focus-visible:ring-amber-500 shadow-sm",
+                destructive: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 shadow-sm",
+                ghost: "bg-transparent hover:bg-gray-100 hover:text-gray-900 text-gray-600",
+                outline: "border border-primary-600 text-primary-600 hover:bg-primary-50 focus-visible:ring-primary-500",
                 link: "text-primary-600 hover:text-primary-700 underline-offset-4 hover:underline p-0 h-auto",
             },
             size: {
                 sm: "h-8 px-3 text-xs rounded-md",
                 md: "h-10 px-4 text-sm rounded-lg",
-                lg: "h-12 px-6 text-base rounded-lg",
-                xl: "h-14 px-8 text-lg rounded-xl",
+                lg: "h-11 px-5 text-base rounded-lg",
+                xl: "h-12 px-6 text-base rounded-lg",
                 icon: "h-10 w-10 rounded-lg",
             },
             fullWidth: {

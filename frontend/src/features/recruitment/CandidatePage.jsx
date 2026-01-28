@@ -73,23 +73,23 @@ const CandidatePage = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Candidate Database</h1>
-                    <p className="text-gray-500 mt-2">Manage your talent pool and candidate profiles.</p>
+                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Candidate Database</h1>
+                    <p className="text-slate-500 mt-2">Manage your talent pool and candidate profiles.</p>
                 </div>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="rounded-xl h-11 bg-gray-900 text-white font-medium shadow-lg shadow-slate-900/20">
+                        <Button className="rounded-xl h-11 bg-slate-900 text-white font-medium shadow-lg shadow-slate-900/20">
                             <Plus className="h-4 w-4 mr-2" /> Add Candidate
                         </Button>
                     </DialogTrigger>
                     <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
                         <DialogHeader className="p-8 pb-4 border-b border-slate-100">
-                            <DialogTitle className="text-2xl font-bold text-gray-900">Add New Candidate</DialogTitle>
+                            <DialogTitle className="text-2xl font-bold text-slate-900">Add New Candidate</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleSubmit} className="p-8 space-y-6">
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">First Name</label>
+                                    <label className="text-sm font-bold text-slate-700">First Name</label>
                                     <Input
                                         className="bg-white"
                                         name="first_name"
@@ -100,7 +100,7 @@ const CandidatePage = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Last Name</label>
+                                    <label className="text-sm font-bold text-slate-700">Last Name</label>
                                     <Input
                                         className="bg-white"
                                         name="last_name"
@@ -114,7 +114,7 @@ const CandidatePage = () => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Email Address</label>
+                                    <label className="text-sm font-bold text-slate-700">Email Address</label>
                                     <Input
                                         type="email"
                                         className="bg-white"
@@ -126,7 +126,7 @@ const CandidatePage = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Phone Number</label>
+                                    <label className="text-sm font-bold text-slate-700">Phone Number</label>
                                     <Input
                                         className="bg-white"
                                         name="phone"
@@ -139,7 +139,7 @@ const CandidatePage = () => {
 
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">LinkedIn URL</label>
+                                    <label className="text-sm font-bold text-slate-700">LinkedIn URL</label>
                                     <Input
                                         type="url"
                                         className="bg-white"
@@ -150,7 +150,7 @@ const CandidatePage = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-gray-700">Portfolio URL</label>
+                                    <label className="text-sm font-bold text-slate-700">Portfolio URL</label>
                                     <Input
                                         type="url"
                                         className="bg-white"
@@ -163,10 +163,10 @@ const CandidatePage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-700">Source</label>
+                                <label className="text-sm font-bold text-slate-700">Source</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full h-10 px-3 bg-white border border-gray-200 rounded-md text-sm focus:ring-2 focus:ring-slate-200 outline-none"
+                                        className="w-full h-10 px-3 bg-white border border-slate-200 rounded-md text-sm focus:ring-2 focus:ring-slate-200 outline-none"
                                         name="source"
                                         value={formData.source}
                                         onChange={handleInputChange}
@@ -182,7 +182,7 @@ const CandidatePage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-700">Skills (comma-separated)</label>
+                                <label className="text-sm font-bold text-slate-700">Skills (comma-separated)</label>
                                 <Input
                                     className="bg-white"
                                     name="skills"
@@ -193,9 +193,9 @@ const CandidatePage = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-gray-700">Summary</label>
+                                <label className="text-sm font-bold text-slate-700">Summary</label>
                                 <textarea
-                                    className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none resize-none"
+                                    className="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none resize-none"
                                     name="summary"
                                     value={formData.summary}
                                     onChange={handleInputChange}
@@ -206,7 +206,7 @@ const CandidatePage = () => {
 
                             <div className="pt-4 flex justify-end gap-3">
                                 <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                                <Button type="submit" disabled={isCreating} className="bg-gray-900 text-white hover:bg-gray-800">
+                                <Button type="submit" disabled={isCreating} className="bg-slate-900 text-white hover:bg-slate-800">
                                     {isCreating ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
                                     Add Candidate
                                 </Button>
@@ -217,20 +217,20 @@ const CandidatePage = () => {
             </div>
 
             {/* Search and Filter Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search by name or email..."
-                        className="w-full h-10 pl-10 pr-4 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
+                        className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="flex items-center gap-2 w-full md:w-auto">
                     <select
-                        className="w-full md:w-48 h-10 px-3 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none cursor-pointer"
+                        className="w-full md:w-48 h-10 px-3 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none cursor-pointer"
                         value={filterSource}
                         onChange={(e) => setFilterSource(e.target.value)}
                     >
@@ -247,13 +247,13 @@ const CandidatePage = () => {
             {/* Candidates List */}
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20">
-                    <div className="animate-spin h-8 w-8 border-2 border-gray-300 border-t-slate-900 rounded-full" />
+                    <div className="animate-spin h-8 w-8 border-2 border-slate-300 border-t-slate-900 rounded-full" />
                 </div>
             ) : !filteredCandidates?.length ? (
-                <div className="py-20 text-center rounded-3xl bg-gray-50 border border-dashed border-gray-200">
+                <div className="py-20 text-center rounded-3xl bg-slate-50 border border-dashed border-slate-200">
                     <Search className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                    <p className="font-bold text-gray-900">No candidates found</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-bold text-slate-900">No candidates found</p>
+                    <p className="text-sm text-slate-500">
                         {searchTerm || filterSource !== 'all' ?
                             'Try adjusting your search or filters' :
                             'Get started by adding your first candidate'}

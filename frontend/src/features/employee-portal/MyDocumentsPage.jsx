@@ -42,7 +42,7 @@ const MyDocumentsPage = () => {
         const ext = fileName?.split('.').pop()?.toLowerCase();
         if (['pdf'].includes(ext)) return <FileType2 className="h-8 w-8 text-red-500" />;
         if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return <FileImage className="h-8 w-8 text-blue-500" />;
-        return <File className="h-8 w-8 text-gray-400" />;
+        return <File className="h-8 w-8 text-slate-400" />;
     };
 
     const getStatusBadge = (status) => {
@@ -52,7 +52,7 @@ const MyDocumentsPage = () => {
             expired: 'bg-red-100 text-red-700',
             rejected: 'bg-red-100 text-red-700'
         };
-        return styles[status] || 'bg-gray-100 text-gray-700';
+        return styles[status] || 'bg-slate-100 text-slate-700';
     };
 
     const handleFileChange = (e) => {
@@ -139,8 +139,8 @@ const MyDocumentsPage = () => {
                                 <FileText className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Documents</p>
-                                <p className="text-2xl font-black text-gray-900 tracking-tight">{documents.length}</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Documents</p>
+                                <p className="text-2xl font-black text-slate-900 tracking-tight">{documents.length}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -149,12 +149,12 @@ const MyDocumentsPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-primary-50 rounded-xl border border-emerald-100">
-                                <CheckCircle className="h-6 w-6 text-primary-600" />
+                            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                                <CheckCircle className="h-6 w-6 text-emerald-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified</p>
-                                <p className="text-2xl font-black text-primary-600 tracking-tight">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verified</p>
+                                <p className="text-2xl font-black text-emerald-600 tracking-tight">
                                     {documents.filter(d => d.status === 'verified').length}
                                 </p>
                             </div>
@@ -169,7 +169,7 @@ const MyDocumentsPage = () => {
                                 <Clock className="h-6 w-6 text-yellow-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending</p>
                                 <p className="text-2xl font-black text-yellow-600 tracking-tight">
                                     {documents.filter(d => d.status === 'pending').length}
                                 </p>
@@ -185,7 +185,7 @@ const MyDocumentsPage = () => {
                                 <AlertCircle className="h-6 w-6 text-red-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Expired</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Expired</p>
                                 <p className="text-2xl font-black text-red-600 tracking-tight">
                                     {documents.filter(d => d.status === 'expired').length}
                                 </p>
@@ -206,12 +206,12 @@ const MyDocumentsPage = () => {
                         >
                             <CardContent className="p-6">
                                 <div className="flex items-start gap-4">
-                                    <div className="p-4 bg-gray-50 rounded-2xl group-hover:bg-gray-100 transition-colors">
+                                    <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-slate-100 transition-colors">
                                         {getFileIcon(doc.file)}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="font-bold text-gray-900 truncate">{doc.title}</h3>
-                                        <p className="text-xs text-gray-500 mt-1 capitalize">
+                                        <h3 className="font-bold text-slate-900 truncate">{doc.title}</h3>
+                                        <p className="text-xs text-slate-500 mt-1 capitalize">
                                             {doc.document_type?.replace('_', ' ') || 'Document'}
                                         </p>
                                         <div className="flex items-center gap-2 mt-3">
@@ -222,7 +222,7 @@ const MyDocumentsPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-gray-400">
+                                <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
                                     <span className="flex items-center gap-1">
                                         <Calendar className="h-3 w-3" />
                                         {formatDate(doc.uploaded_at)}
@@ -234,11 +234,11 @@ const MyDocumentsPage = () => {
                     ))}
                 </div>
             ) : (
-                <Card className="border-dashed border-4 border-slate-100 bg-gray-50/30">
+                <Card className="border-dashed border-4 border-slate-100 bg-slate-50/30">
                     <CardContent className="py-20 text-center">
                         <FolderOpen className="h-16 w-16 mx-auto mb-4 text-slate-200" />
-                        <h3 className="text-xl font-bold text-gray-900">No Documents Yet</h3>
-                        <p className="text-gray-500 mt-2 max-w-md mx-auto">
+                        <h3 className="text-xl font-bold text-slate-900">No Documents Yet</h3>
+                        <p className="text-slate-500 mt-2 max-w-md mx-auto">
                             Upload your important documents such as ID cards, contracts, and certificates for safekeeping.
                         </p>
                         <Button onClick={() => setShowUploadDialog(true)} className="mt-6 gap-2">
@@ -252,33 +252,33 @@ const MyDocumentsPage = () => {
             {/* Upload Dialog */}
             <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
                 <DialogContent className="max-w-lg p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
-                    <DialogHeader className="bg-gray-900 p-8 text-white">
+                    <DialogHeader className="bg-slate-900 p-8 text-white">
                         <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-3">
                             <Upload className="h-5 w-5 text-primary-400" />
                             Upload Document
                         </DialogTitle>
-                        <p className="text-gray-400 text-sm mt-1">Add a new document to your file</p>
+                        <p className="text-slate-400 text-sm mt-1">Add a new document to your file</p>
                     </DialogHeader>
 
                     <form onSubmit={handleUpload} className="p-8 space-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Document Title</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Document Title</label>
                             <input
                                 type="text"
                                 value={uploadForm.title}
                                 onChange={(e) => setUploadForm(prev => ({ ...prev, title: e.target.value }))}
                                 placeholder="e.g., National ID Card"
-                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-gray-50 focus:bg-white focus:border-primary-500 outline-none transition-all"
+                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none transition-all"
                                 required
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Document Type</label>
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Document Type</label>
                             <select
                                 value={uploadForm.document_type}
                                 onChange={(e) => setUploadForm(prev => ({ ...prev, document_type: e.target.value }))}
-                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-gray-50 focus:bg-white focus:border-primary-500 outline-none transition-all"
+                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none transition-all"
                             >
                                 {documentTypes.map(type => (
                                     <option key={type.value} value={type.value}>{type.label}</option>
@@ -287,8 +287,8 @@ const MyDocumentsPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Select File</label>
-                            <div className="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-primary-300 transition-colors">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select File</label>
+                            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-primary-300 transition-colors">
                                 <input
                                     type="file"
                                     onChange={handleFileChange}
@@ -299,11 +299,11 @@ const MyDocumentsPage = () => {
                                 <label htmlFor="file-upload" className="cursor-pointer">
                                     <Upload className="h-10 w-10 mx-auto mb-3 text-slate-300" />
                                     {uploadForm.file ? (
-                                        <p className="font-bold text-primary-600">{uploadForm.file.name}</p>
+                                        <p className="font-bold text-emerald-600">{uploadForm.file.name}</p>
                                     ) : (
                                         <>
-                                            <p className="font-bold text-gray-600">Click to select a file</p>
-                                            <p className="text-xs text-gray-400 mt-1">PDF, JPG, PNG, DOC up to 10MB</p>
+                                            <p className="font-bold text-slate-600">Click to select a file</p>
+                                            <p className="text-xs text-slate-400 mt-1">PDF, JPG, PNG, DOC up to 10MB</p>
                                         </>
                                     )}
                                 </label>
@@ -328,7 +328,7 @@ const MyDocumentsPage = () => {
                 <DialogContent className="max-w-lg p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
                     {selectedDocument && (
                         <>
-                            <DialogHeader className="bg-gray-900 p-8 text-white">
+                            <DialogHeader className="bg-slate-900 p-8 text-white">
                                 <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-3">
                                     {getFileIcon(selectedDocument.file)}
                                     <span className="truncate">{selectedDocument.title}</span>
@@ -337,31 +337,31 @@ const MyDocumentsPage = () => {
 
                             <div className="p-8 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-gray-50 rounded-xl p-4">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Type</p>
-                                        <p className="font-bold text-gray-900 capitalize mt-1">
+                                    <div className="bg-slate-50 rounded-xl p-4">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</p>
+                                        <p className="font-bold text-slate-900 capitalize mt-1">
                                             {selectedDocument.document_type?.replace('_', ' ')}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-xl p-4">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</p>
+                                    <div className="bg-slate-50 rounded-xl p-4">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</p>
                                         <Badge className={`${getStatusBadge(selectedDocument.status)} mt-1`}>
                                             {selectedDocument.status || 'Active'}
                                         </Badge>
                                     </div>
-                                    <div className="bg-gray-50 rounded-xl p-4">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Uploaded</p>
-                                        <p className="font-bold text-gray-900 mt-1">{formatDate(selectedDocument.uploaded_at)}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Uploaded</p>
+                                        <p className="font-bold text-slate-900 mt-1">{formatDate(selectedDocument.uploaded_at)}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-xl p-4">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">File Size</p>
-                                        <p className="font-bold text-gray-900 mt-1">{formatFileSize(selectedDocument.file_size)}</p>
+                                    <div className="bg-slate-50 rounded-xl p-4">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">File Size</p>
+                                        <p className="font-bold text-slate-900 mt-1">{formatFileSize(selectedDocument.file_size)}</p>
                                     </div>
                                 </div>
 
                                 {selectedDocument.expiry_date && (
                                     <div className={`p-4 rounded-xl ${new Date(selectedDocument.expiry_date) < new Date() ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200'}`}>
-                                        <p className="text-xs font-bold text-gray-600">
+                                        <p className="text-xs font-bold text-slate-600">
                                             {new Date(selectedDocument.expiry_date) < new Date() ? '⚠️ Expired on' : '📅 Expires on'}: {formatDate(selectedDocument.expiry_date)}
                                         </p>
                                     </div>

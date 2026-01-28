@@ -66,7 +66,7 @@ const LeaveCalendar = ({ mini = false }) => {
             <div className="space-y-4">
                 <div className="grid grid-cols-7 gap-1">
                     {['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].map(day => (
-                        <div key={day} className="text-[10px] font-black text-gray-400 text-center uppercase py-2">
+                        <div key={day} className="text-[10px] font-black text-slate-400 text-center uppercase py-2">
                             {day}
                         </div>
                     ))}
@@ -80,12 +80,12 @@ const LeaveCalendar = ({ mini = false }) => {
                                 key={index}
                                 className={`h-10 rounded-lg flex flex-col items-center justify-center relative border transition-all ${!date ? 'border-transparent' :
                                         isToday ? 'border-primary-500 bg-primary-50' :
-                                            'border-slate-50 hover:bg-gray-50'
+                                            'border-slate-50 hover:bg-slate-50'
                                     }`}
                             >
                                 {date && (
                                     <>
-                                        <span className={`text-[11px] font-black ${isToday ? 'text-primary-600' : 'text-gray-700'}`}>
+                                        <span className={`text-[11px] font-black ${isToday ? 'text-primary-600' : 'text-slate-700'}`}>
                                             {date.getDate().toString().padStart(2, '0')}
                                         </span>
                                         {leaveRequestsForDay.length > 0 && (
@@ -109,7 +109,7 @@ const LeaveCalendar = ({ mini = false }) => {
         <div className="space-y-6">
             {/* Standard full calendar remains mostly same or styled for Workpay */}
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-black text-gray-900">
+                <h2 className="text-xl font-black text-slate-900">
                     {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
                 </h2>
                 <div className="flex gap-2">
@@ -119,7 +119,7 @@ const LeaveCalendar = ({ mini = false }) => {
 
             <div className="grid grid-cols-7 border border-slate-100 rounded-3xl overflow-hidden bg-white shadow-sm">
                 {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                    <div key={day} className="p-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-slate-50">
+                    <div key={day} className="p-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
                         {day}
                     </div>
                 ))}
@@ -130,13 +130,13 @@ const LeaveCalendar = ({ mini = false }) => {
                     return (
                         <div
                             key={index}
-                            className={`min-h-[140px] border-r border-b border-slate-50 p-3 transition-all hover:bg-gray-50/50 ${isToday ? 'bg-primary-50/30' : ''
+                            className={`min-h-[140px] border-r border-b border-slate-50 p-3 transition-all hover:bg-slate-50/50 ${isToday ? 'bg-primary-50/30' : ''
                                 }`}
                         >
                             {date && (
                                 <>
                                     <div className="flex justify-between items-start mb-3">
-                                        <span className={`text-sm font-black ${isToday ? 'text-primary-600' : 'text-gray-400'}`}>
+                                        <span className={`text-sm font-black ${isToday ? 'text-primary-600' : 'text-slate-400'}`}>
                                             {date.getDate()}
                                         </span>
                                     </div>
@@ -148,7 +148,7 @@ const LeaveCalendar = ({ mini = false }) => {
                                             </div>
                                         ))}
                                         {leaveRequestsForDay.length > 3 && (
-                                            <div className="text-[10px] font-black text-gray-400 text-center py-1">
+                                            <div className="text-[10px] font-black text-slate-400 text-center py-1">
                                                 + {leaveRequestsForDay.length - 3} others
                                             </div>
                                         )}

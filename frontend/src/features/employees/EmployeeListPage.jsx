@@ -22,7 +22,7 @@ const StatusBadge = ({ status }) => {
         active: { color: "text-primary-700 bg-primary-50 border-primary-200", icon: CheckCircle, label: "Active" },
         on_leave: { color: "text-amber-700 bg-amber-50 border-amber-200", icon: Clock, label: "On Leave" },
         terminated: { color: "text-rose-700 bg-rose-50 border-rose-200", icon: XCircle, label: "Terminated" },
-        resigned: { color: "text-gray-700 bg-gray-100 border-gray-200", icon: LogOut, label: "Resigned" },
+        resigned: { color: "text-slate-700 bg-slate-100 border-slate-200", icon: LogOut, label: "Resigned" },
         suspended: { color: "text-orange-700 bg-orange-50 border-orange-200", icon: AlertCircle, label: "Suspended" },
     };
 
@@ -60,243 +60,204 @@ const EmployeeListPage = () => {
     const { data: stats } = useGetEmployeeStatsQuery();
 
     return (
-        <div className="space-y-8 animate-fade-in-up pb-20">
-            {/* Premium Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div className="space-y-6 animate-fade-in pb-10">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
-                        <span className="bg-gradient-to-r from-primary-600 to-indigo-600 bg-clip-text text-transparent">Team Members</span>
-                        <span className="px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-sm font-bold border border-primary-100 shadow-sm">
-                            {employees?.length || 0}
-                        </span>
-                    </h1>
-                    <p className="text-gray-500 mt-2 font-medium max-w-lg leading-relaxed">
-                        Manage your workforce, track real-time status, and oversee organizational growth.
-                    </p>
+                    <h1 className="text-2xl font-bold text-gray-900">Team Members</h1>
+                    <p className="text-gray-600 mt-1">Manage your workforce, track status, and view profiles.</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <Button
-                        variant="secondary"
+                        variant="outline"
                         onClick={() => setIsBulkUploadOpen(true)}
-                        className="btn-premium-secondary"
+                        className="bg-white hover:bg-gray-50 text-gray-700 border-gray-200"
                     >
-                        <Upload className="h-4 w-4 mr-2 text-gray-500" />
+                        <Upload className="h-4 w-4 mr-2" />
                         Bulk Upload
                     </Button>
                     <Button
                         onClick={() => navigate('/employees/new')}
-                        className="btn-premium-primary"
+                        className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm shadow-primary-200"
                     >
-                        <Plus className="h-5 w-5 mr-2" />
-                        Add New Member
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Employee
                     </Button>
                 </div>
             </div>
 
-            {/* Premium Stats Overview */}
+            {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="stat-card group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-sm font-semibold text-gray-500">Total Workforce</p>
-                            <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats?.total || 0}</h3>
-                        </div>
-                        <div className="h-10 w-10 bg-primary-50 rounded-xl flex items-center justify-center text-primary-600 group-hover:scale-110 transition-transform duration-300">
-                            <Users className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-xs font-medium text-emerald-600">
-                        <span className="bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">+12% growth</span>
-                        <span className="ml-2 text-gray-400">vs last month</span>
-                    </div>
-                </div>
-
-                <div className="stat-card group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-sm font-semibold text-gray-500">Active Now</p>
-                            <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats?.active || 0}</h3>
-                        </div>
-                        <div className="h-10 w-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform duration-300">
-                            <Sparkles className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-xs font-medium text-emerald-600">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2"></span>
-                        Working today
-                    </div>
-                </div>
-
-                <div className="stat-card group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-sm font-semibold text-gray-500">On Leave</p>
-                            <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats?.on_leave || 0}</h3>
-                        </div>
-                        <div className="h-10 w-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform duration-300">
-                            <Clock className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-xs font-medium text-amber-600">
-                        <span className="bg-amber-50 px-2 py-1 rounded-full border border-amber-100">
-                            {stats?.on_leave > 0 ? `${stats?.on_leave} Away` : "Full Team"}
-                        </span>
-                    </div>
-                </div>
-
-                <div className="stat-card group">
-                    <div className="flex justify-between items-start">
-                        <div>
-                            <p className="text-sm font-semibold text-gray-500">Departments</p>
-                            <h3 className="text-3xl font-bold text-gray-900 mt-1">{stats?.departments_count || 0}</h3>
-                        </div>
-                        <div className="h-10 w-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
-                            <Building2 className="h-5 w-5" />
-                        </div>
-                    </div>
-                    <div className="mt-4 flex items-center text-xs font-medium text-purple-600">
-                        <span className="bg-purple-50 px-2 py-1 rounded-full border border-purple-100">
-                            Organization
-                        </span>
-                    </div>
-                </div>
+                <StatCard
+                    title="Total Team"
+                    value={stats?.total || 0}
+                    icon={Users}
+                    color="bg-primary-500"
+                    trend="+12% growth"
+                />
+                <StatCard
+                    title="Active Now"
+                    value={stats?.active || 0}
+                    icon={Sparkles}
+                    color="bg-emerald-500"
+                    trend="Working today"
+                />
+                <StatCard
+                    title="On Leave"
+                    value={stats?.on_leave || 0}
+                    icon={Clock}
+                    color="bg-amber-500"
+                    trend={stats?.on_leave > 0 ? "Away" : "Full team"}
+                />
+                <StatCard
+                    title="Departments"
+                    value={stats?.departments_count || 0}
+                    icon={Building2}
+                    color="bg-purple-500"
+                    trend="Organization"
+                />
             </div>
 
-            {/* Premium Search & Filters */}
-            <div className="glass rounded-2xl p-4 sticky top-4 z-20 transition-all duration-300">
+            {/* Enhanced Search & Filters */}
+            <div className="bg-white/80 backdrop-blur-md rounded-xl shadow-sm border border-gray-200 p-4 sticky top-4 z-20">
                 <div className="flex flex-col md:flex-row gap-4">
-                    <div className="relative flex-1 group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <Input
                             placeholder="Search by name, email, or department..."
-                            className="pl-12 h-12 border-gray-200 bg-white/50 focus:bg-white text-base input-premium shadow-none"
+                            className="pl-10 h-10 border-gray-200 bg-gray-50 focus:bg-white transition-colors focus:ring-primary-500 focus:border-primary-500"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
                     <div className="flex gap-3">
-                        <div className="relative">
-                            <select
-                                className="h-12 pl-4 pr-10 border border-gray-200 rounded-xl bg-white/50 focus:bg-white outline-none cursor-pointer hover:border-primary-300 transition-all text-sm font-semibold text-gray-700 appearance-none shadow-sm hover:shadow-md min-w-[160px]"
-                                value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="all">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="on_leave">On Leave</option>
-                                <option value="suspended">Suspended</option>
-                                <option value="terminated">Terminated</option>
-                                <option value="resigned">Resigned</option>
-                            </select>
-                            <Filter className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
-                        </div>
+                        <select
+                            className="h-10 px-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:border-primary-500 outline-none transition-all text-sm font-medium text-gray-700 cursor-pointer hover:border-gray-300"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                        >
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="on_leave">On Leave</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="terminated">Terminated</option>
+                            <option value="resigned">Resigned</option>
+                        </select>
+                        <Button
+                            variant="outline"
+                            className="h-10 border-gray-200 text-gray-700 hover:bg-gray-50"
+                        >
+                            <Filter className="h-4 w-4 mr-2" />
+                            Filters
+                        </Button>
                     </div>
                 </div>
             </div>
 
             {/* Content Area */}
             {isLoading ? (
-                <div className="py-24 flex flex-col items-center justify-center text-gray-400 animate-pulse">
-                    <div className="h-12 w-12 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin mb-4" />
-                    <p className="font-semibold text-gray-500">Loading your team...</p>
+                <div className="py-20 flex flex-col items-center justify-center text-gray-400">
+                    <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent mb-4"></div>
+                    <p className="font-medium text-gray-500">Loading your team...</p>
                 </div>
             ) : employees.length === 0 ? (
-                <div className="py-24 flex flex-col items-center justify-center text-center bg-white rounded-3xl border border-dashed border-gray-200 shadow-sm">
-                    <div className="h-24 w-24 bg-gradient-to-br from-gray-50 to-gray-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
-                        <Users className="h-12 w-12 text-gray-400" />
+                <div className="py-20 flex flex-col items-center justify-center text-center bg-white rounded-2xl border-2 border-dashed border-gray-200">
+                    <div className="h-20 w-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                        <Users className="h-10 w-10 text-gray-400" />
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">No team members found</h2>
-                    <p className="text-gray-500 max-w-sm mb-8 font-medium">
+                    <h2 className="text-lg font-bold text-gray-900 mb-2">No team members found</h2>
+                    <p className="text-gray-500 max-w-sm mb-6 text-sm">
                         {searchTerm || statusFilter !== 'all'
-                            ? "We couldn't find anyone matching your current filters."
-                            : "Your organization is empty. Start by adding your first team member."}
+                            ? "Try adjusting your search or filters to find what you're looking for."
+                            : "Get started by adding your first employee to the system."}
                     </p>
                     {(searchTerm || statusFilter !== 'all') ? (
-                        <Button
-                            variant="outline"
-                            onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
-                            className="rounded-xl h-11 border-gray-300 shadow-sm hover:border-gray-400"
-                        >
+                        <Button variant="outline" onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}>
                             Clear Filters
                         </Button>
                     ) : (
-                        <Button
-                            onClick={() => navigate('/employees/new')}
-                            className="bg-primary-600 text-white shadow-lg shadow-primary-500/30 hover:shadow-xl hover:-translate-y-0.5 transition-all text-base px-6 h-12 rounded-xl"
-                        >
-                            <Plus className="h-5 w-5 mr-2" />
+                        <Button onClick={() => navigate('/employees/new')} className="bg-primary-600 text-white shadow-sm hover:bg-primary-700">
+                            <Plus className="h-4 w-4 mr-2" />
                             Add First Employee
                         </Button>
                     )}
                 </div>
             ) : (
                 <>
-                    {/* Mobile Card View */}
+                    {/* Mobile Card View - Enhanced with Icons */}
                     <div className="md:hidden space-y-4">
                         {employees.map((employee) => (
-                            <div
+                            <Card
                                 key={employee.id}
-                                className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm active:scale-[0.98] transition-all"
+                                className="border border-gray-100 shadow-sm transition-shadow cursor-pointer active:scale-[0.98] group"
                                 onClick={() => navigate(`/employees/${employee.id}/edit`)}
                             >
-                                <div className="flex items-start gap-4">
-                                    <div className="relative h-14 w-14 rounded-2xl bg-gray-50 shrink-0 shadow-inner overflow-hidden border border-gray-100">
-                                        {employee.photo ? (
-                                            <img
-                                                src={getImageUrl(employee.photo)}
-                                                alt={employee.full_name}
-                                                className="h-full w-full object-cover"
-                                            />
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white text-indigo-600 font-bold text-lg">
-                                                {employee.first_name?.[0]}{employee.last_name?.[0]}
-                                            </div>
-                                        )}
-                                        <div className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${employee.employment_status === 'active' ? 'bg-emerald-500' :
-                                                employee.employment_status === 'on_leave' ? 'bg-amber-500' : 'bg-gray-400'
-                                            }`} />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <h3 className="font-bold text-gray-900 truncate">{employee.full_name}</h3>
-                                                <p className="text-sm font-medium text-emerald-600 mb-1">{employee.job_title}</p>
-                                            </div>
-                                            <StatusBadge status={employee.employment_status} />
+                                <CardContent className="p-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="relative h-12 w-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden shrink-0 border border-gray-200">
+                                            {employee.photo ? (
+                                                <img
+                                                    src={getImageUrl(employee.photo)}
+                                                    alt={employee.full_name}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                            ) : (
+                                                <span className="text-sm font-bold text-gray-400">{employee.first_name?.[0]}{employee.last_name?.[0]}</span>
+                                            )}
                                         </div>
-                                        <div className="mt-2 flex items-center gap-2 text-xs font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg w-fit">
-                                            <Building2 className="h-3.5 w-3.5 text-gray-400" />
-                                            {employee.department_name || 'Unassigned'}
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-start justify-between mb-1">
+                                                <h3 className="font-semibold text-gray-900 truncate pr-2 text-sm group-hover:text-primary-600 transition-colors">{employee.full_name}</h3>
+                                                <StatusBadge status={employee.employment_status} />
+                                            </div>
+                                            <p className="text-xs text-gray-500 truncate mb-3 font-medium">{employee.job_title}</p>
+
+                                            <div className="space-y-1.5 border-t border-gray-50 pt-2">
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Building2 className="h-3.5 w-3.5 text-gray-400" />
+                                                    <span className="truncate">{employee.department_name || 'No Dept'}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                    <Mail className="h-3.5 w-3.5 text-gray-400" />
+                                                    <span className="truncate">{employee.email}</span>
+                                                </div>
+                                                {employee.phone && (
+                                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                                        <Phone className="h-3.5 w-3.5 text-gray-400" />
+                                                        <span className="truncate">{employee.phone}</span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                </CardContent>
+                            </Card>
                         ))}
                     </div>
 
                     {/* Desktop Table View */}
-                    <div className="hidden md:block bg-white rounded-2xl shadow-premium border border-gray-200/60 overflow-hidden">
-                        <Table className="table-premium">
-                            <TableHeader>
-                                <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
-                                    <TableHead className="pl-8 h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Employee Profile</TableHead>
-                                    <TableHead className="h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Role & Department</TableHead>
-                                    <TableHead className="h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Status</TableHead>
-                                    <TableHead className="h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Contact</TableHead>
-                                    <TableHead className="h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Joined Date</TableHead>
-                                    <TableHead className="pr-8 text-right h-12 font-bold text-xs uppercase tracking-wider text-gray-500">Actions</TableHead>
+                    <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <Table>
+                            <TableHeader className="bg-gray-50/50">
+                                <TableRow className="hover:bg-transparent border-gray-100">
+                                    <TableHead className="font-semibold text-gray-600 pl-6 h-10 w-[300px]">Employee</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 h-10">Role & Dept</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 h-10">Status</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 h-10 w-[250px]">Contact</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 h-10">Joined</TableHead>
+                                    <TableHead className="font-semibold text-gray-600 text-right pr-6 h-10">Action</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {employees.map((employee) => (
                                     <TableRow
                                         key={employee.id}
-                                        className="cursor-pointer hover:bg-gray-50/80 transition-all group"
+                                        className="cursor-pointer hover:bg-gray-50 transition-colors group border-b border-gray-100 last:border-0"
                                         onClick={() => navigate(`/employees/${employee.id}/edit`)}
                                     >
-                                        <TableCell className="pl-8 py-4">
-                                            <div className="flex items-center gap-4">
-                                                <div className="relative h-11 w-11 rounded-full bg-gray-50 shadow-sm border border-gray-100 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                                        <TableCell className="pl-6 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200">
                                                     {employee.photo ? (
                                                         <img
                                                             src={getImageUrl(employee.photo)}
@@ -305,43 +266,41 @@ const EmployeeListPage = () => {
                                                             onError={(e) => { e.target.style.display = 'none'; }}
                                                         />
                                                     ) : (
-                                                        <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-indigo-50 to-white text-indigo-600 font-bold text-sm">
-                                                            {employee.first_name?.[0]}{employee.last_name?.[0]}
-                                                        </div>
+                                                        <span className="text-xs font-semibold text-gray-500">{employee.first_name?.[0]}{employee.last_name?.[0]}</span>
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="font-bold text-gray-900 group-hover:text-primary-600 transition-colors text-sm">{employee.full_name}</div>
-                                                    <div className="text-xs font-semibold text-gray-400 font-mono mt-0.5">{employee.employee_number}</div>
+                                                    <div className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors text-sm">{employee.full_name}</div>
+                                                    <div className="text-xs text-gray-500 font-mono">{employee.employee_number}</div>
                                                 </div>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="py-4">
-                                            <div className="font-semibold text-gray-800 text-sm">{employee.job_title}</div>
-                                            <div className="flex items-center gap-1.5 text-xs font-medium text-gray-500 mt-1">
-                                                <Building2 className="h-3 w-3 text-gray-400" />
-                                                {employee.department_name || 'Unassigned'}
+                                        <TableCell className="py-3">
+                                            <div className="font-medium text-gray-700 text-sm">{employee.job_title}</div>
+                                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+                                                <Building2 className="h-3 w-3" />
+                                                {employee.department_name || 'No Dept'}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="py-4">
+                                        <TableCell className="py-3">
                                             <StatusBadge status={employee.employment_status} />
                                         </TableCell>
-                                        <TableCell className="py-4">
+                                        <TableCell className="py-3">
                                             <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-xs font-medium text-gray-600 hover:text-primary-600 transition-colors">
+                                                <div className="flex items-center gap-2 text-xs text-gray-600">
                                                     <Mail className="h-3.5 w-3.5 text-gray-400" />
-                                                    <span className="truncate max-w-[180px]">{employee.email}</span>
+                                                    <span className="truncate max-w-[200px]">{employee.email}</span>
                                                 </div>
                                                 {employee.phone && (
-                                                    <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
+                                                    <div className="flex items-center gap-2 text-xs text-gray-600">
                                                         <Phone className="h-3.5 w-3.5 text-gray-400" />
                                                         {employee.phone}
                                                     </div>
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="py-4">
-                                            <div className="text-sm font-medium text-gray-600">
+                                        <TableCell className="py-3">
+                                            <div className="text-sm text-gray-600">
                                                 {new Date(employee.join_date).toLocaleDateString('en-US', {
                                                     month: 'short',
                                                     day: 'numeric',
@@ -349,13 +308,13 @@ const EmployeeListPage = () => {
                                                 })}
                                             </div>
                                         </TableCell>
-                                        <TableCell className="text-right pr-8 py-4">
+                                        <TableCell className="text-right pr-6 py-3">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="btn-premium-ghost opacity-0 group-hover:opacity-100 transition-all font-semibold"
+                                                className="opacity-0 group-hover:opacity-100 transition-opacity h-8 hover:text-primary-600"
                                             >
-                                                Edit Profile
+                                                Edit
                                             </Button>
                                         </TableCell>
                                     </TableRow>

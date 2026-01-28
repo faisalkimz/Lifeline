@@ -63,34 +63,34 @@ const ScheduledReports = () => {
             </CardHeader>
             <CardContent className="p-6">
                 {isAdding && (
-                    <form onSubmit={handleCreate} className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-4 animate-in slide-in-from-top duration-300">
+                    <form onSubmit={handleCreate} className="mb-8 p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-4 animate-in slide-in-from-top duration-300">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Report Name</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Report Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
                                     placeholder="e.g. Weekly Payroll Summary"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Recipients (comma separated)</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Recipients (comma separated)</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
                                     placeholder="manager@company.com, hr@company.com"
                                     value={formData.recipients}
                                     onChange={e => setFormData({ ...formData, recipients: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Module</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Module</label>
                                 <select
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
                                     value={formData.module}
                                     onChange={e => setFormData({ ...formData, module: e.target.value })}
                                 >
@@ -101,9 +101,9 @@ const ScheduledReports = () => {
                                 </select>
                             </div>
                             <div>
-                                <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Frequency</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase mb-1 block">Frequency</label>
                                 <select
-                                    className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
+                                    className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 outline-none"
                                     value={formData.frequency}
                                     onChange={e => setFormData({ ...formData, frequency: e.target.value })}
                                 >
@@ -124,23 +124,23 @@ const ScheduledReports = () => {
 
                 <div className="space-y-3">
                     {isLoading ? (
-                        <div className="py-10 text-center text-gray-400">Loading schedules...</div>
+                        <div className="py-10 text-center text-slate-400">Loading schedules...</div>
                     ) : schedules.length === 0 ? (
                         <div className="py-10 text-center border-2 border-dashed border-slate-100 rounded-xl">
                             <Mail className="h-8 w-8 text-slate-200 mx-auto mb-2" />
-                            <p className="text-sm text-gray-500">No reports scheduled yet.</p>
+                            <p className="text-sm text-slate-500">No reports scheduled yet.</p>
                         </div>
                     ) : (
                         schedules.map(schedule => (
-                            <div key={schedule.id} className="group flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all">
+                            <div key={schedule.id} className="group flex items-center justify-between p-4 bg-white border border-slate-200 rounded-xl hover:border-primary-200 hover:shadow-sm transition-all">
                                 <div className="flex items-center gap-4">
                                     <div className="h-10 w-10 bg-primary-50 rounded-lg flex items-center justify-center">
                                         <Send className="h-5 w-5 text-primary-600" />
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-bold text-gray-900">{schedule.name}</h4>
-                                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                                            <span className="capitalize px-1.5 py-0.5 bg-gray-100 rounded">{schedule.frequency}</span>
+                                        <h4 className="text-sm font-bold text-slate-900">{schedule.name}</h4>
+                                        <div className="flex items-center gap-3 mt-1 text-xs text-slate-500">
+                                            <span className="capitalize px-1.5 py-0.5 bg-slate-100 rounded">{schedule.frequency}</span>
                                             <span>•</span>
                                             <span>Module: {schedule.module}</span>
                                             <span>•</span>
@@ -150,8 +150,8 @@ const ScheduledReports = () => {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <div className="text-right mr-4 hidden md:block">
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase">Last Run</p>
-                                        <p className="text-xs text-gray-600">{schedule.last_run ? new Date(schedule.last_run).toLocaleDateString() : 'Never'}</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase">Last Run</p>
+                                        <p className="text-xs text-slate-600">{schedule.last_run ? new Date(schedule.last_run).toLocaleDateString() : 'Never'}</p>
                                     </div>
                                     <Button
                                         variant="ghost"

@@ -456,12 +456,12 @@ const SettingsPage = () => {
                         <CardHeader className="border-b border-gray-100 p-8">
                             <div className="flex justify-between items-center text-left">
                                 <div>
-                                    <CardTitle className="text-xl font-bold text-gray-900">Connected Applications</CardTitle>
-                                    <p className="text-gray-500 mt-1 text-sm">Sync Lifeline with external tools like Google Calendar, Zoom, and AWS.</p>
+                                    <CardTitle className="text-xl font-bold text-slate-900">Connected Applications</CardTitle>
+                                    <p className="text-slate-500 mt-1 text-sm">Sync Lifeline with external tools like Google Calendar, Zoom, and AWS.</p>
                                 </div>
                                 <Button
                                     onClick={() => navigate('/recruitment/integrations')}
-                                    className="rounded-xl h-12 px-6 bg-gray-900 hover:bg-gray-800 text-white font-bold gap-2 shadow-lg shadow-slate-900/10"
+                                    className="rounded-xl h-12 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold gap-2 shadow-lg shadow-slate-900/10"
                                 >
                                     <Globe className="h-4 w-4" />
                                     Manage Connections
@@ -471,20 +471,20 @@ const SettingsPage = () => {
                         <CardContent className="p-8 text-left">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {[
-                                    { id: 'google_calendar', name: 'Google Calendar', icon: Calendar, color: 'text-primary-500', bg: 'bg-primary-50' },
+                                    { id: 'google_calendar', name: 'Google Calendar', icon: Calendar, color: 'text-emerald-500', bg: 'bg-emerald-50' },
                                     { id: 'microsoft_outlook', icon: Mail, color: 'text-blue-500', bg: 'bg-blue-50' },
                                     { id: 'zoom', name: 'Zoom Meetings', icon: Video, color: 'text-indigo-500', bg: 'bg-indigo-50' },
                                     { id: 'aws_s3', name: 'AWS S3 Storage', icon: Cloud, color: 'text-amber-500', bg: 'bg-amber-50' }
                                 ].map((int, i) => {
                                     const isConnected = integrationStatus?.[int.id]?.connected;
                                     return (
-                                        <div key={i} className={`flex items-center gap-4 p-5 rounded-2xl border transition-all group ${isConnected ? 'border-emerald-100 bg-primary-50/20' : 'border-slate-100 bg-white hover:border-gray-300'}`}>
-                                            <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${isConnected ? 'bg-emerald-100 text-primary-600' : `${int.bg} ${int.color}`}`}>
+                                        <div key={i} className={`flex items-center gap-4 p-5 rounded-2xl border transition-all group ${isConnected ? 'border-emerald-100 bg-emerald-50/20' : 'border-slate-100 bg-white hover:border-slate-300'}`}>
+                                            <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${isConnected ? 'bg-emerald-100 text-emerald-600' : `${int.bg} ${int.color}`}`}>
                                                 <int.icon className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <p className="font-bold text-gray-900 text-sm">{int.name}</p>
-                                                <p className={`text-[11px] font-bold uppercase tracking-wider ${isConnected ? 'text-primary-600' : 'text-gray-400'}`}>
+                                                <p className="font-bold text-slate-900 text-sm">{int.name}</p>
+                                                <p className={`text-[11px] font-bold uppercase tracking-wider ${isConnected ? 'text-emerald-600' : 'text-slate-400'}`}>
                                                     {isConnected ? 'Connected' : 'Ready to sync'}
                                                 </p>
                                             </div>
@@ -493,13 +493,13 @@ const SettingsPage = () => {
                                 })}
                             </div>
 
-                            <div className="mt-10 p-6 bg-gray-50 rounded-2xl border border-slate-100 flex items-center gap-6">
+                            <div className="mt-10 p-6 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-6">
                                 <div className="h-14 w-14 rounded-full bg-white flex items-center justify-center shadow-sm">
-                                    <Shield className="h-6 w-6 text-gray-400" />
+                                    <Shield className="h-6 w-6 text-slate-400" />
                                 </div>
                                 <div className="text-left">
-                                    <h4 className="font-bold text-gray-900">Enterprise Security</h4>
-                                    <p className="text-sm text-gray-500">All external connections use secure OAuth 2.0 and industry-standard encryption for data in transit.</p>
+                                    <h4 className="font-bold text-slate-900">Enterprise Security</h4>
+                                    <p className="text-sm text-slate-500">All external connections use secure OAuth 2.0 and industry-standard encryption for data in transit.</p>
                                 </div>
                             </div>
                         </CardContent>
@@ -541,51 +541,51 @@ const SecurityTab = ({ user }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 text-left">
             <div className="lg:col-span-2 space-y-6">
                 {/* 2FA Card */}
-                <Card className="border border-gray-200 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-gray-50 border-b border-slate-100 py-4">
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
                                 <ShieldCheck className="h-4 w-4 text-blue-600" />
                             </div>
-                            <CardTitle className="text-base font-bold text-gray-900">Two-Factor Authentication (2FA)</CardTitle>
+                            <CardTitle className="text-base font-bold text-slate-900">Two-Factor Authentication (2FA)</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="flex flex-col md:flex-row gap-8">
                             <div className="flex-1">
-                                <p className="text-gray-600 text-sm leading-relaxed mb-6">
+                                <p className="text-slate-600 text-sm leading-relaxed mb-6">
                                     Add an extra layer of security to your account. To sign in, you'll need to provide a 6-digit code from your authenticator app.
                                 </p>
 
                                 {user?.two_factor_enabled ? (
-                                    <div className="p-4 bg-primary-50 rounded-xl border border-emerald-100 flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-primary-600 shadow-sm">
+                                    <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center text-emerald-600 shadow-sm">
                                             <ShieldCheck className="h-5 w-5" />
                                         </div>
                                         <div>
                                             <p className="font-bold text-emerald-900 text-sm">2FA is Enabled</p>
-                                            <p className="text-xs text-primary-600">Your account is protected with two-factor authentication.</p>
+                                            <p className="text-xs text-emerald-600">Your account is protected with two-factor authentication.</p>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="space-y-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                                            <div className="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                                                 {setupData?.qr_code && (
                                                     <img src={setupData.qr_code} alt="QR Code" className="h-32 w-32" />
                                                 )}
                                             </div>
                                             <div className="flex-1 space-y-2">
-                                                <h4 className="font-bold text-gray-900 text-sm">Step 1: Scan QR Code</h4>
-                                                <p className="text-xs text-gray-500">Scan this code with Google Authenticator or Authy on your mobile device.</p>
-                                                <div className="bg-gray-50 p-2 rounded border border-slate-100 font-mono text-[10px] text-gray-400 break-all">
+                                                <h4 className="font-bold text-slate-900 text-sm">Step 1: Scan QR Code</h4>
+                                                <p className="text-xs text-slate-500">Scan this code with Google Authenticator or Authy on your mobile device.</p>
+                                                <div className="bg-slate-50 p-2 rounded border border-slate-100 font-mono text-[10px] text-slate-400 break-all">
                                                     Secret: {setupData?.secret}
                                                 </div>
                                             </div>
                                         </div>
 
                                         <div className="space-y-3 pt-2">
-                                            <h4 className="font-bold text-gray-900 text-sm">Step 2: Enter Verification Code</h4>
+                                            <h4 className="font-bold text-slate-900 text-sm">Step 2: Enter Verification Code</h4>
                                             <div className="flex gap-2">
                                                 <Input
                                                     placeholder="000 000"
@@ -607,26 +607,26 @@ const SecurityTab = ({ user }) => {
                 </Card>
 
                 {/* Audit Logs */}
-                <Card className="border border-gray-200 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-gray-50 border-b border-slate-100 py-4 flex flex-row items-center justify-between">
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4 flex flex-row items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                                <History className="h-4 w-4 text-gray-600" />
+                            <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center">
+                                <History className="h-4 w-4 text-slate-600" />
                             </div>
-                            <CardTitle className="text-base font-bold text-gray-900">Recent Security Activity</CardTitle>
+                            <CardTitle className="text-base font-bold text-slate-900">Recent Security Activity</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">
                         <div className="divide-y divide-slate-100">
                             {logs?.map((log, i) => (
-                                <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                                <div key={i} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
                                     <div className="flex items-center gap-4">
-                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${log.status === 'success' ? 'bg-primary-50 text-primary-600' : 'bg-red-50 text-red-600'}`}>
+                                        <div className={`h-10 w-10 rounded-full flex items-center justify-center shadow-sm ${log.status === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
                                             {log.status === 'success' ? <ShieldCheck className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-gray-900 text-sm capitalize">{log.action.replace('_', ' ')}</p>
-                                            <div className="flex items-center gap-2 text-[11px] text-gray-400 font-medium">
+                                            <p className="font-bold text-slate-900 text-sm capitalize">{log.action.replace('_', ' ')}</p>
+                                            <div className="flex items-center gap-2 text-[11px] text-slate-400 font-medium">
                                                 <span>{log.ip}</span>
                                                 <span>•</span>
                                                 <span>{new Date(log.created_at).toLocaleString()}</span>
@@ -640,7 +640,7 @@ const SecurityTab = ({ user }) => {
                             ))}
                             {(!logs || logs.length === 0) && (
                                 <div className="p-12 text-center">
-                                    <p className="text-gray-400 text-sm font-medium">No recent security events found.</p>
+                                    <p className="text-slate-400 text-sm font-medium">No recent security events found.</p>
                                 </div>
                             )}
                         </div>
@@ -650,24 +650,24 @@ const SecurityTab = ({ user }) => {
 
             <div className="space-y-6">
                 {/* GDPR Card */}
-                <Card className="border border-gray-200 shadow-sm overflow-hidden">
-                    <CardHeader className="bg-gray-50 border-b border-slate-100 py-4">
+                <Card className="border border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="bg-slate-50 border-b border-slate-100 py-4">
                         <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-lg bg-orange-100 flex items-center justify-center">
                                 <Download className="h-4 w-4 text-orange-600" />
                             </div>
-                            <CardTitle className="text-base font-bold text-gray-900">Privacy & GDPR</CardTitle>
+                            <CardTitle className="text-base font-bold text-slate-900">Privacy & GDPR</CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6 text-left space-y-6">
                         <div>
-                            <h4 className="font-bold text-gray-900 text-sm mb-1">Download Personal Data</h4>
-                            <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                            <h4 className="font-bold text-slate-900 text-sm mb-1">Download Personal Data</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
                                 You can request a copy of all information stored about you in our systems at any time.
                             </p>
                             <Button
                                 variant="outline"
-                                className="w-full font-bold h-11 hover:bg-gray-50 border-gray-200 text-gray-700"
+                                className="w-full font-bold h-11 hover:bg-slate-50 border-slate-200 text-slate-700"
                                 onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL || '/api'}/security/export_data/`, '_blank')}
                             >
                                 <Download className="h-4 w-4 mr-2" />
@@ -676,8 +676,8 @@ const SecurityTab = ({ user }) => {
                         </div>
 
                         <div className="pt-6 border-t border-slate-100">
-                            <h4 className="font-bold text-gray-900 text-sm mb-1">Deactivate Account</h4>
-                            <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                            <h4 className="font-bold text-slate-900 text-sm mb-1">Deactivate Account</h4>
+                            <p className="text-xs text-slate-500 leading-relaxed mb-4">
                                 Temporarily hide your profile and access. This action can be undone by an administrator.
                             </p>
                             <Button variant="outline" className="w-full font-bold h-11 border-red-200 text-red-600 hover:bg-red-50">
@@ -774,15 +774,15 @@ const TaxSettingsTab = () => {
         <div className="max-w-5xl space-y-8 text-left animate-in fade-in duration-500">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
-                    <Card className="border border-gray-200 shadow-xl shadow-slate-200/20 rounded-3xl overflow-hidden bg-white">
-                        <CardHeader className="bg-gray-50/50 border-b border-slate-100 py-6 px-8">
+                    <Card className="border border-slate-200 shadow-xl shadow-slate-200/20 rounded-3xl overflow-hidden bg-white">
+                        <CardHeader className="bg-slate-50/50 border-b border-slate-100 py-6 px-8">
                             <div className="flex items-center gap-4">
                                 <div className="h-12 w-12 rounded-2xl bg-emerald-100 flex items-center justify-center shadow-inner">
-                                    <Landmark className="h-6 w-6 text-primary-600" />
+                                    <Landmark className="h-6 w-6 text-emerald-600" />
                                 </div>
                                 <div>
-                                    <CardTitle className="text-xl font-black text-gray-900 tracking-tight">Uganda Statutory Deductions</CardTitle>
-                                    <p className="text-gray-500 text-sm font-medium">Standard rates for NSSF & PAYE Reliefs</p>
+                                    <CardTitle className="text-xl font-black text-slate-900 tracking-tight">Uganda Statutory Deductions</CardTitle>
+                                    <p className="text-slate-500 text-sm font-medium">Standard rates for NSSF & PAYE Reliefs</p>
                                 </div>
                             </div>
                         </CardHeader>
@@ -790,48 +790,48 @@ const TaxSettingsTab = () => {
                             {/* NSSF Section */}
                             <section className="space-y-6">
                                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                                    <Receipt className="h-4 w-4 text-gray-400" />
+                                    <Receipt className="h-4 w-4 text-slate-400" />
                                     <h3 className="font-bold text-slate-800 text-lg">NSSF Contributions</h3>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Employee Rate</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Employee Rate</Label>
                                         <div className="relative group">
                                             <Input
                                                 type="number"
                                                 value={form.nssf_employee_rate}
                                                 onChange={(e) => setForm({ ...form, nssf_employee_rate: e.target.value })}
-                                                className="pl-4 pr-10 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                                className="pl-4 pr-10 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                                             />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">%</span>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                                         </div>
-                                        <p className="text-[11px] text-gray-500 font-bold px-1">Uganda Standard: <span className="text-primary-600">5.0%</span></p>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">Uganda Standard: <span className="text-emerald-600">5.0%</span></p>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Employer Rate</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Employer Rate</Label>
                                         <div className="relative group">
                                             <Input
                                                 type="number"
                                                 value={form.nssf_employer_rate}
                                                 onChange={(e) => setForm({ ...form, nssf_employer_rate: e.target.value })}
-                                                className="pl-4 pr-10 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                                className="pl-4 pr-10 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                                             />
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold">%</span>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
                                         </div>
-                                        <p className="text-[11px] text-gray-500 font-bold px-1">Uganda Standard: <span className="text-primary-600">10.0%</span></p>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">Uganda Standard: <span className="text-emerald-600">10.0%</span></p>
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Monthly Ceiling</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Monthly Ceiling</Label>
                                         <div className="relative group">
                                             <Input
                                                 type="number"
                                                 value={form.nssf_ceiling}
                                                 onChange={(e) => setForm({ ...form, nssf_ceiling: e.target.value })}
-                                                className="pl-12 pr-4 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
+                                                className="pl-12 pr-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all outline-none"
                                             />
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-xs uppercase">Shs</span>
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs uppercase">Shs</span>
                                         </div>
-                                        <p className="text-[11px] text-gray-500 font-bold px-1">0 = <span className="text-gray-900">No Limit (Default)</span></p>
+                                        <p className="text-[11px] text-slate-500 font-bold px-1">0 = <span className="text-slate-900">No Limit (Default)</span></p>
                                     </div>
                                 </div>
                             </section>
@@ -839,49 +839,49 @@ const TaxSettingsTab = () => {
                             {/* PAYE Reliefs Section */}
                             <section className="space-y-6">
                                 <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                                    <ShieldCheck className="h-4 w-4 text-gray-400" />
+                                    <ShieldCheck className="h-4 w-4 text-slate-400" />
                                     <h3 className="font-bold text-slate-800 text-lg">PAYE Tax Reliefs</h3>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Personal Relief</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Personal Relief</Label>
                                         <Input
                                             type="number"
                                             value={form.personal_relief}
                                             onChange={(e) => setForm({ ...form, personal_relief: e.target.value })}
-                                            className="px-4 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Insurance Relief</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Insurance Relief</Label>
                                         <Input
                                             type="number"
                                             value={form.insurance_relief}
                                             onChange={(e) => setForm({ ...form, insurance_relief: e.target.value })}
-                                            className="px-4 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <Label className="text-xs font-black uppercase tracking-widest text-gray-400">Pension Relief</Label>
+                                        <Label className="text-xs font-black uppercase tracking-widest text-slate-400">Pension Relief</Label>
                                         <Input
                                             type="number"
                                             value={form.pension_fund_relief}
                                             onChange={(e) => setForm({ ...form, pension_fund_relief: e.target.value })}
-                                            className="px-4 py-6 text-lg font-black bg-gray-50 border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
+                                            className="px-4 py-6 text-lg font-black bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-500/10 transition-all outline-none"
                                         />
                                     </div>
                                 </div>
                             </section>
 
                             {/* Local Service Tax */}
-                            <section className="p-6 bg-gray-50/50 rounded-3xl border border-slate-100 flex items-center justify-between">
+                            <section className="p-6 bg-slate-50/50 rounded-3xl border border-slate-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${form.local_service_tax_enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-gray-400'}`}>
+                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center transition-colors ${form.local_service_tax_enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-400'}`}>
                                         <Landmark className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-gray-900">Local Service Tax (LST)</h4>
-                                        <p className="text-xs text-gray-500 font-bold">Apply annual LST deductions to payroll</p>
+                                        <h4 className="font-black text-slate-900">Local Service Tax (LST)</h4>
+                                        <p className="text-xs text-slate-500 font-bold">Apply annual LST deductions to payroll</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-6">
@@ -890,7 +890,7 @@ const TaxSettingsTab = () => {
                                         id="lst_enabled"
                                         checked={form.local_service_tax_enabled}
                                         onChange={(e) => setForm({ ...form, local_service_tax_enabled: e.target.checked })}
-                                        className="h-6 w-6 rounded-lg border-gray-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
+                                        className="h-6 w-6 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer"
                                     />
                                     {form.local_service_tax_enabled && (
                                         <div className="w-24 animate-in zoom-in duration-300">
@@ -898,7 +898,7 @@ const TaxSettingsTab = () => {
                                                 type="number"
                                                 value={form.local_service_tax_rate}
                                                 onChange={(e) => setForm({ ...form, local_service_tax_rate: e.target.value })}
-                                                className="h-10 font-black border-gray-200 focus:border-blue-500 rounded-xl"
+                                                className="h-10 font-black border-slate-200 focus:border-blue-500 rounded-xl"
                                             />
                                         </div>
                                     )}
@@ -909,7 +909,7 @@ const TaxSettingsTab = () => {
                                 <Button
                                     onClick={handleSave}
                                     disabled={isUpdating}
-                                    className="px-10 py-7 rounded-2xl font-black bg-gray-900 hover:bg-gray-800 text-white shadow-2xl shadow-slate-900/20 active:scale-95 transition-all text-lg"
+                                    className="px-10 py-7 rounded-2xl font-black bg-slate-900 hover:bg-slate-800 text-white shadow-2xl shadow-slate-900/20 active:scale-95 transition-all text-lg"
                                 >
                                     <Save className="h-5 w-5 mr-3" />
                                     {isUpdating ? 'Applying Changes...' : 'Save Tax Profile'}
@@ -952,15 +952,15 @@ const TaxSettingsTab = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="border border-gray-200 rounded-3xl p-8 bg-gray-50/30">
+                    <Card className="border border-slate-200 rounded-3xl p-8 bg-slate-50/30">
                         <div className="flex items-center gap-3 mb-6">
-                            <Info className="h-5 w-5 text-gray-400" />
-                            <h4 className="font-bold text-gray-900">Need Guidance?</h4>
+                            <Info className="h-5 w-5 text-slate-400" />
+                            <h4 className="font-bold text-slate-900">Need Guidance?</h4>
                         </div>
-                        <p className="text-sm text-gray-500 font-medium leading-relaxed mb-6">
+                        <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">
                             Refer to the <b>Uganda Revenue Authority (URA)</b> technical guide for the 2024/25 fiscal year if you are unsure about custom rates.
                         </p>
-                        <Button variant="outline" className="w-full py-6 rounded-2xl font-bold border-gray-200 text-gray-700 bg-white hover:bg-gray-50 transition-all">
+                        <Button variant="outline" className="w-full py-6 rounded-2xl font-bold border-slate-200 text-slate-700 bg-white hover:bg-slate-50 transition-all">
                             View URA Tax Guide
                         </Button>
                     </Card>

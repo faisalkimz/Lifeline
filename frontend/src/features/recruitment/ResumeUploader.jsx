@@ -88,15 +88,15 @@ const ResumeUploader = ({ onDataExtracted }) => {
     return (
         <div className="space-y-6">
             {/* Upload Card */}
-            <Card className="border-2 border-dashed border-gray-300 hover:border-primary-400 transition-colors">
+            <Card className="border-2 border-dashed border-slate-300 hover:border-primary-400 transition-colors">
                 <CardContent className="p-8">
                     <div className="text-center">
                         <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center mb-4">
                             <Upload className="h-8 w-8 text-primary-600" />
                         </div>
 
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Upload Resume</h3>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Upload Resume</h3>
+                        <p className="text-sm text-slate-600 mb-6">
                             Upload a PDF or DOCX resume to automatically extract candidate information
                         </p>
 
@@ -114,24 +114,24 @@ const ResumeUploader = ({ onDataExtracted }) => {
                                         Choose File
                                     </div>
                                 </label>
-                                <p className="text-xs text-gray-500 mt-3">PDF or DOCX, max 5MB</p>
+                                <p className="text-xs text-slate-500 mt-3">PDF or DOCX, max 5MB</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {/* File Info */}
-                                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 flex items-center gap-4">
+                                <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center gap-4">
                                     <div className="h-12 w-12 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0">
                                         <FileText className="h-6 w-6 text-primary-600" />
                                     </div>
                                     <div className="flex-1 text-left">
-                                        <p className="font-semibold text-gray-900 truncate">{file.name}</p>
-                                        <p className="text-xs text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                                        <p className="font-semibold text-slate-900 truncate">{file.name}</p>
+                                        <p className="text-xs text-slate-500">{(file.size / 1024).toFixed(2)} KB</p>
                                     </div>
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={resetUploader}
-                                        className="text-gray-500 hover:text-gray-700"
+                                        className="text-slate-500 hover:text-slate-700"
                                     >
                                         Change
                                     </Button>
@@ -181,10 +181,10 @@ const ResumeUploader = ({ onDataExtracted }) => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                     >
-                        <Card className="border-emerald-200 bg-primary-50/50">
+                        <Card className="border-emerald-200 bg-emerald-50/50">
                             <CardContent className="p-6">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="h-10 w-10 rounded-xl bg-primary-500 flex items-center justify-center">
+                                    <div className="h-10 w-10 rounded-xl bg-emerald-500 flex items-center justify-center">
                                         <CheckCircle className="h-5 w-5 text-white" />
                                     </div>
                                     <div>
@@ -196,33 +196,33 @@ const ResumeUploader = ({ onDataExtracted }) => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {parsedData.first_name && (
                                         <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                                            <p className="text-xs font-medium text-gray-600 mb-1">First Name</p>
-                                            <p className="font-semibold text-gray-900">{parsedData.first_name}</p>
+                                            <p className="text-xs font-medium text-slate-600 mb-1">First Name</p>
+                                            <p className="font-semibold text-slate-900">{parsedData.first_name}</p>
                                         </div>
                                     )}
                                     {parsedData.last_name && (
                                         <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                                            <p className="text-xs font-medium text-gray-600 mb-1">Last Name</p>
-                                            <p className="font-semibold text-gray-900">{parsedData.last_name}</p>
+                                            <p className="text-xs font-medium text-slate-600 mb-1">Last Name</p>
+                                            <p className="font-semibold text-slate-900">{parsedData.last_name}</p>
                                         </div>
                                     )}
                                     {parsedData.email && (
                                         <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                                            <p className="text-xs font-medium text-gray-600 mb-1">Email</p>
-                                            <p className="font-semibold text-gray-900">{parsedData.email}</p>
+                                            <p className="text-xs font-medium text-slate-600 mb-1">Email</p>
+                                            <p className="font-semibold text-slate-900">{parsedData.email}</p>
                                         </div>
                                     )}
                                     {parsedData.phone && (
                                         <div className="bg-white rounded-lg p-3 border border-emerald-100">
-                                            <p className="text-xs font-medium text-gray-600 mb-1">Phone</p>
-                                            <p className="font-semibold text-gray-900">{parsedData.phone}</p>
+                                            <p className="text-xs font-medium text-slate-600 mb-1">Phone</p>
+                                            <p className="font-semibold text-slate-900">{parsedData.phone}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {parsedData.skills && parsedData.skills.length > 0 && (
                                     <div className="mt-4 bg-white rounded-lg p-4 border border-emerald-100">
-                                        <p className="text-xs font-medium text-gray-600 mb-2">Skills Found</p>
+                                        <p className="text-xs font-medium text-slate-600 mb-2">Skills Found</p>
                                         <div className="flex flex-wrap gap-2">
                                             {parsedData.skills.map((skill, index) => (
                                                 <span

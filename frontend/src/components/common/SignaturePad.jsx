@@ -63,19 +63,19 @@ const SignaturePad = ({ onSave, onCancel }) => {
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in duration-300">
-            <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-gray-200">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-gray-50">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950">
                     <div className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-primary-600" />
                         <h3 className="text-xl font-black text-slate-800 dark:text-white tracking-tight">Legal <span className="text-primary-600">e-Signature</span></h3>
                     </div>
-                    <button onClick={onCancel} className="p-2 hover:bg-slate-200 dark:hover:bg-gray-800 rounded-full transition-colors">
-                        <X className="h-5 w-5 text-gray-400" />
+                    <button onClick={onCancel} className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition-colors">
+                        <X className="h-5 w-5 text-slate-400" />
                     </button>
                 </div>
 
                 <div className="p-8 space-y-6">
-                    <p className="text-sm text-gray-500 font-medium italic">Please use your mouse or touch screen to sign inside the box below:</p>
+                    <p className="text-sm text-slate-500 font-medium italic">Please use your mouse or touch screen to sign inside the box below:</p>
 
                     <div className="relative group">
                         <canvas
@@ -89,11 +89,11 @@ const SignaturePad = ({ onSave, onCancel }) => {
                             onTouchStart={startDrawing}
                             onTouchMove={draw}
                             onTouchEnd={stopDrawing}
-                            className="w-full bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl cursor-crosshair shadow-inner"
+                            className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-2xl cursor-crosshair shadow-inner"
                         />
                         <button
                             onClick={clear}
-                            className="absolute top-4 right-4 p-3 bg-white dark:bg-slate-700 shadow-lg rounded-xl text-gray-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                            className="absolute top-4 right-4 p-3 bg-white dark:bg-slate-700 shadow-lg rounded-xl text-slate-500 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
                             title="Clear"
                         >
                             <Eraser className="h-4 w-4" />
@@ -106,7 +106,7 @@ const SignaturePad = ({ onSave, onCancel }) => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button onClick={onCancel} className="flex-1 py-4 bg-gray-100 text-gray-600 dark:text-gray-400 font-bold rounded-2xl hover:bg-slate-200 transition-all">
+                        <button onClick={onCancel} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-2xl hover:bg-slate-200 transition-all">
                             Cancel
                         </button>
                         <button

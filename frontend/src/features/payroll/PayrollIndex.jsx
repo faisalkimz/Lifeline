@@ -14,13 +14,13 @@ const PayrollIndex = () => {
             {/* Premium Header */}
             <div className="relative group">
                 <div className="absolute -left-10 top-0 bottom-0 w-1 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
-                <h1 className="text-5xl font-black tracking-tighter text-gray-900 leading-none">Financial Operations</h1>
-                <p className="text-gray-500 mt-4 text-xl font-medium max-w-2xl">Manage organizational liquidity, payroll compliance, and employee compensation strategies in one unified command center.</p>
+                <h1 className="text-5xl font-black tracking-tighter text-slate-900 leading-none">Financial Operations</h1>
+                <p className="text-slate-500 mt-4 text-xl font-medium max-w-2xl">Manage organizational liquidity, payroll compliance, and employee compensation strategies in one unified command center.</p>
             </div>
 
             {/* Navigation Tabs - Modern Segmented Control */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <div className="bg-gray-100/50 backdrop-blur-sm p-2 rounded-[2rem] inline-flex mb-10 border border-gray-200/50 shadow-inner">
+                <div className="bg-slate-100/50 backdrop-blur-sm p-2 rounded-[2rem] inline-flex mb-10 border border-slate-200/50 shadow-inner">
                     <TabsList className="bg-transparent border-none p-0 flex gap-1">
                         {[
                             { id: 'dashboard', label: 'Overview', icon: DollarSign },
@@ -33,7 +33,7 @@ const PayrollIndex = () => {
                                 value={tab.id}
                                 className="data-[state=active]:bg-white data-[state=active]:text-primary-600 data-[state=active]:shadow-[0_8px_16px_-4px_rgba(0,0,0,0.08)] rounded-[1.5rem] px-8 py-3.5 text-sm font-black transition-all duration-300 flex items-center gap-2 border border-transparent data-[state=active]:border-slate-100"
                             >
-                                <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-primary-500' : 'text-gray-400'}`} />
+                                <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? 'text-primary-500' : 'text-slate-400'}`} />
                                 {tab.label}
                             </TabsTrigger>
                         ))}

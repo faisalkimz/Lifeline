@@ -40,7 +40,7 @@ const SelectTrigger = ({ children, className }) => {
             type="button"
             onClick={() => setOpen(!open)}
             className={cn(
-                "flex h-10 w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-slate-950 dark:focus:ring-slate-300",
+                "flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus:ring-slate-300",
                 className
             )}
         >
@@ -63,7 +63,7 @@ const SelectContent = ({ children, className }) => {
     return (
         <div
             className={cn(
-                "absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white p-1 text-slate-950 shadow-md animate-in fade-in-0 zoom-in-95 dark:text-slate-50",
+                "absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-slate-200 bg-white p-1 text-slate-950 shadow-md animate-in fade-in-0 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50",
                 className
             )}
         >
@@ -80,8 +80,8 @@ const SelectItem = ({ children, value: itemValue, className }) => {
         <div
             onClick={() => onValueChange(itemValue)}
             className={cn(
-                "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-gray-100 dark:hover:bg-gray-800",
-                isSelected && "bg-gray-100",
+                "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-slate-100 dark:hover:bg-slate-800",
+                isSelected && "bg-slate-100 dark:bg-slate-800",
                 className
             )}
         >

@@ -80,17 +80,17 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
 
         {/* AI Score Banner */}
         {application?.score > 0 && (
-          <div className="mx-6 mt-4 p-4 bg-primary-50 border border-emerald-100 rounded-xl flex items-center justify-between">
+          <div className="mx-6 mt-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center font-bold text-emerald-700">
                 {application.score}%
               </div>
               <div>
                 <p className="text-sm font-bold text-emerald-900">AI Compatibility Score</p>
-                <p className="text-xs text-primary-600 font-medium">Candidate matches {application.score}% of job requirements.</p>
+                <p className="text-xs text-emerald-600 font-medium">Candidate matches {application.score}% of job requirements.</p>
               </div>
             </div>
-            <TrendingUp className="h-5 w-5 text-primary-500" />
+            <TrendingUp className="h-5 w-5 text-emerald-500" />
           </div>
         )}
 
@@ -186,7 +186,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           {application && (
             <Button
               variant="outline"
-              className="flex-1 gap-2 border-gray-200 hover:bg-white hover:text-primary-600 font-bold"
+              className="flex-1 gap-2 border-slate-200 hover:bg-white hover:text-primary-600 font-bold"
               onClick={async () => {
                 try {
                   const res = await screenWithAi(application.id).unwrap();
@@ -207,7 +207,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           >
             Generate Offer
           </Button>
-          <Button variant="outline" className="flex-1 font-bold border-gray-200">
+          <Button variant="outline" className="flex-1 font-bold border-slate-200">
             Schedule Interview
           </Button>
         </div>

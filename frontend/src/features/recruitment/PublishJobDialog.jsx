@@ -38,8 +38,8 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
             id: 'fuzu',
             name: 'Fuzu',
             icon: Globe,
-            color: 'bg-primary-50 border-emerald-200 text-primary-600',
-            activeColor: 'bg-primary-600 border-emerald-600 text-white',
+            color: 'bg-emerald-50 border-emerald-200 text-emerald-600',
+            activeColor: 'bg-emerald-600 border-emerald-600 text-white',
             description: 'East African jobs - Local talent'
         },
         {
@@ -126,20 +126,20 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden flex flex-col p-0 bg-white rounded-3xl">
                 <div className="bg-white px-8 py-6 flex items-center justify-between border-b border-slate-100">
                     <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                            <Globe className="h-6 w-6 text-gray-600" />
+                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <Globe className="h-6 w-6 text-slate-600" />
                         </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
                                 Publish Job
                             </DialogTitle>
-                            <p className="text-sm text-gray-500 mt-1 font-medium">
+                            <p className="text-sm text-slate-500 mt-1 font-medium">
                                 Choose platforms to publish <strong>{job?.title}</strong>
                             </p>
                         </div>
                     </div>
                     <Link to={`/recruitment/jobs/${job.id}`} target="_blank">
-                        <Button variant="outline" size="sm" className="bg-white border-gray-200 text-gray-600 hover:text-gray-900 font-bold rounded-xl shadow-sm">
+                        <Button variant="outline" size="sm" className="bg-white border-slate-200 text-slate-600 hover:text-slate-900 font-bold rounded-xl shadow-sm">
                             <Eye className="h-4 w-4 mr-2" />
                             Preview
                         </Button>
@@ -148,20 +148,20 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Scheduled Publishing */}
-                    <div className="bg-gray-50 border border-slate-100 rounded-2xl p-6">
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-white rounded-lg border border-slate-100 shadow-sm">
-                                <Calendar className="h-5 w-5 text-gray-900" />
+                                <Calendar className="h-5 w-5 text-slate-900" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-gray-900 text-sm">Schedule Publishing</h3>
-                                <p className="text-xs text-gray-500">Automatically publish at a later date.</p>
+                                <h3 className="font-bold text-slate-900 text-sm">Schedule Publishing</h3>
+                                <p className="text-xs text-slate-500">Automatically publish at a later date.</p>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                                     Date
                                 </label>
                                 <input
@@ -169,25 +169,25 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                     value={publishDate}
                                     onChange={(e) => setPublishDate(e.target.value)}
                                     min={new Date().toISOString().split('T')[0]}
-                                    className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
+                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                                     Time
                                 </label>
                                 <input
                                     type="time"
                                     value={publishTime}
                                     onChange={(e) => setPublishTime(e.target.value)}
-                                    className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
+                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-slate-200 outline-none"
                                 />
                             </div>
                         </div>
                         {publishDate && publishTime && (
-                            <div className="mt-4 p-3 bg-white border border-gray-200 rounded-xl flex items-center gap-3 shadow-sm">
-                                <Clock className="h-4 w-4 text-primary-500" />
-                                <span className="text-xs font-bold text-gray-700">
+                            <div className="mt-4 p-3 bg-white border border-slate-200 rounded-xl flex items-center gap-3 shadow-sm">
+                                <Clock className="h-4 w-4 text-emerald-500" />
+                                <span className="text-xs font-bold text-slate-700">
                                     Scheduled for {new Date(`${publishDate}T${publishTime}`).toLocaleString()}
                                 </span>
                             </div>
@@ -197,13 +197,13 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                     {/* Platforms */}
                     <div className="space-y-4">
                         <div className="flex justify-between items-center">
-                            <h3 className="font-bold text-gray-900">Publish Immediately</h3>
+                            <h3 className="font-bold text-slate-900">Publish Immediately</h3>
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleSelectAll}
                                 disabled={publishing}
-                                className="text-gray-500 hover:text-gray-900"
+                                className="text-slate-500 hover:text-slate-900"
                             >
                                 Select All Active
                             </Button>
@@ -220,7 +220,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                         onClick={() => isActive && handlePlatformToggle(platform.id)}
                                         className={cn(
                                             "relative p-5 rounded-2xl border transition-all cursor-pointer flex items-start gap-4 active:scale-95",
-                                            isSelected ? "border-slate-900 bg-gray-50 shadow-md" : "border-gray-200 bg-white hover:border-gray-300",
+                                            isSelected ? "border-slate-900 bg-slate-50 shadow-md" : "border-slate-200 bg-white hover:border-slate-300",
                                             !isActive && "opacity-50 cursor-not-allowed grayscale"
                                         )}
                                     >
@@ -229,16 +229,16 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                                 <platform.icon className="h-6 w-6" />
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-gray-900">{platform.name}</h3>
-                                                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{platform.description}</p>
+                                                <h3 className="font-bold text-slate-900">{platform.name}</h3>
+                                                <p className="text-xs text-slate-500 mt-1 leading-relaxed">{platform.description}</p>
                                                 <div className="mt-2">
                                                     {isActive ? (
-                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-primary-600 bg-primary-50 px-2 py-1 rounded-lg">
+                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
                                                             <CheckCircle className="h-3 w-3" />
                                                             Ready
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
+                                                        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg">
                                                             <XCircle className="h-3 w-3" />
                                                             Not Connected
                                                         </span>
@@ -248,7 +248,7 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                                         </div>
                                         {isSelected && (
                                             <div className="absolute top-4 right-4">
-                                                <div className="h-6 w-6 bg-gray-900 rounded-full flex items-center justify-center shadow-lg">
+                                                <div className="h-6 w-6 bg-slate-900 rounded-full flex items-center justify-center shadow-lg">
                                                     <CheckCircle className="h-3.5 w-3.5 text-white" />
                                                 </div>
                                             </div>
@@ -261,23 +261,23 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
 
                     {/* Results */}
                     {publishResults && (
-                        <div className="space-y-3 p-5 bg-gray-50 rounded-2xl border border-gray-200">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-primary-500" />
+                        <div className="space-y-3 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+                            <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                <Activity className="h-5 w-5 text-emerald-500" />
                                 Publishing Results
                             </h3>
                             {Object.entries(publishResults.platforms).map(([platform, result]) => (
                                 <div key={platform} className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100 shadow-sm">
                                     <div className="flex items-center gap-3">
                                         {result.success ? (
-                                            <CheckCircle className="h-5 w-5 text-primary-500" />
+                                            <CheckCircle className="h-5 w-5 text-emerald-500" />
                                         ) : (
                                             <XCircle className="h-5 w-5 text-red-500" />
                                         )}
                                         <div>
-                                            <p className="font-bold text-gray-900 text-sm capitalize">{platform}</p>
+                                            <p className="font-bold text-slate-900 text-sm capitalize">{platform}</p>
                                             {result.success && result.url && (
-                                                <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-600 hover:underline flex items-center gap-1 font-medium">
+                                                <a href={result.url} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:underline flex items-center gap-1 font-medium">
                                                     View Listing <ExternalLink className="h-3 w-3" />
                                                 </a>
                                             )}
@@ -291,14 +291,14 @@ const PublishJobDialog = ({ job, isOpen, onClose }) => {
                 </div>
 
                 <div className="p-6 border-t border-slate-100 bg-white flex gap-3">
-                    <Button variant="ghost" onClick={onClose} disabled={publishing} className="flex-1 h-12 rounded-xl text-gray-500 hover:text-gray-900 font-bold">
+                    <Button variant="ghost" onClick={onClose} disabled={publishing} className="flex-1 h-12 rounded-xl text-slate-500 hover:text-slate-900 font-bold">
                         {publishResults ? 'Close' : 'Cancel'}
                     </Button>
                     {!publishResults && (
                         <Button
                             onClick={handlePublish}
                             disabled={publishing || (selectedPlatforms.length === 0 && !publishDate)}
-                            className="flex-1 h-12 bg-gray-900 hover:bg-gray-800 text-white shadow-lg shadow-slate-900/20 rounded-xl font-bold"
+                            className="flex-1 h-12 bg-slate-900 hover:bg-slate-800 text-white shadow-lg shadow-slate-900/20 rounded-xl font-bold"
                         >
                             {publishing ? (
                                 <>

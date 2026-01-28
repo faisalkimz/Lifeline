@@ -88,7 +88,7 @@ const DashboardLayout = () => {
           <Icon className="h-4 w-4 text-white" />
         </div>
         <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-gray-500 font-bold leading-none mb-1">{label}</p>
+          <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold leading-none mb-1">{label}</p>
           <p className="text-sm font-bold text-white leading-none">{value || 0}</p>
         </div>
       </div>
@@ -101,38 +101,38 @@ const DashboardLayout = () => {
   );
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-50 flex font-sans text-gray-900 transition-colors duration-200">
+    <div className="h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 flex font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
-        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-40 lg:hidden animate-fade-in-up" onClick={() => setIsSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-slate-900/50 z-40 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      {/* Sidebar - Premium OmniHR Theme */}
+      {/* Sidebar - Workpay Dark Theme (Stays Dark in both modes) */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200/80 transition-all duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col shrink-0 shadow-sm',
+          'fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex lg:flex-col shrink-0',
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        {/* Logo Area - with gradient */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-200/80 shrink-0 bg-gradient-to-r from-white to-gray-50/30">
-          <Link to="/dashboard" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-xl group-hover:shadow-primary-500/30 transition-all duration-300 group-hover:scale-105">
+        {/* Logo Area */}
+        <div className="h-16 flex items-center px-6 border-b border-slate-800 bg-slate-900 shrink-0">
+          <Link to="/dashboard" className="flex items-center gap-2">
+            <div className="h-8 w-8 bg-primary-500 rounded-lg flex items-center justify-center shadow-lg shadow-primary-900/20">
               <Building className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900 tracking-tight">Lifeline</span>
+            <span className="text-xl font-bold text-white tracking-tight">Lifeline</span>
           </Link>
-          <button onClick={() => setIsSidebarOpen(false)} className="ml-auto lg:hidden text-gray-400 hover:text-gray-600">
+          <button onClick={() => setIsSidebarOpen(false)} className="ml-auto lg:hidden text-slate-400">
             <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Navigation Links */}
-        <div className="flex-1 overflow-y-auto pt-6 px-3 space-y-8 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
+        <div className="flex-1 overflow-y-auto pt-6 px-3 space-y-8 scrollbar-hide">
           {/* Main Modules */}
           <div>
-            <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Main</p>
-            <nav className="space-y-0.5">
+            <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-600 mb-3">Human Resources</p>
+            <nav className="space-y-1">
               {navigation.map((item) => {
                 const isActive = location.pathname.startsWith(item.href);
                 return (
@@ -140,17 +140,14 @@ const DashboardLayout = () => {
                     key={item.name}
                     to={item.href}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
+                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group',
                       isActive
-                        ? 'bg-gradient-to-r from-primary-50 to-primary-100/50 text-primary-700 shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                     )}
                   >
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary-500 to-primary-600 rounded-r-full" />
-                    )}
-                    <item.icon className={cn('h-5 w-5 transition-all duration-200', isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-500')} />
-                    <span className={isActive ? 'font-semibold' : ''}>{item.name}</span>
+                    <item.icon className={cn('h-4 w-4 transition-colors', isActive ? 'text-white' : 'text-slate-500 group-hover:text-white')} />
+                    {item.name}
                   </Link>
                 );
               })}
@@ -160,8 +157,8 @@ const DashboardLayout = () => {
           {/* Admin Section */}
           {user.role !== 'employee' && (
             <div>
-              <p className="px-3 text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-3">Administration</p>
-              <nav className="space-y-0.5">
+              <p className="px-3 text-xs font-semibold uppercase tracking-wider text-slate-600 mb-3">Administration</p>
+              <nav className="space-y-1">
                 {adminLinks.map((item) => {
                   const isActive = location.pathname.startsWith(item.href);
                   return (
@@ -169,42 +166,41 @@ const DashboardLayout = () => {
                       key={item.name}
                       to={item.href}
                       className={cn(
-                        'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative',
+                        'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group',
                         isActive
-                          ? 'bg-gradient-to-r from-primary-50 to-primary-100/50 text-primary-700 shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          ? 'bg-primary-600 text-white shadow-lg shadow-primary-900/20'
+                          : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                       )}
                     >
-                      {isActive && (
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary-500 to-primary-600 rounded-r-full" />
-                      )}
-                      <item.icon className={cn('h-5 w-5 transition-all duration-200', isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-primary-500')} />
-                      <span className={isActive ? 'font-semibold' : ''}>{item.name}</span>
+                      <item.icon className={cn('h-4 w-4 transition-colors', isActive ? 'text-white' : 'text-slate-500 group-hover:text-white')} />
+                      {item.name}
                     </Link>
                   );
                 })}
               </nav>
             </div>
           )}
+
+
         </div>
 
         {/* User Profile Footer */}
-        <div className="p-4 border-t border-gray-200 shrink-0">
+        <div className="p-4 border-t border-slate-800 bg-slate-900 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-gray-100 overflow-hidden border-2 border-gray-200">
+            <div className="h-10 w-10 rounded-xl bg-slate-800 border border-slate-700 p-0.5 overflow-hidden transition-transform hover:scale-105">
               {user.photo ? (
-                <img src={getImageUrl(user.photo)} alt="Profile" className="h-full w-full object-cover" />
+                <img src={getImageUrl(user.photo)} alt="Profile" className="h-full w-full object-cover rounded-lg" />
               ) : (
-                <div className="h-full w-full bg-primary-600 flex items-center justify-center text-white text-sm font-semibold uppercase">
+                <div className="h-full w-full bg-primary-600 flex items-center justify-center text-white text-xs font-bold rounded-lg uppercase">
                   {user.first_name?.[0]}{user.last_name?.[0]}
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 truncate">{user.first_name} {user.last_name}</p>
-              <p className="text-xs text-gray-500 truncate capitalize">{user.role?.replace('_', ' ')}</p>
+              <p className="text-sm font-bold text-white truncate leading-none mb-1">{user.first_name} {user.last_name}</p>
+              <p className="text-[10px] font-semibold text-slate-500 truncate uppercase tracking-tight">{user.role?.replace('_', ' ')}</p>
             </div>
-            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Logout">
+            <button onClick={handleLogout} className="p-2 text-slate-500 hover:text-white hover:bg-slate-800 rounded-lg transition-colors" title="Logout">
               <LogOut className="h-5 w-5" />
             </button>
           </div>
@@ -214,42 +210,51 @@ const DashboardLayout = () => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
-        {/* Top Header - Clean OmniHR Style */}
-        <header className="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm z-20 shrink-0">
+        {/* Top Header - Fixed & Clean */}
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6 shadow-sm z-20 shrink-0">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
               <Menu className="h-6 w-6" />
             </button>
 
-            {/* Company Context */}
-            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200 cursor-pointer hover:border-primary-300 hover:bg-white transition-all group">
-              <div className="h-7 w-7 rounded-lg bg-primary-600 flex items-center justify-center text-white text-xs font-semibold shadow-sm group-hover:scale-105 transition-transform">
+            {/* Context Switcher (Platform mimic) */}
+            <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300 dark:hover:border-primary-700 hover:bg-white dark:hover:bg-slate-800 transition-all group">
+              <div className="h-7 w-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-indigo-200 group-hover:scale-105 transition-transform">
                 L
               </div>
               <div className="pr-2">
-                <span className="text-xs font-medium text-gray-500 uppercase tracking-tight block leading-none mb-0.5">Company</span>
-                <span className="text-sm font-semibold text-gray-900 block leading-none">{user.company_name || 'Lifeline Tech'}</span>
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tighter block leading-none mb-0.5">Company</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200 block leading-none">{user.company_name || 'Lifeline Tech'}</span>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-400 group-hover:text-primary-500 transition-colors" />
+              <ChevronDown className="h-4 w-4 text-slate-400 group-hover:text-primary-500 transition-colors" />
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             {/* Search Bar */}
             <div className="hidden md:flex relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
               <input
                 type="text"
                 placeholder="Search..."
-                className="pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-primary-500 w-48 lg:w-64 transition-all focus:bg-white focus:w-80"
+                className="pl-10 pr-4 py-2 text-sm bg-slate-100 dark:bg-slate-800 border-none rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/20 w-48 lg:w-64 transition-all focus:bg-white dark:focus:bg-slate-900 focus:w-80"
               />
             </div>
 
-            <div className="h-6 w-px bg-gray-200 mx-2"></div>
+            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800 rounded-xl transition-all"
+              title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
 
             <Link
               to="/help"
-              className="p-2 text-gray-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+              className="p-2 text-slate-500 dark:text-slate-400 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800 rounded-xl transition-all"
               title="Help & Support"
             >
               <HelpCircle className="h-5 w-5" />
@@ -259,7 +264,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Content Scrollable Area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto bg-slate-50/50 dark:bg-slate-950 p-6 lg:p-10 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 scrollbar-track-transparent">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>

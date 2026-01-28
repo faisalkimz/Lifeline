@@ -9,8 +9,7 @@ import {
     CheckCircle, ChevronRight, Star, Sparkles,
     Building2, Calendar, Phone, Mail, MapPin, Shield,
     Lock, Key, ChevronLeft, Home, Heart, AlertCircle,
-    UserCircle, Globe, Camera, BadgeCheck, Clock, Users, Info,
-    ShieldCheck, ClipboardList, Fingerprint
+    UserCircle, Globe, Camera, BadgeCheck, Clock, Users, Info
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -96,30 +95,20 @@ const steps = [
     { id: 'emergency', label: 'Emergency', icon: Heart, description: 'Contacts & bank' },
 ];
 
-const InputField = ({ label, error, required, hint, className, children }) => (
-    <div className={`space-y-1.5 ${className || ''}`}>
-        <div className="flex items-baseline justify-between mb-1">
-            <label className="text-sm font-semibold text-gray-700 tracking-tight">
-                {label} {required && <span className="text-rose-500 ml-0.5">*</span>}
-            </label>
-            {hint && <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{hint}</span>}
-        </div>
-        <div className="group relative">
-            {children}
-        </div>
-        <AnimatePresence mode="wait">
-            {error && (
-                <motion.div
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -5 }}
-                    className="flex items-center gap-1.5 mt-1.5 text-rose-500"
-                >
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    <p className="text-[11px] font-bold tracking-tight">{error.message}</p>
-                </motion.div>
-            )}
-        </AnimatePresence>
+const InputField = ({ label, error, required, hint, children }) => (
+    <div className="space-y-2">
+        <label className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-slate-700">
+                {label} {required && <span className="text-rose-500">*</span>}
+            </span>
+            {hint && <span className="text-xs text-slate-400">{hint}</span>}
+        </label>
+        {children}
+        {error && (
+            <p className="text-xs text-rose-500 flex items-center gap-1.5 mt-1">
+                <AlertCircle className="h-3 w-3" /> {error.message}
+            </p>
+        )}
     </div>
 );
 
@@ -301,18 +290,18 @@ const EmployeeFormPage = () => {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary-200 border-t-primary-600 mb-4"></div>
-                <p className="text-gray-500 font-medium">Loading profile...</p>
+                <p className="text-slate-500 font-medium">Loading profile...</p>
             </div>
         );
     }
 
-    const inputClass = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 placeholder:text-gray-400 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-medium shadow-sm hover:border-gray-300";
-    const selectClass = "w-full h-11 px-4 rounded-xl border border-gray-200 bg-gray-50/50 text-gray-900 focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-medium appearance-none cursor-pointer shadow-sm hover:border-gray-300";
+    const inputClass = "w-full h-12 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-medium";
+    const selectClass = "w-full h-12 px-4 rounded-xl border-2 border-slate-200 bg-white text-slate-900 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-medium appearance-none cursor-pointer";
 
     return (
-        <div className="min-h-screen bg-[#FDFDFF]">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
             <div className="max-w-5xl mx-auto px-6 py-12">
-                {/* Premium Header */}
+                {/* Friendly Header */}
                 <motion.div
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -320,895 +309,818 @@ const EmployeeFormPage = () => {
                 >
                     <button
                         onClick={() => navigate('/employees')}
-                        className="flex items-center gap-2 text-gray-400 hover:text-gray-900 transition-all mb-8 group"
+                        className="flex items-center gap-2 text-slate-500 hover:text-slate-900 transition-colors mb-6 group"
                     >
-                        <div className="p-1 rounded-lg bg-white border border-gray-100 shadow-sm group-hover:shadow-md group-hover:-translate-x-0.5 transition-all">
-                            <ArrowLeft className="h-4 w-4" />
-                        </div>
-                        <span className="text-xs font-bold uppercase tracking-widest">Back to Directory</span>
+                        <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                        <span className="text-sm font-medium">Back to team</span>
                     </button>
 
-                    <div className="flex flex-col md:flex-row md:items-center gap-8">
-                        {/* Profile Image - More Engaging */}
-                        <div className="relative group self-start">
-                            <div className="h-28 w-28 rounded-3xl bg-white p-1 shadow-premium-lg ring-1 ring-gray-100 overflow-hidden relative group">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-purple-500/5 z-0" />
-                                <div className="h-full w-full rounded-[20px] bg-gray-50 flex items-center justify-center overflow-hidden z-10 relative border border-gray-100">
-                                    {previewImage ? (
-                                        <img
-                                            src={previewImage.startsWith('data:') ? previewImage : getMediaUrl(previewImage)}
-                                            alt="Preview"
-                                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                        />
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-1 text-gray-300 group-hover:text-primary-400 transition-colors">
-                                            <Camera className="h-8 w-8" />
-                                            <span className="text-[10px] font-bold uppercase tracking-tighter">Upload</span>
-                                        </div>
-                                    )}
-                                </div>
+                    <div className="flex items-center gap-6">
+                        {/* Photo Upload */}
+                        <div className="relative group">
+                            <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center overflow-hidden shadow-lg shadow-primary-200/50">
+                                {previewImage ? (
+                                    <img src={previewImage.startsWith('data:') ? previewImage : getMediaUrl(previewImage)} alt="Preview" className="h-full w-full object-cover" />
+                                ) : (
+                                    <UserCircle className="h-12 w-12 text-primary-400" />
+                                )}
                             </div>
-                            <label className="absolute -bottom-2 -right-2 h-10 w-10 flex items-center justify-center bg-white rounded-2xl shadow-premium-md border border-gray-100 cursor-pointer hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all">
-                                <Plus className="h-5 w-5 text-primary-600" />
+                            <label className="absolute inset-0 flex items-center justify-center bg-slate-900/50 rounded-2xl opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                                <Camera className="h-6 w-6 text-white" />
                                 <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
                             </label>
                         </div>
 
                         <div>
-                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-[10px] font-black uppercase tracking-widest mb-3 border border-primary-100 shadow-sm shadow-primary-500/5">
-                                <Sparkles className="h-3 w-3" />
-                                Workforce Management
-                            </div>
-                            <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-2">
-                                {isEditMode ? 'Employee Profile' : 'New Team Member'}
+                            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                                {isEditMode ? 'Edit Team Member' : 'Add New Team Member'}
                             </h1>
-                            <p className="text-gray-500 font-medium max-w-lg leading-relaxed">
-                                {isEditMode
-                                    ? `Update the details for ${employeeData?.full_name || 'this member'}. Changes will be applied immediately.`
-                                    : "Complete the steps below to onboard your new colleague and set up their personal directory entry."}
+                            <p className="text-slate-500 mt-1">
+                                {isEditMode ? "Update their information below" : "Let's get them set up in just a few steps"}
                             </p>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Premium Step Progress */}
-                <div className="mb-12 relative px-4">
-                    <div className="flex items-center justify-between relative z-10">
-                        {/* Elegant Progress Line Background */}
-                        <div className="absolute top-6 left-0 right-0 h-[2px] bg-gray-100 -z-10 mx-6 rounded-full" />
-
-                        {/* Active Progress Line with Gradient */}
-                        <motion.div
-                            className="absolute top-6 left-0 h-[2px] bg-gradient-to-r from-primary-500 via-indigo-500 to-purple-500 -z-10 mx-6 rounded-full"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
-                            transition={{ duration: 0.8, ease: "circOut" }}
+                {/* Step Progress */}
+                <div className="mb-10">
+                    <div className="flex items-center justify-between relative">
+                        {/* Progress Line */}
+                        <div className="absolute top-6 left-0 right-0 h-0.5 bg-slate-200 -z-10" />
+                        <div
+                            className="absolute top-6 left-0 h-0.5 bg-primary-500 -z-10 transition-all duration-500"
+                            style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
                         />
 
                         {steps.map((step, index) => (
                             <button
                                 key={step.id}
                                 onClick={() => setCurrentStep(index)}
-                                className="flex flex-col items-center group touch-none outline-none"
+                                className={`flex flex-col items-center gap-2 relative transition-all ${index <= currentStep ? 'opacity-100' : 'opacity-50'
+                                    }`}
                             >
-                                <div className={`
-                                    relative h-12 w-12 rounded-2xl flex items-center justify-center transition-all duration-500 border-2
-                                    ${index === currentStep
-                                        ? 'bg-white border-primary-500 text-primary-600 shadow-premium-lg scale-110'
-                                        : index < currentStep
-                                            ? 'bg-primary-500 border-primary-500 text-white shadow-premium-sm'
-                                            : 'bg-white border-gray-100 text-gray-300 group-hover:border-gray-300'
-                                    }
-                                `}>
+                                <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all shadow-lg ${index === currentStep
+                                    ? 'bg-primary-500 text-white shadow-primary-300 scale-110'
+                                    : index < currentStep
+                                        ? 'bg-emerald-500 text-white shadow-emerald-200'
+                                        : 'bg-white text-slate-400 shadow-slate-200'
+                                    }`}>
                                     {index < currentStep ? (
-                                        <BadgeCheck className="h-6 w-6" />
+                                        <CheckCircle className="h-5 w-5" />
                                     ) : (
-                                        <step.icon className={`h-5 w-5 ${index === currentStep ? 'animate-pulse' : ''}`} />
-                                    )}
-
-                                    {/* Subtle active pulse effect */}
-                                    {index === currentStep && (
-                                        <span className="absolute inset-0 rounded-2xl ring-4 ring-primary-500/10 animate-pulse" />
+                                        <step.icon className="h-5 w-5" />
                                     )}
                                 </div>
-                                <div className="mt-3 flex flex-col items-center">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest transition-colors duration-300 ${index === currentStep ? 'text-primary-600' : 'text-gray-400'
-                                        }`}>
-                                        {step.label}
-                                    </span>
-                                </div>
+                                <span className={`text-xs font-semibold ${index === currentStep ? 'text-primary-600' : 'text-slate-500'
+                                    }`}>
+                                    {step.label}
+                                </span>
                             </button>
                         ))}
                     </div>
                 </div>
 
-                {/* Form Card with Glassmorphism */}
+                {/* Form Card */}
                 <motion.div
                     key={currentStep}
-                    initial={{ opacity: 0, scale: 0.98, y: 10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    <Card className="bg-white/80 backdrop-blur-xl rounded-[32px] shadow-premium-xl border border-white/60 overflow-hidden relative">
-                        {/* Top Accent Gradient Line */}
-                        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 opacity-80" />
-
+                    <Card className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border-none overflow-hidden">
                         <CardContent className="p-0">
-                            {/* Premium Step Header */}
-                            <div className="px-10 py-10 border-b border-gray-100/50 bg-gradient-to-b from-gray-50/50 to-transparent">
-                                <div className="flex items-center gap-6">
-                                    <div className="h-16 w-16 rounded-2xl bg-white shadow-premium-md border border-gray-100 flex items-center justify-center text-primary-600">
-                                        {React.createElement(steps[currentStep].icon, { className: "h-8 w-8" })}
+                            {/* Step Header */}
+                            <div className="px-10 py-8 bg-gradient-to-r from-slate-50 to-white border-b border-slate-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="h-14 w-14 rounded-2xl bg-primary-100 flex items-center justify-center">
+                                        {React.createElement(steps[currentStep].icon, { className: "h-7 w-7 text-primary-600" })}
                                     </div>
                                     <div>
-                                        <div className="text-[10px] font-bold text-primary-500 uppercase tracking-[0.2em] mb-1">
-                                            Step 0{currentStep + 1} of 0{steps.length}
-                                        </div>
-                                        <h2 className="text-2xl font-black text-gray-900 tracking-tight">{steps[currentStep].label}</h2>
-                                        <p className="text-gray-500 font-medium text-sm mt-0.5">{steps[currentStep].description}</p>
+                                        <h2 className="text-xl font-bold text-slate-900">{steps[currentStep].label}</h2>
+                                        <p className="text-slate-500 text-sm">{steps[currentStep].description}</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <form onSubmit={handleSubmit(onSubmit)} className="p-10 space-y-10">
+                            <form onSubmit={handleSubmit(onSubmit)} className="p-10 space-y-8">
                                 {/* IDENTITY STEP */}
                                 {currentStep === 0 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        {/* Engaging Greeting */}
-                                        <div className="bg-gradient-to-br from-primary-50 to-indigo-50/30 rounded-3xl p-8 flex items-start gap-6 border border-primary-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                                <UserCircle className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        {/* Welcome Message */}
+                                        <div className="bg-gradient-to-br from-primary-50 to-blue-50 border border-primary-100 rounded-2xl p-6 flex items-start gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-primary-500 flex items-center justify-center flex-shrink-0">
+                                                <UserCircle className="h-6 w-6 text-white" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <Sparkles className="h-7 w-7 text-primary-500 animate-pulse" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Personal Presence</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    Every great journey starts with a name. Let's capture the essential details to welcome your new team member home.
+                                            <div>
+                                                <h3 className="font-bold text-primary-900 mb-1 text-lg">Let's start with the basics</h3>
+                                                <p className="text-sm text-primary-700 leading-relaxed">
+                                                    We need some personal information to create their profile. Don't worry - we keep all this information secure and private.
                                                 </p>
                                             </div>
                                         </div>
 
-                                        {/* Name Section - Handcrafted Grid */}
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-primary-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Full Legal Name</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                <InputField label="First Name" error={errors.first_name} required hint="Required">
+                                        {/* Full Name Section */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                What's their name?
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <InputField label="First name" error={errors.first_name} required>
                                                     <input
                                                         {...register('first_name')}
-                                                        placeholder="Sarah"
+                                                        placeholder="e.g. Sarah"
                                                         className={inputClass}
+                                                        autoComplete="given-name"
                                                     />
+                                                    <p className="text-xs text-slate-500 mt-1.5">Their given name</p>
                                                 </InputField>
-                                                <InputField label="Middle Name" error={errors.middle_name} hint="Optional">
+                                                <InputField label="Middle name" error={errors.middle_name} hint="Optional">
                                                     <input
                                                         {...register('middle_name')}
-                                                        placeholder="Jane"
+                                                        placeholder="e.g. Jane"
                                                         className={inputClass}
+                                                        autoComplete="additional-name"
                                                     />
+                                                    <p className="text-xs text-slate-500 mt-1.5">If they have one</p>
                                                 </InputField>
-                                                <InputField label="Last Name" error={errors.last_name} required hint="Required">
+                                                <InputField label="Last name" error={errors.last_name} required>
                                                     <input
                                                         {...register('last_name')}
-                                                        placeholder="Johnson"
+                                                        placeholder="e.g. Johnson"
                                                         className={inputClass}
+                                                        autoComplete="family-name"
                                                     />
+                                                    <p className="text-xs text-slate-500 mt-1.5">Family name</p>
                                                 </InputField>
                                             </div>
-                                        </section>
+                                        </div>
 
-                                        {/* Contact Section */}
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-indigo-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Communication Bridge</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <InputField label="Email Address" error={errors.email} required hint="Business Email">
-                                                    <div className="relative group">
-                                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                                        {/* Contact Information */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                How can we reach them?
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="Email address" error={errors.email} required>
+                                                    <div className="relative">
+                                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
                                                             {...register('email')}
                                                             type="email"
-                                                            placeholder="sarah.j@company.com"
+                                                            placeholder="sarah.johnson@company.com"
                                                             className={`${inputClass} pl-12`}
+                                                            autoComplete="email"
                                                         />
                                                     </div>
+                                                    <p className="text-xs text-slate-500 mt-1.5">💡 We'll use this for important updates and login</p>
                                                 </InputField>
-                                                <InputField label="Phone Number" error={errors.phone} required hint="Direct Line">
-                                                    <div className="relative group">
-                                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                                                <InputField label="Phone number" error={errors.phone} required>
+                                                    <div className="relative">
+                                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
                                                             {...register('phone')}
                                                             placeholder="+256 700 000 000"
                                                             className={`${inputClass} pl-12`}
+                                                            autoComplete="tel"
                                                         />
                                                     </div>
+                                                    <p className="text-xs text-slate-500 mt-1.5">Include country code for international numbers</p>
                                                 </InputField>
                                             </div>
-                                        </section>
+                                        </div>
 
-                                        <div className="h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
+                                        <div className="h-px bg-slate-200" />
 
-                                        {/* Details Grid */}
-                                        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                            <InputField label="Birthday" error={errors.date_of_birth} required hint="Month/Day/Year">
-                                                <div className="relative group">
-                                                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors pointer-events-none" />
+                                        {/* Personal Details */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                A bit more about them
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <InputField label="Date of birth" error={errors.date_of_birth} required>
                                                     <input
                                                         {...register('date_of_birth')}
                                                         type="date"
-                                                        className={`${inputClass} pl-12`}
-                                                    />
-                                                </div>
-                                            </InputField>
-                                            <InputField label="Gender" error={errors.gender} required hint="Legal Identity">
-                                                <select {...register('gender')} className={selectClass}>
-                                                    <option value="male">Male</option>
-                                                    <option value="female">Female</option>
-                                                    <option value="other">Other</option>
-                                                </select>
-                                            </InputField>
-                                            <InputField label="Marital Status" error={errors.marital_status} hint="Payroll Detail">
-                                                <select {...register('marital_status')} className={selectClass}>
-                                                    <option value="single">Single</option>
-                                                    <option value="married">Married</option>
-                                                    <option value="divorced">Divorced</option>
-                                                    <option value="widowed">Widowed</option>
-                                                </select>
-                                            </InputField>
-                                        </section>
-
-                                        {/* Location */}
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-blue-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Base Location</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                <div className="md:col-span-2">
-                                                    <InputField label="Residential Address" error={errors.address} hint="Home Base">
-                                                        <div className="relative group">
-                                                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
-                                                            <input
-                                                                {...register('address')}
-                                                                placeholder="e.g. 123 Skyview Drive"
-                                                                className={`${inputClass} pl-12`}
-                                                            />
-                                                        </div>
-                                                    </InputField>
-                                                </div>
-                                                <InputField label="City" error={errors.city} hint="Hub">
-                                                    <input
-                                                        {...register('city')}
-                                                        placeholder="Kampala"
                                                         className={inputClass}
+                                                        autoComplete="bday"
                                                     />
+                                                    <p className="text-xs text-slate-500 mt-1.5">For age verification and birthday celebrations 🎂</p>
+                                                </InputField>
+                                                <InputField label="Gender" error={errors.gender} required>
+                                                    <select {...register('gender')} className={selectClass}>
+                                                        <option value="male">Male</option>
+                                                        <option value="female">Female</option>
+                                                        <option value="other">Other</option>
+                                                    </select>
+                                                </InputField>
+                                                <InputField label="Marital status" error={errors.marital_status} hint="Optional">
+                                                    <select {...register('marital_status')} className={selectClass}>
+                                                        <option value="single">Single</option>
+                                                        <option value="married">Married</option>
+                                                        <option value="divorced">Divorced</option>
+                                                        <option value="widowed">Widowed</option>
+                                                    </select>
+                                                    <p className="text-xs text-slate-500 mt-1.5">For benefits and tax purposes</p>
                                                 </InputField>
                                             </div>
-                                        </section>
+                                        </div>
 
-                                        {/* Security Trust Notice */}
-                                        <div className="bg-gray-50/50 border border-gray-100 rounded-2xl p-6 flex items-start gap-4 shadow-inner">
-                                            <div className="h-10 w-10 rounded-full bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0">
-                                                <Shield className="h-5 w-5 text-emerald-500" />
+                                        {/* Address */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                Where do they live?
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <div className="md:col-span-2">
+                                                    <InputField label="Street address" error={errors.address} hint="Optional">
+                                                        <div className="relative">
+                                                            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                                                            <input
+                                                                {...register('address')}
+                                                                placeholder="e.g. 123 Main Street, Apartment 4B"
+                                                                className={`${inputClass} pl-12`}
+                                                                autoComplete="street-address"
+                                                            />
+                                                        </div>
+                                                        <p className="text-xs text-slate-500 mt-1.5">Full street address including apartment/unit number</p>
+                                                    </InputField>
+                                                </div>
+                                                <InputField label="City" error={errors.city} hint="Optional">
+                                                    <input
+                                                        {...register('city')}
+                                                        placeholder="e.g. Kampala"
+                                                        className={inputClass}
+                                                        autoComplete="address-level2"
+                                                    />
+                                                    <p className="text-xs text-slate-500 mt-1.5">City or town</p>
+                                                </InputField>
+                                            </div>
+                                        </div>
+
+                                        {/* Privacy Notice */}
+                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-start gap-3">
+                                            <div className="h-5 w-5 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <Shield className="h-3 w-3 text-slate-600" />
                                             </div>
                                             <div>
-                                                <h4 className="text-sm font-black text-gray-900 mb-0.5 tracking-tight">Secure Intelligence</h4>
-                                                <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                                                    All personal data is encrypted using military-grade standards. Access is strictly limited to authorized people.
+                                                <p className="text-sm text-slate-600">
+                                                    <span className="font-semibold text-slate-700">Privacy first:</span> All personal information is encrypted and stored securely. Only authorized HR personnel can access this data, and it's used solely for employment purposes.
                                                 </p>
                                             </div>
                                         </div>
-                                    </motion.div>
+                                    </div>
                                 )}
 
                                 {/* EMPLOYMENT STEP */}
                                 {currentStep === 1 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-3xl p-8 flex items-start gap-6 border border-blue-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:rotate-12 transition-transform duration-700">
-                                                <Briefcase className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        {/* Helpful Context Box */}
+                                        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
+                                            <div className="h-10 w-10 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                                <Briefcase className="h-5 w-5 text-blue-600" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <Briefcase className="h-7 w-7 text-blue-500" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Professional Standing</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    Define their impact within the organization. Setting this up correctly ensures smooth workflows and clear hierarchies.
+                                            <div>
+                                                <h3 className="font-semibold text-blue-900 mb-1">Work Information</h3>
+                                                <p className="text-sm text-blue-700">
+                                                    Tell us about their role and where they'll fit in the team. This helps us set up their workspace and permissions correctly.
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <InputField label="Official Job Title" error={errors.job_title} required hint="Company Role">
-                                                <div className="relative group">
-                                                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+                                        {/* Role & Department */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                Role & Department
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="What's their job title?" error={errors.job_title} required>
                                                     <input
                                                         {...register('job_title')}
-                                                        placeholder="Product Designer"
-                                                        className={`${inputClass} pl-12 text-gray-900`}
+                                                        placeholder="e.g. Senior Software Engineer"
+                                                        className={inputClass}
                                                     />
-                                                </div>
-                                            </InputField>
-                                            <InputField label="Departmental Home" error={errors.department} required hint="Business Unit">
-                                                <div className="relative group">
-                                                    <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors z-10 pointer-events-none" />
-                                                    <select {...register('department')} className={`${selectClass} pl-12`}>
-                                                        <option value="">Select Department</option>
+                                                    <p className="text-xs text-slate-500 mt-1.5">💡 Be specific - this appears on their profile and documents</p>
+                                                </InputField>
+                                                <InputField label="Which department?" error={errors.department} required>
+                                                    <select {...register('department')} className={selectClass}>
+                                                        <option value="">Choose a department...</option>
                                                         {departments.map(dept => (
                                                             <option key={dept.id} value={dept.id}>{dept.name}</option>
                                                         ))}
                                                     </select>
-                                                </div>
-                                            </InputField>
-                                        </section>
+                                                    {departments.length === 0 && (
+                                                        <p className="text-xs text-amber-600 mt-1.5">⚠️ No departments yet. Create one first!</p>
+                                                    )}
+                                                </InputField>
+                                            </div>
+                                        </div>
 
-                                        <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                            <InputField label="Leadership Connection" error={errors.manager} hint="Reports To">
-                                                <div className="relative group">
-                                                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors z-10 pointer-events-none" />
-                                                    <select {...register('manager')} className={`${selectClass} pl-12`}>
-                                                        <option value="">Direct to Board / Leadership</option>
+                                        {/* Reporting Structure */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                Team Structure
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="Who do they report to?" error={errors.manager} hint="Optional">
+                                                    <select {...register('manager')} className={selectClass}>
+                                                        <option value="">Direct to leadership</option>
                                                         {employees.map(emp => (
                                                             <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                                                         ))}
                                                     </select>
-                                                </div>
-                                            </InputField>
-                                            <InputField label="Employment Model" error={errors.employment_type} required hint="Engagement Basis">
-                                                <select {...register('employment_type')} className={selectClass}>
-                                                    <option value="full_time">Full-Time (Indefinite)</option>
-                                                    <option value="part_time">Part-Time (Scheduled)</option>
-                                                    <option value="contract">Contract (Project-Based)</option>
-                                                    <option value="intern">Internship (Seasonal)</option>
-                                                    <option value="casual">Casual (On-Demand)</option>
-                                                </select>
-                                            </InputField>
-                                        </section>
-
-                                        <div className="h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
-
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-violet-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Chronology</h3>
+                                                    <p className="text-xs text-slate-500 mt-1.5">This sets up approval workflows and team hierarchy</p>
+                                                </InputField>
+                                                <InputField label="Employment type" error={errors.employment_type} required>
+                                                    <select {...register('employment_type')} className={selectClass}>
+                                                        <option value="full_time">Full-Time Employee</option>
+                                                        <option value="part_time">Part-Time Employee</option>
+                                                        <option value="contract">Contractor</option>
+                                                        <option value="intern">Intern</option>
+                                                        <option value="casual">Casual Worker</option>
+                                                    </select>
+                                                </InputField>
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                                <InputField label="Onboarding Date" error={errors.join_date} required hint="First Day">
-                                                    <div className="relative group">
-                                                        <Clock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors pointer-events-none" />
-                                                        <input {...register('join_date')} type="date" className={`${inputClass} pl-12`} />
-                                                    </div>
+                                        </div>
+
+                                        <div className="h-px bg-slate-200" />
+
+                                        {/* Important Dates */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-primary-500" />
+                                                Important Dates
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                <InputField label="When do they start?" error={errors.join_date} required>
+                                                    <input {...register('join_date')} type="date" className={inputClass} />
+                                                    <p className="text-xs text-slate-500 mt-1.5">Their official first day</p>
                                                 </InputField>
-                                                <InputField label="Probation Review" error={errors.probation_end_date} hint="Expiry">
+                                                <InputField label="Probation ends on" error={errors.probation_end_date} hint="Optional">
                                                     <input {...register('probation_end_date')} type="date" className={inputClass} />
+                                                    <p className="text-xs text-slate-500 mt-1.5">Usually 3-6 months from start date</p>
                                                 </InputField>
-                                                <InputField label="Operating Status" error={errors.employment_status} required hint="Current State">
+                                                <InputField label="Current status" error={errors.employment_status} required>
                                                     <select {...register('employment_status')} className={selectClass}>
-                                                        <option value="active">Active Presence</option>
-                                                        <option value="on_leave">Extended Leave</option>
-                                                        <option value="suspended">Administrative Hold</option>
-                                                        <option value="terminated">Offboarded</option>
+                                                        <option value="active">Active</option>
+                                                        <option value="on_leave">On Leave</option>
+                                                        <option value="suspended">Suspended</option>
+                                                        <option value="terminated">Terminated</option>
                                                         <option value="resigned">Resigned</option>
                                                     </select>
                                                 </InputField>
                                             </div>
-                                        </section>
-
-                                        <div className="bg-amber-50/50 border border-amber-100/50 rounded-2xl p-6 flex items-start gap-4 shadow-inner">
-                                            <div className="h-10 w-10 rounded-full bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0">
-                                                <Info className="h-5 w-5 text-amber-500" />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-sm font-black text-gray-900 mb-0.5 tracking-tight">Organization Map</h4>
-                                                <p className="text-xs text-gray-500 leading-relaxed font-medium">
-                                                    Setting the correct manager establishes the approval flow for leave requests and performance reviews.
-                                                </p>
-                                            </div>
                                         </div>
-                                    </motion.div>
+
+                                        {/* Quick Tip */}
+                                        <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-start gap-3">
+                                            <div className="h-5 w-5 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <span className="text-xs font-bold text-slate-600">💡</span>
+                                            </div>
+                                            <p className="text-sm text-slate-600">
+                                                <span className="font-semibold text-slate-700">Quick tip:</span> Make sure the department and manager are set up correctly - this affects leave approvals, performance reviews, and team reports.
+                                            </p>
+                                        </div>
+                                    </div>
                                 )}
 
                                 {/* SALARY STEP */}
                                 {currentStep === 2 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50/30 rounded-3xl p-8 flex items-start gap-6 border border-emerald-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:-translate-x-2 transition-transform duration-700">
-                                                <Wallet className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-6 flex items-start gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center flex-shrink-0">
+                                                <Wallet className="h-6 w-6 text-white" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <CreditCard className="h-7 w-7 text-emerald-500" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Compensation Strategy</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    Reward their contribution. Transparent and accurate payroll setup starts here with the base agreement.
+                                            <div>
+                                                <h3 className="font-bold text-emerald-900 mb-1 text-lg">Money matters</h3>
+                                                <p className="text-sm text-emerald-700 leading-relaxed">
+                                                    Let's set up their compensation package. This ensures they get paid correctly and on time.
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-emerald-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Base Compensation</h3>
-                                            </div>
-                                            <div className="bg-gray-50/50 rounded-3xl p-10 border border-gray-100 shadow-inner">
-                                                <InputField
-                                                    label="Gross Monthly Salary"
-                                                    error={errors.basic_salary}
-                                                    required
-                                                    hint="Before Deductions"
-                                                    className="max-w-xl mx-auto text-center"
-                                                >
-                                                    <div className="relative flex items-center group">
-                                                        <div className="absolute left-6 text-xl font-black text-gray-300 group-focus-within:text-emerald-500 transition-colors pointer-events-none">
-                                                            UGX
-                                                        </div>
+                                        {/* Basic Salary */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                                The basics
+                                            </h3>
+                                            <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                                                <InputField label="What is their basic monthly salary?" error={errors.basic_salary} required>
+                                                    <div className="relative max-w-md">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">UGX</span>
                                                         <input
                                                             {...register('basic_salary')}
                                                             type="number"
                                                             placeholder="0"
-                                                            className="w-full h-20 pl-24 pr-8 rounded-[24px] border-2 border-gray-100 bg-white text-3xl font-black text-gray-900 placeholder:text-gray-200 focus:border-emerald-500 focus:ring-8 focus:ring-emerald-500/5 outline-none transition-all text-right"
+                                                            className={`${inputClass} pl-14 font-mono text-lg font-bold tracking-tight text-emerald-700`}
                                                         />
                                                     </div>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-4">
-                                                        Standard monthly cycle payment amount
-                                                    </p>
+                                                    <p className="text-xs text-slate-500 mt-2">Before tax and deductions</p>
                                                 </InputField>
                                             </div>
-                                        </section>
+                                        </div>
 
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-primary-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Benefit Supplements</h3>
+                                        {/* Allowances */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                                Monthly Allowances (Optional)
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="Housing" error={errors.housing_allowance}>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">UGX</span>
+                                                        <input {...register('housing_allowance')} type="number" placeholder="0" className={`${inputClass} pl-14 font-mono`} />
+                                                    </div>
+                                                </InputField>
+                                                <InputField label="Transport" error={errors.transport_allowance}>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">UGX</span>
+                                                        <input {...register('transport_allowance')} type="number" placeholder="0" className={`${inputClass} pl-14 font-mono`} />
+                                                    </div>
+                                                </InputField>
+                                                <InputField label="Medical" error={errors.medical_allowance}>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">UGX</span>
+                                                        <input {...register('medical_allowance')} type="number" placeholder="0" className={`${inputClass} pl-14 font-mono`} />
+                                                    </div>
+                                                </InputField>
+                                                <InputField label="Lunch" error={errors.lunch_allowance}>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">UGX</span>
+                                                        <input {...register('lunch_allowance')} type="number" placeholder="0" className={`${inputClass} pl-14 font-mono`} />
+                                                    </div>
+                                                </InputField>
+                                                <InputField label="Other" error={errors.other_allowances}>
+                                                    <div className="relative">
+                                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">UGX</span>
+                                                        <input {...register('other_allowances')} type="number" placeholder="0" className={`${inputClass} pl-14 font-mono`} />
+                                                    </div>
+                                                </InputField>
                                             </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                {[
-                                                    { name: 'housing_allowance', label: 'Housing Allowance' },
-                                                    { name: 'transport_allowance', label: 'Transport Stipend' },
-                                                    { name: 'medical_allowance', label: 'Medical Benefit' },
-                                                    { name: 'lunch_allowance', label: 'Meal Allowance' },
-                                                    { name: 'other_allowances', label: 'Other Supplements' },
-                                                ].map((allowance) => (
-                                                    <InputField
-                                                        key={allowance.name}
-                                                        label={allowance.label}
-                                                        error={errors[allowance.name]}
-                                                        hint="Monthly"
-                                                    >
-                                                        <div className="relative group">
-                                                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-400 group-focus-within:text-primary-500 transition-colors">UGX</div>
-                                                            <input
-                                                                {...register(allowance.name)}
-                                                                type="number"
-                                                                placeholder="0"
-                                                                className={`${inputClass} pl-14 font-black`}
-                                                            />
-                                                        </div>
-                                                    </InputField>
-                                                ))}
-                                            </div>
-                                        </section>
-                                    </motion.div>
+                                        </div>
+                                    </div>
                                 )}
 
                                 {/* SECURITY STEP */}
                                 {currentStep === 3 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        <div className="bg-gradient-to-br from-indigo-50 to-violet-50/30 rounded-3xl p-8 flex items-start gap-6 border border-indigo-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                                <ShieldCheck className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        <div className="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 rounded-2xl p-6 flex items-start gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-indigo-500 flex items-center justify-center flex-shrink-0">
+                                                <Lock className="h-6 w-6 text-white" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <Lock className="h-7 w-7 text-indigo-500" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Access Control</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    Determine their reach within the platform. Grant appropriate permissions based on their role and responsibility level.
+                                            <div>
+                                                <h3 className="font-bold text-indigo-900 mb-1 text-lg">System Access</h3>
+                                                <p className="text-sm text-indigo-700 leading-relaxed">
+                                                    Control how they access the platform. You can grant different permissions based on their role.
                                                 </p>
                                             </div>
                                         </div>
 
                                         <div
                                             onClick={() => setValue('create_user', !createUser)}
-                                            className={`group p-8 rounded-[28px] border-2 cursor-pointer transition-all duration-500 relative overflow-hidden ${createUser
-                                                ? 'bg-white border-primary-500 shadow-premium-lg ring-4 ring-primary-500/5'
-                                                : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-premium-md'
+                                            className={`group p-6 rounded-2xl border-2 cursor-pointer transition-all ${createUser
+                                                ? 'bg-indigo-50 border-indigo-500 ring-4 ring-indigo-500/10'
+                                                : 'bg-white border-slate-200 hover:border-indigo-300 hover:shadow-lg hover:shadow-indigo-100'
                                                 }`}
                                         >
-                                            {createUser && (
-                                                <div className="absolute top-0 left-0 right-0 h-1 bg-primary-500" />
-                                            )}
-
-                                            <div className="flex items-center justify-between relative z-10">
-                                                <div className="flex items-center gap-6">
-                                                    <div className={`h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-500 ${createUser
-                                                        ? 'bg-primary-500 text-white shadow-premium-sm'
-                                                        : 'bg-gray-50 text-gray-400 group-hover:bg-primary-50 group-hover:text-primary-400'
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-colors ${createUser ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-500'
                                                         }`}>
-                                                        <Key className="h-8 w-8" />
+                                                        <Key className="h-6 w-6" />
                                                     </div>
                                                     <div>
-                                                        <h3 className={`font-black text-xl tracking-tight ${createUser ? 'text-gray-900' : 'text-gray-400'}`}>
-                                                            Digital Twin Presence
-                                                        </h3>
-                                                        <p className="text-sm font-medium text-gray-500">
-                                                            Activate credentials for their personal portal access.
-                                                        </p>
+                                                        <h3 className={`font-bold text-lg ${createUser ? 'text-indigo-900' : 'text-slate-900'}`}>Create User Account</h3>
+                                                        <p className="text-sm text-slate-500">Allow them to log in to the employee portal</p>
                                                     </div>
                                                 </div>
-
-                                                <div className={`
-                                                    h-10 w-10 rounded-2xl flex items-center justify-center transition-all duration-500 border-2
-                                                    ${createUser ? 'bg-primary-500 border-primary-500 text-white' : 'bg-white border-gray-100 text-transparent'}
-                                                `}>
-                                                    <CheckCircle className="h-6 w-6" />
+                                                <div className={`h-8 w-8 rounded-full border-2 flex items-center justify-center transition-all ${createUser
+                                                    ? 'bg-indigo-500 border-indigo-500 scale-110'
+                                                    : 'border-slate-300 group-hover:border-indigo-400'
+                                                    }`}>
+                                                    {createUser && <CheckCircle className="h-4 w-4 text-white" />}
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <AnimatePresence mode="wait">
+                                        <AnimatePresence>
                                             {createUser && (
                                                 <motion.div
-                                                    initial={{ opacity: 0, height: 0, y: -20 }}
-                                                    animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                                    exit={{ opacity: 0, height: 0, y: -20 }}
-                                                    transition={{ duration: 0.5, ease: "circOut" }}
-                                                    className="space-y-10 pt-2 origin-top"
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    exit={{ opacity: 0, height: 0 }}
+                                                    className="space-y-8 pl-1 origin-top"
                                                 >
-                                                    <section>
-                                                        <div className="flex items-center gap-3 mb-6">
-                                                            <div className="h-6 w-1 rounded-full bg-primary-500" />
-                                                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Entry Credentials</h3>
-                                                        </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 bg-gray-50/50 p-8 rounded-[32px] border border-gray-100 shadow-inner">
-                                                            <InputField label="Login Identity" error={errors.username} required hint="Username">
+                                                    <div>
+                                                        <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                            <div className="h-1 w-1 rounded-full bg-indigo-500" />
+                                                            Login Credentials
+                                                        </h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                                                            <InputField label="Username (for login)" error={errors.username} required>
                                                                 <input
                                                                     {...register('username')}
-                                                                    placeholder="j.doe"
+                                                                    placeholder="e.g. jdoe"
                                                                     className={inputClass}
+                                                                    autoComplete="off"
                                                                 />
                                                             </InputField>
-                                                            <div className="space-y-4">
+                                                            <div className="space-y-3">
                                                                 <div
                                                                     onClick={() => setValue('auto_password', !autoPassword)}
-                                                                    className={`flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${autoPassword
-                                                                        ? 'bg-primary-100/50 border-primary-500 text-primary-700'
-                                                                        : 'bg-white border-gray-100 hover:border-gray-200'
+                                                                    className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${autoPassword
+                                                                        ? 'bg-indigo-600 border-indigo-600 text-white'
+                                                                        : 'bg-white border-slate-200 hover:border-slate-300'
                                                                         }`}
                                                                 >
-                                                                    <div className={`h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all ${autoPassword
-                                                                        ? 'bg-primary-500 border-primary-500'
-                                                                        : 'bg-white border-gray-100'
+                                                                    <div className={`h-5 w-5 rounded border flex items-center justify-center ${autoPassword
+                                                                        ? 'bg-white/20 border-transparent'
+                                                                        : 'border-slate-300'
                                                                         }`}>
-                                                                        {autoPassword && <CheckCircle className="h-4 w-4 text-white" />}
+                                                                        {autoPassword && <CheckCircle className="h-3 w-3 text-white" />}
                                                                     </div>
-                                                                    <span className="text-sm font-black tracking-tight uppercase">Generate Secure Key</span>
+                                                                    <span className="text-sm font-semibold">Auto-generate secure password</span>
                                                                 </div>
                                                                 {!autoPassword && (
-                                                                    <InputField label="Manual Passkey" error={errors.password} required hint="Custom">
+                                                                    <InputField label="Custom Password" error={errors.password} required>
                                                                         <input
                                                                             {...register('password')}
                                                                             type="password"
-                                                                            placeholder="••••••••"
+                                                                            placeholder="Minimum 8 characters"
                                                                             className={inputClass}
+                                                                            autoComplete="new-password"
                                                                         />
                                                                     </InputField>
                                                                 )}
                                                             </div>
                                                         </div>
-                                                    </section>
+                                                    </div>
 
-                                                    <section>
-                                                        <div className="flex items-center gap-3 mb-6">
-                                                            <div className="h-6 w-1 rounded-full bg-purple-500" />
-                                                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Platform Authority</h3>
-                                                        </div>
-                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                                    <div>
+                                                        <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                            <div className="h-1 w-1 rounded-full bg-indigo-500" />
+                                                            What can they see?
+                                                        </h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                             {[
-                                                                { id: 'employee', label: 'Individual', icon: User, desc: 'Personal hub & records access.', color: 'text-gray-600', activeBg: 'bg-gray-900', activeText: 'text-white' },
-                                                                { id: 'manager', label: 'Leader', icon: Users, desc: 'Team oversight & approvals.', color: 'text-blue-600', activeBg: 'bg-blue-600', activeText: 'text-white' },
-                                                                { id: 'hr_manager', label: 'Architect', icon: Shield, desc: 'Full ecosystem orchestration.', color: 'text-purple-600', activeBg: 'bg-purple-600', activeText: 'text-white' },
+                                                                { id: 'employee', label: 'Standard Employee', icon: User, desc: 'Can view their own profile, payslips, and request leave.', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                                                                { id: 'manager', label: 'Team Manager', icon: Users, desc: 'Can manage their team, approve leave, and view reports.', color: 'text-blue-600', bg: 'bg-blue-50' },
+                                                                { id: 'hr_manager', label: 'HR Administrator', icon: Shield, desc: 'Full access to all employee data and system settings.', color: 'text-purple-600', bg: 'bg-purple-50' },
                                                             ].map(role => (
                                                                 <div
                                                                     key={role.id}
                                                                     onClick={() => setValue('role', role.id)}
-                                                                    className={`
-                                                                        relative p-6 rounded-[24px] border-2 cursor-pointer transition-all duration-500 text-center flex flex-col items-center gap-4
-                                                                        ${watch('role') === role.id
-                                                                            ? `${role.activeBg} ${role.activeText} border-transparent shadow-premium-lg scale-[1.02]`
-                                                                            : 'bg-white border-gray-100 hover:border-gray-300 hover:shadow-premium-sm'
-                                                                        }
-                                                                    `}
+                                                                    className={`relative p-6 rounded-2xl border-2 cursor-pointer text-left transition-all hover:shadow-lg ${watch('role') === role.id
+                                                                        ? 'bg-white border-indigo-500 ring-4 ring-indigo-500/10'
+                                                                        : 'bg-white border-slate-100 hover:border-slate-300'
+                                                                        }`}
                                                                 >
-                                                                    <div className={`
-                                                                        h-12 w-12 rounded-[18px] flex items-center justify-center transition-all duration-500
-                                                                        ${watch('role') === role.id ? 'bg-white/20' : 'bg-gray-50 text-gray-400'}
-                                                                    `}>
-                                                                        <role.icon className="h-6 w-6" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="font-black tracking-tight text-sm uppercase mb-1">{role.label}</p>
-                                                                        <p className={`text-[10px] font-medium leading-tight ${watch('role') === role.id ? 'opacity-80' : 'text-gray-400'}`}>
-                                                                            {role.desc}
-                                                                        </p>
-                                                                    </div>
-
                                                                     {watch('role') === role.id && (
-                                                                        <motion.div
-                                                                            layoutId="roleCheck"
-                                                                            className="absolute -top-2 -right-2 h-6 w-6 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-premium-sm border-2 border-white"
-                                                                        >
-                                                                            <CheckCircle className="h-4 w-4" />
-                                                                        </motion.div>
+                                                                        <div className="absolute top-4 right-4 text-indigo-500">
+                                                                            <CheckCircle className="h-5 w-5" />
+                                                                        </div>
                                                                     )}
+                                                                    <role.icon className={`h-8 w-8 mb-4 ${role.color}`} />
+                                                                    <p className="font-bold text-slate-900 mb-1">{role.label}</p>
+                                                                    <p className="text-xs text-slate-500 leading-relaxed">{role.desc}</p>
                                                                 </div>
                                                             ))}
                                                         </div>
-                                                    </section>
+                                                    </div>
                                                 </motion.div>
                                             )}
                                         </AnimatePresence>
-                                    </motion.div>
+                                    </div>
                                 )}
 
                                 {/* TAX & ID STEP */}
                                 {currentStep === 4 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        <div className="bg-gradient-to-br from-amber-50 to-orange-50/30 rounded-3xl p-8 flex items-start gap-6 border border-amber-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:rotate-6 transition-transform duration-700">
-                                                <FileText className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-6 flex items-start gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-amber-500 flex items-center justify-center flex-shrink-0">
+                                                <FileText className="h-6 w-6 text-white" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <FileText className="h-7 w-7 text-amber-500" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Statutory Compliance</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    Ensure all legal and tax requirements are met. These identifiers are essential for official records and filings.
+                                            <div>
+                                                <h3 className="font-bold text-amber-900 mb-1 text-lg">Tax & Identification</h3>
+                                                <p className="text-sm text-amber-800 leading-relaxed">
+                                                    We need these identification numbers for tax compliance, NSSF, and statutory filings.
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-amber-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Legal Identity</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <InputField label="National ID Number (NIN)" error={errors.national_id} required hint="Primary ID">
-                                                    <div className="relative group">
-                                                        <BadgeCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-amber-500 transition-colors pointer-events-none" />
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-amber-500" />
+                                                Identification
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="National ID Number (NIN)" error={errors.national_id} required>
+                                                    <div className="relative">
+                                                        <BadgeCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
                                                             {...register('national_id')}
-                                                            placeholder="CM123456789ABC"
-                                                            className={`${inputClass} pl-12 uppercase font-black tracking-widest`}
+                                                            placeholder="e.g. CM12345..."
+                                                            className={`${inputClass} pl-12 uppercase font-mono`}
                                                         />
                                                     </div>
+                                                    <p className="text-xs text-slate-500 mt-1.5">Usually found on the back of the ID card</p>
                                                 </InputField>
-                                                <InputField label="Passport Document" error={errors.passport_number} hint="Travel Identity">
-                                                    <div className="relative group">
-                                                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-amber-500 transition-colors pointer-events-none" />
+                                                <InputField label="Passport Number" error={errors.passport_number} hint="Optional">
+                                                    <div className="relative">
+                                                        <Globe className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
                                                             {...register('passport_number')}
-                                                            placeholder="A0123456"
-                                                            className={`${inputClass} pl-12 uppercase font-black`}
+                                                            placeholder="e.g. A00123..."
+                                                            className={`${inputClass} pl-12 uppercase font-mono`}
                                                         />
                                                     </div>
                                                 </InputField>
                                             </div>
-                                        </section>
-
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-orange-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Tax & Pension</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <InputField label="Tax Identity (TIN)" error={errors.tin_number} hint="URA Registry">
-                                                    <div className="relative group">
-                                                        <ClipboardList className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors pointer-events-none" />
-                                                        <input
-                                                            {...register('tin_number')}
-                                                            placeholder="1001234567"
-                                                            className={`${inputClass} pl-12 font-black`}
-                                                        />
-                                                    </div>
-                                                </InputField>
-                                                <InputField label="NSSF Member ID" error={errors.nssf_number} hint="Social Security">
-                                                    <div className="relative group">
-                                                        <Fingerprint className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-orange-500 transition-colors pointer-events-none" />
-                                                        <input
-                                                            {...register('nssf_number')}
-                                                            placeholder="1234567890"
-                                                            className={`${inputClass} pl-12 font-black`}
-                                                        />
-                                                    </div>
-                                                </InputField>
-                                            </div>
-                                        </section>
-
-                                        <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 italic text-gray-400 text-xs font-medium text-center">
-                                            All sensitive identifiers are encrypted and stored in compliance with local data protection regulations.
                                         </div>
-                                    </motion.div>
+
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-amber-500" />
+                                                Tax & Insurance
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="TIN Number" error={errors.tin_number} hint="Optional">
+                                                    <input
+                                                        {...register('tin_number')}
+                                                        placeholder="10 digits"
+                                                        className={`${inputClass} font-mono`}
+                                                    />
+                                                    <p className="text-xs text-slate-500 mt-1.5">For URA tax filing</p>
+                                                </InputField>
+                                                <InputField label="NSSF Number" error={errors.nssf_number} hint="Optional">
+                                                    <input
+                                                        {...register('nssf_number')}
+                                                        placeholder="Member ID"
+                                                        className={`${inputClass} font-mono`}
+                                                    />
+                                                    <p className="text-xs text-slate-500 mt-1.5">For social security contributions</p>
+                                                </InputField>
+                                            </div>
+                                        </div>
+                                    </div>
                                 )}
 
-                                {/* EMERGENCY & FINAL STEP */}
+                                {/* EMERGENCY STEP */}
                                 {currentStep === 5 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -10 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        className="space-y-10"
-                                    >
-                                        <div className="bg-gradient-to-br from-rose-50 to-pink-50/30 rounded-3xl p-8 flex items-start gap-6 border border-rose-100/50 relative overflow-hidden group">
-                                            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform duration-700">
-                                                <Heart className="h-24 w-24" />
+                                    <div className="space-y-8">
+                                        <div className="bg-gradient-to-br from-rose-50 to-pink-50 border border-rose-100 rounded-2xl p-6 flex items-start gap-4">
+                                            <div className="h-12 w-12 rounded-xl bg-rose-500 flex items-center justify-center flex-shrink-0">
+                                                <Heart className="h-6 w-6 text-white" />
                                             </div>
-                                            <div className="h-14 w-14 rounded-2xl bg-white shadow-premium-sm flex items-center justify-center flex-shrink-0 relative z-10 border border-white">
-                                                <Heart className="h-7 w-7 text-rose-500" />
-                                            </div>
-                                            <div className="relative z-10">
-                                                <h3 className="font-black text-gray-900 mb-1.5 text-xl tracking-tight">Well-being & Settlement</h3>
-                                                <p className="text-gray-600 font-medium leading-relaxed max-w-lg">
-                                                    The final pieces of the puzzle. Setting up emergency support and ensuring their hard work is rewarded.
+                                            <div>
+                                                <h3 className="font-bold text-rose-900 mb-1 text-lg">Final details</h3>
+                                                <p className="text-sm text-rose-800 leading-relaxed">
+                                                    Just a few last things to keep them safe and get them paid.
                                                 </p>
                                             </div>
                                         </div>
 
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-rose-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Emergency Nexus</h3>
-                                            </div>
-                                            <div className="bg-rose-50/50 border border-rose-100 px-8 py-10 rounded-[40px] shadow-inner">
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                    <InputField label="Primary Contact Name" error={errors.emergency_contact_name} hint="Next of Kin">
+                                        {/* Emergency Contact */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-rose-500" />
+                                                Who should we call in an emergency?
+                                            </h3>
+                                            <div className="bg-rose-50/50 border border-rose-100 rounded-2xl p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="Contact Name" error={errors.emergency_contact_name} hint="Optional">
+                                                    <input
+                                                        {...register('emergency_contact_name')}
+                                                        placeholder="e.g. Spouse or Parent"
+                                                        className={inputClass}
+                                                    />
+                                                </InputField>
+                                                <InputField label="Phone Number" error={errors.emergency_contact_phone} hint="Optional">
+                                                    <div className="relative">
+                                                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
-                                                            {...register('emergency_contact_name')}
-                                                            placeholder="Jane Doe"
-                                                            className={`${inputClass} bg-white/50`}
-                                                        />
-                                                    </InputField>
-                                                    <InputField label="Contact Phone" error={errors.emergency_contact_phone} hint="Mobile/Direct">
-                                                        <div className="relative group">
-                                                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-rose-500 transition-colors pointer-events-none" />
-                                                            <input
-                                                                {...register('emergency_contact_phone')}
-                                                                placeholder="+256 701 000 000"
-                                                                className={`${inputClass} pl-12 bg-white/50`}
-                                                            />
-                                                        </div>
-                                                    </InputField>
-                                                    <div className="md:col-span-2">
-                                                        <InputField label="Kindred Relationship" error={errors.emergency_contact_relationship} hint="Connection">
-                                                            <select {...register('emergency_contact_relationship')} className={`${selectClass} bg-white/50`}>
-                                                                <option value="">Select Relationship</option>
-                                                                <option value="spouse">Spouse / Partner</option>
-                                                                <option value="parent">Parental Figure</option>
-                                                                <option value="sibling">Sibling</option>
-                                                                <option value="child">Child / Dependent</option>
-                                                                <option value="friend">Close Friend</option>
-                                                                <option value="other">Other</option>
-                                                            </select>
-                                                        </InputField>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-primary-500" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Financial Gateway</h3>
-                                            </div>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <InputField label="Banking Institution" error={errors.bank_name} hint="Bank Entity">
-                                                    <div className="relative group">
-                                                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors pointer-events-none" />
-                                                        <input
-                                                            {...register('bank_name')}
-                                                            placeholder="e.g. Standard Chartered"
+                                                            {...register('emergency_contact_phone')}
+                                                            placeholder="+256..."
                                                             className={`${inputClass} pl-12`}
                                                         />
                                                     </div>
                                                 </InputField>
-                                                <InputField label="Account Identity" error={errors.bank_account_number} hint="Unique ID">
-                                                    <div className="relative group">
-                                                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-focus-within:text-primary-500 transition-colors pointer-events-none" />
+                                                <div className="md:col-span-2">
+                                                    <InputField label="Relationship" error={errors.emergency_contact_relationship} hint="Optional">
+                                                        <select {...register('emergency_contact_relationship')} className={selectClass}>
+                                                            <option value="">Choose relationship...</option>
+                                                            <option value="spouse">Spouse</option>
+                                                            <option value="parent">Parent</option>
+                                                            <option value="sibling">Sibling</option>
+                                                            <option value="child">Child</option>
+                                                            <option value="friend">Friend</option>
+                                                            <option value="other">Other</option>
+                                                        </select>
+                                                    </InputField>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="h-px bg-slate-200" />
+
+                                        {/* Banking Details */}
+                                        <div>
+                                            <h3 className="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                                <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                                Where should we send their salary?
+                                            </h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <InputField label="Bank Name" error={errors.bank_name} hint="Optional">
+                                                    <input
+                                                        {...register('bank_name')}
+                                                        placeholder="e.g. Stanbic Bank"
+                                                        className={inputClass}
+                                                    />
+                                                </InputField>
+                                                <InputField label="Account Number" error={errors.bank_account_number} hint="Optional">
+                                                    <div className="relative">
+                                                        <CreditCard className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
                                                         <input
                                                             {...register('bank_account_number')}
-                                                            placeholder="0000000000"
-                                                            className={`${inputClass} pl-12 font-black tracking-widest`}
+                                                            placeholder="Account Number"
+                                                            className={`${inputClass} pl-12 font-mono`}
                                                         />
                                                     </div>
                                                 </InputField>
                                             </div>
-                                        </section>
+                                        </div>
 
-                                        <section>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="h-6 w-1 rounded-full bg-gray-400" />
-                                                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">Observation Deck</h3>
+                                        <div className="pt-6">
+                                            <div className="bg-slate-50 rounded-xl p-4 flex gap-4">
+                                                <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                                                    <Info className="h-4 w-4 text-slate-500" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-slate-900">Ready to submit?</h4>
+                                                    <p className="text-xs text-slate-500 mt-1">
+                                                        Please review all the information before adding this team member. You can always edit their profile later.
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <InputField label="Personnel Insights" error={errors.notes} hint="Internal Notes">
-                                                <textarea
-                                                    {...register('notes')}
-                                                    rows={4}
-                                                    placeholder="Add any unique observations or onboarding notes here..."
-                                                    className="w-full p-6 rounded-[32px] border-2 border-gray-100 bg-gray-50/50 text-gray-900 placeholder:text-gray-300 focus:border-primary-500 focus:ring-8 focus:ring-primary-500/5 outline-none transition-all resize-none shadow-inner font-medium text-sm leading-relaxed"
-                                                />
-                                            </InputField>
-                                        </section>
-                                    </motion.div>
+                                        </div>
+
+                                        <InputField label="Additional Notes" error={errors.notes} hint="Internal use only">
+                                            <textarea
+                                                {...register('notes')}
+                                                rows={3}
+                                                placeholder="Any other relevant information..."
+                                                className="w-full p-4 rounded-xl border-2 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all resize-none"
+                                            />
+                                        </InputField>
+                                    </div>
                                 )}
 
                                 {/* Navigation Buttons */}
-                                <div className="flex items-center justify-between pt-12 mt-12 border-t border-gray-100">
-                                    <button
+                                <div className="flex items-center justify-between pt-8 border-t border-slate-100">
+                                    <Button
                                         type="button"
+                                        variant="ghost"
                                         onClick={currentStep === 0 ? () => navigate('/employees') : prevStep}
-                                        className="h-14 px-8 flex items-center gap-3 text-gray-400 hover:text-gray-900 font-black tracking-tight uppercase text-xs transition-colors group"
+                                        className="px-6 py-3 text-slate-600 hover:text-slate-900 font-semibold rounded-xl"
                                     >
-                                        <ChevronLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-                                        {currentStep === 0 ? 'Abort Entry' : 'Previous Phase'}
-                                    </button>
+                                        <ChevronLeft className="h-4 w-4 mr-2" />
+                                        {currentStep === 0 ? 'Cancel' : 'Previous'}
+                                    </Button>
 
                                     {currentStep < steps.length - 1 ? (
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={nextStep}
-                                            className="h-14 px-10 bg-gray-900 hover:bg-black text-white font-black tracking-tight uppercase text-xs rounded-2xl shadow-premium-lg hover:shadow-premium-xl transition-all flex items-center gap-3 active:scale-95"
+                                            className="px-8 py-3 bg-primary-500 hover:bg-primary-600 text-white font-semibold rounded-xl shadow-lg shadow-primary-200 transition-all"
                                         >
-                                            Advance to {steps[currentStep + 1].label}
-                                            <ChevronRight className="h-5 w-5" />
-                                        </button>
+                                            Continue
+                                            <ChevronRight className="h-4 w-4 ml-2" />
+                                        </Button>
                                     ) : (
-                                        <button
+                                        <Button
                                             type="submit"
                                             disabled={isCreating || isUpdating}
-                                            className="h-14 px-12 bg-primary-600 hover:bg-primary-700 text-white font-black tracking-tight uppercase text-xs rounded-2xl shadow-premium-lg hover:shadow-premium-xl transition-all flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                                            className="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl shadow-lg shadow-emerald-200 transition-all gap-2"
                                         >
                                             {isCreating || isUpdating ? (
                                                 <>
-                                                    <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                                    Syncing Profile...
+                                                    <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                    Saving...
                                                 </>
                                             ) : (
                                                 <>
-                                                    <Save className="h-5 w-5" />
-                                                    {isEditMode ? 'Commit Changes' : 'Finalize Onboarding'}
+                                                    <Save className="h-4 w-4" />
+                                                    {isEditMode ? 'Update Employee' : 'Add to Team'}
                                                 </>
                                             )}
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             </form>

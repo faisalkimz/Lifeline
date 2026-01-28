@@ -73,9 +73,9 @@ const ChatWidget = () => {
     }
 
     return (
-        <div className={`fixed right-6 bottom-6 w-96 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 transition-all z-50 flex flex-col overflow-hidden ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
+        <div className={`fixed right-6 bottom-6 w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 transition-all z-50 flex flex-col overflow-hidden ${isMinimized ? 'h-16' : 'h-[500px]'}`}>
             {/* Header */}
-            <div className="p-4 bg-gray-900 text-white flex items-center justify-between">
+            <div className="p-4 bg-slate-900 dark:bg-slate-950 text-white flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-primary-500 flex items-center justify-center">
                         <Bot className="h-6 w-6" />
@@ -84,7 +84,7 @@ const ChatWidget = () => {
                         <h3 className="font-bold text-sm">Lifeline AI</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                            <span className="text-[10px] text-gray-400 font-medium">Assistant Online</span>
+                            <span className="text-[10px] text-slate-400 font-medium">Assistant Online</span>
                         </div>
                     </div>
                 </div>
@@ -101,19 +101,19 @@ const ChatWidget = () => {
             {!isMinimized && (
                 <>
                     {/* Chat Area */}
-                    <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
+                    <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950/50">
                         {currentSession?.messages?.length === 0 && (
                             <div className="text-center py-10 px-6">
                                 <Bot className="h-12 w-12 text-primary-500 mx-auto mb-4 opacity-50" />
                                 <h4 className="font-bold text-slate-800 dark:text-white mb-2">Hello! I'm Lifeline AI</h4>
-                                <p className="text-xs text-gray-500">Ask me anything about your leave, payslips, or company policies.</p>
+                                <p className="text-xs text-slate-500">Ask me anything about your leave, payslips, or company policies.</p>
                             </div>
                         )}
                         {currentSession?.messages?.map((msg, idx) => (
                             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
                                 <div className={`max-w-[80%] p-3 rounded-2xl text-sm ${msg.role === 'user'
                                     ? 'bg-primary-600 text-white rounded-tr-none'
-                                    : 'bg-white text-slate-800 border border-gray-200 rounded-tl-none shadow-sm'
+                                    : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-tl-none shadow-sm'
                                     }`}>
                                     {msg.content}
                                 </div>
@@ -121,7 +121,7 @@ const ChatWidget = () => {
                         ))}
                         {isSending && (
                             <div className="flex justify-start">
-                                <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-gray-200 shadow-sm">
+                                <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none border border-slate-200 dark:border-slate-700 shadow-sm">
                                     <Loader2 className="h-4 w-4 animate-spin text-primary-500" />
                                 </div>
                             </div>
@@ -129,13 +129,13 @@ const ChatWidget = () => {
                     </div>
 
                     {/* Input Area */}
-                    <form onSubmit={handleSend} className="p-4 border-t border-gray-200 bg-white dark:bg-gray-900 flex gap-2">
+                    <form onSubmit={handleSend} className="p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex gap-2">
                         <input
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
                             placeholder="Type your message..."
-                            className="flex-1 bg-gray-100 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 dark:text-white"
+                            className="flex-1 bg-slate-100 dark:bg-slate-800 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary-500 dark:text-white"
                         />
                         <button
                             type="submit"

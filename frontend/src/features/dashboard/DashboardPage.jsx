@@ -86,13 +86,13 @@ const DashboardPage = () => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <motion.div variants={itemVariants} className="text-sm font-medium text-gray-500 mb-1">
+                    <motion.div variants={itemVariants} className="text-sm font-medium text-slate-500 mb-1">
                         {formattedDate}
                     </motion.div>
-                    <motion.h1 variants={itemVariants} className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight">
+                    <motion.h1 variants={itemVariants} className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
                         {greeting}, <span className="text-primary-600">{user.first_name || 'Admin'}</span>
                     </motion.h1>
-                    <motion.p variants={itemVariants} className="text-gray-500 mt-2 max-w-lg">
+                    <motion.p variants={itemVariants} className="text-slate-500 mt-2 max-w-lg">
                         {isHRAdmin
                             ? "Here's what's happening across your organization today."
                             : "Welcome back! Here's your workplace summary for today."}
@@ -100,13 +100,13 @@ const DashboardPage = () => {
                 </div>
                 <div className="flex gap-3">
                     <Link to="/leave">
-                        <Button variant="outline" className="rounded-xl h-11 border-gray-200 text-gray-600 hover:text-gray-900 font-medium">
+                        <Button variant="outline" className="rounded-xl h-11 border-slate-200 text-slate-600 hover:text-slate-900 font-medium">
                             <Calendar className="mr-2 h-4 w-4" /> Request Leave
                         </Button>
                     </Link>
                     {isHRAdmin && (
                         <Link to="/employees/new">
-                            <Button className="rounded-xl h-11 bg-gray-900 text-white hover:bg-gray-800 font-medium shadow-lg shadow-slate-900/20">
+                            <Button className="rounded-xl h-11 bg-slate-900 text-white hover:bg-slate-800 font-medium shadow-lg shadow-slate-900/20">
                                 <Users className="mr-2 h-4 w-4" /> Add Employee
                             </Button>
                         </Link>
@@ -155,8 +155,8 @@ const DashboardPage = () => {
                         <Card className="rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 bg-white overflow-hidden">
                             <CardHeader className="p-6 border-b border-slate-50 flex flex-row items-center justify-between">
                                 <div>
-                                    <CardTitle className="text-xl font-bold text-gray-900">Needs Attention</CardTitle>
-                                    <p className="text-gray-500 text-sm mt-1">Leave requests awaiting your approval</p>
+                                    <CardTitle className="text-xl font-bold text-slate-900">Needs Attention</CardTitle>
+                                    <p className="text-slate-500 text-sm mt-1">Leave requests awaiting your approval</p>
                                 </div>
                                 <Link to="/leave/approvals">
                                     <Button variant="ghost" size="sm" className="text-primary-600 font-medium hover:bg-primary-50">
@@ -168,16 +168,16 @@ const DashboardPage = () => {
                                 {pendingRequests.length > 0 ? (
                                     <div className="divide-y divide-slate-50">
                                         {pendingRequests.slice(0, 4).map((request) => (
-                                            <div key={request.id} className="p-6 hover:bg-gray-50/80 transition-colors group">
+                                            <div key={request.id} className="p-6 hover:bg-slate-50/80 transition-colors group">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center gap-4">
-                                                        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-bold text-lg group-hover:bg-white group-hover:text-primary-600 group-hover:shadow-md transition-all">
+                                                        <div className="h-12 w-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-lg group-hover:bg-white group-hover:text-primary-600 group-hover:shadow-md transition-all">
                                                             {request.employee_name?.split(' ').map(n => n[0]).join('')}
                                                         </div>
                                                         <div>
-                                                            <h4 className="font-bold text-gray-900">{request.employee_name}</h4>
-                                                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
-                                                                <span className="font-medium text-gray-700">{request.leave_type_name}</span>
+                                                            <h4 className="font-bold text-slate-900">{request.employee_name}</h4>
+                                                            <div className="flex items-center gap-2 text-sm text-slate-500 mt-0.5">
+                                                                <span className="font-medium text-slate-700">{request.leave_type_name}</span>
                                                                 <span className="h-1 w-1 rounded-full bg-slate-300" />
                                                                 <span>{request.days_requested} days</span>
                                                             </div>
@@ -185,7 +185,7 @@ const DashboardPage = () => {
                                                     </div>
                                                     <div className="flex items-center gap-3">
                                                         <Link to="/leave/approvals">
-                                                            <Button size="sm" className="rounded-lg h-9 bg-gray-900 text-white text-xs font-medium hover:bg-gray-800">
+                                                            <Button size="sm" className="rounded-lg h-9 bg-slate-900 text-white text-xs font-medium hover:bg-slate-800">
                                                                 Review
                                                             </Button>
                                                         </Link>
@@ -195,9 +195,9 @@ const DashboardPage = () => {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="p-12 text-center text-gray-400">
+                                    <div className="p-12 text-center text-slate-400">
                                         <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-slate-200" />
-                                        <p className="font-medium text-gray-600">You're all caught up!</p>
+                                        <p className="font-medium text-slate-600">You're all caught up!</p>
                                         <p className="text-sm mt-1">No pending requests at the moment.</p>
                                     </div>
                                 )}
@@ -210,23 +210,23 @@ const DashboardPage = () => {
                         {isHRAdmin && (
                             <Card className="rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 bg-white p-6">
                                 <div className="flex items-center justify-between mb-6">
-                                    <h3 className="font-bold text-gray-900">Department Headcount</h3>
-                                    <PieChart className="h-5 w-5 text-gray-400" />
+                                    <h3 className="font-bold text-slate-900">Department Headcount</h3>
+                                    <PieChart className="h-5 w-5 text-slate-400" />
                                 </div>
                                 <div className="space-y-4">
                                     {stats?.departments ? (
                                         Object.entries(stats.departments).slice(0, 4).map(([dept, count], idx) => (
                                             <div key={idx} className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
-                                                    <div className={`h-2.5 w-2.5 rounded-full ${['bg-blue-500', 'bg-primary-500', 'bg-indigo-500', 'bg-orange-500'][idx % 4]}`} />
-                                                    <span className="text-sm font-medium text-gray-600 capitalize">{dept}</span>
+                                                    <div className={`h-2.5 w-2.5 rounded-full ${['bg-blue-500', 'bg-emerald-500', 'bg-indigo-500', 'bg-orange-500'][idx % 4]}`} />
+                                                    <span className="text-sm font-medium text-slate-600 capitalize">{dept}</span>
                                                 </div>
-                                                <span className="text-sm font-bold text-gray-900">{count}</span>
+                                                <span className="text-sm font-bold text-slate-900">{count}</span>
                                             </div>
                                         ))
                                     ) : (
                                         <div className="py-8 text-center">
-                                            <p className="text-sm text-gray-400">No department data available</p>
+                                            <p className="text-sm text-slate-400">No department data available</p>
                                         </div>
                                     )}
                                 </div>
@@ -242,7 +242,7 @@ const DashboardPage = () => {
                                 <div>
                                     <div className="flex items-center gap-2 mb-2">
                                         <Activity className={cn("h-5 w-5", isHRAdmin ? "text-indigo-200" : "text-primary-500")} />
-                                        <span className={cn("font-medium", isHRAdmin ? "text-indigo-100" : "text-gray-500")}>
+                                        <span className={cn("font-medium", isHRAdmin ? "text-indigo-100" : "text-slate-500")}>
                                             {isHRAdmin ? "Payroll Status" : "My Performance"}
                                         </span>
                                     </div>
@@ -253,8 +253,8 @@ const DashboardPage = () => {
                                         </>
                                     ) : (
                                         <>
-                                            <h3 className="text-2xl font-bold text-gray-900">Great Progress</h3>
-                                            <p className="text-gray-500 text-sm mt-1">You've completed all weekly targets.</p>
+                                            <h3 className="text-2xl font-bold text-slate-900">Great Progress</h3>
+                                            <p className="text-slate-500 text-sm mt-1">You've completed all weekly targets.</p>
                                         </>
                                     )}
                                 </div>
@@ -275,11 +275,11 @@ const DashboardPage = () => {
                 <div className="space-y-8">
                     {/* Quick Launch */}
                     <Card className="rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/40 bg-white p-6">
-                        <h3 className="font-bold text-gray-900 mb-6 px-1">Quick Access</h3>
+                        <h3 className="font-bold text-slate-900 mb-6 px-1">Quick Access</h3>
                         <div className="grid grid-cols-2 gap-4">
                             {[
                                 { to: "/employees", icon: Users, label: "Employees", color: "bg-blue-50 text-blue-600", roles: [ROLES.MANAGER, ROLES.HR_MANAGER, ROLES.COMPANY_ADMIN, ROLES.SUPER_ADMIN] },
-                                { to: "/attendance", icon: Clock, label: "Attendance", color: "bg-primary-50 text-primary-600" },
+                                { to: "/attendance", icon: Clock, label: "Attendance", color: "bg-emerald-50 text-emerald-600" },
                                 { to: "/payroll/my-payslips", icon: CreditCard, label: "My Payslips", color: "bg-indigo-50 text-indigo-600" },
                                 { to: "/leave", icon: Calendar, label: "Time Off", color: "bg-rose-50 text-rose-600" },
                                 { to: "/recruitment", icon: Briefcase, label: "Hiring", color: "bg-purple-50 text-purple-600", roles: [ROLES.MANAGER, ROLES.HR_MANAGER, ROLES.COMPANY_ADMIN, ROLES.SUPER_ADMIN] },
@@ -304,11 +304,11 @@ const DashboardPage = () => {
                                 <Megaphone className="h-6 w-6 text-rose-500" />
                             </div>
                             <div className="flex-1">
-                                <h4 className="font-bold text-gray-900 mb-1">Company Announcement</h4>
+                                <h4 className="font-bold text-slate-900 mb-1">Company Announcement</h4>
                                 {latestAnnouncement ? (
                                     <>
-                                        <h5 className='text-sm font-bold text-gray-700 mb-1 line-clamp-1'>{latestAnnouncement.title}</h5>
-                                        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2">
+                                        <h5 className='text-sm font-bold text-slate-700 mb-1 line-clamp-1'>{latestAnnouncement.title}</h5>
+                                        <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
                                             {latestAnnouncement.content}
                                         </p>
                                         <Button
@@ -320,7 +320,7 @@ const DashboardPage = () => {
                                         </Button>
                                     </>
                                 ) : (
-                                    <p className="text-sm text-gray-500">No active announcements.</p>
+                                    <p className="text-sm text-slate-500">No active announcements.</p>
                                 )}
                             </div>
                         </div>
@@ -331,7 +331,7 @@ const DashboardPage = () => {
                                     onClick={() => setIsCreateAnnouncementOpen(true)}
                                     variant="ghost"
                                     size="sm"
-                                    className="text-gray-400 hover:text-gray-900 font-medium text-xs"
+                                    className="text-slate-400 hover:text-slate-900 font-medium text-xs"
                                 >
                                     <Plus className="h-3 w-3 mr-1" /> Create Announcement
                                 </Button>
@@ -346,21 +346,21 @@ const DashboardPage = () => {
                 {latestAnnouncement && (
                     <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
                         <DialogHeader className="p-8 pb-4 border-b border-slate-50">
-                            <DialogTitle className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                            <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Megaphone className="h-6 w-6 text-rose-500" /> Announcement Details
                             </DialogTitle>
                         </DialogHeader>
                         <div className="p-8">
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">{latestAnnouncement.title}</h3>
-                            <p className="text-gray-600 leading-relaxed mb-6 whitespace-pre-wrap">
+                            <h3 className="text-lg font-bold text-slate-900 mb-2">{latestAnnouncement.title}</h3>
+                            <p className="text-slate-600 leading-relaxed mb-6 whitespace-pre-wrap">
                                 {latestAnnouncement.content}
                             </p>
-                            <div className="bg-gray-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
-                                <span className="text-sm font-medium text-gray-500">Posted by {latestAnnouncement.posted_by_name || 'Admin'}</span>
-                                <span className="text-sm font-bold text-gray-900">{new Date(latestAnnouncement.created_at).toLocaleDateString()}</span>
+                            <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center justify-between">
+                                <span className="text-sm font-medium text-slate-500">Posted by {latestAnnouncement.posted_by_name || 'Admin'}</span>
+                                <span className="text-sm font-bold text-slate-900">{new Date(latestAnnouncement.created_at).toLocaleDateString()}</span>
                             </div>
                             <div className="mt-8 flex justify-end">
-                                <Button onClick={() => setIsAnnouncementOpen(false)} className="bg-gray-900 text-white rounded-xl px-6">
+                                <Button onClick={() => setIsAnnouncementOpen(false)} className="bg-slate-900 text-white rounded-xl px-6">
                                     Close Announcement
                                 </Button>
                             </div>
@@ -373,13 +373,13 @@ const DashboardPage = () => {
             <Dialog open={isCreateAnnouncementOpen} onOpenChange={setIsCreateAnnouncementOpen}>
                 <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
                     <DialogHeader className="p-8 pb-4 border-b border-slate-50">
-                        <DialogTitle className="text-2xl font-bold text-gray-900">
+                        <DialogTitle className="text-2xl font-bold text-slate-900">
                             New Announcement
                         </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleCreateAnnouncement} className="p-8 space-y-4">
                         <div className="space-y-2">
-                            <label className='text-sm font-bold text-gray-700'>Title</label>
+                            <label className='text-sm font-bold text-slate-700'>Title</label>
                             <Input
                                 required
                                 placeholder="e.g. Office Holiday Party"
@@ -389,20 +389,20 @@ const DashboardPage = () => {
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className='text-sm font-bold text-gray-700'>Content</label>
+                            <label className='text-sm font-bold text-slate-700'>Content</label>
                             <textarea
                                 required
                                 placeholder="Write your announcement here..."
                                 value={newAnnouncement.content}
                                 onChange={(e) => setNewAnnouncement({ ...newAnnouncement, content: e.target.value })}
-                                className="w-full p-3 min-h-[150px] bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 outline-none resize-none text-sm"
+                                className="w-full p-3 min-h-[150px] bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/10 outline-none resize-none text-sm"
                             />
                         </div>
                         <div className="mt-8 flex justify-end gap-3">
-                            <Button type="button" variant="ghost" onClick={() => setIsCreateAnnouncementOpen(false)} className="text-gray-500 rounded-xl px-6">
+                            <Button type="button" variant="ghost" onClick={() => setIsCreateAnnouncementOpen(false)} className="text-slate-500 rounded-xl px-6">
                                 Cancel
                             </Button>
-                            <Button type="submit" className="bg-gray-900 text-white rounded-xl px-6 shadow-lg shadow-slate-900/20">
+                            <Button type="submit" className="bg-slate-900 text-white rounded-xl px-6 shadow-lg shadow-slate-900/20">
                                 {isCreatingAnnouncement ? 'Posting...' : 'Post Announcement'}
                             </Button>
                         </div>
@@ -417,7 +417,7 @@ const DashboardPage = () => {
 const StatCard = ({ title, value, change, icon: Icon, color }) => {
     const colorClasses = {
         blue: "bg-blue-50 text-blue-600",
-        emerald: "bg-primary-50 text-primary-600",
+        emerald: "bg-emerald-50 text-emerald-600",
         amber: "bg-amber-50 text-amber-600",
         rose: "bg-rose-50 text-rose-600",
     };
@@ -432,15 +432,15 @@ const StatCard = ({ title, value, change, icon: Icon, color }) => {
                     <Icon className="h-6 w-6" />
                 </div>
                 {change && (
-                    <div className="flex items-center text-xs font-medium text-primary-600 bg-primary-50 px-2 py-1 rounded-full">
+                    <div className="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
                         <ArrowUpRight className="h-3 w-3 mr-1" />
-                        <span className="text-gray-600">{change}</span>
+                        <span className="text-slate-600">{change}</span>
                     </div>
                 )}
             </div>
             <div>
-                <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{value}</h3>
-                <p className="text-sm font-medium text-gray-500 mt-1">{title}</p>
+                <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
+                <p className="text-sm font-medium text-slate-500 mt-1">{title}</p>
             </div>
         </motion.div>
     );
@@ -448,11 +448,11 @@ const StatCard = ({ title, value, change, icon: Icon, color }) => {
 
 const QuickLink = ({ to, icon: Icon, label, color }) => (
     <Link to={to} className="group">
-        <div className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-gray-200 hover:shadow-lg transition-all flex flex-col items-center justify-center gap-3 text-center h-full">
+        <div className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-slate-200 hover:shadow-lg transition-all flex flex-col items-center justify-center gap-3 text-center h-full">
             <div className={`p-3 rounded-xl transition-transform group-hover:scale-110 ${color}`}>
                 <Icon className="h-6 w-6" />
             </div>
-            <span className="text-sm font-bold text-gray-700 group-hover:text-gray-900">{label}</span>
+            <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900">{label}</span>
         </div>
     </Link>
 );

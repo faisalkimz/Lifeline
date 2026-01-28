@@ -14,13 +14,13 @@ const AuthLayout = () => {
     }
 
     return (
-        <div className="min-h-screen w-full flex bg-white transition-colors duration-500 overflow-hidden">
+        <div className="min-h-screen w-full flex bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
             {/* Left Side - Brand & Marketing */}
-            <div className="hidden lg:flex lg:w-1/2 bg-primary-900 dark:bg-gray-900 relative overflow-hidden items-center justify-center p-12">
+            <div className="hidden lg:flex lg:w-1/2 bg-primary-900 dark:bg-slate-900 relative overflow-hidden items-center justify-center p-12">
                 {/* Abstract Background Shapes */}
                 <div className="absolute top-0 left-0 w-full h-full">
                     <div className="absolute -top-24 -right-24 w-[600px] h-[600px] bg-primary-500/20 rounded-full blur-[120px] animate-pulse"></div>
-                    <div className="absolute -bottom-24 -left-24 w-[600px] h-[600px] bg-primary-500/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
+                    <div className="absolute -bottom-24 -left-24 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
                 </div>
 
                 <div className="relative z-10 max-w-lg text-center">
@@ -70,7 +70,7 @@ const AuthLayout = () => {
             </div>
 
             {/* Right Side - Form Area */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-6 sm:p-12">
+            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6 sm:p-12">
                 <div className="w-full max-w-md">
                     <Outlet />
                 </div>

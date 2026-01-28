@@ -76,7 +76,7 @@ const DisciplinaryPage = () => {
             case 'active': return 'bg-orange-100 text-orange-700 border-orange-200';
             case 'closed': return 'bg-green-100 text-green-700 border-green-200';
             case 'under_appeal': return 'bg-blue-100 text-blue-700 border-blue-200';
-            default: return 'bg-gray-100 text-gray-700 border-gray-200';
+            default: return 'bg-slate-100 text-slate-700 border-slate-200';
         }
     };
 
@@ -84,7 +84,7 @@ const DisciplinaryPage = () => {
         switch (severity) {
             case 'critical': return 'text-red-600';
             case 'severe': return 'text-orange-600';
-            default: return 'text-gray-600';
+            default: return 'text-slate-600';
         }
     };
 
@@ -99,20 +99,20 @@ const DisciplinaryPage = () => {
     };
 
     return (
-        <div className="space-y-8 pb-10 font-sans text-gray-900">
+        <div className="space-y-8 pb-10 font-sans text-slate-900">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="h-16 w-16 bg-gray-900 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">
+                    <div className="h-16 w-16 bg-slate-900 rounded-2xl flex items-center justify-center text-xl font-bold text-white shadow-lg">
                         <AlertTriangle className="h-8 w-8 text-orange-400" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Disciplinary Management</h1>
-                        <p className="text-gray-500 font-medium">Employee Conduct & Disciplinary Actions</p>
+                        <h1 className="text-2xl font-black text-slate-900 tracking-tight">Disciplinary Management</h1>
+                        <p className="text-slate-500 font-medium">Employee Conduct & Disciplinary Actions</p>
                     </div>
                 </div>
                 {isAdmin && (
-                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-gray-900 hover:bg-gray-800 shadow-xl rounded-xl px-6 h-12 font-bold">
+                    <Button onClick={() => setIsCreateDialogOpen(true)} className="bg-slate-900 hover:bg-slate-800 shadow-xl rounded-xl px-6 h-12 font-bold">
                         <Plus className="h-4 w-4 mr-2" /> New Disciplinary Case
                     </Button>
                 )}
@@ -121,11 +121,11 @@ const DisciplinaryPage = () => {
             {/* Controls */}
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="relative flex-1 w-full max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <input
                         type="text"
                         placeholder="Search Case ID or Name..."
-                        className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition-all shadow-sm"
+                        className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 transition-all shadow-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -134,7 +134,7 @@ const DisciplinaryPage = () => {
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="h-11 px-4 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 cursor-pointer"
+                        className="h-11 px-4 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-900/5 cursor-pointer"
                     >
                         <option value="all">All Statuses</option>
                         <option value="draft">Draft</option>
@@ -148,7 +148,7 @@ const DisciplinaryPage = () => {
             <Card className="border-none shadow-xl shadow-slate-200/50 overflow-hidden rounded-2xl">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
-                        <thead className="bg-gray-50 text-gray-400 font-black uppercase tracking-[0.1em] text-[10px]">
+                        <thead className="bg-slate-50 text-slate-400 font-black uppercase tracking-[0.1em] text-[10px]">
                             <tr>
                                 <th className="px-6 py-5">Incident</th>
                                 <th className="px-6 py-5">Employee</th>
@@ -161,29 +161,29 @@ const DisciplinaryPage = () => {
                             {isLoading ? (
                                 [1, 2, 3].map(i => (
                                     <tr key={i} className="animate-pulse">
-                                        <td colSpan="5" className="px-6 py-8"><div className="h-4 bg-gray-100 rounded w-full"></div></td>
+                                        <td colSpan="5" className="px-6 py-8"><div className="h-4 bg-slate-100 rounded w-full"></div></td>
                                     </tr>
                                 ))
                             ) : cases.length > 0 ? (
                                 cases.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
                                         <td className="px-6 py-5">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-gray-400 text-[10px] uppercase tracking-widest">{item.case_id}</span>
-                                                <span className="font-bold text-gray-900 mt-1">{item.reason}</span>
-                                                <span className="text-gray-400 text-xs flex items-center gap-1 mt-1">
+                                                <span className="font-black text-slate-400 text-[10px] uppercase tracking-widest">{item.case_id}</span>
+                                                <span className="font-bold text-slate-900 mt-1">{item.reason}</span>
+                                                <span className="text-slate-400 text-xs flex items-center gap-1 mt-1">
                                                     <Calendar className="h-3 w-3" /> {item.incident_date}
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
-                                                <div className="h-9 w-9 rounded-xl bg-gray-100 flex items-center justify-center text-xs font-black text-gray-500 border border-gray-200">
+                                                <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center text-xs font-black text-slate-500 border border-slate-200">
                                                     {item.employee_name[0]}
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-gray-700">{item.employee_name}</span>
-                                                    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">Employee</span>
+                                                    <span className="font-bold text-slate-700">{item.employee_name}</span>
+                                                    <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Employee</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -202,7 +202,7 @@ const DisciplinaryPage = () => {
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => openCaseView(item)}
-                                                className="border-gray-200 hover:bg-gray-900 hover:text-white transition-all rounded-xl gap-2 font-bold"
+                                                className="border-slate-200 hover:bg-slate-900 hover:text-white transition-all rounded-xl gap-2 font-bold"
                                             >
                                                 <Info className="h-3.5 w-3.5" /> Details
                                             </Button>
@@ -213,11 +213,11 @@ const DisciplinaryPage = () => {
                                 <tr>
                                     <td colSpan="5" className="px-6 py-32 text-center">
                                         <div className="flex flex-col items-center justify-center">
-                                            <div className="h-20 w-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 border-2 border-dashed border-gray-200">
+                                            <div className="h-20 w-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 border-2 border-dashed border-slate-200">
                                                 <FileText className="h-8 w-8 text-slate-300" />
                                             </div>
-                                            <p className="text-xl font-black text-gray-900 tracking-tight">No Cases Found</p>
-                                            <p className="text-gray-500 mt-2 max-w-xs mx-auto text-sm font-medium">
+                                            <p className="text-xl font-black text-slate-900 tracking-tight">No Cases Found</p>
+                                            <p className="text-slate-500 mt-2 max-w-xs mx-auto text-sm font-medium">
                                                 No disciplinary records found for this selection.
                                             </p>
                                         </div>
@@ -235,7 +235,7 @@ const DisciplinaryPage = () => {
                     {selectedCase && (
                         <div className="flex flex-col bg-white">
                             {/* Detailed Header */}
-                            <div className="bg-gray-900 p-8 text-white relative">
+                            <div className="bg-slate-900 p-8 text-white relative">
                                 <div className="absolute top-0 right-0 p-8 opacity-10">
                                     <AlertTriangle className="h-32 w-32" />
                                 </div>
@@ -254,17 +254,17 @@ const DisciplinaryPage = () => {
                                 {/* Left Side: Case Info */}
                                 <div className="md:col-span-2 space-y-8">
                                     <section>
-                                        <h4 className="flex items-center gap-2 text-gray-900 font-black uppercase text-xs tracking-widest mb-4">
+                                        <h4 className="flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest mb-4">
                                             <FileText className="h-4 w-4 text-orange-500" /> Case Description
                                         </h4>
-                                        <div className="bg-gray-50 p-6 rounded-[1.5rem] border border-slate-100">
-                                            <h3 className="text-xl font-bold text-gray-900 mb-3">{selectedCase.reason}</h3>
-                                            <p className="text-gray-600 leading-relaxed italic">"{selectedCase.description}"</p>
+                                        <div className="bg-slate-50 p-6 rounded-[1.5rem] border border-slate-100">
+                                            <h3 className="text-xl font-bold text-slate-900 mb-3">{selectedCase.reason}</h3>
+                                            <p className="text-slate-600 leading-relaxed italic">"{selectedCase.description}"</p>
                                         </div>
                                     </section>
 
                                     <section>
-                                        <h4 className="flex items-center gap-2 text-gray-900 font-black uppercase text-xs tracking-widest mb-4">
+                                        <h4 className="flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest mb-4">
                                             <MessageSquare className="h-4 w-4 text-blue-500" /> Employee Response
                                         </h4>
                                         {selectedCase.employee_statement ? (
@@ -277,9 +277,9 @@ const DisciplinaryPage = () => {
                                             <div className="text-center py-8 border-2 border-dashed border-slate-100 rounded-[1.5rem]">
                                                 {user?.employee?.id === selectedCase.employee ? (
                                                     <div className="space-y-4">
-                                                        <p className="text-sm text-gray-500 font-medium">Please provide your official statement regarding this case.</p>
+                                                        <p className="text-sm text-slate-500 font-medium">Please provide your official statement regarding this case.</p>
                                                         <textarea
-                                                            className="w-full h-32 p-4 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 transition-all text-sm resize-none"
+                                                            className="w-full h-32 p-4 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900/5 transition-all text-sm resize-none"
                                                             placeholder="Type your response here..."
                                                             value={statement}
                                                             onChange={(e) => setStatement(e.target.value)}
@@ -287,13 +287,13 @@ const DisciplinaryPage = () => {
                                                         <Button
                                                             onClick={handleSubmitStatement}
                                                             disabled={isSubmitting || !statement}
-                                                            className="bg-gray-900 hover:bg-gray-800 rounded-xl w-full"
+                                                            className="bg-slate-900 hover:bg-slate-800 rounded-xl w-full"
                                                         >
                                                             {isSubmitting ? 'Submitting...' : 'Submit Official Statement'}
                                                         </Button>
                                                     </div>
                                                 ) : (
-                                                    <p className="text-sm text-gray-400 font-bold italic">Awaiting employee statement...</p>
+                                                    <p className="text-sm text-slate-400 font-bold italic">Awaiting employee statement...</p>
                                                 )}
                                             </div>
                                         )}
@@ -301,15 +301,15 @@ const DisciplinaryPage = () => {
 
                                     {isAdmin && (
                                         <section>
-                                            <h4 className="flex items-center gap-2 text-gray-900 font-black uppercase text-xs tracking-widest mb-4">
-                                                <Save className="h-4 w-4 text-primary-500" /> Management Decision
+                                            <h4 className="flex items-center gap-2 text-slate-900 font-black uppercase text-xs tracking-widest mb-4">
+                                                <Save className="h-4 w-4 text-emerald-500" /> Management Decision
                                             </h4>
                                             <form onSubmit={handleUpdateCase} className="space-y-6">
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Update Status</label>
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Update Status</label>
                                                         <select
-                                                            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-xl text-sm"
+                                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm"
                                                             value={updateFormData.status}
                                                             onChange={(e) => setUpdateFormData({ ...updateFormData, status: e.target.value })}
                                                         >
@@ -319,9 +319,9 @@ const DisciplinaryPage = () => {
                                                         </select>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Action Taken</label>
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Action Taken</label>
                                                         <select
-                                                            className="w-full h-11 px-4 bg-gray-50 border border-gray-200 rounded-xl text-sm"
+                                                            className="w-full h-11 px-4 bg-slate-50 border border-slate-200 rounded-xl text-sm"
                                                             value={updateFormData.action_taken}
                                                             onChange={(e) => setUpdateFormData({ ...updateFormData, action_taken: e.target.value })}
                                                         >
@@ -335,15 +335,15 @@ const DisciplinaryPage = () => {
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Decision Summary</label>
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Decision Summary</label>
                                                     <textarea
-                                                        className="w-full h-24 p-4 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none"
+                                                        className="w-full h-24 p-4 bg-slate-50 border border-slate-200 rounded-xl text-sm resize-none"
                                                         value={updateFormData.decision}
                                                         onChange={(e) => setUpdateFormData({ ...updateFormData, decision: e.target.value })}
                                                         placeholder="Document the final decision..."
                                                     />
                                                 </div>
-                                                <Button type="submit" disabled={isUpdating} className="bg-primary-600 hover:bg-primary-700 rounded-xl w-full font-black uppercase tracking-widest h-12 shadow-lg shadow-emerald-100">
+                                                <Button type="submit" disabled={isUpdating} className="bg-emerald-600 hover:bg-emerald-700 rounded-xl w-full font-black uppercase tracking-widest h-12 shadow-lg shadow-emerald-100">
                                                     {isUpdating ? 'Saving...' : 'Save Decision'}
                                                 </Button>
                                             </form>
@@ -353,40 +353,40 @@ const DisciplinaryPage = () => {
 
                                 {/* Right Side: Personnel & Log */}
                                 <div className="space-y-6">
-                                    <Card className="bg-gray-50 border-none rounded-[1.5rem] p-6">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Employee</h4>
+                                    <Card className="bg-slate-50 border-none rounded-[1.5rem] p-6">
+                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Employee</h4>
                                         <div className="flex items-center gap-4">
-                                            <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-lg font-black text-gray-900 shadow-sm border border-slate-100">
+                                            <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-lg font-black text-slate-900 shadow-sm border border-slate-100">
                                                 {selectedCase.employee_name[0]}
                                             </div>
                                             <div>
-                                                <p className="font-black text-gray-900">{selectedCase.employee_name}</p>
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-tight">Active</p>
+                                                <p className="font-black text-slate-900">{selectedCase.employee_name}</p>
+                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">Active</p>
                                             </div>
                                         </div>
                                     </Card>
 
-                                    <Card className="bg-gray-50 border-none rounded-[1.5rem] p-6">
-                                        <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Case Details</h4>
+                                    <Card className="bg-slate-50 border-none rounded-[1.5rem] p-6">
+                                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Case Details</h4>
                                         <div className="space-y-4">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-gray-500">Incident Date</span>
-                                                <span className="text-xs font-black text-gray-900">{selectedCase.incident_date}</span>
+                                                <span className="text-xs font-bold text-slate-500">Incident Date</span>
+                                                <span className="text-xs font-black text-slate-900">{selectedCase.incident_date}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-gray-500">Severity Level</span>
+                                                <span className="text-xs font-bold text-slate-500">Severity Level</span>
                                                 <span className={cn("text-xs font-black uppercase tracking-widest", getSeverityStyle(selectedCase.severity))}>
                                                     {selectedCase.severity}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-xs font-bold text-gray-500">Issued On</span>
-                                                <span className="text-xs font-black text-gray-900">{new Date(selectedCase.created_at).toLocaleDateString()}</span>
+                                                <span className="text-xs font-bold text-slate-500">Issued On</span>
+                                                <span className="text-xs font-black text-slate-900">{new Date(selectedCase.created_at).toLocaleDateString()}</span>
                                             </div>
                                         </div>
                                     </Card>
 
-                                    <Button onClick={() => setSelectedCase(null)} variant="outline" className="w-full rounded-xl h-12 border-gray-200 font-bold hover:bg-gray-50">
+                                    <Button onClick={() => setSelectedCase(null)} variant="outline" className="w-full rounded-xl h-12 border-slate-200 font-bold hover:bg-slate-50">
                                         <X className="h-4 w-4 mr-2" /> Close View
                                     </Button>
                                 </div>

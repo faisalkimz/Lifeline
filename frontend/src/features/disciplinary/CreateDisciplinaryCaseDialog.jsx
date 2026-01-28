@@ -47,14 +47,14 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
             <DialogContent className="max-w-2xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-0">
                 {/* Header */}
                 <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                        <AlertTriangle className="h-6 w-6 text-gray-600" />
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                        <AlertTriangle className="h-6 w-6 text-slate-600" />
                     </div>
                     <div>
-                        <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
                             Open Case File
                         </DialogTitle>
-                        <p className="text-gray-500 mt-1 font-medium text-sm">
+                        <p className="text-slate-500 mt-1 font-medium text-sm">
                             Document a disciplinary incident
                         </p>
                     </div>
@@ -63,10 +63,10 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700">Who is involved?</label>
+                            <label className="text-sm font-bold text-slate-700">Who is involved?</label>
                             <div className="relative">
                                 <select
-                                    className="w-full h-12 pl-3 pr-8 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer"
+                                    className="w-full h-12 pl-3 pr-8 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all appearance-none cursor-pointer"
                                     value={formData.employee}
                                     onChange={(e) => handleInputChange('employee', e.target.value)}
                                     required
@@ -76,15 +76,15 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                                         <option key={emp.id} value={emp.id}>{emp.full_name}</option>
                                     ))}
                                 </select>
-                                <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
+                                <User className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-gray-700">When did it happen?</label>
+                            <label className="text-sm font-bold text-slate-700">When did it happen?</label>
                             <div className="relative">
                                 <input
                                     type="date"
-                                    className="w-full h-12 px-3 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-gray-900"
+                                    className="w-full h-12 px-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all text-slate-900"
                                     value={formData.incident_date}
                                     onChange={(e) => handleInputChange('incident_date', e.target.value)}
                                     required
@@ -94,20 +94,20 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700">What is the violation?</label>
+                        <label className="text-sm font-bold text-slate-700">What is the violation?</label>
                         <Input
                             placeholder="e.g. Unexcused Absence, Code of Conduct Violation"
                             value={formData.reason}
                             onChange={(e) => handleInputChange('reason', e.target.value)}
                             required
-                            className="h-12 bg-gray-50 border-gray-200 rounded-xl text-gray-900 font-medium placeholder:text-gray-400 focus:bg-white transition-all"
+                            className="h-12 bg-slate-50 border-slate-200 rounded-xl text-slate-900 font-medium placeholder:text-slate-400 focus:bg-white transition-all"
                         />
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700">The Details</label>
+                        <label className="text-sm font-bold text-slate-700">The Details</label>
                         <textarea
-                            className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium text-gray-900 min-h-[140px] resize-none text-sm leading-relaxed focus:bg-white"
+                            className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium text-slate-900 min-h-[140px] resize-none text-sm leading-relaxed focus:bg-white"
                             placeholder="Provide a detailed, objective description of the incident..."
                             value={formData.description}
                             onChange={(e) => handleInputChange('description', e.target.value)}
@@ -115,7 +115,7 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6 p-5 bg-primary-50/50 rounded-2xl border border-emerald-100">
+                    <div className="grid grid-cols-2 gap-6 p-5 bg-emerald-50/50 rounded-2xl border border-emerald-100">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Severity</label>
                             <select
@@ -143,10 +143,10 @@ const CreateDisciplinaryCaseDialog = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="flex justify-end gap-3 pt-2">
-                        <Button type="button" variant="ghost" onClick={onClose} className="h-12 px-6 text-gray-500 hover:text-gray-900 font-bold hover:bg-gray-50 rounded-xl">
+                        <Button type="button" variant="ghost" onClick={onClose} className="h-12 px-6 text-slate-500 hover:text-slate-900 font-bold hover:bg-slate-50 rounded-xl">
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="bg-primary-600 hover:bg-primary-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all">
+                        <Button type="submit" disabled={isLoading} className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-8 h-12 font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 hover:-translate-y-0.5 transition-all">
                             {isLoading ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processing...

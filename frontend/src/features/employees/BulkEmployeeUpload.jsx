@@ -562,14 +562,14 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
         <Dialog open={isOpen} onOpenChange={handleClose}>
             <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col bg-white">
                 <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                    <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                        <Users className="h-6 w-6 text-gray-600" />
+                    <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                        <Users className="h-6 w-6 text-slate-600" />
                     </div>
                     <div>
-                        <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">
+                        <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
                             Add Your Team
                         </DialogTitle>
-                        <p className="text-gray-500 mt-1 font-medium text-sm">
+                        <p className="text-slate-500 mt-1 font-medium text-sm">
                             Let's get everyone onboarded in one go!
                         </p>
                     </div>
@@ -580,8 +580,8 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                         <div className="max-w-2xl mx-auto space-y-12">
                             {/* Simple, Human Introduction */}
                             <div className="space-y-2">
-                                <h3 className="text-xl font-semibold text-gray-900">How to get started</h3>
-                                <p className="text-gray-500 leading-relaxed">
+                                <h3 className="text-xl font-semibold text-slate-900">How to get started</h3>
+                                <p className="text-slate-500 leading-relaxed">
                                     The quickest way to add your team is by using a spreadsheet.
                                     Download our template, fill in your employee details, and upload it back here.
                                 </p>
@@ -595,16 +595,16 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                             <Building2 className="h-5 w-5 text-blue-600" />
                                         </div>
                                         <div className="flex-1">
-                                            <label className="block text-sm font-bold text-gray-900 mb-2">
+                                            <label className="block text-sm font-bold text-slate-900 mb-2">
                                                 Default Department (Optional)
                                             </label>
-                                            <p className="text-xs text-gray-600 mb-3">
+                                            <p className="text-xs text-slate-600 mb-3">
                                                 Select a department to apply to all employees in this upload. You can also specify departments individually in the Excel file.
                                             </p>
                                             <select
                                                 value={selectedDepartment}
                                                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                                                className="w-full rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                className="w-full rounded-lg border-2 border-blue-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                                 disabled={departmentsLoading}
                                             >
                                                 <option value="">No default (use Excel file values)</option>
@@ -627,10 +627,10 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                 {/* Instructions List */}
                                 <div className="space-y-6">
                                     <div className="flex gap-4">
-                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-sm">1</div>
+                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">1</div>
                                         <div>
-                                            <p className="font-semibold text-gray-900">Download the template</p>
-                                            <p className="text-sm text-gray-500 mt-1 mb-3">
+                                            <p className="font-semibold text-slate-900">Download the template</p>
+                                            <p className="text-sm text-slate-500 mt-1 mb-3">
                                                 A pre-formatted Excel file with all the columns you'll need.
                                                 {departments.length > 0 && (
                                                     <span className="block mt-1 text-xs text-blue-600">
@@ -640,7 +640,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                             </p>
                                             <button
                                                 onClick={downloadTemplate}
-                                                className="text-sm font-bold text-primary-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+                                                className="text-sm font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
                                             >
                                                 <Download className="h-4 w-4" />
                                                 Get template.xlsx
@@ -649,11 +649,11 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                     </div>
 
                                     <div className="flex gap-4">
-                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-sm">2</div>
+                                        <div className="flex-shrink-0 h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-sm">2</div>
                                         <div>
-                                            <p className="font-semibold text-gray-900">Add your people</p>
-                                            <p className="text-sm text-gray-500 mt-1">
-                                                Only <span className="text-gray-900 font-medium">Name and Email</span> are required for now.
+                                            <p className="font-semibold text-slate-900">Add your people</p>
+                                            <p className="text-sm text-slate-500 mt-1">
+                                                Only <span className="text-slate-900 font-medium">Name and Email</span> are required for now.
                                                 {selectedDepartment && (
                                                     <span className="block mt-1 text-xs text-blue-600">
                                                         ✓ All employees will be assigned to: <strong>{departments.find(d => d.id === parseInt(selectedDepartment))?.name}</strong>
@@ -669,16 +669,16 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between px-1">
                                         <div className="flex items-center gap-2">
-                                            <div className="h-2 w-2 rounded-full bg-primary-500"></div>
-                                            <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Ready to upload</span>
+                                            <div className="h-2 w-2 rounded-full bg-emerald-500"></div>
+                                            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Ready to upload</span>
                                         </div>
                                     </div>
 
                                     <div className={cn(
                                         "relative group cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-12 text-center",
                                         file
-                                            ? "bg-primary-50/30 border-emerald-200"
-                                            : "bg-gray-50/50 border-gray-200 hover:border-gray-300 hover:bg-white"
+                                            ? "bg-emerald-50/30 border-emerald-200"
+                                            : "bg-slate-50/50 border-slate-200 hover:border-slate-300 hover:bg-white"
                                     )}>
                                         <input
                                             type="file"
@@ -690,12 +690,12 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                         <label htmlFor="file-upload" className="cursor-pointer block">
                                             {file ? (
                                                 <div className="space-y-4">
-                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-emerald-100 flex items-center justify-center mx-auto text-primary-600">
+                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-emerald-100 flex items-center justify-center mx-auto text-emerald-600">
                                                         <FileCheck className="h-8 w-8" />
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-gray-900">{file.name}</p>
-                                                        <p className="text-sm text-gray-500 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
+                                                        <p className="font-semibold text-slate-900">{file.name}</p>
+                                                        <p className="text-sm text-slate-500 mt-1">{(file.size / 1024).toFixed(1)} KB</p>
                                                     </div>
                                                     <button
                                                         onClick={(e) => { e.preventDefault(); setFile(null); }}
@@ -706,14 +706,14 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                                 </div>
                                             ) : (
                                                 <div className="space-y-4">
-                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto text-gray-400 group-hover:text-gray-600 transition-colors">
+                                                    <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center mx-auto text-slate-400 group-hover:text-slate-600 transition-colors">
                                                         <Upload className="h-8 w-8" />
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-gray-900">Drop your file here</p>
-                                                        <p className="text-sm text-gray-500 mt-1">or click to browse from your computer</p>
+                                                        <p className="font-semibold text-slate-900">Drop your file here</p>
+                                                        <p className="text-sm text-slate-500 mt-1">or click to browse from your computer</p>
                                                     </div>
-                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Excel or CSV</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Excel or CSV</p>
                                                 </div>
                                             )}
                                         </label>
@@ -731,12 +731,12 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                             >
                                 {/* Summary Cards */}
                                 <div className="grid grid-cols-3 gap-4">
-                                    <div className="bg-gray-50 border-2 border-gray-200 rounded-2xl p-6 text-center">
-                                        <p className="text-4xl font-bold text-gray-900 mb-2">{results.total}</p>
-                                        <p className="text-sm font-medium text-gray-600">Total Records</p>
+                                    <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 text-center">
+                                        <p className="text-4xl font-bold text-slate-900 mb-2">{results.total}</p>
+                                        <p className="text-sm font-medium text-slate-600">Total Records</p>
                                     </div>
-                                    <div className="bg-primary-50 border-2 border-emerald-200 rounded-2xl p-6 text-center">
-                                        <p className="text-4xl font-bold text-primary-600 mb-2">{results.successful}</p>
+                                    <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6 text-center">
+                                        <p className="text-4xl font-bold text-emerald-600 mb-2">{results.successful}</p>
                                         <p className="text-sm font-medium text-emerald-700">✓ Successful</p>
                                     </div>
                                     <div className="bg-rose-50 border-2 border-rose-200 rounded-2xl p-6 text-center">
@@ -746,9 +746,9 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                 </div>
 
                                 {/* Detailed Results */}
-                                <div className="border-2 border-gray-200 rounded-2xl overflow-hidden bg-white">
-                                    <div className="bg-gray-50 px-6 py-4 border-b-2 border-gray-200">
-                                        <h3 className="font-bold text-gray-900 text-lg">Upload Details</h3>
+                                <div className="border-2 border-slate-200 rounded-2xl overflow-hidden bg-white">
+                                    <div className="bg-slate-50 px-6 py-4 border-b-2 border-slate-200">
+                                        <h3 className="font-bold text-slate-900 text-lg">Upload Details</h3>
                                     </div>
                                     <div className="max-h-80 overflow-y-auto">
                                         {results.details.map((detail, idx) => (
@@ -757,13 +757,13 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                                 initial={{ opacity: 0, x: -20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 transition={{ delay: idx * 0.05 }}
-                                                className={`px-6 py-4 border-b border-slate-100 flex items-center justify-between ${detail.status === 'success' ? 'bg-white hover:bg-primary-50/30' : 'bg-rose-50/50'
+                                                className={`px-6 py-4 border-b border-slate-100 flex items-center justify-between ${detail.status === 'success' ? 'bg-white hover:bg-emerald-50/30' : 'bg-rose-50/50'
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-4">
                                                     {detail.status === 'success' ? (
                                                         <div className="h-10 w-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                                                            <CheckCircle className="h-5 w-5 text-primary-600" />
+                                                            <CheckCircle className="h-5 w-5 text-emerald-600" />
                                                         </div>
                                                     ) : (
                                                         <div className="h-10 w-10 rounded-xl bg-rose-100 flex items-center justify-center">
@@ -771,7 +771,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <p className="text-sm font-semibold text-gray-900">
+                                                        <p className="text-sm font-semibold text-slate-900">
                                                             Row {detail.row}: {detail.name}
                                                         </p>
                                                         {detail.error && (
@@ -792,12 +792,12 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-4 p-8 bg-gray-50 border-t border-slate-100">
+                <div className="flex gap-4 p-8 bg-slate-50 border-t border-slate-100">
                     <Button
                         variant="ghost"
                         onClick={handleClose}
                         disabled={uploading}
-                        className="flex-1 h-14 text-gray-500 hover:text-gray-900 font-bold uppercase tracking-widest text-[10px] rounded-2xl hover:bg-white transition-all"
+                        className="flex-1 h-14 text-slate-500 hover:text-slate-900 font-bold uppercase tracking-widest text-[10px] rounded-2xl hover:bg-white transition-all"
                     >
                         {results ? 'Close' : 'Cancel'}
                     </Button>
@@ -805,7 +805,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                         <Button
                             onClick={handleUpload}
                             disabled={!file || uploading}
-                            className="flex-[2] h-14 bg-gray-900 hover:bg-gray-800 text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-2xl shadow-slate-900/20 gap-3 transition-all enabled:hover:-translate-y-1 disabled:opacity-50"
+                            className="flex-[2] h-14 bg-slate-900 hover:bg-slate-800 text-white font-bold uppercase tracking-widest text-[10px] rounded-2xl shadow-2xl shadow-slate-900/20 gap-3 transition-all enabled:hover:-translate-y-1 disabled:opacity-50"
                         >
                             {uploading ? (
                                 <>

@@ -67,7 +67,7 @@ const NotificationsPopover = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
                     "p-2 rounded-xl transition-all relative",
-                    isOpen ? "bg-primary-50 text-primary-600" : "text-gray-500 hover:text-primary-600 hover:bg-primary-50"
+                    isOpen ? "bg-primary-50 text-primary-600" : "text-slate-500 hover:text-primary-600 hover:bg-primary-50"
                 )}
             >
                 <Bell className="h-5 w-5" />
@@ -78,7 +78,7 @@ const NotificationsPopover = () => {
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-100 z-50 overflow-hidden animate-fade-in origin-top-right">
-                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-gray-50/50">
+                    <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
                         <div className="flex items-center gap-2">
                             <h3 className="font-bold text-slate-800">Notifications</h3>
                             {isSupported && !subscription && (
@@ -104,11 +104,11 @@ const NotificationsPopover = () => {
 
                     <div className="max-h-[60vh] overflow-y-auto">
                         {isLoading ? (
-                            <div className="p-8 text-center text-gray-400 text-sm">Loading...</div>
+                            <div className="p-8 text-center text-slate-400 text-sm">Loading...</div>
                         ) : notifications.length === 0 ? (
                             <div className="p-8 text-center">
                                 <Bell className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                                <p className="text-gray-500 font-medium text-sm">No notifications yet</p>
+                                <p className="text-slate-500 font-medium text-sm">No notifications yet</p>
                             </div>
                         ) : (
                             <div>
@@ -116,7 +116,7 @@ const NotificationsPopover = () => {
                                     <div
                                         key={notification.id}
                                         className={cn(
-                                            "p-4 border-b border-slate-50 hover:bg-gray-50 transition-colors flex gap-3 cursor-default group",
+                                            "p-4 border-b border-slate-50 hover:bg-slate-50 transition-colors flex gap-3 cursor-default group",
                                             !notification.is_read && "bg-primary-50/30"
                                         )}
                                     >
@@ -124,21 +124,21 @@ const NotificationsPopover = () => {
                                             {notification.actor_avatar ? (
                                                 <img src={notification.actor_avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
                                             ) : (
-                                                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                                                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center">
                                                     {getIcon(notification.notification_type)}
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm text-gray-900 leading-snug">
+                                            <p className="text-sm text-slate-900 leading-snug">
                                                 <span className="font-semibold">{notification.actor_name || 'System'}</span> {notification.verb}
                                             </p>
                                             {notification.description && (
-                                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                                <p className="text-xs text-slate-500 mt-1 line-clamp-2">
                                                     {notification.description}
                                                 </p>
                                             )}
-                                            <p className="text-[10px] text-gray-400 mt-1.5 font-medium">
+                                            <p className="text-[10px] text-slate-400 mt-1.5 font-medium">
                                                 {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                                             </p>
                                         </div>

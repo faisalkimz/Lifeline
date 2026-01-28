@@ -109,12 +109,12 @@ const SalaryAdvancesPage = () => {
             <Dialog open={!!advance} onOpenChange={onClose}>
                 <DialogContent className="max-w-2xl">
                     <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 -mx-6 -mt-6 mb-6">
-                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                            <DollarSign className="h-6 w-6 text-gray-600" />
+                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <DollarSign className="h-6 w-6 text-slate-600" />
                         </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Advance Details</DialogTitle>
-                            <p className="text-gray-500 mt-1 font-medium text-sm">Review your salary advance request.</p>
+                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Advance Details</DialogTitle>
+                            <p className="text-slate-500 mt-1 font-medium text-sm">Review your salary advance request.</p>
                         </div>
                     </div>
                     <div className="space-y-6">
@@ -224,12 +224,12 @@ const SalaryAdvancesPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-gray-900 rounded-xl text-white">
+                            <div className="p-3 bg-slate-900 rounded-xl text-white">
                                 <DollarSign className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Disbursed</p>
-                                <p className="text-2xl font-black text-gray-900 tracking-tighter">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Disbursed</p>
+                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
                                     {formatCurrency(advances.filter(a => a.status === 'active' || a.status === 'completed').reduce((acc, curr) => acc + parseFloat(curr.amount), 0))}
                                 </p>
                             </div>
@@ -240,12 +240,12 @@ const SalaryAdvancesPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-primary-50 rounded-xl text-primary-600 border border-emerald-100">
+                            <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600 border border-emerald-100">
                                 <CheckCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Advances</p>
-                                <p className="text-2xl font-black text-primary-600 tracking-tighter">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Advances</p>
+                                <p className="text-2xl font-black text-emerald-600 tracking-tighter">
                                     {advances.filter(a => a.status === 'active').length}
                                 </p>
                             </div>
@@ -260,7 +260,7 @@ const SalaryAdvancesPage = () => {
                                 <Clock className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending Approvals</p>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Approvals</p>
                                 <p className="text-2xl font-black text-orange-600 tracking-tighter">
                                     {advances.filter(a => a.status === 'pending').length}
                                 </p>
@@ -272,12 +272,12 @@ const SalaryAdvancesPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl bg-white overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-400 border border-slate-100">
+                            <div className="p-3 bg-slate-50 rounded-xl text-slate-400 border border-slate-100">
                                 <XCircle className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Settled / Cancelled</p>
-                                <p className="text-2xl font-black text-gray-900 tracking-tighter">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Settled / Cancelled</p>
+                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
                                     {advances.filter(a => a.status === 'cancelled' || a.status === 'completed').length}
                                 </p>
                             </div>
@@ -288,13 +288,13 @@ const SalaryAdvancesPage = () => {
 
             {/* Advances Table */}
             <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
-                <CardHeader className="bg-gray-50 border-b border-slate-100 p-8">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-500">Advance Ledger</CardTitle>
+                <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Advance Ledger</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
+                            <thead className="bg-slate-50/50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
                                 <tr>
                                     <th className="px-8 py-5">Employee</th>
                                     <th className="px-8 py-5">Amount</th>
@@ -309,25 +309,25 @@ const SalaryAdvancesPage = () => {
                                     [1, 2, 3].map(i => <tr key={i} className="animate-pulse h-20 bg-white"></tr>)
                                 ) : advances.length > 0 ? (
                                     advances.map((advance) => (
-                                        <tr key={advance.id} className="hover:bg-gray-50/50 transition-all group">
+                                        <tr key={advance.id} className="hover:bg-slate-50/50 transition-all group">
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-gray-900 text-sm">{advance.employee_name}</span>
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{advance.employee_number}</span>
+                                                    <span className="font-black text-slate-900 text-sm">{advance.employee_name}</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{advance.employee_number}</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
-                                                    <span className="font-black text-gray-900">{formatCurrency(advance.amount)}</span>
-                                                    <span className="text-[10px] font-bold text-primary-500 uppercase tracking-tight mt-0.5">Approved Amount</span>
+                                                    <span className="font-black text-slate-900">{formatCurrency(advance.amount)}</span>
+                                                    <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-tight mt-0.5">Approved Amount</span>
                                                 </div>
                                             </td>
                                             <td className="px-8 py-6">
-                                                <span className="text-xs font-medium text-gray-600 truncate max-w-[150px] inline-block">{advance.loan_purpose}</span>
+                                                <span className="text-xs font-medium text-slate-600 truncate max-w-[150px] inline-block">{advance.loan_purpose}</span>
                                             </td>
                                             <td className="px-8 py-6">
                                                 <div className="flex flex-col">
-                                                    <span className="text-xs font-black text-gray-700">{advance.repayment_period_months} Months</span>
+                                                    <span className="text-xs font-black text-slate-700">{advance.repayment_period_months} Months</span>
                                                     <span className="text-[10px] font-bold text-orange-500 uppercase mt-0.5">-{formatCurrency(advance.monthly_deduction)} / mo</span>
                                                 </div>
                                             </td>
@@ -338,12 +338,12 @@ const SalaryAdvancesPage = () => {
                                             </td>
                                             <td className="px-8 py-6 text-right">
                                                 <div className="flex justify-end gap-2">
-                                                    <Button variant="ghost" size="sm" onClick={() => setSelectedAdvance(advance)} className="h-10 w-10 text-slate-300 hover:text-gray-900 hover:bg-gray-100 rounded-xl">
+                                                    <Button variant="ghost" size="sm" onClick={() => setSelectedAdvance(advance)} className="h-10 w-10 text-slate-300 hover:text-slate-900 hover:bg-slate-100 rounded-xl">
                                                         <Eye className="h-5 w-5" />
                                                     </Button>
                                                     {isAdmin && advance.status === 'pending' && (
                                                         <>
-                                                            <Button variant="ghost" size="sm" onClick={() => handleApprove(advance.id)} className="h-10 w-10 text-emerald-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl">
+                                                            <Button variant="ghost" size="sm" onClick={() => handleApprove(advance.id)} className="h-10 w-10 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl">
                                                                 <CheckCircle className="h-5 w-5" />
                                                             </Button>
                                                             <Button variant="ghost" size="sm" onClick={() => handleReject(advance.id)} className="h-10 w-10 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl">
@@ -372,20 +372,20 @@ const SalaryAdvancesPage = () => {
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[3rem] overflow-hidden bg-white">
                     <div className="bg-white px-10 pt-10 pb-6">
-                        <DialogTitle className="text-3xl font-semibold text-gray-900 tracking-tight">Request an advance</DialogTitle>
-                        <p className="text-gray-500 mt-2 text-sm max-w-md leading-relaxed">
+                        <DialogTitle className="text-3xl font-semibold text-slate-900 tracking-tight">Request an advance</DialogTitle>
+                        <p className="text-slate-500 mt-2 text-sm max-w-md leading-relaxed">
                             Specify the amount and repayment period. The requested amount will be deducted from your upcoming payslips.
                         </p>
                     </div>
                     <form onSubmit={handleSubmit} className="p-10 space-y-8">
                         {isAdmin && (
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Select Employee</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Select Employee</label>
                                 <select
                                     name="employee"
                                     value={formData.employee}
                                     onChange={handleInputChange}
-                                    className="w-full h-14 bg-gray-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-gray-900 focus:bg-white outline-none"
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
                                     required
                                 >
                                     <option value="">Select Employee</option>
@@ -398,7 +398,7 @@ const SalaryAdvancesPage = () => {
 
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Amount (UGX)</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Amount (UGX)</label>
                                 <Input
                                     name="amount"
                                     type="number"
@@ -406,16 +406,16 @@ const SalaryAdvancesPage = () => {
                                     onChange={handleInputChange}
                                     placeholder="500000"
                                     required
-                                    className="h-14 border-2 border-slate-100 rounded-2xl bg-gray-50 font-black text-gray-900 px-6"
+                                    className="h-14 border-2 border-slate-100 rounded-2xl bg-slate-50 font-black text-slate-900 px-6"
                                 />
                             </div>
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Repayment Period (Months)</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Repayment Period (Months)</label>
                                 <select
                                     name="repayment_period_months"
                                     value={formData.repayment_period_months}
                                     onChange={handleInputChange}
-                                    className="w-full h-14 bg-gray-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-gray-900 focus:bg-white outline-none"
+                                    className="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-bold text-slate-900 focus:bg-white outline-none"
                                     required
                                 >
                                     <option value="1">1 Month (Next Payroll)</option>
@@ -427,31 +427,31 @@ const SalaryAdvancesPage = () => {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Reason for Advance</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Reason for Advance</label>
                             <textarea
                                 name="loan_purpose"
                                 value={formData.loan_purpose}
                                 onChange={handleInputChange}
                                 rows="3"
-                                className="w-full p-6 bg-gray-50 border-2 border-slate-100 rounded-[2rem] font-medium text-gray-700 focus:bg-white outline-none resize-none"
+                                className="w-full p-6 bg-slate-50 border-2 border-slate-100 rounded-[2rem] font-medium text-slate-700 focus:bg-white outline-none resize-none"
                                 placeholder="Please state the reason for this advance request..."
                                 required
                             />
                         </div>
 
                         {formData.amount && (
-                            <div className="bg-gray-900 p-8 rounded-[2rem] text-white">
+                            <div className="bg-slate-900 p-8 rounded-[2rem] text-white">
                                 <div className="flex justify-between items-center mb-4">
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-primary-400 italic">Net Payment Summary</h4>
                                     <Badge className="bg-primary-600 text-[9px] font-black">0% INTEREST</Badge>
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
                                     <div className="space-y-1">
-                                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-500">Monthly Deduction</p>
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Monthly Deduction</p>
                                         <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(calculateMonthlyDeduction())}</p>
                                     </div>
                                     <div className="space-y-1">
-                                        <p className="text-[8px] font-bold uppercase tracking-widest text-gray-500">Total Amount</p>
+                                        <p className="text-[8px] font-bold uppercase tracking-widest text-slate-500">Total Amount</p>
                                         <p className="text-xl font-black tracking-tighter text-white">{formatCurrency(parseFloat(formData.amount) || 0)}</p>
                                     </div>
                                 </div>
@@ -463,14 +463,14 @@ const SalaryAdvancesPage = () => {
                                 type="button"
                                 variant="ghost"
                                 onClick={() => setShowForm(false)}
-                                className="h-11 px-6 text-gray-600 font-semibold hover:bg-gray-50 rounded-lg"
+                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isCreating}
-                                className="h-11 px-8 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg shadow-sm"
+                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
                             >
                                 {isCreating ? 'Processing...' : 'Submit request'}
                             </Button>

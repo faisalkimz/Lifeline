@@ -124,14 +124,14 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
       <DialogContent className="max-w-lg bg-white p-0 rounded-2xl border-none shadow-2xl overflow-hidden">
         {/* Professional Header */}
         <div className="px-8 py-6 flex items-center gap-4 border-b border-slate-50">
-          <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
-            <Calendar className="h-6 w-6 text-gray-600" />
+          <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
+            <Calendar className="h-6 w-6 text-slate-600" />
           </div>
           <div>
-            <DialogTitle className="text-xl font-bold text-gray-900">
+            <DialogTitle className="text-xl font-bold text-slate-900">
               Run payroll
             </DialogTitle>
-            <p className="text-gray-500 mt-0.5 text-sm">
+            <p className="text-slate-500 mt-0.5 text-sm">
               Prepare and process the upcoming payroll run.
             </p>
           </div>
@@ -148,39 +148,39 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-2 gap-5">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Payroll month</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Payroll month</label>
               <div className="relative">
                 <select
                   name="month"
                   value={formData.month}
                   onChange={handleInputChange}
-                  className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl text-sm bg-white hover:border-slate-400 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all appearance-none outline-none text-gray-700 font-semibold cursor-pointer"
+                  className="w-full pl-4 pr-10 py-3 border border-slate-200 rounded-xl text-sm bg-white hover:border-slate-400 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all appearance-none outline-none text-slate-700 font-semibold cursor-pointer"
                   required
                 >
                   {months.map(m => (
                     <option key={m.value} value={m.value}>{m.label}</option>
                   ))}
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Year</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Year</label>
               <div className="relative">
                 <select
                   name="year"
                   value={formData.year}
                   onChange={handleInputChange}
-                  className="w-full pl-4 pr-10 py-3 border border-gray-200 rounded-xl text-sm bg-white hover:border-slate-400 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all appearance-none outline-none text-gray-700 font-semibold cursor-pointer"
+                  className="w-full pl-4 pr-10 py-3 border border-slate-200 rounded-xl text-sm bg-white hover:border-slate-400 focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all appearance-none outline-none text-slate-700 font-semibold cursor-pointer"
                   required
                 >
                   {years.map(y => (
                     <option key={y} value={y}>{y}</option>
                   ))}
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
               </div>
@@ -189,49 +189,49 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date from</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date from</label>
               <Input
                 type="date"
                 name="start_date"
                 value={formData.start_date}
                 onChange={handleInputChange}
                 required
-                className="h-11 border-gray-200 rounded-xl text-sm font-semibold"
+                className="h-11 border-slate-200 rounded-xl text-sm font-semibold"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Date to</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Date to</label>
               <Input
                 type="date"
                 name="end_date"
                 value={formData.end_date}
                 onChange={handleInputChange}
                 required
-                className="h-11 border-gray-200 rounded-xl text-sm font-semibold"
+                className="h-11 border-slate-200 rounded-xl text-sm font-semibold"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs font-bold text-primary-600 uppercase tracking-wider">Payment date</label>
+              <label className="text-xs font-bold text-emerald-600 uppercase tracking-wider">Payment date</label>
               <Input
                 type="date"
                 name="payment_date"
                 value={formData.payment_date}
                 onChange={handleInputChange}
                 required
-                className="h-11 bg-primary-50 border-emerald-100 focus:bg-white focus:border-emerald-500 transition-all text-sm font-semibold text-emerald-900"
+                className="h-11 bg-emerald-50 border-emerald-100 focus:bg-white focus:border-emerald-500 transition-all text-sm font-semibold text-emerald-900"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Description (Optional)</label>
+            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description (Optional)</label>
             <Input
               type="text"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
               placeholder="e.g. End of Month Payroll"
-              className="h-11 border-gray-200 rounded-xl font-semibold"
+              className="h-11 border-slate-200 rounded-xl font-semibold"
             />
           </div>
 
@@ -254,30 +254,30 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 type="checkbox"
                 id="specific_employees"
-                className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-slate-900 cursor-pointer"
+                className="w-5 h-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900 cursor-pointer"
                 checked={selectSpecific}
                 onChange={(e) => setSelectSpecific(e.target.checked)}
               />
-              <label htmlFor="specific_employees" className="text-sm font-semibold text-gray-700 cursor-pointer select-none">
+              <label htmlFor="specific_employees" className="text-sm font-semibold text-slate-700 cursor-pointer select-none">
                 I only want to process specific employees (Optional)
               </label>
             </div>
 
             {selectSpecific && (
-              <div className="space-y-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <div className="space-y-3 bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     placeholder="Search employees..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 h-11 text-sm bg-white border-gray-200 rounded-lg"
+                    className="pl-10 h-11 text-sm bg-white border-slate-200 rounded-lg"
                   />
                 </div>
 
                 <div className="flex justify-between items-center px-1">
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{selectedIds.size} employees selected</span>
-                  <button type="button" onClick={handleSelectAll} className="text-xs font-bold text-gray-900 hover:underline">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{selectedIds.size} employees selected</span>
+                  <button type="button" onClick={handleSelectAll} className="text-xs font-bold text-slate-900 hover:underline">
                     {selectedIds.size === employees?.length ? 'Deselect all' : 'Select all'}
                   </button>
                 </div>
@@ -285,7 +285,7 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
                 <div className="h-48 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
                   {filteredEmployees.map(emp => (
                     <label key={emp.id} className="flex items-center gap-3 hover:bg-white p-2.5 rounded-lg cursor-pointer transition-all border border-transparent hover:border-slate-100 hover:shadow-sm">
-                      <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedIds.has(emp.id) ? 'bg-gray-900 border-slate-900' : 'bg-white border-gray-300'}`}>
+                      <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedIds.has(emp.id) ? 'bg-slate-900 border-slate-900' : 'bg-white border-slate-300'}`}>
                         {selectedIds.has(emp.id) && <Check className="h-3.5 w-3.5 text-white" />}
                       </div>
                       <input
@@ -295,8 +295,8 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
                         className="hidden"
                       />
                       <div className="flex flex-col">
-                        <span className="text-sm font-bold text-gray-900">{emp.full_name}</span>
-                        <span className="text-xs text-gray-500 font-semibold">{emp.job_title}</span>
+                        <span className="text-sm font-bold text-slate-900">{emp.full_name}</span>
+                        <span className="text-xs text-slate-500 font-semibold">{emp.job_title}</span>
                       </div>
                     </label>
                   ))}
@@ -306,10 +306,10 @@ const CreatePayrollRunModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           <DialogFooter className="pt-4 border-t border-slate-50 gap-3">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading} className="font-semibold text-gray-500">
+            <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading} className="font-semibold text-slate-500">
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading} className="h-11 px-8 bg-gray-900 text-white font-semibold rounded-lg shadow-sm hover:bg-gray-800 transition-all">
+            <Button type="submit" disabled={isLoading} className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm hover:bg-slate-800 transition-all">
               {isLoading ? 'Processing...' : 'Create payroll run'}
             </Button>
           </DialogFooter>

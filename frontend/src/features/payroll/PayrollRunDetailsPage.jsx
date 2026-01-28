@@ -240,12 +240,12 @@ const PayrollRunDetailsPage = () => {
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-2xl font-bold text-slate-900">
                             Payroll Run: {new Date(run.year, run.month - 1).toLocaleString('default', { month: 'long', year: 'numeric' })}
                         </h1>
                         <div className="flex items-center gap-2 mt-1">
                             {getStatusBadge(run.status)}
-                            <span className="text-gray-500 text-sm">{payslips.length} Employees</span>
+                            <span className="text-slate-500 text-sm">{payslips.length} Employees</span>
                         </div>
                     </div>
                 </div>
@@ -271,7 +271,7 @@ const PayrollRunDetailsPage = () => {
                     <Button
                         onClick={handleEmailAll}
                         variant="outline"
-                        className="border-gray-200 text-purple-600 hover:bg-purple-50 font-bold"
+                        className="border-slate-200 text-purple-600 hover:bg-purple-50 font-bold"
                         disabled={payslips.length === 0 || isEmailing || run.status === 'draft'}
                     >
                         {isEmailing ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Mail className="h-4 w-4 mr-2" />}
@@ -280,7 +280,7 @@ const PayrollRunDetailsPage = () => {
                     <Button
                         onClick={handleDownloadAll}
                         variant="outline"
-                        className="border-gray-200 text-blue-600 hover:bg-blue-50 font-bold"
+                        className="border-slate-200 text-blue-600 hover:bg-blue-50 font-bold"
                         disabled={payslips.length === 0 || isGeneratingPdf}
                     >
                         {isGeneratingPdf ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <DownloadCloud className="h-4 w-4 mr-2" />}
@@ -289,7 +289,7 @@ const PayrollRunDetailsPage = () => {
                     <Button
                         onClick={handleExportTaxReport}
                         variant="outline"
-                        className="border-gray-200 text-gray-600 hover:bg-gray-50 font-bold"
+                        className="border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
                         disabled={payslips.length === 0}
                     >
                         <FileSpreadsheet className="h-4 w-4 mr-2" />
@@ -302,25 +302,25 @@ const PayrollRunDetailsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
                     <CardContent className="p-4">
-                        <p className="text-sm font-medium text-gray-500">Total Gross</p>
+                        <p className="text-sm font-medium text-slate-500">Total Gross</p>
                         <p className="text-2xl font-bold">{formatCurrency(run.total_gross)}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-4">
-                        <p className="text-sm font-medium text-gray-500">Total Deductions</p>
+                        <p className="text-sm font-medium text-slate-500">Total Deductions</p>
                         <p className="text-2xl font-bold text-orange-600">{formatCurrency(run.total_deductions)}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-4">
-                        <p className="text-sm font-medium text-gray-500">Total Statutory (LST+NSSF+PAYE)</p>
+                        <p className="text-sm font-medium text-slate-500">Total Statutory (LST+NSSF+PAYE)</p>
                         <p className="text-2xl font-bold text-indigo-600">{formatCurrency(Number(run.total_paye) + Number(run.total_nssf_employee) + Number(run.total_lst))}</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardContent className="p-4">
-                        <p className="text-sm font-medium text-gray-500">Total Net Pay</p>
+                        <p className="text-sm font-medium text-slate-500">Total Net Pay</p>
                         <p className="text-2xl font-bold text-blue-600">{formatCurrency(run.total_net)}</p>
                     </CardContent>
                 </Card>
@@ -362,7 +362,7 @@ const PayrollRunDetailsPage = () => {
                         <TableBody>
                             {payslips.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={10} className="text-center py-8 text-gray-500">
+                                    <TableCell colSpan={10} className="text-center py-8 text-slate-500">
                                         No payslips found. Payroll might be in Draft state without saved items.
                                         Click 'Process Payroll' to generate payslips.
                                     </TableCell>
@@ -371,11 +371,11 @@ const PayrollRunDetailsPage = () => {
                                 payslips.map((payslip) => (
                                     <TableRow key={payslip.id}>
                                         <TableCell>
-                                            <div className="font-medium text-gray-900">{payslip.employee_name}</div>
-                                            <div className="text-xs text-gray-500">{payslip.department}</div>
+                                            <div className="font-medium text-slate-900">{payslip.employee_name}</div>
+                                            <div className="text-xs text-slate-500">{payslip.department}</div>
                                         </TableCell>
-                                        <TableCell className="text-right text-gray-600">{formatCurrency(payslip.basic_salary)}</TableCell>
-                                        <TableCell className="text-right text-gray-600">{formatCurrency(payslip.total_allowances)}</TableCell>
+                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.basic_salary)}</TableCell>
+                                        <TableCell className="text-right text-slate-600">{formatCurrency(payslip.total_allowances)}</TableCell>
 
                                         {/* Editable Columns */}
                                         <TableCell className="text-right">
@@ -387,7 +387,7 @@ const PayrollRunDetailsPage = () => {
                                                     className="w-24 h-8 text-right p-1"
                                                 />
                                             ) : (
-                                                <span className={payslip.bonus > 0 ? "text-green-600 font-medium" : "text-gray-400"}>
+                                                <span className={payslip.bonus > 0 ? "text-green-600 font-medium" : "text-slate-400"}>
                                                     {formatCurrency(payslip.bonus)}
                                                 </span>
                                             )}
@@ -401,16 +401,16 @@ const PayrollRunDetailsPage = () => {
                                                     className="w-24 h-8 text-right p-1"
                                                 />
                                             ) : (
-                                                <span className={payslip.other_deductions > 0 ? "text-red-600 font-medium" : "text-gray-400"}>
+                                                <span className={payslip.other_deductions > 0 ? "text-red-600 font-medium" : "text-slate-400"}>
                                                     {formatCurrency(payslip.other_deductions)}
                                                 </span>
                                             )}
                                         </TableCell>
 
                                         <TableCell className="text-right font-medium">{formatCurrency(payslip.gross_salary)}</TableCell>
-                                        <TableCell className="text-right text-gray-500">{formatCurrency(payslip.paye_tax)}</TableCell>
-                                        <TableCell className="text-right text-gray-500">{formatCurrency(Number(payslip.nssf_employee))}</TableCell>
-                                        <TableCell className="text-right text-gray-500">{formatCurrency(payslip.local_service_tax)}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(payslip.paye_tax)}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(Number(payslip.nssf_employee))}</TableCell>
+                                        <TableCell className="text-right text-slate-500">{formatCurrency(payslip.local_service_tax)}</TableCell>
                                         <TableCell className="text-right font-bold text-blue-700 text-lg">{formatCurrency(payslip.net_salary)}</TableCell>
                                         <TableCell className="text-center">
                                             <Button
@@ -430,7 +430,7 @@ const PayrollRunDetailsPage = () => {
                                                         <Button size="icon" variant="ghost" className="h-8 w-8 text-green-600" onClick={() => handleSave(payslip.id)}>
                                                             <Save className="h-4 w-4" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-gray-400" onClick={handleCancel}>
+                                                        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400" onClick={handleCancel}>
                                                             <X className="h-4 w-4" />
                                                         </Button>
                                                     </div>

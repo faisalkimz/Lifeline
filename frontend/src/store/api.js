@@ -78,7 +78,12 @@ export const api = createApi({
       invalidatesTags: ['User']
     }),
     getSecurityLogs: builder.query({
-      query: () => '/security/logs/'
+      query: () => '/security/logs/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      }
     }),
     exportData: builder.query({
       query: () => '/security/export_data/'
@@ -121,7 +126,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: (result) =>
         result && Array.isArray(result)
@@ -167,7 +172,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: (result) =>
         result && Array.isArray(result)
@@ -213,7 +218,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: (result) =>
         result && Array.isArray(result)
@@ -259,7 +264,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: ['PayrollRun']
     }),
@@ -465,7 +470,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: (result) =>
         result && Array.isArray(result)
@@ -521,6 +526,11 @@ export const api = createApi({
         url: '/leave/holidays/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['PublicHoliday']
     }),
 
@@ -550,10 +560,20 @@ export const api = createApi({
         url: '/attendance/records/my_attendance/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Attendance']
     }),
     getTeamAttendance: builder.query({
       query: () => '/attendance/records/team_attendance/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Attendance']
     }),
 
@@ -563,6 +583,11 @@ export const api = createApi({
         url: '/performance/cycles/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['PerformanceCycle']
     }),
     createPerformanceCycle: builder.mutation({
@@ -607,15 +632,22 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: (result) =>
         result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
     }),
     getTeamGoals: builder.query({
       query: () => '/performance/goals/team_goals/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: (result) =>
-        result ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }] : [{ type: 'Goal', id: 'LIST' }]
+        Array.isArray(result)
+          ? [...result.map(({ id }) => ({ type: 'Goal', id })), { type: 'Goal', id: 'LIST' }]
+          : [{ type: 'Goal', id: 'LIST' }]
     }),
     createGoal: builder.mutation({
       query: (body) => ({
@@ -647,6 +679,11 @@ export const api = createApi({
         url: '/performance/reviews/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['PerformanceReview']
     }),
     getReviewStats: builder.query({
@@ -676,6 +713,11 @@ export const api = createApi({
         url: '/recruitment/jobs/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Job']
     }),
     getJob: builder.query({
@@ -703,6 +745,11 @@ export const api = createApi({
         url: '/recruitment/candidates/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Candidate']
     }),
     createCandidate: builder.mutation({
@@ -733,6 +780,11 @@ export const api = createApi({
         url: '/recruitment/applications/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Application']
     }),
     createApplication: builder.mutation({
@@ -771,6 +823,11 @@ export const api = createApi({
         url: '/recruitment/interviews/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Interview']
     }),
     createInterview: builder.mutation({
@@ -798,6 +855,11 @@ export const api = createApi({
     }),
     getRecruitmentIntegrations: builder.query({
       query: () => '/recruitment/integrations/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['RecruitmentIntegration']
     }),
     updateRecruitmentIntegration: builder.mutation({
@@ -827,6 +889,11 @@ export const api = createApi({
         url: '/recruitment/public/jobs/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['PublicJob']
     }),
     submitJobApplication: builder.mutation({
@@ -850,6 +917,11 @@ export const api = createApi({
         url: '/recruitment/offers/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['OfferLetter']
     }),
     createOffer: builder.mutation({
@@ -871,6 +943,11 @@ export const api = createApi({
     // ========== TRAINING & DEVELOPMENT ==========
     getTrainingPrograms: builder.query({
       query: () => '/training/programs/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['TrainingProgram']
     }),
     createTrainingProgram: builder.mutation({
@@ -886,6 +963,11 @@ export const api = createApi({
         url: '/training/sessions/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['TrainingSession']
     }),
     createTrainingSession: builder.mutation({
@@ -901,6 +983,11 @@ export const api = createApi({
         url: '/training/enrollments/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Enrollment']
     }),
     enrollInTraining: builder.mutation({
@@ -953,6 +1040,11 @@ export const api = createApi({
     // ========== BENEFITS ADMINISTRATION ==========
     getBenefitTypes: builder.query({
       query: () => '/benefits/types/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['BenefitType']
     }),
     createBenefitType: builder.mutation({
@@ -983,6 +1075,11 @@ export const api = createApi({
         url: '/benefits/enrollments/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['EmployeeBenefit']
     }),
     createEmployeeBenefit: builder.mutation({
@@ -1015,6 +1112,11 @@ export const api = createApi({
         url: '/documents/folders/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Document']
     }),
     createFolder: builder.mutation({
@@ -1045,10 +1147,20 @@ export const api = createApi({
         url: '/documents/company/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Document']
     }),
     getStorageStats: builder.query({
       query: () => '/documents/company/storage_stats/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Document', 'EmployeeDocument']
     }),
     createDocument: builder.mutation({
@@ -1079,6 +1191,11 @@ export const api = createApi({
         url: '/documents/employee/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['EmployeeDocument']
     }),
     createEmployeeDocument: builder.mutation({
@@ -1111,6 +1228,11 @@ export const api = createApi({
         url: '/offboarding/resignations/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Resignation']
     }),
     createResignation: builder.mutation({
@@ -1131,6 +1253,11 @@ export const api = createApi({
     }),
     getExitInterviews: builder.query({
       query: () => '/offboarding/interviews/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['ExitInterview']
     }),
 
@@ -1140,6 +1267,11 @@ export const api = createApi({
         url: '/disciplinary/actions/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['DisciplinaryAction']
     }),
     createDisciplinaryAction: builder.mutation({
@@ -1173,6 +1305,11 @@ export const api = createApi({
         url: '/expense/categories/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['ExpenseCategory']
     }),
     getExpenseClaims: builder.query({
@@ -1180,6 +1317,11 @@ export const api = createApi({
         url: '/expense/claims/',
         params
       }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['ExpenseClaim']
     }),
     createExpenseClaim: builder.mutation({
@@ -1209,6 +1351,11 @@ export const api = createApi({
     // --- Accounts / Settings ---
     getUsers: builder.query({
       query: () => '/users/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['User'],
     }),
     getCompany: builder.query({
@@ -1226,6 +1373,11 @@ export const api = createApi({
     // Notifications
     getNotifications: builder.query({
       query: () => '/notifications/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Notification'],
     }),
     markNotificationRead: builder.mutation({
@@ -1245,6 +1397,11 @@ export const api = createApi({
     // Announcement Endpoints
     getAnnouncements: builder.query({
       query: () => '/notifications/announcements/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Announcement']
     }),
     createAnnouncement: builder.mutation({
@@ -1277,7 +1434,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: ['ReportSchedule']
     }),
@@ -1303,6 +1460,11 @@ export const api = createApi({
     // ========== ATTENDANCE ADVANCED ==========
     getAttendancePolicy: builder.query({
       query: () => '/attendance/policies/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['AttendancePolicy']
     }),
     updateAttendancePolicy: builder.mutation({
@@ -1315,6 +1477,11 @@ export const api = createApi({
     }),
     getWorkLocations: builder.query({
       query: () => '/attendance/locations/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['WorkLocation']
     }),
     createWorkLocation: builder.mutation({
@@ -1336,10 +1503,20 @@ export const api = createApi({
     // ========== GLOBAL INTEGRATIONS ==========
     getIntegrations: builder.query({
       query: () => '/integrations/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Integration']
     }),
     getIntegrationStatus: builder.query({
       query: () => '/integrations/status/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Integration']
     }),
     createIntegration: builder.mutation({
@@ -1374,6 +1551,11 @@ export const api = createApi({
     // --- Assets ---
     getAssetCategories: builder.query({
       query: (params) => ({ url: '/assets/categories/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['AssetCategory']
     }),
     createAssetCategory: builder.mutation({
@@ -1382,6 +1564,11 @@ export const api = createApi({
     }),
     getAssets: builder.query({
       query: (params) => ({ url: '/assets/items/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Asset']
     }),
     getAsset: builder.query({
@@ -1410,11 +1597,21 @@ export const api = createApi({
     }),
     getAssetAssignments: builder.query({
       query: (params) => ({ url: '/assets/assignments/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['AssetAssignment']
     }),
     // --- Digital Forms ---
     getFormTemplates: builder.query({
       query: (params) => ({ url: '/forms/templates/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['FormTemplate']
     }),
     createFormTemplate: builder.mutation({
@@ -1423,6 +1620,11 @@ export const api = createApi({
     }),
     getFormSubmissions: builder.query({
       query: (params) => ({ url: '/forms/submissions/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['FormSubmission']
     }),
     createFormSubmission: builder.mutation({
@@ -1444,6 +1646,11 @@ export const api = createApi({
     // --- Surveys & Pulse ---
     getSurveys: builder.query({
       query: (params) => ({ url: '/surveys/surveys/', params }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Survey']
     }),
     createSurvey: builder.mutation({
@@ -1469,6 +1676,11 @@ export const api = createApi({
     // --- GCC Compliance ---
     getGCCSettings: builder.query({
       query: () => '/gcc/settings/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return response || {};
+      },
       providesTags: ['GCCSettings']
     }),
     updateGCCSettings: builder.mutation({
@@ -1477,11 +1689,21 @@ export const api = createApi({
     }),
     getGratuityRecords: builder.query({
       query: () => '/gcc/gratuity/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['Gratuity']
     }),
     // --- Digital Signatures ---
     getDocumentSignatures: builder.query({
       query: () => '/documents/signatures/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['DocumentSignature']
     }),
     signDocument: builder.mutation({
@@ -1491,6 +1713,11 @@ export const api = createApi({
     // --- AI Assistant ---
     getChatSessions: builder.query({
       query: () => '/bot/chats/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
       providesTags: ['ChatSession']
     }),
     createChatSession: builder.mutation({

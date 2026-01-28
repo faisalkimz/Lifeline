@@ -317,12 +317,17 @@ class OvertimeRequestViewSet(viewsets.ModelViewSet):
         
         # Check permission
         user = request.user
-        if user.role not in ['admin', 'hr_manager']:
-            if not hasattr(user, 'employee') or overtime.employee.manager != user.employee:
-                return Response(
-                    {"error": "You don't have permission to approve this request"},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        is_authorized = user.role in ['super_admin', 'company_admin', 'hr_manager']
+        
+        if not is_authorized:
+            if hasattr(user, 'employee') and overtime.employee.manager == user.employee:
+                is_authorized = True
+        
+        if not is_authorized:
+            return Response(
+                {"error": "You don't have permission to approve this request"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         overtime.status = 'approved'
         overtime.approved_by = user.employee if hasattr(user, 'employee') else None
@@ -356,12 +361,17 @@ class OvertimeRequestViewSet(viewsets.ModelViewSet):
         
         # Check permission
         user = request.user
-        if user.role not in ['admin', 'hr_manager']:
-            if not hasattr(user, 'employee') or overtime.employee.manager != user.employee:
-                return Response(
-                    {"error": "You don't have permission to reject this request"},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        is_authorized = user.role in ['super_admin', 'company_admin', 'hr_manager']
+        
+        if not is_authorized:
+            if hasattr(user, 'employee') and overtime.employee.manager == user.employee:
+                is_authorized = True
+        
+        if not is_authorized:
+            return Response(
+                {"error": "You don't have permission to reject this request"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         overtime.status = 'rejected'
         overtime.rejection_reason = request.data.get('reason', '')

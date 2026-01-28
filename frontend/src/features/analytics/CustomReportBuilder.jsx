@@ -94,7 +94,7 @@ const CustomReportBuilder = () => {
             <CardContent className="p-6 space-y-8">
                 {/* Module Selection */}
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-slate-700">1. Select Data Source</label>
+                    <label className="text-sm font-semibold text-gray-700">1. Select Data Source</label>
                     <div className="flex gap-3">
                         {REPORT_MODULES.map(m => (
                             <button
@@ -102,7 +102,7 @@ const CustomReportBuilder = () => {
                                 onClick={() => handleModuleChange(m.id)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${selectedModule === m.id
                                     ? 'bg-primary-500 text-white shadow-md shadow-primary-200'
-                                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                                    : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                                     }`}
                             >
                                 {m.label}
@@ -113,22 +113,22 @@ const CustomReportBuilder = () => {
 
                 {/* Date Range */}
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-slate-700">2. Date Range (Optional)</label>
+                    <label className="text-sm font-semibold text-gray-700">2. Date Range (Optional)</label>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="text-xs text-slate-500 mb-1 block">Start Date</label>
+                            <label className="text-xs text-gray-500 mb-1 block">Start Date</label>
                             <input
                                 type="date"
-                                className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                                className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
                                 value={dateRange.start}
                                 onChange={e => setDateRange({ ...dateRange, start: e.target.value })}
                             />
                         </div>
                         <div>
-                            <label className="text-xs text-slate-500 mb-1 block">End Date</label>
+                            <label className="text-xs text-gray-500 mb-1 block">End Date</label>
                             <input
                                 type="date"
-                                className="w-full h-10 px-3 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
+                                className="w-full h-10 px-3 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none"
                                 value={dateRange.end}
                                 onChange={e => setDateRange({ ...dateRange, end: e.target.value })}
                             />
@@ -138,20 +138,20 @@ const CustomReportBuilder = () => {
 
                 {/* Column Selection */}
                 <div className="space-y-3">
-                    <label className="text-sm font-semibold text-slate-700">3. Select Columns</label>
+                    <label className="text-sm font-semibold text-gray-700">3. Select Columns</label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {currentModule.columns.map(col => (
                             <div
                                 key={col}
                                 onClick={() => toggleColumn(col)}
-                                className="flex items-center gap-2 p-2 rounded-md hover:bg-slate-50 cursor-pointer border border-transparent hover:border-slate-100 transition-colors"
+                                className="flex items-center gap-2 p-2 rounded-md hover:bg-gray-50 cursor-pointer border border-transparent hover:border-slate-100 transition-colors"
                             >
                                 {selectedColumns.includes(col) ? (
                                     <CheckSquare className="h-4 w-4 text-primary-600" />
                                 ) : (
                                     <Square className="h-4 w-4 text-slate-300" />
                                 )}
-                                <span className="text-sm text-slate-600 capitalize">{col.replace(/_/g, ' ')}</span>
+                                <span className="text-sm text-gray-600 capitalize">{col.replace(/_/g, ' ')}</span>
                             </div>
                         ))}
                     </div>
@@ -169,7 +169,7 @@ const CustomReportBuilder = () => {
                                 onChange={() => setFormat('csv')}
                                 className="text-primary-600 focus:ring-primary-500"
                             />
-                            <span className="text-sm text-slate-700">CSV</span>
+                            <span className="text-sm text-gray-700">CSV</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -180,7 +180,7 @@ const CustomReportBuilder = () => {
                                 onChange={() => setFormat('json')}
                                 className="text-primary-600 focus:ring-primary-500"
                             />
-                            <span className="text-sm text-slate-700">JSON</span>
+                            <span className="text-sm text-gray-700">JSON</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -191,7 +191,7 @@ const CustomReportBuilder = () => {
                                 onChange={() => setFormat('excel')}
                                 className="text-primary-600 focus:ring-primary-500"
                             />
-                            <span className="text-sm text-slate-700">Excel</span>
+                            <span className="text-sm text-gray-700">Excel</span>
                         </label>
                         <label className="flex items-center gap-2 cursor-pointer">
                             <input
@@ -202,7 +202,7 @@ const CustomReportBuilder = () => {
                                 onChange={() => setFormat('pdf')}
                                 className="text-primary-600 focus:ring-primary-500"
                             />
-                            <span className="text-sm text-slate-700">PDF</span>
+                            <span className="text-sm text-gray-700">PDF</span>
                         </label>
                     </div>
 

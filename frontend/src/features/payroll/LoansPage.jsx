@@ -100,7 +100,7 @@ const LoansPage = () => {
             case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
             case 'rejected': return 'bg-red-100 text-red-700 border-red-200';
             case 'completed': return 'bg-blue-100 text-blue-700 border-blue-200';
-            default: return 'bg-slate-100 text-slate-700 border-slate-200';
+            default: return 'bg-gray-100 text-gray-700 border-gray-200';
         }
     };
 
@@ -146,37 +146,37 @@ const LoansPage = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Principal Amount</label>
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Principal Amount</label>
                             <input
                                 type="number"
                                 value={loanCalculator.principal}
                                 onChange={(e) => setLoanCalculator(prev => ({ ...prev, principal: e.target.value }))}
                                 placeholder="5,000,000"
-                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-slate-500 outline-none focus:border-primary-400"
+                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-gray-500 outline-none focus:border-primary-400"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Interest Rate (%)</label>
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Interest Rate (%)</label>
                             <input
                                 type="number"
                                 value={loanCalculator.interestRate}
                                 onChange={(e) => setLoanCalculator(prev => ({ ...prev, interestRate: e.target.value }))}
                                 placeholder="5"
-                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-slate-500 outline-none focus:border-primary-400"
+                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-gray-500 outline-none focus:border-primary-400"
                             />
                         </div>
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Term (Months)</label>
+                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Term (Months)</label>
                             <select
                                 value={loanCalculator.months}
                                 onChange={(e) => setLoanCalculator(prev => ({ ...prev, months: e.target.value }))}
                                 className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white outline-none focus:border-primary-400"
                             >
-                                <option value="6" className="text-slate-900">6 Months</option>
-                                <option value="12" className="text-slate-900">12 Months</option>
-                                <option value="18" className="text-slate-900">18 Months</option>
-                                <option value="24" className="text-slate-900">24 Months</option>
-                                <option value="36" className="text-slate-900">36 Months</option>
+                                <option value="6" className="text-gray-900">6 Months</option>
+                                <option value="12" className="text-gray-900">12 Months</option>
+                                <option value="18" className="text-gray-900">18 Months</option>
+                                <option value="24" className="text-gray-900">24 Months</option>
+                                <option value="36" className="text-gray-900">36 Months</option>
                             </select>
                         </div>
                         <div className="bg-primary-600 rounded-2xl p-4 text-center">
@@ -197,12 +197,12 @@ const LoansPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-slate-900 rounded-xl text-white">
+                            <div className="p-3 bg-gray-900 rounded-xl text-white">
                                 <PiggyBank className="h-6 w-6" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Disbursed</p>
-                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Disbursed</p>
+                                <p className="text-2xl font-black text-gray-900 tracking-tighter">
                                     {formatCurrency(stats.totalDisbursed)}
                                 </p>
                             </div>
@@ -213,12 +213,12 @@ const LoansPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                <TrendingUp className="h-6 w-6 text-emerald-600" />
+                            <div className="p-3 bg-primary-50 rounded-xl border border-emerald-100">
+                                <TrendingUp className="h-6 w-6 text-primary-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Loans</p>
-                                <p className="text-2xl font-black text-emerald-600 tracking-tighter">{stats.activeLoans}</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Loans</p>
+                                <p className="text-2xl font-black text-primary-600 tracking-tighter">{stats.activeLoans}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -231,7 +231,7 @@ const LoansPage = () => {
                                 <Clock className="h-6 w-6 text-orange-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Approval</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Pending Approval</p>
                                 <p className="text-2xl font-black text-orange-600 tracking-tighter">{stats.pendingLoans}</p>
                             </div>
                         </div>
@@ -245,7 +245,7 @@ const LoansPage = () => {
                                 <DollarSign className="h-6 w-6 text-red-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Outstanding</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Outstanding</p>
                                 <p className="text-2xl font-black text-red-600 tracking-tighter">
                                     {formatCurrency(stats.totalOutstanding)}
                                 </p>
@@ -257,40 +257,40 @@ const LoansPage = () => {
 
             {/* Loans Table */}
             <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Loan Portfolio</CardTitle>
+                <CardHeader className="bg-gray-50 border-b border-slate-100 p-8">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-500">Loan Portfolio</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     {loans.length > 0 ? (
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50/50">
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Employee</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Principal</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Interest</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Term</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Monthly</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
+                                <TableRow className="bg-gray-50/50">
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Employee</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Principal</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Interest</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Term</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Monthly</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {loans.map((loan) => (
-                                    <TableRow key={loan.id} className="hover:bg-slate-50/50 transition-all">
+                                    <TableRow key={loan.id} className="hover:bg-gray-50/50 transition-all">
                                         <TableCell className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="font-bold text-slate-900">{loan.employee_name}</span>
-                                                <span className="text-xs text-slate-400">{loan.employee_number}</span>
+                                                <span className="font-bold text-gray-900">{loan.employee_name}</span>
+                                                <span className="text-xs text-gray-400">{loan.employee_number}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-8 py-6 font-bold text-slate-900">
+                                        <TableCell className="px-8 py-6 font-bold text-gray-900">
                                             {formatCurrency(loan.amount)}
                                         </TableCell>
                                         <TableCell className="px-8 py-6">
-                                            <span className="font-bold text-slate-700">{loan.interest_rate || 5}%</span>
+                                            <span className="font-bold text-gray-700">{loan.interest_rate || 5}%</span>
                                         </TableCell>
                                         <TableCell className="px-8 py-6">
-                                            <span className="font-bold text-slate-700">{loan.repayment_period_months} months</span>
+                                            <span className="font-bold text-gray-700">{loan.repayment_period_months} months</span>
                                         </TableCell>
                                         <TableCell className="px-8 py-6 font-bold text-primary-600">
                                             {formatCurrency(loan.monthly_deduction)}
@@ -305,7 +305,7 @@ const LoansPage = () => {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => setSelectedLoan(loan)}
-                                                className="h-10 w-10 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
+                                                className="h-10 w-10 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-xl"
                                             >
                                                 <Eye className="h-5 w-5" />
                                             </Button>
@@ -318,7 +318,7 @@ const LoansPage = () => {
                         <div className="p-20 text-center">
                             <PiggyBank className="h-16 w-16 mx-auto mb-4 text-slate-200" />
                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No loans found</p>
-                            <p className="text-sm text-slate-400 mt-2">Apply for a staff loan to get started</p>
+                            <p className="text-sm text-gray-400 mt-2">Apply for a staff loan to get started</p>
                         </div>
                     )}
                 </CardContent>
@@ -328,8 +328,8 @@ const LoansPage = () => {
             <Dialog open={showForm} onOpenChange={setShowForm}>
                 <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
                     <div className="bg-white px-10 pt-10 pb-6">
-                        <DialogTitle className="text-3xl font-semibold text-slate-900 tracking-tight">Loan application</DialogTitle>
-                        <p className="text-slate-500 mt-2 text-sm max-w-md leading-relaxed">
+                        <DialogTitle className="text-3xl font-semibold text-gray-900 tracking-tight">Loan application</DialogTitle>
+                        <p className="text-gray-500 mt-2 text-sm max-w-md leading-relaxed">
                             Apply for a personal loan from the company. Please ensure you have reviewed the loan policy before submitting.
                         </p>
                     </div>
@@ -337,12 +337,12 @@ const LoansPage = () => {
                     <form onSubmit={handleSubmit} className="p-8 space-y-6">
                         {isAdmin && (
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Employee</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Select Employee</label>
                                 <select
                                     name="employee"
                                     value={formData.employee}
                                     onChange={handleInputChange}
-                                    className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none"
+                                    className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-gray-50 focus:bg-white focus:border-primary-500 outline-none"
                                     required
                                 >
                                     <option value="">Choose employee...</option>
@@ -355,7 +355,7 @@ const LoansPage = () => {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Loan Amount (UGX)</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Loan Amount (UGX)</label>
                                 <Input
                                     name="amount"
                                     type="number"
@@ -367,7 +367,7 @@ const LoansPage = () => {
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Interest Rate (%)</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Interest Rate (%)</label>
                                 <Input
                                     name="interest_rate"
                                     type="number"
@@ -380,12 +380,12 @@ const LoansPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Repayment Period</label>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Repayment Period</label>
                             <select
                                 name="repayment_period_months"
                                 value={formData.repayment_period_months}
                                 onChange={handleInputChange}
-                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none"
+                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-gray-50 focus:bg-white focus:border-primary-500 outline-none"
                             >
                                 <option value="6">6 Months</option>
                                 <option value="12">12 Months</option>
@@ -396,38 +396,38 @@ const LoansPage = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Purpose of Loan</label>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Purpose of Loan</label>
                             <textarea
                                 name="loan_purpose"
                                 value={formData.loan_purpose}
                                 onChange={handleInputChange}
                                 rows="3"
-                                className="w-full p-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none resize-none"
+                                className="w-full p-4 border-2 border-slate-100 rounded-xl bg-gray-50 focus:bg-white focus:border-primary-500 outline-none resize-none"
                                 placeholder="Please describe the purpose of this loan..."
                                 required
                             />
                         </div>
 
                         {formData.amount && (
-                            <div className="bg-slate-900 rounded-2xl p-6 text-white">
+                            <div className="bg-gray-900 rounded-2xl p-6 text-white">
                                 <div className="flex justify-between items-center mb-4">
                                     <h4 className="text-xs font-black uppercase tracking-widest text-primary-400">Loan Summary</h4>
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
                                     <div>
-                                        <p className="text-xs text-slate-400">Monthly Payment</p>
+                                        <p className="text-xs text-gray-400">Monthly Payment</p>
                                         <p className="text-xl font-black">
                                             {formatCurrency(calculateMonthlyPayment(formData.amount, formData.interest_rate, formData.repayment_period_months))}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-400">Total Interest</p>
+                                        <p className="text-xs text-gray-400">Total Interest</p>
                                         <p className="text-xl font-black text-yellow-400">
                                             {formatCurrency(calculateTotalInterest(formData.amount, formData.interest_rate, formData.repayment_period_months))}
                                         </p>
                                     </div>
                                     <div>
-                                        <p className="text-xs text-slate-400">Total Repayment</p>
+                                        <p className="text-xs text-gray-400">Total Repayment</p>
                                         <p className="text-xl font-black text-primary-400">
                                             {formatCurrency(calculateMonthlyPayment(formData.amount, formData.interest_rate, formData.repayment_period_months) * parseInt(formData.repayment_period_months))}
                                         </p>
@@ -441,14 +441,14 @@ const LoansPage = () => {
                                 type="button"
                                 variant="ghost"
                                 onClick={() => setShowForm(false)}
-                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
+                                className="h-11 px-6 text-gray-600 font-semibold hover:bg-gray-50 rounded-lg"
                             >
                                 Cancel
                             </Button>
                             <Button
                                 type="submit"
                                 disabled={isCreating}
-                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
+                                className="h-11 px-8 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg shadow-sm"
                             >
                                 {isCreating ? 'Submitting...' : 'Submit application'}
                             </Button>
@@ -463,42 +463,42 @@ const LoansPage = () => {
                     {selectedLoan && (
                         <>
                             <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                                    <DollarSign className="h-6 w-6 text-slate-600" />
+                                <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                                    <DollarSign className="h-6 w-6 text-gray-600" />
                                 </div>
                                 <div>
-                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Loan Details</DialogTitle>
-                                    <p className="text-slate-500 mt-1 font-medium text-sm">{selectedLoan.employee_name}</p>
+                                    <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Loan Details</DialogTitle>
+                                    <p className="text-gray-500 mt-1 font-medium text-sm">{selectedLoan.employee_name}</p>
                                 </div>
                             </div>
 
                             <div className="p-8 space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Principal</p>
-                                        <p className="text-lg font-black text-slate-900">{formatCurrency(selectedLoan.amount)}</p>
+                                    <div className="bg-gray-50 rounded-xl p-4">
+                                        <p className="text-xs text-gray-400">Principal</p>
+                                        <p className="text-lg font-black text-gray-900">{formatCurrency(selectedLoan.amount)}</p>
                                     </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Interest Rate</p>
-                                        <p className="text-lg font-black text-slate-900">{selectedLoan.interest_rate || 5}%</p>
+                                    <div className="bg-gray-50 rounded-xl p-4">
+                                        <p className="text-xs text-gray-400">Interest Rate</p>
+                                        <p className="text-lg font-black text-gray-900">{selectedLoan.interest_rate || 5}%</p>
                                     </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Term</p>
-                                        <p className="text-lg font-black text-slate-900">{selectedLoan.repayment_period_months} months</p>
+                                    <div className="bg-gray-50 rounded-xl p-4">
+                                        <p className="text-xs text-gray-400">Term</p>
+                                        <p className="text-lg font-black text-gray-900">{selectedLoan.repayment_period_months} months</p>
                                     </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Monthly Payment</p>
+                                    <div className="bg-gray-50 rounded-xl p-4">
+                                        <p className="text-xs text-gray-400">Monthly Payment</p>
                                         <p className="text-lg font-black text-primary-600">{formatCurrency(selectedLoan.monthly_deduction)}</p>
                                     </div>
                                 </div>
 
-                                <div className="bg-slate-100 rounded-xl p-4">
-                                    <p className="text-xs text-slate-400 mb-2">Purpose</p>
-                                    <p className="text-slate-700">{selectedLoan.loan_purpose}</p>
+                                <div className="bg-gray-100 rounded-xl p-4">
+                                    <p className="text-xs text-gray-400 mb-2">Purpose</p>
+                                    <p className="text-gray-700">{selectedLoan.loan_purpose}</p>
                                 </div>
 
                                 <div className="flex justify-between items-center">
-                                    <span className="text-slate-500">Status</span>
+                                    <span className="text-gray-500">Status</span>
                                     <Badge className={cn("rounded-xl px-4 py-1.5", getStatusColor(selectedLoan.status))}>
                                         {selectedLoan.status}
                                     </Badge>

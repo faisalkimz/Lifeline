@@ -89,7 +89,7 @@ const DocumentsPage = () => {
         { id: 'policy', name: 'Policies', color: 'text-blue-600 bg-blue-50' },
         { id: 'contract', name: 'Contracts', color: 'text-purple-600 bg-purple-50' },
         { id: 'form', name: 'Forms', color: 'text-orange-600 bg-orange-50' },
-        { id: 'other', name: 'Other', color: 'text-slate-600 bg-slate-50' }
+        { id: 'other', name: 'Other', color: 'text-gray-600 bg-gray-50' }
     ];
 
     const getFileIcon = (fileName) => {
@@ -173,29 +173,29 @@ const DocumentsPage = () => {
         <div className="space-y-8 pb-12">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Documents</h1>
-                    <p className="text-slate-500 mt-2">Centralized file storage and document management.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Documents</h1>
+                    <p className="text-gray-500 mt-2">Centralized file storage and document management.</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="rounded-xl h-11 border-slate-200">
+                    <Button variant="outline" onClick={() => { setIsFolderDialogOpen(true); setIsEditingFolder(false); }} className="rounded-xl h-11 border-gray-200">
                         <Plus className="h-4 w-4 mr-2" /> New Folder
                     </Button>
-                    <Button onClick={() => setIsUploadDialogOpen(true)} className="rounded-xl h-11 bg-slate-900 text-white font-medium shadow-lg shadow-slate-900/20">
+                    <Button onClick={() => setIsUploadDialogOpen(true)} className="rounded-xl h-11 bg-gray-900 text-white font-medium shadow-lg shadow-slate-900/20">
                         <Upload className="h-4 w-4 mr-2" /> Upload File
                     </Button>
                 </div>
             </div>
 
-            <div className="flex items-center gap-4 bg-slate-100 p-1.5 rounded-xl w-fit">
+            <div className="flex items-center gap-4 bg-gray-100 p-1.5 rounded-xl w-fit">
                 <button
                     onClick={() => setActiveTab('company')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'company' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'company' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                     Company Files
                 </button>
                 <button
                     onClick={() => setActiveTab('personal')}
-                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'personal' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'personal' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                     Personal Files
                 </button>
@@ -204,14 +204,14 @@ const DocumentsPage = () => {
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 items-start">
                 <div className="space-y-6">
                     {/* Folder Tree */}
-                    <Card className="rounded-3xl border border-slate-200 shadow-sm bg-white overflow-hidden">
+                    <Card className="rounded-3xl border border-gray-200 shadow-sm bg-white overflow-hidden">
                         <CardHeader className="p-6 pb-2">
-                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Folders</CardTitle>
+                            <CardTitle className="text-sm font-bold uppercase tracking-wider text-gray-500">Folders</CardTitle>
                         </CardHeader>
                         <CardContent className="p-3">
                             <button
                                 onClick={() => setCurrentFolderId(null)}
-                                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium transition-colors ${!currentFolderId ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:bg-slate-50'}`}
+                                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium transition-colors ${!currentFolderId ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'}`}
                             >
                                 <HardDrive className="h-4 w-4" /> Root
                             </button>
@@ -219,9 +219,9 @@ const DocumentsPage = () => {
                                 <button
                                     key={folder.id}
                                     onClick={() => setCurrentFolderId(folder.id)}
-                                    className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium transition-colors ${currentFolderId === folder.id ? 'bg-slate-100 text-slate-900' : 'text-slate-600 hover:bg-slate-50'}`}
+                                    className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-sm font-medium transition-colors ${currentFolderId === folder.id ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50'}`}
                                 >
-                                    <FolderIcon className="h-4 w-4 text-emerald-500" />
+                                    <FolderIcon className="h-4 w-4 text-primary-500" />
                                     {folder.name}
                                 </button>
                             ))}
@@ -229,27 +229,27 @@ const DocumentsPage = () => {
                     </Card>
 
                     {/* Storage Stats */}
-                    <Card className="rounded-3xl border border-slate-200 shadow-sm bg-slate-50 p-6">
+                    <Card className="rounded-3xl border border-gray-200 shadow-sm bg-gray-50 p-6">
                         <div className="flex items-center gap-4 mb-4">
                             <div className="p-3 bg-white rounded-xl shadow-sm">
-                                <Cloud className="h-6 w-6 text-slate-400" />
+                                <Cloud className="h-6 w-6 text-gray-400" />
                             </div>
                             <div>
-                                <p className="text-sm font-bold text-slate-900">Storage Used</p>
-                                <p className="text-xs text-slate-500">{storage?.used_display || '0 B'} of 5GB</p>
+                                <p className="text-sm font-bold text-gray-900">Storage Used</p>
+                                <p className="text-xs text-gray-500">{storage?.used_display || '0 B'} of 5GB</p>
                             </div>
                         </div>
                         <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${storage?.percentage || 0}%` }} />
+                            <div className="h-full bg-primary-500 rounded-full" style={{ width: `${storage?.percentage || 0}%` }} />
                         </div>
                     </Card>
                 </div>
 
                 <div className="xl:col-span-3 space-y-6">
                     {/* Search Bar */}
-                    <div className="bg-white p-2 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div className="bg-white p-2 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
                         <div className="relative flex-1">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 placeholder="Search filenames..."
                                 value={searchTerm}
@@ -258,10 +258,10 @@ const DocumentsPage = () => {
                             />
                         </div>
                         <div className="flex items-center gap-2 pr-2">
-                            <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-slate-100 text-slate-900' : 'text-slate-400'}`}>
+                            <button onClick={() => setViewMode('grid')} className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'}`}>
                                 <Grid className="h-4 w-4" />
                             </button>
-                            <button onClick={() => setViewMode('table')} className={`p-2 rounded-lg ${viewMode === 'table' ? 'bg-slate-100 text-slate-900' : 'text-slate-400'}`}>
+                            <button onClick={() => setViewMode('table')} className={`p-2 rounded-lg ${viewMode === 'table' ? 'bg-gray-100 text-gray-900' : 'text-gray-400'}`}>
                                 <List className="h-4 w-4" />
                             </button>
                         </div>
@@ -269,11 +269,11 @@ const DocumentsPage = () => {
 
                     {/* Files Grid */}
                     {docsLoading ? (
-                        <div className="py-20 flex justify-center"><div className="animate-spin h-8 w-8 border-2 border-slate-300 border-t-slate-900 rounded-full" /></div>
+                        <div className="py-20 flex justify-center"><div className="animate-spin h-8 w-8 border-2 border-gray-300 border-t-slate-900 rounded-full" /></div>
                     ) : filteredDocs.length === 0 ? (
-                        <div className="py-20 text-center bg-slate-50/50 rounded-3xl border border-dashed border-slate-200">
+                        <div className="py-20 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
                             <File className="h-10 w-10 text-slate-300 mx-auto mb-3" />
-                            <p className="text-slate-500 font-medium">No files found</p>
+                            <p className="text-gray-500 font-medium">No files found</p>
                         </div>
                     ) : (
                         <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-2"}>
@@ -295,12 +295,12 @@ const DocumentsPage = () => {
             <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
                 <DialogContent className="max-w-xl bg-white rounded-3xl p-6">
                     <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 mb-6 -mx-6 -mt-6">
-                        <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                            <Upload className="h-6 w-6 text-slate-600" />
+                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-slate-100 shadow-sm">
+                            <Upload className="h-6 w-6 text-gray-600" />
                         </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Upload File</DialogTitle>
-                            <p className="text-slate-500 mt-1 font-medium text-sm">Add a new document to the registry.</p>
+                            <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">Upload File</DialogTitle>
+                            <p className="text-gray-500 mt-1 font-medium text-sm">Add a new document to the registry.</p>
                         </div>
                     </div>
                     <form onSubmit={handleUpload} className="space-y-4 pt-4">
@@ -309,14 +309,14 @@ const DocumentsPage = () => {
                             value={uploadForm.title} onChange={e => setUploadForm({ ...uploadForm, title: e.target.value })}
                             className="bg-white"
                         />
-                        <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center cursor-pointer hover:bg-slate-50 transition-colors relative">
+                        <div className="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors relative">
                             <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={e => setUploadForm({ ...uploadForm, file: e.target.files[0] })} />
                             <Upload className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                            <p className="text-sm font-medium text-slate-600">{uploadForm.file ? uploadForm.file.name : 'Click to select file'}</p>
+                            <p className="text-sm font-medium text-gray-600">{uploadForm.file ? uploadForm.file.name : 'Click to select file'}</p>
                         </div>
                         <div className="flex justify-end gap-3 pt-4">
                             <Button type="button" variant="ghost" onClick={() => setIsUploadDialogOpen(false)}>Cancel</Button>
-                            <Button type="submit" className="bg-slate-900 text-white">Upload</Button>
+                            <Button type="submit" className="bg-gray-900 text-white">Upload</Button>
                         </div>
                     </form>
                 </DialogContent>
@@ -326,12 +326,12 @@ const DocumentsPage = () => {
             <Dialog open={isFolderDialogOpen} onOpenChange={setIsFolderDialogOpen}>
                 <DialogContent className="max-w-md bg-white rounded-3xl p-6">
                     <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100 mb-6 -mx-6 -mt-6">
-                        <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 shadow-sm">
-                            <FolderIcon className="h-6 w-6 text-emerald-600" />
+                        <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-emerald-100 shadow-sm">
+                            <FolderIcon className="h-6 w-6 text-primary-600" />
                         </div>
                         <div>
-                            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">New Folder</DialogTitle>
-                            <p className="text-slate-500 mt-1 font-medium text-sm">Create a new container for your files.</p>
+                            <DialogTitle className="text-2xl font-bold text-gray-900 tracking-tight">New Folder</DialogTitle>
+                            <p className="text-gray-500 mt-1 font-medium text-sm">Create a new container for your files.</p>
                         </div>
                     </div>
                     <form onSubmit={handleFolderSubmit} className="space-y-4 pt-4">
@@ -342,7 +342,7 @@ const DocumentsPage = () => {
                         />
                         <div className="flex justify-end gap-3">
                             <Button type="button" variant="ghost" onClick={() => setIsFolderDialogOpen(false)}>Cancel</Button>
-                            <Button type="submit" className="bg-slate-900 text-white">Create</Button>
+                            <Button type="submit" className="bg-gray-900 text-white">Create</Button>
                         </div>
                     </form>
                 </DialogContent>
@@ -353,21 +353,21 @@ const DocumentsPage = () => {
 
 const FileCard = ({ doc, viewMode, onDelete, icon: Icon }) => {
     return (
-        <div className={`group bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all rounded-2xl ${viewMode === 'grid' ? 'p-6 flex flex-col gap-4' : 'p-4 flex items-center justify-between'}`}>
+        <div className={`group bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all rounded-2xl ${viewMode === 'grid' ? 'p-6 flex flex-col gap-4' : 'p-4 flex items-center justify-between'}`}>
             <div className="flex items-start gap-4">
-                <div className="p-3 bg-slate-50 rounded-xl text-slate-500">
+                <div className="p-3 bg-gray-50 rounded-xl text-gray-500">
                     <Icon className="h-6 w-6" />
                 </div>
                 <div>
-                    <h3 className="font-bold text-slate-900 line-clamp-1">{doc.title}</h3>
-                    <p className="text-xs text-slate-500 mt-1">{new Date(doc.created_at).toLocaleDateString()}</p>
+                    <h3 className="font-bold text-gray-900 line-clamp-1">{doc.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1">{new Date(doc.created_at).toLocaleDateString()}</p>
                 </div>
             </div>
             <div className={`flex items-center gap-2 ${viewMode === 'grid' ? 'mt-auto justify-end' : ''}`}>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-emerald-600" onClick={() => window.open(getMediaUrl(doc.file))}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-primary-600" onClick={() => window.open(getMediaUrl(doc.file))}>
                     <Download className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-slate-400 hover:text-red-600" onClick={onDelete}>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 rounded-lg text-gray-400 hover:text-red-600" onClick={onDelete}>
                     <Trash2 className="h-4 w-4" />
                 </Button>
             </div>

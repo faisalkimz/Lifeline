@@ -94,10 +94,10 @@ const ResetPasswordPage = () => {
 
     if (tokenStatus === 'verifying') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
                 <Card className="w-full max-w-md p-12 text-center">
                     <Loader2 className="h-12 w-12 animate-spin text-primary-600 mx-auto mb-4" />
-                    <p className="text-slate-600 dark:text-slate-400 font-medium">Verifying reset link...</p>
+                    <p className="text-gray-600 dark:text-gray-400 font-medium">Verifying reset link...</p>
                 </Card>
             </div>
         );
@@ -105,7 +105,7 @@ const ResetPasswordPage = () => {
 
     if (tokenStatus === 'invalid') {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
                 <Card className="w-full max-w-md">
                     <CardContent className="p-12 text-center space-y-6">
                         <motion.div
@@ -116,8 +116,8 @@ const ResetPasswordPage = () => {
                             <AlertTriangle className="h-10 w-10" />
                         </motion.div>
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Invalid Reset Link</h2>
-                            <p className="text-slate-600 dark:text-slate-400">
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">Invalid Reset Link</h2>
+                            <p className="text-gray-600 dark:text-gray-400">
                                 This password reset link is invalid or has expired.
                             </p>
                         </div>
@@ -134,7 +134,7 @@ const ResetPasswordPage = () => {
 
     if (resetSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
                 <Card className="w-full max-w-md">
                     <CardContent className="p-12 text-center space-y-6">
                         <motion.div
@@ -146,8 +146,8 @@ const ResetPasswordPage = () => {
                             <CheckCircle2 className="h-10 w-10" />
                         </motion.div>
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Password Reset Complete!</h2>
-                            <p className="text-slate-600 dark:text-slate-400">
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2">Password Reset Complete!</h2>
+                            <p className="text-gray-600 dark:text-gray-400">
                                 Your password has been successfully updated. Redirecting you to login...
                             </p>
                         </div>
@@ -164,7 +164,7 @@ const ResetPasswordPage = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                     <motion.div
@@ -174,11 +174,11 @@ const ResetPasswordPage = () => {
                     >
                         <KeyRound className="h-8 w-8" />
                     </motion.div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Create New Password</h2>
-                    <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">For {userEmail}</p>
+                    <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Create New Password</h2>
+                    <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">For {userEmail}</p>
                 </div>
 
-                <Card className="border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 backdrop-blur-sm">
+                <Card className="border-none shadow-xl shadow-slate-200/50 dark:shadow-none bg-white dark:bg-gray-900/50 border-slate-100 backdrop-blur-sm">
                     <CardContent className="p-8">
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             <div className="space-y-2">
@@ -200,12 +200,12 @@ const ResetPasswordPage = () => {
                                                         "h-full flex-1 rounded-full transition-all duration-500",
                                                         i <= strength
                                                             ? (strength <= 2 ? 'bg-error-500' : strength === 3 ? 'bg-warning-500' : 'bg-success-500')
-                                                            : 'bg-slate-200 dark:bg-slate-800'
+                                                            : 'bg-slate-200'
                                                     )}
                                                 />
                                             ))}
                                         </div>
-                                        <p className="text-[10px] font-bold text-slate-400 uppercase">
+                                        <p className="text-[10px] font-bold text-gray-400 uppercase">
                                             Security Rank: <span className={cn(
                                                 strength <= 2 ? 'text-error-500' : strength === 3 ? 'text-warning-500' : 'text-success-500'
                                             )}>

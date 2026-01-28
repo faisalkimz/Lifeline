@@ -36,7 +36,7 @@ const LeaveBalances = () => {
 
                         <div className="space-y-3">
                             <div>
-                                <p className="text-2xl font-black text-slate-900 leading-none">
+                                <p className="text-2xl font-black text-gray-900 leading-none">
                                     {parseFloat(balance.total_days).toFixed(2)}
                                 </p>
                                 <div className="flex flex-col mt-3">
@@ -49,7 +49,7 @@ const LeaveBalances = () => {
 
                             <div className="pt-3 border-t border-gray-50 flex justify-between items-center">
                                 <span className="text-[10px] font-bold text-gray-400 uppercase">Leave taken</span>
-                                <span className="text-sm font-black text-slate-700">
+                                <span className="text-sm font-black text-gray-700">
                                     {parseFloat(balance.used_days).toFixed(0)}
                                 </span>
                             </div>

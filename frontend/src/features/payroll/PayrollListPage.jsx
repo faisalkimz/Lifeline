@@ -106,8 +106,8 @@ const PayrollListPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Payroll Management</h1>
-          <p className="text-slate-600 mt-1">Manage monthly payroll processing and employee payments</p>
+          <h1 className="text-3xl font-bold text-gray-900">Payroll Management</h1>
+          <p className="text-gray-600 mt-1">Manage monthly payroll processing and employee payments</p>
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
@@ -121,13 +121,13 @@ const PayrollListPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm font-medium text-slate-600">Total Payroll Runs</p>
-            <p className="text-3xl font-bold text-slate-900">{payrollRuns.length}</p>
+            <p className="text-sm font-medium text-gray-600">Total Payroll Runs</p>
+            <p className="text-3xl font-bold text-gray-900">{payrollRuns.length}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm font-medium text-slate-600">Pending Approval</p>
+            <p className="text-sm font-medium text-gray-600">Pending Approval</p>
             <p className="text-3xl font-bold text-yellow-600">
               {payrollRuns.filter(run => run.status === 'processing').length}
             </p>
@@ -135,7 +135,7 @@ const PayrollListPage = () => {
         </Card>
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm font-medium text-slate-600">Approved</p>
+            <p className="text-sm font-medium text-gray-600">Approved</p>
             <p className="text-3xl font-bold text-blue-600">
               {payrollRuns.filter(run => run.status === 'approved').length}
             </p>
@@ -143,7 +143,7 @@ const PayrollListPage = () => {
         </Card>
         <Card>
           <CardContent className="p-6">
-            <p className="text-sm font-medium text-slate-600">Paid</p>
+            <p className="text-sm font-medium text-gray-600">Paid</p>
             <p className="text-3xl font-bold text-green-600">
               {payrollRuns.filter(run => run.status === 'paid').length}
             </p>
@@ -236,7 +236,7 @@ const PayrollListPage = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-slate-500">
+                  <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                     No payroll runs found. Create one to get started.
                   </TableCell>
                 </TableRow>
@@ -263,22 +263,22 @@ const PayrollListPage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-500">Total Deductions</p>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500">Total Deductions</p>
                 <p className="text-xl font-bold">{formatCurrency(selectedRun.total_deductions)}</p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-500">PAYE Tax</p>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500">PAYE Tax</p>
                 <p className="text-xl font-bold">{formatCurrency(selectedRun.total_paye)}</p>
               </div>
-              <div className="p-4 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-500">NSSF Total</p>
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500">NSSF Total</p>
                 <p className="text-xl font-bold">{formatCurrency(parseFloat(selectedRun.total_nssf_employee) + parseFloat(selectedRun.total_nssf_employer))}</p>
               </div>
             </div>
 
             <div className="text-center py-8 border-t border-slate-100">
-              <p className="text-slate-500">Payslip details view coming soon...</p>
+              <p className="text-gray-500">Payslip details view coming soon...</p>
             </div>
           </div>
         </div>

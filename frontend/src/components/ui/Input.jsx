@@ -12,21 +12,21 @@ const Input = React.forwardRef(({ className, type = 'text', label, error, varian
                 <div className="flex justify-between items-center px-1">
                     <label
                         htmlFor={inputId}
-                        className="text-xs font-bold uppercase tracking-wider text-slate-500 group-focus-within:text-primary-600 transition-colors"
+                        className="text-xs font-bold uppercase tracking-wider text-gray-500 group-focus-within:text-primary-600 transition-colors"
                     >
                         {label}
                         {required && <span className="text-error-500 ml-1" aria-label="required">*</span>}
                     </label>
-                    {hint && <span className="text-[10px] font-medium text-slate-400 capitalize">{hint}</span>}
+                    {hint && <span className="text-[10px] font-medium text-gray-400 capitalize">{hint}</span>}
                 </div>
             )}
             <input
                 id={inputId}
                 type={type}
                 className={cn(
-                    "flex h-11 w-full rounded-xl border bg-white dark:bg-slate-900 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 shadow-sm",
+                    "flex h-11 w-full rounded-xl border bg-white dark:bg-gray-900 px-4 py-3 text-sm text-gray-900 placeholder-slate-400 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-300 shadow-sm",
                     {
-                        "border-slate-200 dark:border-slate-800 focus:ring-primary-500/10 focus:border-primary-500": variant === "default" && !error,
+                        "border-gray-200 focus:ring-primary-500/10 focus:border-primary-500": variant === "default" && !error,
                         "border-error-500 focus:ring-error-500/10 focus:border-error-500": error,
                         "border-success-500 focus:ring-success-500/10 focus:border-success-500": variant === "success",
                         "border-warning-500 focus:ring-warning-500/10 focus:border-warning-500": variant === "warning",

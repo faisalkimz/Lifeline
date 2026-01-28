@@ -183,9 +183,9 @@ const BenefitsPage = () => {
     // Category Config
     const CATEGORIES = {
         insurance: { label: 'Health & Care', icon: Heart, color: 'text-rose-600 bg-rose-50' },
-        allowance: { label: 'Working Essentials', icon: Briefcase, color: 'text-slate-700 bg-slate-50' },
+        allowance: { label: 'Working Essentials', icon: Briefcase, color: 'text-gray-700 bg-gray-50' },
         loan: { label: 'Home & Future', icon: Home, color: 'text-indigo-600 bg-indigo-50' },
-        retirement: { label: 'Relaxation', icon: Palmtree, color: 'text-emerald-600 bg-emerald-50' },
+        retirement: { label: 'Relaxation', icon: Palmtree, color: 'text-primary-600 bg-primary-50' },
         perk: { label: 'Celebration', icon: Gift, color: 'text-amber-600 bg-amber-50' },
     };
     const getUiConfig = (catKey) => CATEGORIES[catKey] || CATEGORIES.insurance;
@@ -216,11 +216,11 @@ const BenefitsPage = () => {
             {/* Professional Header */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Your Benefits</h1>
-                    <p className="text-slate-500 mt-2 text-lg">Manage your health, wealth, and future with corporate benefits.</p>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Your Benefits</h1>
+                    <p className="text-gray-500 mt-2 text-lg">Manage your health, wealth, and future with corporate benefits.</p>
                 </div>
                 {isAdmin && (
-                    <Button onClick={() => { resetTypeForm(); setIsTypeDialogOpen(true); }} className="h-11 px-6 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-all gap-2">
+                    <Button onClick={() => { resetTypeForm(); setIsTypeDialogOpen(true); }} className="h-11 px-6 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-all gap-2">
                         <Plus className="h-4 w-4" /> Add benefit plan
                     </Button>
                 )}
@@ -229,12 +229,12 @@ const BenefitsPage = () => {
             {/* Active Enrollments */}
             <section className="space-y-6">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 border border-emerald-100 shadow-sm">
+                    <div className="h-10 w-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600 border border-emerald-100 shadow-sm">
                         <Check className="h-5 w-5" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold text-slate-900">Active enrollments</h2>
-                        <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Your current coverage</p>
+                        <h2 className="text-xl font-bold text-gray-900">Active enrollments</h2>
+                        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Your current coverage</p>
                     </div>
                 </div>
 
@@ -251,13 +251,13 @@ const BenefitsPage = () => {
                             />
                         ))
                     ) : (
-                        <div className="col-span-full py-16 flex flex-col items-center justify-center bg-slate-50 border border-slate-200 border-dashed rounded-2xl">
+                        <div className="col-span-full py-16 flex flex-col items-center justify-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl">
                             <Umbrella className="h-12 w-12 text-slate-300 mb-4" />
-                            <p className="text-slate-900 font-bold text-lg">You don't have active plans</p>
-                            <p className="text-slate-500 text-sm mb-6 max-w-xs text-center">Protect yourself and your family by enrolling in one of our comprehensive benefits.</p>
+                            <p className="text-gray-900 font-bold text-lg">You don't have active plans</p>
+                            <p className="text-gray-500 text-sm mb-6 max-w-xs text-center">Protect yourself and your family by enrolling in one of our comprehensive benefits.</p>
                             <Button
                                 onClick={() => document.getElementById('available-plans').scrollIntoView({ behavior: 'smooth' })}
-                                className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm"
+                                className="h-11 px-8 bg-gray-900 text-white font-semibold rounded-lg shadow-sm"
                             >
                                 Browse plans
                             </Button>
@@ -274,17 +274,17 @@ const BenefitsPage = () => {
                             <Search className="h-5 w-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-900">Available plans</h2>
-                            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Explore options</p>
+                            <h2 className="text-xl font-bold text-gray-900">Available plans</h2>
+                            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Explore options</p>
                         </div>
                     </div>
                     <div className="relative w-full md:w-80">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
                             placeholder="Find a plan..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full h-11 pl-11 pr-4 bg-white border border-slate-200 rounded-xl text-sm font-medium outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all"
+                            className="w-full h-11 pl-11 pr-4 bg-white border border-gray-200 rounded-xl text-sm font-medium outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-all"
                         />
                     </div>
                 </div>
@@ -316,7 +316,7 @@ const BenefitsPage = () => {
                                 />
                             ))
                     ) : (
-                        <div className="col-span-full py-16 text-center text-slate-400">
+                        <div className="col-span-full py-16 text-center text-gray-400">
                             No plans available matching your search.
                         </div>
                     )}
@@ -328,10 +328,10 @@ const BenefitsPage = () => {
                 <DialogContent className="max-w-xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
                     <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
                         <div>
-                            <DialogTitle className="text-xl font-bold text-slate-900">Enrollment wizard</DialogTitle>
-                            <p className="text-xs text-slate-500 mt-0.5">Step {enrollStep} of 3</p>
+                            <DialogTitle className="text-xl font-bold text-gray-900">Enrollment wizard</DialogTitle>
+                            <p className="text-xs text-gray-500 mt-0.5">Step {enrollStep} of 3</p>
                         </div>
-                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                        <div className="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
                             <Umbrella className="h-5 w-5" />
                         </div>
                     </div>
@@ -344,26 +344,26 @@ const BenefitsPage = () => {
                                         {React.createElement(getUiConfig(selectedType?.category).icon, { className: 'h-8 w-8' })}
                                     </div>
                                     <div>
-                                        <h2 className="text-2xl font-bold text-slate-900">{selectedType?.name}</h2>
-                                        <p className="text-slate-500 leading-relaxed max-w-sm">{selectedType?.description}</p>
+                                        <h2 className="text-2xl font-bold text-gray-900">{selectedType?.name}</h2>
+                                        <p className="text-gray-500 leading-relaxed max-w-sm">{selectedType?.description}</p>
                                     </div>
                                 </div>
-                                <div className="bg-slate-50 p-6 rounded-xl border border-slate-100">
-                                    <h4 className="font-semibold text-slate-900 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
+                                <div className="bg-gray-50 p-6 rounded-xl border border-slate-100">
+                                    <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2 text-sm uppercase tracking-wider">
                                         Plan Highlights
                                     </h4>
                                     <ul className="space-y-3">
-                                        <li className="flex items-center gap-3 text-sm text-slate-600">
-                                            <Check className="h-4 w-4 text-emerald-500" />
-                                            Provider: <span className="font-semibold text-slate-900">{selectedType?.provider_name || 'Internal'}</span>
+                                        <li className="flex items-center gap-3 text-sm text-gray-600">
+                                            <Check className="h-4 w-4 text-primary-500" />
+                                            Provider: <span className="font-semibold text-gray-900">{selectedType?.provider_name || 'Internal'}</span>
                                         </li>
-                                        <li className="flex items-center gap-3 text-sm text-slate-600">
-                                            <Check className="h-4 w-4 text-emerald-500" />
-                                            Base Value: <span className="font-semibold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(selectedType?.default_value)}</span>
+                                        <li className="flex items-center gap-3 text-sm text-gray-600">
+                                            <Check className="h-4 w-4 text-primary-500" />
+                                            Base Value: <span className="font-semibold text-gray-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(selectedType?.default_value)}</span>
                                         </li>
-                                        <li className="flex items-center gap-3 text-sm text-slate-600">
-                                            <Check className="h-4 w-4 text-emerald-500" />
-                                            Tax Status: <span className="font-semibold text-slate-900">{selectedType?.is_taxable ? 'Taxable' : 'Tax Exempt'}</span>
+                                        <li className="flex items-center gap-3 text-sm text-gray-600">
+                                            <Check className="h-4 w-4 text-primary-500" />
+                                            Tax Status: <span className="font-semibold text-gray-900">{selectedType?.is_taxable ? 'Taxable' : 'Tax Exempt'}</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -373,34 +373,34 @@ const BenefitsPage = () => {
                         {enrollStep === 2 && (
                             <div className="flex-1 space-y-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Who is covered?</h2>
-                                    <p className="text-slate-500">Select family members to include in your plan.</p>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Who is covered?</h2>
+                                    <p className="text-gray-500">Select family members to include in your plan.</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                    <div className="aspect-square rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center p-4 text-center cursor-default">
-                                        <div className="h-10 w-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-500 mb-2 font-bold">
+                                    <div className="aspect-square rounded-xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center p-4 text-center cursor-default">
+                                        <div className="h-10 w-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-500 mb-2 font-bold">
                                             {user?.first_name?.[0]}{user?.last_name?.[0]}
                                         </div>
-                                        <p className="text-sm font-bold text-slate-900">You</p>
-                                        <Badge className="mt-1 bg-slate-200 text-slate-600 text-[10px] uppercase border-none">Primary</Badge>
+                                        <p className="text-sm font-bold text-gray-900">You</p>
+                                        <Badge className="mt-1 bg-slate-200 text-gray-600 text-[10px] uppercase border-none">Primary</Badge>
                                     </div>
 
                                     {enrollForm.dependents_covered.map((dep, i) => (
-                                        <div key={i} className="relative aspect-square rounded-xl bg-slate-50 border border-slate-200 flex flex-col items-center justify-center p-4 text-center group">
+                                        <div key={i} className="relative aspect-square rounded-xl bg-gray-50 border border-gray-200 flex flex-col items-center justify-center p-4 text-center group">
                                             <button onClick={() => removeDependent(i)} className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors">
                                                 <Trash2 className="h-4 w-4" />
                                             </button>
-                                            <div className="h-10 w-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 mb-2 font-bold uppercase">
+                                            <div className="h-10 w-10 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-600 mb-2 font-bold uppercase">
                                                 {dep.substring(0, 2)}
                                             </div>
-                                            <p className="text-sm font-bold text-slate-900 line-clamp-1">{dep}</p>
+                                            <p className="text-sm font-bold text-gray-900 line-clamp-1">{dep}</p>
                                             <Badge className="mt-1 bg-blue-50 text-blue-600 text-[10px] uppercase border-none">Family</Badge>
                                         </div>
                                     ))}
 
-                                    <div className="aspect-square rounded-xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center p-4 text-center hover:border-slate-400 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => document.getElementById('new-dep-input').focus()}>
-                                        <div className="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mb-2">
+                                    <div className="aspect-square rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center p-4 text-center hover:border-slate-400 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => document.getElementById('new-dep-input').focus()}>
+                                        <div className="h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 mb-2">
                                             <Plus className="h-5 w-5" />
                                         </div>
                                         <Input
@@ -409,7 +409,7 @@ const BenefitsPage = () => {
                                             value={newDependent}
                                             onChange={e => setNewDependent(e.target.value)}
                                             onKeyDown={e => e.key === 'Enter' && addDependent()}
-                                            className="h-8 text-center text-sm bg-transparent border-none focus:ring-0 p-0 w-full placeholder:text-slate-400"
+                                            className="h-8 text-center text-sm bg-transparent border-none focus:ring-0 p-0 w-full placeholder:text-gray-400"
                                         />
                                     </div>
                                 </div>
@@ -419,44 +419,44 @@ const BenefitsPage = () => {
                         {enrollStep === 3 && (
                             <div className="flex-1 space-y-6">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Review & confirm</h2>
-                                    <p className="text-slate-500">Confirm your benefit selection breakdown.</p>
+                                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & confirm</h2>
+                                    <p className="text-gray-500">Confirm your benefit selection breakdown.</p>
                                 </div>
 
-                                <div className="bg-slate-50 rounded-xl p-6 border border-slate-100 space-y-6">
-                                    <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                                <div className="bg-gray-50 rounded-xl p-6 border border-slate-100 space-y-6">
+                                    <div className="flex items-center justify-between border-b border-gray-200 pb-4">
                                         <div className="flex items-center gap-3">
                                             <div className={`h-10 w-10 rounded-lg ${getUiConfig(selectedType?.category).color} flex items-center justify-center border border-slate-100`}>
                                                 {React.createElement(getUiConfig(selectedType?.category).icon, { className: 'h-5 w-5' })}
                                             </div>
                                             <div>
-                                                <p className="font-bold text-slate-900">{selectedType?.name}</p>
-                                                <p className="text-xs text-slate-500">{enrollForm.dependents_covered.length > 0 ? `+ ${enrollForm.dependents_covered.length} Dependents` : 'Individual Plan'}</p>
+                                                <p className="font-bold text-gray-900">{selectedType?.name}</p>
+                                                <p className="text-xs text-gray-500">{enrollForm.dependents_covered.length > 0 ? `+ ${enrollForm.dependents_covered.length} Dependents` : 'Individual Plan'}</p>
                                             </div>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Value</p>
-                                            <p className="text-lg font-bold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(parseFloat(enrollForm.employee_contribution || 0) + parseFloat(enrollForm.employer_contribution || 0))}</p>
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Value</p>
+                                            <p className="text-lg font-bold text-gray-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(parseFloat(enrollForm.employee_contribution || 0) + parseFloat(enrollForm.employer_contribution || 0))}</p>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Your monthly contribution</label>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Your monthly contribution</label>
                                             <Input
                                                 type="number"
                                                 value={enrollForm.employee_contribution}
                                                 onChange={e => setEnrollForm({ ...enrollForm, employee_contribution: e.target.value })}
-                                                className="h-11 bg-white border-slate-200 font-bold"
+                                                className="h-11 bg-white border-gray-200 font-bold"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Company contribution</label>
+                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Company contribution</label>
                                             <Input
                                                 type="number"
                                                 value={enrollForm.employer_contribution}
                                                 onChange={e => setEnrollForm({ ...enrollForm, employer_contribution: e.target.value })}
-                                                className="h-11 bg-slate-100 border-transparent font-bold text-slate-500 cursor-not-allowed"
+                                                className="h-11 bg-gray-100 border-transparent font-bold text-gray-500 cursor-not-allowed"
                                                 disabled
                                             />
                                         </div>
@@ -467,21 +467,21 @@ const BenefitsPage = () => {
 
                         <div className="mt-auto pt-10 flex justify-between items-center">
                             {enrollStep > 1 ? (
-                                <Button variant="ghost" onClick={prevStep} className="font-semibold text-slate-500 gap-2">
+                                <Button variant="ghost" onClick={prevStep} className="font-semibold text-gray-500 gap-2">
                                     <ChevronLeft className="h-4 w-4" /> Back
                                 </Button>
                             ) : (
-                                <Button variant="ghost" onClick={() => setIsEnrollDialogOpen(false)} className="text-slate-400 hover:text-rose-500">
+                                <Button variant="ghost" onClick={() => setIsEnrollDialogOpen(false)} className="text-gray-400 hover:text-rose-500">
                                     Cancel
                                 </Button>
                             )}
 
                             {enrollStep < 3 ? (
-                                <Button onClick={nextStep} className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm gap-2">
+                                <Button onClick={nextStep} className="h-11 px-8 bg-gray-900 text-white font-semibold rounded-lg shadow-sm gap-2">
                                     Next step <ChevronRight className="h-4 w-4" />
                                 </Button>
                             ) : (
-                                <Button onClick={handleEnrollSubmit} className="h-11 px-10 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-sm">
+                                <Button onClick={handleEnrollSubmit} className="h-11 px-10 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-sm">
                                     Confirm enrollment
                                 </Button>
                             )}
@@ -495,30 +495,30 @@ const BenefitsPage = () => {
                 {viewingBenefit && (
                     <DialogContent className="max-w-md bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
                         <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
-                            <DialogTitle className="text-xl font-bold text-slate-900">Plan details</DialogTitle>
-                            <div className={`h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center ${getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.color}`}>
+                            <DialogTitle className="text-xl font-bold text-gray-900">Plan details</DialogTitle>
+                            <div className={`h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center ${getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.color}`}>
                                 {React.createElement(getUiConfig((viewingBenefit.benefit_type?.category || viewingBenefit.category))?.icon, { className: 'h-5 w-5' })}
                             </div>
                         </div>
 
                         <div className="p-8 space-y-8">
                             <div className="text-center">
-                                <h2 className="text-2xl font-bold text-slate-900">
+                                <h2 className="text-2xl font-bold text-gray-900">
                                     {viewingBenefit.benefit_type?.name || viewingBenefit.name}
                                 </h2>
-                                <p className="text-slate-500 mt-1">Provided by {viewingBenefit.benefit_type?.provider_name || viewingBenefit.provider_name}</p>
+                                <p className="text-gray-500 mt-1">Provided by {viewingBenefit.benefit_type?.provider_name || viewingBenefit.provider_name}</p>
                             </div>
 
                             {viewingBenefit.isEnrolled ? (
                                 <div className="space-y-6">
-                                    <div className="bg-slate-50 p-6 rounded-xl border border-slate-100 text-center">
-                                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Your monthly investment</p>
-                                        <p className="text-3xl font-bold text-slate-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(viewingBenefit.employee_contribution)}</p>
+                                    <div className="bg-gray-50 p-6 rounded-xl border border-slate-100 text-center">
+                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Your monthly investment</p>
+                                        <p className="text-3xl font-bold text-gray-900">{new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX' }).format(viewingBenefit.employee_contribution)}</p>
                                     </div>
 
                                     {viewingBenefit.dependents_covered?.length > 0 && (
                                         <div className="space-y-3">
-                                            <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Covered family members</p>
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Covered family members</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {viewingBenefit.dependents_covered.map((d, i) => (
                                                     <Badge key={i} className="bg-blue-50 text-blue-700 border-none font-semibold px-3 py-1 rounded-full">{d}</Badge>
@@ -533,8 +533,8 @@ const BenefitsPage = () => {
                                 </div>
                             ) : (
                                 <div className="space-y-6">
-                                    <p className="text-center text-slate-600 leading-relaxed">{viewingBenefit.description}</p>
-                                    <Button onClick={() => { setIsDetailsDialogOpen(false); openEnrollDialog(viewingBenefit); }} className="w-full h-11 bg-slate-900 text-white font-semibold rounded-lg shadow-sm">
+                                    <p className="text-center text-gray-600 leading-relaxed">{viewingBenefit.description}</p>
+                                    <Button onClick={() => { setIsDetailsDialogOpen(false); openEnrollDialog(viewingBenefit); }} className="w-full h-11 bg-gray-900 text-white font-semibold rounded-lg shadow-sm">
                                         Start enrollment
                                     </Button>
                                 </div>
@@ -548,10 +548,10 @@ const BenefitsPage = () => {
             <Dialog open={isTypeDialogOpen} onOpenChange={(open) => { if (!open) resetTypeForm(); setIsTypeDialogOpen(open); }}>
                 <DialogContent className="max-w-xl bg-white rounded-2xl p-0 overflow-hidden shadow-2xl border-none">
                     <div className="px-8 py-6 border-b border-slate-50 flex justify-between items-center">
-                        <DialogTitle className="text-xl font-bold text-slate-900">
+                        <DialogTitle className="text-xl font-bold text-gray-900">
                             {isEditingType ? 'Edit benefit plan' : 'Create benefit plan'}
                         </DialogTitle>
-                        <div className="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                        <div className="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400">
                             <Plus className="h-5 w-5" />
                         </div>
                     </div>
@@ -559,20 +559,20 @@ const BenefitsPage = () => {
                     <form onSubmit={handleCreateOrUpdateType} className="p-8 space-y-6">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Plan name</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Plan name</label>
                                 <Input
                                     value={typeForm.name}
                                     onChange={e => setTypeForm({ ...typeForm, name: e.target.value })}
-                                    className="h-11 rounded-xl border-slate-200"
+                                    className="h-11 rounded-xl border-gray-200"
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Category</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
                                 <select
                                     value={typeForm.category}
                                     onChange={e => setTypeForm({ ...typeForm, category: e.target.value })}
-                                    className="w-full h-11 px-3 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-700 outline-none focus:ring-1 focus:ring-slate-900"
+                                    className="w-full h-11 px-3 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 outline-none focus:ring-1 focus:ring-slate-900"
                                 >
                                     <option value="insurance">Insurance</option>
                                     <option value="allowance">Allowance</option>
@@ -585,12 +585,12 @@ const BenefitsPage = () => {
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Default value (UGX)</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Default value (UGX)</label>
                                 <Input
                                     type="number"
                                     value={typeForm.default_value}
                                     onChange={e => setTypeForm({ ...typeForm, default_value: parseFloat(e.target.value) })}
-                                    className="h-11 rounded-xl border-slate-200"
+                                    className="h-11 rounded-xl border-gray-200"
                                 />
                             </div>
                             <div className="space-y-2 flex items-center pt-6">
@@ -599,38 +599,38 @@ const BenefitsPage = () => {
                                         type="checkbox"
                                         checked={typeForm.is_taxable}
                                         onChange={e => setTypeForm({ ...typeForm, is_taxable: e.target.checked })}
-                                        className="h-5 w-5 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                                        className="h-5 w-5 rounded border-gray-300 text-gray-900 focus:ring-slate-900"
                                     />
-                                    <span className="text-sm font-semibold text-slate-700">Taxable benefit</span>
+                                    <span className="text-sm font-semibold text-gray-700">Taxable benefit</span>
                                 </label>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Provider name</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Provider name</label>
                                 <Input
                                     value={typeForm.provider_name}
                                     onChange={e => setTypeForm({ ...typeForm, provider_name: e.target.value })}
-                                    className="h-11 rounded-xl border-slate-200"
+                                    className="h-11 rounded-xl border-gray-200"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Contact / Policy #</label>
+                                <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Contact / Policy #</label>
                                 <Input
                                     value={typeForm.provider_contact}
                                     onChange={e => setTypeForm({ ...typeForm, provider_contact: e.target.value })}
-                                    className="h-11 rounded-xl border-slate-200"
+                                    className="h-11 rounded-xl border-gray-200"
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Description</label>
+                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Description</label>
                             <textarea
                                 value={typeForm.description}
                                 onChange={e => setTypeForm({ ...typeForm, description: e.target.value })}
-                                className="w-full p-4 bg-white border border-slate-200 rounded-xl text-sm min-h-[100px] outline-none resize-none focus:ring-1 focus:ring-slate-900"
+                                className="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm min-h-[100px] outline-none resize-none focus:ring-1 focus:ring-slate-900"
                                 required
                             />
                         </div>
@@ -639,7 +639,7 @@ const BenefitsPage = () => {
                             <Button type="button" variant="ghost" onClick={() => setIsTypeDialogOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" className="h-11 px-8 bg-slate-900 text-white font-semibold rounded-lg shadow-sm">
+                            <Button type="submit" className="h-11 px-8 bg-gray-900 text-white font-semibold rounded-lg shadow-sm">
                                 {isEditingType ? 'Save changes' : 'Create plan'}
                             </Button>
                         </div>
@@ -657,7 +657,7 @@ const BenefitCard = ({ benefit, isEnrolled, getUiConfig, onClick, onUnenroll, on
 
     return (
         <Card
-            className="flex flex-col h-full bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
+            className="flex flex-col h-full bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer overflow-hidden"
             onClick={onClick}
         >
             <div className="p-6 flex flex-col h-full">
@@ -666,25 +666,25 @@ const BenefitCard = ({ benefit, isEnrolled, getUiConfig, onClick, onUnenroll, on
                         {React.createElement(config.icon, { className: 'h-6 w-6' })}
                     </div>
                     {isEnrolled && (
-                        <Badge className="bg-emerald-50 text-emerald-700 border-none font-bold px-3 py-1 rounded-full text-[10px]">ACTIVE</Badge>
+                        <Badge className="bg-primary-50 text-emerald-700 border-none font-bold px-3 py-1 rounded-full text-[10px]">ACTIVE</Badge>
                     )}
                 </div>
 
                 <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2 leading-tight">
                         {data.name}
                     </h3>
-                    <p className="text-sm text-slate-500 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
                         {data.description || 'Access comprehensive coverage designed for your well-being.'}
                     </p>
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-slate-50 flex items-center justify-between">
                     <div>
-                        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                        <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
                             {isEnrolled ? 'Monthly cost' : 'Monthly value'}
                         </p>
-                        <p className="text-lg font-bold text-slate-900">
+                        <p className="text-lg font-bold text-gray-900">
                             {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'UGX', maximumSignificantDigits: 3 }).format(isEnrolled ? benefit.employee_contribution : data.default_value)}
                         </p>
                     </div>
@@ -692,15 +692,15 @@ const BenefitCard = ({ benefit, isEnrolled, getUiConfig, onClick, onUnenroll, on
                     <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                         {isAdmin && !isEnrolled ? (
                             <>
-                                <Button size="icon" variant="ghost" onClick={onEdit} className="h-9 w-9 text-slate-400 hover:text-slate-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
-                                <Button size="icon" variant="ghost" onClick={onDelete} className="h-9 w-9 text-slate-400 hover:text-rose-500 rounded-lg"><Trash2 className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" onClick={onEdit} className="h-9 w-9 text-gray-400 hover:text-gray-900 rounded-lg"><Edit className="h-4 w-4" /></Button>
+                                <Button size="icon" variant="ghost" onClick={onDelete} className="h-9 w-9 text-gray-400 hover:text-rose-500 rounded-lg"><Trash2 className="h-4 w-4" /></Button>
                             </>
                         ) : (
                             <Button
                                 size="sm"
                                 variant={isEnrolled ? "ghost" : "default"}
                                 onClick={(e) => { e.stopPropagation(); isEnrolled ? onUnenroll() : onEnroll(); }}
-                                className={`h-9 px-4 font-semibold text-xs rounded-lg ${!isEnrolled && 'bg-slate-900 text-white hover:bg-slate-800'}`}
+                                className={`h-9 px-4 font-semibold text-xs rounded-lg ${!isEnrolled && 'bg-gray-900 text-white hover:bg-gray-800'}`}
                             >
                                 {isEnrolled ? 'Cancel' : 'Enroll'}
                             </Button>

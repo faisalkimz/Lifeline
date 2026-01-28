@@ -84,16 +84,16 @@ const PipelinePage = () => {
         <div className="space-y-8 pb-12 h-[calc(100vh-100px)] flex flex-col">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 shrink-0">
                 <div>
-                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                        <Link to="/recruitment" className="hover:text-slate-900 flex items-center gap-1">
+                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
+                        <Link to="/recruitment" className="hover:text-gray-900 flex items-center gap-1">
                             <ArrowLeft className="h-3 w-3" /> Back to Recruitment
                         </Link>
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Hiring Pipeline</h1>
-                    <div className="flex items-center gap-6 mt-2 text-sm text-slate-500 font-medium">
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Hiring Pipeline</h1>
+                    <div className="flex items-center gap-6 mt-2 text-sm text-gray-500 font-medium">
                         <span className="flex items-center gap-2"><Users className="h-4 w-4" /> {stats.total} Candidates</span>
                         <span className="flex items-center gap-2"><Activity className="h-4 w-4" /> {stats.active} Active</span>
-                        <span className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600" /> {stats.hired} Hired</span>
+                        <span className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-primary-600" /> {stats.hired} Hired</span>
                     </div>
                 </div>
             </div>
@@ -111,14 +111,14 @@ const PipelinePage = () => {
                                 <div key={stage.id} className="w-80 flex flex-col gap-4 h-full">
                                     <div className="flex items-center justify-between px-2">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-slate-700">{stage.name}</h3>
-                                            <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none px-2 py-0.5 rounded-md text-xs">
+                                            <h3 className="font-bold text-gray-700">{stage.name}</h3>
+                                            <Badge variant="secondary" className="bg-gray-100 text-gray-600 border-none px-2 py-0.5 rounded-md text-xs">
                                                 {columns[stage.id].length}
                                             </Badge>
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 rounded-2xl bg-slate-50 border border-slate-100 p-2 overflow-y-auto w-full">
+                                    <div className="flex-1 rounded-2xl bg-gray-50 border border-slate-100 p-2 overflow-y-auto w-full">
                                         <Droppable droppableId={stage.id}>
                                             {(provided, snapshot) => (
                                                 <div
@@ -126,7 +126,7 @@ const PipelinePage = () => {
                                                     ref={provided.innerRef}
                                                     className={cn(
                                                         "min-h-[150px] space-y-3 transition-colors rounded-xl p-1",
-                                                        snapshot.isDraggingOver ? 'bg-slate-100/50 ring-2 ring-slate-200' : ''
+                                                        snapshot.isDraggingOver ? 'bg-gray-100/50 ring-2 ring-slate-200' : ''
                                                     )}
                                                 >
                                                     {columns[stage.id].map((application, index) => (
@@ -188,13 +188,13 @@ const CandidateCard = ({ application, onClick, isDragging }) => {
         <Card
             onClick={onClick}
             className={cn(
-                "cursor-pointer group hover:shadow-md transition-all border-slate-200 shadow-sm",
+                "cursor-pointer group hover:shadow-md transition-all border-gray-200 shadow-sm",
                 isDragging ? "shadow-xl ring-2 ring-primary-500 rotate-2" : "bg-white"
             )}
         >
             <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 overflow-hidden shrink-0 flex items-center justify-center">
                         {candidate?.photo ? (
                             <img
                                 src={getMediaUrl(candidate.photo)}
@@ -203,24 +203,24 @@ const CandidateCard = ({ application, onClick, isDragging }) => {
                                 onError={(e) => { e.target.style.display = 'none'; }}
                             />
                         ) : (
-                            <span className="text-xs font-bold text-slate-400">
+                            <span className="text-xs font-bold text-gray-400">
                                 {candidate?.first_name?.[0]}{candidate?.last_name?.[0]}
                             </span>
                         )}
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-900 text-sm">{candidate?.first_name} {candidate?.last_name}</h4>
-                        <p className="text-xs text-slate-500 truncate max-w-[140px]">{application.job_title}</p>
+                        <h4 className="font-bold text-gray-900 text-sm">{candidate?.first_name} {candidate?.last_name}</h4>
+                        <p className="text-xs text-gray-500 truncate max-w-[140px]">{application.job_title}</p>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">
                         <Clock className="h-3 w-3" />
                         <span>{new Date(application.applied_at).toLocaleDateString()}</span>
                     </div>
                     {application.score > 0 && (
-                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-bold text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded">
                             {application.score}%
                         </span>
                     )}

@@ -80,12 +80,12 @@ const MyPayslipsPage = () => {
                 <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                     <CardContent className="p-6">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                <DollarSign className="h-6 w-6 text-emerald-600" />
+                            <div className="p-3 bg-primary-50 rounded-xl border border-emerald-100">
+                                <DollarSign className="h-6 w-6 text-primary-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Latest Net Salary</p>
-                                <p className="text-2xl font-black text-emerald-600 tracking-tight">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Latest Net Salary</p>
+                                <p className="text-2xl font-black text-primary-600 tracking-tight">
                                     {latestPayslip ? formatCurrency(latestPayslip.net_salary) : 'N/A'}
                                 </p>
                             </div>
@@ -100,8 +100,8 @@ const MyPayslipsPage = () => {
                                 <Calendar className="h-6 w-6 text-blue-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Latest Pay Period</p>
-                                <p className="text-2xl font-black text-slate-900 tracking-tight">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Latest Pay Period</p>
+                                <p className="text-2xl font-black text-gray-900 tracking-tight">
                                     {latestPayslip
                                         ? new Date(latestPayslip.year, latestPayslip.month - 1).toLocaleString('en-US', { month: 'short', year: 'numeric' })
                                         : 'N/A'
@@ -119,8 +119,8 @@ const MyPayslipsPage = () => {
                                 <FileText className="h-6 w-6 text-purple-600" />
                             </div>
                             <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Payslips</p>
-                                <p className="text-2xl font-black text-slate-900 tracking-tight">{payslips.length}</p>
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Payslips</p>
+                                <p className="text-2xl font-black text-gray-900 tracking-tight">{payslips.length}</p>
                             </div>
                         </div>
                     </CardContent>
@@ -129,39 +129,39 @@ const MyPayslipsPage = () => {
 
             {/* Payslips Table */}
             <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Payslip History</CardTitle>
+                <CardHeader className="bg-gray-50 border-b border-slate-100 p-8">
+                    <CardTitle className="text-sm font-black uppercase tracking-widest text-gray-500">Payslip History</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
                     {payslips.length > 0 ? (
                         <Table>
                             <TableHeader>
-                                <TableRow className="bg-slate-50/50">
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pay Period</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Gross Salary</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Deductions</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Net Salary</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
+                                <TableRow className="bg-gray-50/50">
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Pay Period</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Gross Salary</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Deductions</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Net Salary</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</TableHead>
+                                    <TableHead className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {payslips.map((payslip) => (
-                                    <TableRow key={payslip.id} className="hover:bg-slate-50/50 transition-all">
+                                    <TableRow key={payslip.id} className="hover:bg-gray-50/50 transition-all">
                                         <TableCell className="px-8 py-6">
                                             <div className="flex flex-col">
-                                                <span className="font-black text-slate-900">
+                                                <span className="font-black text-gray-900">
                                                     {new Date(payslip.year, payslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
                                                 </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-8 py-6 text-right font-bold text-slate-700">
+                                        <TableCell className="px-8 py-6 text-right font-bold text-gray-700">
                                             {formatCurrency(payslip.gross_salary)}
                                         </TableCell>
                                         <TableCell className="px-8 py-6 text-right font-bold text-orange-600">
                                             -{formatCurrency(payslip.total_deductions)}
                                         </TableCell>
-                                        <TableCell className="px-8 py-6 text-right font-black text-emerald-600 text-lg">
+                                        <TableCell className="px-8 py-6 text-right font-black text-primary-600 text-lg">
                                             {formatCurrency(payslip.net_salary)}
                                         </TableCell>
                                         <TableCell className="px-8 py-6">
@@ -175,7 +175,7 @@ const MyPayslipsPage = () => {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => setSelectedPayslip(payslip)}
-                                                    className="h-10 px-4 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl gap-2"
+                                                    className="h-10 px-4 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl gap-2"
                                                 >
                                                     <Eye className="h-4 w-4" />
                                                     View
@@ -200,7 +200,7 @@ const MyPayslipsPage = () => {
                         <div className="p-20 text-center">
                             <FileText className="h-16 w-16 mx-auto mb-4 text-slate-200" />
                             <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No payslips available yet</p>
-                            <p className="text-sm text-slate-400 mt-2">Your payslips will appear here after payroll processing</p>
+                            <p className="text-sm text-gray-400 mt-2">Your payslips will appear here after payroll processing</p>
                         </div>
                     )}
                 </CardContent>
@@ -211,12 +211,12 @@ const MyPayslipsPage = () => {
                 <DialogContent className="bg-white max-w-3xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
                     {selectedPayslip && (
                         <>
-                            <DialogHeader className="bg-slate-50 p-8 border-b border-slate-100">
-                                <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3 text-slate-900">
+                            <DialogHeader className="bg-gray-50 p-8 border-b border-slate-100">
+                                <DialogTitle className="text-2xl font-black tracking-tight flex items-center gap-3 text-gray-900">
                                     <FileText className="h-6 w-6 text-primary-600" />
                                     Payslip Details
                                 </DialogTitle>
-                                <p className="text-slate-500 text-sm mt-1">
+                                <p className="text-gray-500 text-sm mt-1">
                                     {new Date(selectedPayslip.year, selectedPayslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
                                 </p>
                             </DialogHeader>
@@ -224,27 +224,27 @@ const MyPayslipsPage = () => {
                             <div className="p-8 space-y-8">
                                 {/* Earnings Section */}
                                 <div className="space-y-4">
-                                    <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Earnings</h3>
-                                    <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 space-y-3">
+                                    <h3 className="text-[10px] font-black text-primary-600 uppercase tracking-widest">Earnings</h3>
+                                    <div className="bg-primary-50 border border-emerald-100 rounded-2xl p-6 space-y-3">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Basic Salary</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.basic_salary)}</span>
+                                            <span className="text-gray-600">Basic Salary</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.basic_salary)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Housing Allowance</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.housing_allowance)}</span>
+                                            <span className="text-gray-600">Housing Allowance</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.housing_allowance)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Transport Allowance</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.transport_allowance)}</span>
+                                            <span className="text-gray-600">Transport Allowance</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.transport_allowance)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Other Allowances</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.other_allowances)}</span>
+                                            <span className="text-gray-600">Other Allowances</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.other_allowances)}</span>
                                         </div>
                                         <div className="flex justify-between items-center pt-3 border-t-2 border-emerald-200">
                                             <span className="font-black text-emerald-700">Gross Salary</span>
-                                            <span className="text-xl font-black text-emerald-600">{formatCurrency(selectedPayslip.gross_salary)}</span>
+                                            <span className="text-xl font-black text-primary-600">{formatCurrency(selectedPayslip.gross_salary)}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -254,20 +254,20 @@ const MyPayslipsPage = () => {
                                     <h3 className="text-[10px] font-black text-orange-600 uppercase tracking-widest">Deductions</h3>
                                     <div className="bg-orange-50 border border-orange-100 rounded-2xl p-6 space-y-3">
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">PAYE Tax</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.paye_tax)}</span>
+                                            <span className="text-gray-600">PAYE Tax</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.paye_tax)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">NSSF Employee (10%)</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.nssf_employee)}</span>
+                                            <span className="text-gray-600">NSSF Employee (10%)</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.nssf_employee)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Local Service Tax</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.local_service_tax)}</span>
+                                            <span className="text-gray-600">Local Service Tax</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.local_service_tax)}</span>
                                         </div>
                                         <div className="flex justify-between items-center">
-                                            <span className="text-slate-600">Loan Deduction</span>
-                                            <span className="font-bold text-slate-900">{formatCurrency(selectedPayslip.loan_deduction)}</span>
+                                            <span className="text-gray-600">Loan Deduction</span>
+                                            <span className="font-bold text-gray-900">{formatCurrency(selectedPayslip.loan_deduction)}</span>
                                         </div>
                                         <div className="flex justify-between items-center pt-3 border-t-2 border-orange-200">
                                             <span className="font-black text-orange-700">Total Deductions</span>

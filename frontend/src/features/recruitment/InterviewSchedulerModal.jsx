@@ -57,12 +57,12 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-md bg-white rounded-3xl p-0 overflow-hidden shadow-2xl border-none">
-                <DialogHeader className="p-8 bg-slate-900 text-white">
+                <DialogHeader className="p-8 bg-gray-900 text-white">
                     <DialogTitle className="text-2xl font-bold flex items-center gap-3">
                         <Calendar className="h-6 w-6 text-blue-400" />
                         Schedule Interview
                     </DialogTitle>
-                    <p className="text-slate-400 text-sm mt-1">
+                    <p className="text-gray-400 text-sm mt-1">
                         Schedule for {application?.candidate?.first_name} {application?.candidate?.last_name}
                     </p>
                 </DialogHeader>
@@ -80,12 +80,12 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
 
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <Label className="text-slate-500 font-bold uppercase text-[10px] tracking-widest px-1">Interviewer</Label>
+                            <Label className="text-gray-500 font-bold uppercase text-[10px] tracking-widest px-1">Interviewer</Label>
                             <Select
                                 value={formData.interviewer_id}
                                 onValueChange={(val) => setFormData({ ...formData, interviewer_id: val })}
                             >
-                                <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-200">
+                                <SelectTrigger className="h-12 rounded-xl bg-gray-50 border-gray-200">
                                     <SelectValue placeholder="Select an interviewer" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -100,20 +100,20 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-slate-500 font-bold uppercase text-[10px] tracking-widest px-1">Date & Time</Label>
+                                <Label className="text-gray-500 font-bold uppercase text-[10px] tracking-widest px-1">Date & Time</Label>
                                 <Input
                                     type="datetime-local"
-                                    className="h-12 rounded-xl bg-slate-50 border-slate-200"
+                                    className="h-12 rounded-xl bg-gray-50 border-gray-200"
                                     value={formData.date_time}
                                     onChange={e => setFormData({ ...formData, date_time: e.target.value })}
                                     required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-slate-500 font-bold uppercase text-[10px] tracking-widest px-1">Duration (min)</Label>
+                                <Label className="text-gray-500 font-bold uppercase text-[10px] tracking-widest px-1">Duration (min)</Label>
                                 <Input
                                     type="number"
-                                    className="h-12 rounded-xl bg-slate-50 border-slate-200"
+                                    className="h-12 rounded-xl bg-gray-50 border-gray-200"
                                     value={formData.duration_minutes}
                                     onChange={e => setFormData({ ...formData, duration_minutes: e.target.value })}
                                     required
@@ -122,12 +122,12 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
                         </div>
 
                         <div className="space-y-2">
-                            <Label className="text-slate-500 font-bold uppercase text-[10px] tracking-widest px-1">Interview Type</Label>
+                            <Label className="text-gray-500 font-bold uppercase text-[10px] tracking-widest px-1">Interview Type</Label>
                             <Select
                                 value={formData.interview_type}
                                 onValueChange={(val) => setFormData({ ...formData, interview_type: val })}
                             >
-                                <SelectTrigger className="h-12 rounded-xl bg-slate-50 border-slate-200">
+                                <SelectTrigger className="h-12 rounded-xl bg-gray-50 border-gray-200">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -140,9 +140,9 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
 
                         {formData.interview_type !== 'video' && (
                             <div className="space-y-2">
-                                <Label className="text-slate-500 font-bold uppercase text-[10px] tracking-widest px-1">Location / Extra Info</Label>
+                                <Label className="text-gray-500 font-bold uppercase text-[10px] tracking-widest px-1">Location / Extra Info</Label>
                                 <Input
-                                    className="h-12 rounded-xl bg-slate-50 border-slate-200"
+                                    className="h-12 rounded-xl bg-gray-50 border-gray-200"
                                     placeholder="Enter physical address or reference"
                                     value={formData.location}
                                     onChange={e => setFormData({ ...formData, location: e.target.value })}
@@ -155,7 +155,7 @@ const InterviewSchedulerModal = ({ isOpen, onClose, application }) => {
                         <Button type="button" variant="ghost" onClick={onClose} className="flex-1 font-bold rounded-xl h-14">
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading} className="flex-1 font-bold rounded-xl h-14 bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-200">
+                        <Button type="submit" disabled={isLoading} className="flex-1 font-bold rounded-xl h-14 bg-gray-900 text-white hover:bg-gray-800 shadow-xl shadow-slate-200">
                             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Schedule & Notify"}
                         </Button>
                     </div>

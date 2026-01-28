@@ -31,7 +31,7 @@ const LeaveRequestsPage = () => {
     const [showTypeModal, setShowTypeModal] = useState(false);
     const [selectedType, setSelectedType] = useState(null);
 
-    const isCompanyAdmin = user?.role === 'company_admin' || user?.role === 'admin' || user?.role === 'hr_manager';
+    const isCompanyAdmin = ['super_admin', 'company_admin', 'hr_manager'].includes(user?.role);
 
     // Map Workpay statuses to system statuses
     const statusMap = {

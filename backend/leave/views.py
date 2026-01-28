@@ -69,9 +69,22 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
             employee__company=user.company
         ).select_related('employee', 'leave_type', 'approved_by')
         
+        # Role-based filtering
+        if user.role not in ['super_admin', 'company_admin', 'hr_manager']:
+            if hasattr(user, 'employee') and user.employee:
+                queryset = queryset.filter(
+                    Q(employee=user.employee) | Q(employee__manager=user.employee)
+                )
+            else:
+                queryset = queryset.filter(employee__user_account=user)
+
+        # Handle pending_approvals flag (used by Approvals page)
+        if self.request.query_params.get('pending_approvals') == 'true':
+            queryset = queryset.filter(status='pending')
+        
         # Filter by status
         status_filter = self.request.query_params.get('status')
-        if status_filter:
+        if status_filter and status_filter != 'all':
             queryset = queryset.filter(status=status_filter)
         
         # Filter by employee
@@ -111,7 +124,7 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         else:
             queryset = LeaveRequest.objects.none()
         
-        if user.role in ['admin', 'hr_manager']:
+        if user.role in ['super_admin', 'company_admin', 'hr_manager']:
             queryset = LeaveRequest.objects.filter(
                 employee__company=user.company,
                 status='pending'
@@ -133,12 +146,17 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         
         # Check permission
         user = request.user
-        if user.role not in ['admin', 'hr_manager']:
-            if not hasattr(user, 'employee') or leave_request.employee.manager != user.employee:
-                return Response(
-                    {"error": "You don't have permission to approve this request"},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        is_authorized = user.role in ['super_admin', 'company_admin', 'hr_manager']
+        
+        if not is_authorized:
+            if hasattr(user, 'employee') and leave_request.employee.manager == user.employee:
+                is_authorized = True
+        
+        if not is_authorized:
+            return Response(
+                {"error": "You don't have permission to approve this request"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         # Update leave balance
         try:
@@ -187,12 +205,17 @@ class LeaveRequestViewSet(viewsets.ModelViewSet):
         
         # Check permission (same as approve)
         user = request.user
-        if user.role not in ['admin', 'hr_manager']:
-            if not hasattr(user, 'employee') or leave_request.employee.manager != user.employee:
-                return Response(
-                    {"error": "You don't have permission to reject this request"},
-                    status=status.HTTP_403_FORBIDDEN
-                )
+        is_authorized = user.role in ['super_admin', 'company_admin', 'hr_manager']
+        
+        if not is_authorized:
+            if hasattr(user, 'employee') and leave_request.employee.manager == user.employee:
+                is_authorized = True
+        
+        if not is_authorized:
+            return Response(
+                {"error": "You don't have permission to reject this request"},
+                status=status.HTTP_403_FORBIDDEN
+            )
         
         # Update balance (remove pending)
         try:

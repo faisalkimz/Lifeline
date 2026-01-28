@@ -73,8 +73,8 @@ class LeaveRequestSerializer(serializers.ModelSerializer):
             return False
         # Manager or HR can approve
         return obj.status == 'pending' and (
-            request.user.role in ['admin', 'hr_manager'] or
-            obj.employee.manager == request.user.employee
+            request.user.role in ['super_admin', 'company_admin', 'hr_manager'] or
+            (hasattr(request.user, 'employee') and obj.employee.manager == request.user.employee)
         )
     
     def get_can_cancel(self, obj):

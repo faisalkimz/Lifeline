@@ -437,7 +437,7 @@ export const api = createApi({
       transformResponse: (response) => {
         if (Array.isArray(response)) return response;
         if (response?.results && Array.isArray(response.results)) return response.results;
-        return response || [];
+        return [];
       },
       providesTags: ['LeaveRequest']
     }),
@@ -509,9 +509,10 @@ export const api = createApi({
       invalidatesTags: ['LeaveRequest']
     }),
     rejectLeaveRequest: builder.mutation({
-      query: (id) => ({
+      query: ({ id, ...body }) => ({
         url: `/leave/requests/${id}/reject/`,
-        method: 'POST'
+        method: 'POST',
+        body
       }),
       invalidatesTags: ['LeaveRequest']
     }),

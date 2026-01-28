@@ -18,6 +18,7 @@ import {
     TrendingUp, BarChart3, Star, Trash2, Calendar, ChevronRight, Flag
 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
+import { exportToCSV } from '../../utils/exportUtils';
 import toast from 'react-hot-toast';
 
 const PerformancePage = () => {
@@ -138,6 +139,25 @@ const GoalsSection = ({ user }) => {
         due_date: ''
     });
 
+    const handleExport = () => {
+        if (!goals || goals.length === 0) {
+            toast.error("No goals to export");
+            return;
+        }
+
+        const exportData = goals.map(g => ({
+            Title: g.title,
+            Description: g.description,
+            Status: g.status,
+            Priority: g.priority,
+            Progress: `${g.progress}%`,
+            'Due Date': g.due_date || 'N/A'
+        }));
+
+        exportToCSV(exportData, `my_goals_${new Date().toISOString().split('T')[0]}`);
+        toast.success("Goals exported successfully");
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -157,84 +177,93 @@ const GoalsSection = ({ user }) => {
                     <h3 className="text-lg font-bold text-gray-900">My Goals</h3>
                     <p className="text-sm text-gray-500">Set and track your professional objectives</p>
                 </div>
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-primary-600 hover:bg-primary-700 text-white shadow-md shadow-primary-200">
-                            <Plus className="h-4 w-4 mr-2" /> New Goal
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 p-0 overflow-hidden">
-                        <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                            <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-primary-100 shadow-sm">
-                                <Target className="h-6 w-6 text-primary-600" />
+                <div className="flex gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={handleExport}
+                        className="border-gray-200 text-gray-600 hover:bg-gray-100 h-10 px-4"
+                    >
+                        Export
+                    </Button>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="bg-primary-600 hover:bg-primary-700 text-white shadow-md shadow-primary-200 h-10 px-4">
+                                <Plus className="h-4 w-4 mr-2" /> New Goal
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 p-0 overflow-hidden">
+                            <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
+                                <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-primary-100 shadow-sm">
+                                    <Target className="h-6 w-6 text-primary-600" />
+                                </div>
+                                <div>
+                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Create New Goal</DialogTitle>
+                                    <p className="text-slate-500 mt-1 font-medium text-sm">Define clear objectives to track your progress.</p>
+                                </div>
                             </div>
-                            <div>
-                                <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Create New Goal</DialogTitle>
-                                <p className="text-slate-500 mt-1 font-medium text-sm">Define clear objectives to track your progress.</p>
-                            </div>
-                        </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-5">
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Goal Title</label>
-                                <Input
-                                    className="bg-white"
-                                    value={formData.title}
-                                    onChange={e => setFormData({ ...formData, title: e.target.value })}
-                                    required
-                                    placeholder="e.g. Master Advanced React Patterns"
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-medium text-gray-700">Description</label>
-                                <textarea
-                                    className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
-                                    rows="3"
-                                    value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Describe what you want to achieve..."
-                                    required
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <form onSubmit={handleSubmit} className="p-6 space-y-5">
                                 <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Priority</label>
-                                    <div className="relative">
-                                        <select
-                                            className="w-full h-10 pl-3 pr-8 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 outline-none appearance-none"
-                                            value={formData.priority}
-                                            onChange={e => setFormData({ ...formData, priority: e.target.value })}
-                                        >
-                                            <option value="low">Low Priority</option>
-                                            <option value="medium">Medium Priority</option>
-                                            <option value="high">High Priority</option>
-                                        </select>
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                            <Flag className="h-4 w-4 text-gray-400" />
-                                        </div>
-                                    </div>
+                                    <label className="text-sm font-medium text-gray-700">Goal Title</label>
+                                    <Input
+                                        className="bg-white"
+                                        value={formData.title}
+                                        onChange={e => setFormData({ ...formData, title: e.target.value })}
+                                        required
+                                        placeholder="e.g. Master Advanced React Patterns"
+                                    />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <label className="text-sm font-medium text-gray-700">Due Date</label>
-                                    <Input
-                                        type="date"
-                                        className="bg-white"
-                                        value={formData.due_date}
-                                        onChange={e => setFormData({ ...formData, due_date: e.target.value })}
+                                    <label className="text-sm font-medium text-gray-700">Description</label>
+                                    <textarea
+                                        className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
+                                        rows="3"
+                                        value={formData.description}
+                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Describe what you want to achieve..."
                                         required
                                     />
                                 </div>
-                            </div>
-                            <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-4">
-                                <Button type="button" onClick={() => setIsDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900">
-                                    Cancel
-                                </Button>
-                                <Button type="submit" disabled={isCreating} className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
-                                    {isCreating ? 'Creating...' : 'Create Goal'}
-                                </Button>
-                            </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium text-gray-700">Priority</label>
+                                        <div className="relative">
+                                            <select
+                                                className="w-full h-10 pl-3 pr-8 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 outline-none appearance-none"
+                                                value={formData.priority}
+                                                onChange={e => setFormData({ ...formData, priority: e.target.value })}
+                                            >
+                                                <option value="low">Low Priority</option>
+                                                <option value="medium">Medium Priority</option>
+                                                <option value="high">High Priority</option>
+                                            </select>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                                <Flag className="h-4 w-4 text-gray-400" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-medium text-gray-700">Due Date</label>
+                                        <Input
+                                            type="date"
+                                            className="bg-white"
+                                            value={formData.due_date}
+                                            onChange={e => setFormData({ ...formData, due_date: e.target.value })}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-4">
+                                    <Button type="button" onClick={() => setIsDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900">
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit" disabled={isCreating} className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
+                                        {isCreating ? 'Creating...' : 'Create Goal'}
+                                    </Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
             {isLoading ? (

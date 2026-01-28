@@ -1728,6 +1728,52 @@ export const api = createApi({
       query: ({ id, content }) => ({ url: `/bot/chats/${id}/send_message/`, method: 'POST', body: { content } }),
       invalidatesTags: ['ChatSession']
     }),
+
+    // ========== OVERTIME ==========
+    getOvertimeRequests: builder.query({
+      query: (params) => ({
+        url: '/attendance/overtime/',
+        params
+      }),
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
+      providesTags: ['Overtime']
+    }),
+    getMyOvertimeRequests: builder.query({
+      query: () => '/attendance/overtime/my_requests/',
+      transformResponse: (response) => {
+        if (Array.isArray(response)) return response;
+        if (response?.results && Array.isArray(response.results)) return response.results;
+        return [];
+      },
+      providesTags: ['Overtime']
+    }),
+    createOvertimeRequest: builder.mutation({
+      query: (body) => ({
+        url: '/attendance/overtime/',
+        method: 'POST',
+        body
+      }),
+      invalidatesTags: ['Overtime']
+    }),
+    approveOvertimeRequest: builder.mutation({
+      query: (id) => ({
+        url: `/attendance/overtime/${id}/approve/`,
+        method: 'POST'
+      }),
+      invalidatesTags: ['Overtime']
+    }),
+    rejectOvertimeRequest: builder.mutation({
+      query: ({ id, reason }) => ({
+        url: `/attendance/overtime/${id}/reject/`,
+        method: 'POST',
+        body: { reason }
+      }),
+      invalidatesTags: ['Overtime']
+    }),
   })
 });
 
@@ -1970,6 +2016,12 @@ export const {
   useGetChatSessionsQuery,
   useCreateChatSessionMutation,
   useSendChatMessageMutation,
+  // Overtime
+  useGetOvertimeRequestsQuery,
+  useGetMyOvertimeRequestsQuery,
+  useCreateOvertimeRequestMutation,
+  useApproveOvertimeRequestMutation,
+  useRejectOvertimeRequestMutation,
 } = api;
 
 export default api;

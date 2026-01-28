@@ -15,6 +15,7 @@ import {
     useGetMyAttendanceQuery,
     useGetAttendancePolicyQuery
 } from '../../store/api';
+import { exportToCSV } from '../../utils/exportUtils';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -122,6 +123,25 @@ const AttendancePage = () => {
     const formatDate = (date) => date.toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
+
+    const handleExport = () => {
+        if (!attendanceArray || attendanceArray.length === 0) {
+            toast.error("No data to export");
+            return;
+        }
+
+        const exportData = attendanceArray.map(record => ({
+            Date: record.date,
+            'Clock In': record.clock_in_time || '--:--',
+            'Clock Out': record.clock_out_time || '--:--',
+            Status: record.is_late ? 'Late' : 'On Time',
+            'Hours Worked': record.hours_worked || 0,
+            Notes: record.notes || ''
+        }));
+
+        exportToCSV(exportData, `attendance_history_${new Date().toISOString().split('T')[0]}`);
+        toast.success("Attendance history exported");
+    };
 
     return (
         <div className="space-y-10 pb-12">
@@ -258,7 +278,14 @@ const AttendancePage = () => {
                             Work History
                         </CardTitle>
                         <div className="flex gap-2">
-                            <Button variant="outline" size="sm" className="rounded-lg h-9 text-xs font-medium">Export</Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="rounded-lg h-9 text-xs font-medium"
+                                onClick={handleExport}
+                            >
+                                Export
+                            </Button>
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">

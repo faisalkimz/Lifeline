@@ -11,12 +11,36 @@ import {
     ArrowUpRight, Target, Flame, Timer, Coins, HardHat,
     Briefcase, MessageSquare, MoreVertical, Search
 } from 'lucide-react';
+import {
+    useGetMyOvertimeRequestsQuery,
+    useGetOvertimeRequestsQuery,
+    useCreateOvertimeRequestMutation,
+    useApproveOvertimeRequestMutation,
+    useRejectOvertimeRequestMutation,
+    useGetCurrentUserQuery
+} from '../../store/api';
+import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
 const OvertimePage = () => {
+    const { data: user } = useGetCurrentUserQuery();
+    const isManager = ['super_admin', 'company_admin', 'hr_manager', 'manager'].includes(user?.role);
+
     const [showForm, setShowForm] = useState(false);
     const [selectedOvertime, setSelectedOvertime] = useState(null);
+    const [rejectionReason, setRejectionReason] = useState('');
+
+    const { data: myRecords = [], isLoading: loadingMy } = useGetMyOvertimeRequestsQuery(undefined, {
+        skip: isManager && !user?.employee // If they are absolute admin with no employee, skip my_requests? No, backend handles it.
+    });
+    const { data: teamRecords = [], isLoading: loadingTeam } = useGetOvertimeRequestsQuery(undefined, {
+        skip: !isManager
+    });
+
+    const [createRequest, { isLoading: isCreating }] = useCreateOvertimeRequestMutation();
+    const [approveRecord, { isLoading: isApproving }] = useApproveOvertimeRequestMutation();
+    const [rejectRecord, { isLoading: isRejecting }] = useRejectOvertimeRequestMutation();
 
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
@@ -26,25 +50,8 @@ const OvertimePage = () => {
         project: ''
     });
 
-    const overtimeRecords = [
-        {
-            id: 1, date: '2025-12-15', start_time: '18:00', end_time: '22:00',
-            hours: 4, rate: 1.5, amount: 180000, reason: 'Neural link maintenance',
-            project: 'Infrastructure Alpha', status: 'approved',
-            submitted_date: '2025-12-16', approved_date: '2025-12-16'
-        },
-        {
-            id: 2, date: '2025-12-10', start_time: '17:30', end_time: '20:30',
-            hours: 3, rate: 1.5, amount: 135000, reason: 'Operational readiness prep',
-            project: 'Mission Q4', status: 'pending', submitted_date: '2025-12-11'
-        },
-        {
-            id: 3, date: '2025-11-28', start_time: '19:00', end_time: '23:00',
-            hours: 4, rate: 2.0, amount: 240000, reason: 'Holiday node support',
-            project: 'Grid Guard', status: 'approved',
-            submitted_date: '2025-11-29', approved_date: '2025-11-30'
-        }
-    ];
+    const records = isManager ? teamRecords : myRecords;
+    const isLoading = loadingMy || loadingTeam;
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -57,13 +64,47 @@ const OvertimePage = () => {
         const end = new Date(`2000-01-01T${formData.end_time}`);
         let diff = (end - start) / (1000 * 60 * 60);
         if (diff < 0) diff += 24;
-        return Math.max(0, diff);
+        return Math.max(0, diff).toFixed(1);
     };
 
-    const calculateAmount = () => {
-        const hours = calculateHours();
-        const baseRate = 75000;
-        return Math.round(hours * baseRate * 1.5);
+    const handleCreate = async (e) => {
+        e.preventDefault();
+        try {
+            await createRequest({
+                ...formData,
+                hours_requested: calculateHours()
+            }).unwrap();
+            toast.success("Overtime log committed to flux.");
+            setShowForm(false);
+            setFormData({ date: new Date().toISOString().split('T')[0], start_time: '', end_time: '', reason: '', project: '' });
+        } catch (e) {
+            toast.error(e?.data?.error || "Commit failed.");
+        }
+    };
+
+    const handleApprove = async () => {
+        try {
+            await approveRecord(selectedOvertime.id).unwrap();
+            toast.success("Manifest authorized.");
+            setSelectedOvertime(null);
+        } catch (e) {
+            toast.error("Authorization failed.");
+        }
+    };
+
+    const handleReject = async () => {
+        if (!rejectionReason) {
+            toast.error("Strategic justification required for rejection.");
+            return;
+        }
+        try {
+            await rejectRecord({ id: selectedOvertime.id, reason: rejectionReason }).unwrap();
+            toast.success("Manifest terminated.");
+            setSelectedOvertime(null);
+            setRejectionReason('');
+        } catch (e) {
+            toast.error("Termination failed.");
+        }
     };
 
     const formatCurrency = (value) => {
@@ -142,18 +183,23 @@ const OvertimePage = () => {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {overtimeRecords.map((record) => (
+                                        {isLoading ? (
+                                            <TableRow><TableCell colSpan={5} className="text-center py-20"><Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-500" /></TableCell></TableRow>
+                                        ) : records.length === 0 ? (
+                                            <TableRow><TableCell colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">No cycles detected in this sector.</TableCell></TableRow>
+                                        ) : records.map((record) => (
                                             <TableRow key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => setSelectedOvertime(record)}>
                                                 <TableCell className="px-12 py-8 font-black text-slate-900 italic">{new Date(record.date).toLocaleDateString()}</TableCell>
-                                                <TableCell className="px-12 py-8 font-bold text-slate-500 text-xs italic">{record.start_time} - {record.end_time} ({record.hours}H)</TableCell>
+                                                <TableCell className="px-12 py-8 font-bold text-slate-500 text-xs italic">{record.start_time} - {record.end_time} ({record.hours_requested}H)</TableCell>
                                                 <TableCell className="px-12 py-8">
-                                                    <Badge className="bg-slate-900 text-white border-none text-[8px] font-black italic px-3 py-1 rounded-full">{record.rate}x</Badge>
+                                                    <Badge className="bg-slate-900 text-white border-none text-[8px] font-black italic px-3 py-1 rounded-full">{record.overtime_rate || '1.1'}x</Badge>
                                                 </TableCell>
-                                                <TableCell className="px-12 py-8 text-right font-black text-emerald-500 italic">{formatCurrency(record.amount)}</TableCell>
+                                                <TableCell className="px-12 py-8 text-right font-black text-emerald-500 italic">{formatCurrency(record.estimated_amount || 0)}</TableCell>
                                                 <TableCell className="px-12 py-8 text-right">
                                                     <Badge className={cn(
                                                         "border-none text-[8px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full italic",
-                                                        record.status === 'approved' ? 'bg-emerald-500 text-white' : 'bg-amber-500 text-white'
+                                                        record.status === 'approved' ? 'bg-emerald-500 text-white' :
+                                                            record.status === 'rejected' ? 'bg-rose-500 text-white' : 'bg-amber-500 text-white'
                                                     )}>
                                                         {record.status}
                                                     </Badge>
@@ -209,7 +255,7 @@ const OvertimePage = () => {
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] mt-3 italic font-bold">Operational Performance Overclock</p>
                     </DialogHeader>
 
-                    <form className="p-12 space-y-8" onSubmit={(e) => { e.preventDefault(); setShowForm(false); }}>
+                    <form className="p-12 space-y-8" onSubmit={handleCreate}>
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-bold">Temporal Coord (Date)</label>
@@ -303,7 +349,38 @@ const OvertimePage = () => {
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Operational Justification</p>
                                 <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-4 border-emerald-500 pl-6 py-2">{selectedOvertime.reason}</p>
                             </div>
-                            <Button onClick={() => setSelectedOvertime(null)} className="w-full h-16 bg-slate-900 font-black uppercase tracking-widest rounded-2xl italic text-[10px]">CLOSE MANIFEST</Button>
+
+                            {isManager && selectedOvertime.status === 'pending' && (
+                                <div className="space-y-6 pt-6 border-t border-slate-100">
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Strategic Rejection Justification</label>
+                                        <textarea
+                                            className="w-full p-6 bg-slate-50 border-none rounded-[2rem] font-medium min-h-[100px] focus:ring-2 focus:ring-rose-500 outline-none text-slate-600 shadow-inner resize-none"
+                                            placeholder="Reason for termination..."
+                                            value={rejectionReason}
+                                            onChange={(e) => setRejectionReason(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <Button
+                                            onClick={handleReject}
+                                            disabled={isRejecting}
+                                            className="flex-1 h-16 bg-rose-500 hover:bg-rose-400 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl"
+                                        >
+                                            TERMINATE REQUEST
+                                        </Button>
+                                        <Button
+                                            onClick={handleApprove}
+                                            disabled={isApproving}
+                                            className="flex-1 h-16 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-widest text-[10px] rounded-2xl shadow-xl"
+                                        >
+                                            AUTHORIZE FLUX
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            <Button onClick={() => setSelectedOvertime(null)} variant="ghost" className="w-full h-16 text-slate-400 font-black uppercase tracking-widest rounded-2xl italic text-[10px]">CLOSE MANIFEST</Button>
                         </div>
                     )}
                 </DialogContent>

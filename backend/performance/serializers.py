@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import PerformanceCycle, Goal, PerformanceReview
 from employees.serializers import EmployeeSerializer
+from employees.models import Employee
 
 class PerformanceCycleSerializer(serializers.ModelSerializer):
     class Meta:
@@ -11,6 +12,7 @@ class PerformanceCycleSerializer(serializers.ModelSerializer):
 class GoalSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)
     cycle_name = serializers.CharField(source='cycle.name', read_only=True)
+    employee = serializers.PrimaryKeyRelatedField(queryset=Employee.objects.all(), required=False, allow_null=True)
 
     class Meta:
         model = Goal

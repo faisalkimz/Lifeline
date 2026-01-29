@@ -14,15 +14,16 @@ import {
     Calendar, Clock, CreditCard, FileText, ArrowRight,
     CheckCircle, AlertCircle, Activity, MapPin, ChevronRight, DollarSign, User
 } from 'lucide-react';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { Link } from 'react-router-dom';
 
 const EmployeeDashboard = () => {
     const user = useSelector(selectCurrentUser);
-    const { data: profile } = useGetMyProfileQuery();
-    const { data: todayAttendance } = useGetTodayAttendanceQuery();
-    const { data: leaveBalances } = useGetLeaveBalancesQuery();
-    const { data: leaveRequests } = useGetMyLeaveRequestsQuery();
-    const { data: payslipsData } = useGetPayslipsQuery();
+    const { data: profile, isLoading: isProfileLoading } = useGetMyProfileQuery();
+    const { data: todayAttendance, isLoading: isAttendanceLoading } = useGetTodayAttendanceQuery();
+    const { data: leaveBalances, isLoading: isLeaveLoading } = useGetLeaveBalancesQuery();
+    const { data: leaveRequests, isLoading: isRequestsLoading } = useGetMyLeaveRequestsQuery();
+    const { data: payslipsData, isLoading: isPayslipsLoading } = useGetPayslipsQuery();
 
     const payslips = (payslipsData?.results || payslipsData || []).slice(0, 3);
     const pendingRequestsCount = leaveRequests?.filter(r => r.status === 'pending').length || 0;
@@ -48,7 +49,8 @@ const EmployeeDashboard = () => {
             unit: 'days',
             icon: Calendar,
             color: 'text-primary-600',
-            bg: 'bg-primary-50'
+            bg: 'bg-primary-50',
+            loading: isLeaveLoading
         },
         {
             label: 'Attendance Status',
@@ -56,7 +58,8 @@ const EmployeeDashboard = () => {
             unit: '',
             icon: Activity,
             color: todayAttendance?.clock_in ? 'text-emerald-600' : 'text-slate-400',
-            bg: todayAttendance?.clock_in ? 'bg-emerald-50' : 'bg-slate-50'
+            bg: todayAttendance?.clock_in ? 'bg-emerald-50' : 'bg-slate-50',
+            loading: isAttendanceLoading
         },
         {
             label: 'Pending Requests',
@@ -64,7 +67,8 @@ const EmployeeDashboard = () => {
             unit: '',
             icon: AlertCircle,
             color: 'text-amber-600',
-            bg: 'bg-amber-50'
+            bg: 'bg-amber-50',
+            loading: isRequestsLoading
         },
     ];
 
@@ -84,11 +88,11 @@ const EmployeeDashboard = () => {
                         <div className="flex items-center gap-4 mt-2">
                             <div className="flex items-center gap-1.5 text-gray-500 text-sm font-semibold">
                                 <MapPin className="h-4 w-4 text-primary-500" />
-                                {profile?.job_title || 'Employee'}
+                                {isProfileLoading ? <Skeleton className="h-4 w-24" /> : (profile?.job_title || 'Employee')}
                             </div>
                             <div className="h-1 w-1 rounded-full bg-gray-300"></div>
                             <div className="text-primary-600 text-sm font-bold uppercase tracking-wider">
-                                {profile?.department_name || 'Staff Portal'}
+                                {isProfileLoading ? <Skeleton className="h-4 w-32" /> : (profile?.department_name || 'Staff Portal')}
                             </div>
                         </div>
                     </div>
@@ -113,9 +117,13 @@ const EmployeeDashboard = () => {
                             </div>
                             <div className="relative z-10">
                                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                                <h3 className="text-2xl font-black text-gray-900">
-                                    {stat.value} <span className="text-sm font-bold text-gray-400 uppercase">{stat.unit}</span>
-                                </h3>
+                                {stat.loading ? (
+                                    <Skeleton className="h-8 w-24" />
+                                ) : (
+                                    <h3 className="text-2xl font-black text-gray-900">
+                                        {stat.value} <span className="text-sm font-bold text-gray-400 uppercase">{stat.unit}</span>
+                                    </h3>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
@@ -164,24 +172,36 @@ const EmployeeDashboard = () => {
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Clock In</p>
                                     <div className="flex items-center gap-3">
                                         <div className={`h-3 w-3 rounded-full ${todayAttendance?.clock_in ? 'bg-emerald-500 animate-pulse' : 'bg-slate-200'}`}></div>
-                                        <p className="text-2xl font-black text-gray-900">
-                                            {todayAttendance?.clock_in ? new Date(todayAttendance.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                                        </p>
+                                        {isAttendanceLoading ? (
+                                            <Skeleton className="h-8 w-32" />
+                                        ) : (
+                                            <p className="text-2xl font-black text-gray-900">
+                                                {todayAttendance?.clock_in ? new Date(todayAttendance.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="space-y-2 border-l border-gray-100 pl-12 lg:pl-12">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Clock Out</p>
-                                    <p className="text-2xl font-black text-gray-300">
-                                        {todayAttendance?.clock_out ? new Date(todayAttendance.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
-                                    </p>
+                                    {isAttendanceLoading ? (
+                                        <Skeleton className="h-8 w-32" />
+                                    ) : (
+                                        <p className="text-2xl font-black text-gray-300">
+                                            {todayAttendance?.clock_out ? new Date(todayAttendance.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--'}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="hidden lg:block space-y-2 border-l border-gray-100 pl-12">
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Duty Status</p>
-                                    <p className="text-sm font-bold text-slate-500 mt-2">
-                                        {todayAttendance?.clock_in
-                                            ? todayAttendance?.clock_out ? "Shift Completed" : "Currently On Duty"
-                                            : "Awaiting Clock-in"}
-                                    </p>
+                                    {isAttendanceLoading ? (
+                                        <Skeleton className="h-5 w-40 mt-2" />
+                                    ) : (
+                                        <p className="text-sm font-bold text-slate-500 mt-2">
+                                            {todayAttendance?.clock_in
+                                                ? todayAttendance?.clock_out ? "Shift Completed" : "Currently On Duty"
+                                                : "Awaiting Clock-in"}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </CardContent>
@@ -202,7 +222,28 @@ const EmployeeDashboard = () => {
                         </div>
                         <CardContent className="p-0">
                             <div className="divide-y divide-gray-50">
-                                {payslips.length > 0 ? payslips.map((payslip, i) => (
+                                {isPayslipsLoading ? (
+                                    <div className="p-8 space-y-6">
+                                        {[1, 2].map(i => (
+                                            <div key={i} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-5">
+                                                    <Skeleton className="h-12 w-12 rounded-xl" />
+                                                    <div className="space-y-2">
+                                                        <Skeleton className="h-4 w-32" />
+                                                        <Skeleton className="h-3 w-20" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-6">
+                                                    <div className="space-y-2 text-right">
+                                                        <Skeleton className="h-4 w-24" />
+                                                        <Skeleton className="h-2 w-12 ml-auto" />
+                                                    </div>
+                                                    <Skeleton className="h-9 w-24 rounded-lg" />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : payslips.length > 0 ? payslips.map((payslip, i) => (
                                     <div key={payslip.id} className="px-8 py-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
                                         <div className="flex items-center gap-5">
                                             <div className="h-12 w-12 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100 group-hover:scale-110 transition-transform">
@@ -250,7 +291,17 @@ const EmployeeDashboard = () => {
                                 My Entitlements
                             </h3>
                             <div className="space-y-5">
-                                {leaveBalances?.map((balance, i) => (
+                                {isLeaveLoading ? (
+                                    [1, 2, 3].map(i => (
+                                        <div key={i} className="flex flex-col gap-2 p-4 bg-white/10 rounded-2xl border border-white/10">
+                                            <div className="flex justify-between items-center">
+                                                <Skeleton className="h-3 w-24 bg-white/20" />
+                                                <Skeleton className="h-6 w-12 bg-white/20" />
+                                            </div>
+                                            <Skeleton className="h-1.5 w-full bg-white/10 rounded-full" />
+                                        </div>
+                                    ))
+                                ) : leaveBalances?.map((balance, i) => (
                                     <div key={i} className="flex flex-col gap-2 p-4 bg-white/10 rounded-2xl border border-white/10 group/item">
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs font-bold text-white/80 uppercase tracking-tighter">{balance.leave_type_name || 'Annual Leave'}</span>
@@ -264,10 +315,10 @@ const EmployeeDashboard = () => {
                                         </div>
                                     </div>
                                 )) || (
-                                        <div className="text-center text-white/40 py-8 border border-dashed border-white/20 rounded-2xl">
-                                            <p className="text-xs font-bold uppercase tracking-widest">No balances found</p>
-                                        </div>
-                                    )}
+                                    <div className="text-center text-white/40 py-8 border border-dashed border-white/20 rounded-2xl">
+                                        <p className="text-xs font-bold uppercase tracking-widest">No balances found</p>
+                                    </div>
+                                )}
                             </div>
                             <Link to="/employee/leave">
                                 <Button className="w-full mt-8 bg-white text-slate-900 hover:bg-gray-100 border-none font-black uppercase tracking-widest py-6 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95">

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import {
     Laptop, Monitor, Smartphone, Box, Plus, Search, Filter,
-    MoreVertical, CheckCircle, AlertCircle, RefreshCw, User,
-    Calendar, RotateCcw, PenSquare, Trash2
+    User, CheckCircle, RefreshCw, RotateCcw, PenSquare, Trash2
 } from 'lucide-react';
 import {
     useGetAssetsQuery,
@@ -16,6 +15,7 @@ import {
     useCreateAssetCategoryMutation
 } from '../../store/api';
 import toast from 'react-hot-toast';
+import { Skeleton } from '../../components/ui/Skeleton';
 
 const AssetsPage = () => {
     const [activeTab, setActiveTab] = useState('inventory');
@@ -157,10 +157,10 @@ const AssetsPage = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard label="Total Assets" value={stats.total} icon={Box} color="bg-blue-500" />
-                <StatCard label="Assigned" value={stats.assigned} icon={User} color="bg-green-500" />
-                <StatCard label="Available" value={stats.available} icon={CheckCircle} color="bg-indigo-500" />
-                <StatCard label="Maintenance" value={stats.maintenance} icon={RefreshCw} color="bg-orange-500" />
+                <StatCard label="Total Assets" value={stats.total} icon={Box} color="bg-blue-500" loading={isLoading} />
+                <StatCard label="Assigned" value={stats.assigned} icon={User} color="bg-green-500" loading={isLoading} />
+                <StatCard label="Available" value={stats.available} icon={CheckCircle} color="bg-indigo-500" loading={isLoading} />
+                <StatCard label="Maintenance" value={stats.maintenance} icon={RefreshCw} color="bg-orange-500" loading={isLoading} />
             </div>
 
             {/* Main Content */}
@@ -224,7 +224,16 @@ const AssetsPage = () => {
                             </thead>
                             <tbody>
                                 {isLoading ? (
-                                    <tr><td colSpan="6" className="text-center py-8">Loading assets...</td></tr>
+                                    [...Array(5)].map((_, i) => (
+                                        <tr key={i}>
+                                            <td className="p-4"><div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-lg" /><div className="space-y-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div></td>
+                                            <td className="p-4"><Skeleton className="h-4 w-24" /></td>
+                                            <td className="p-4"><div className="space-y-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></td>
+                                            <td className="p-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
+                                            <td className="p-4"><div className="flex items-center gap-2"><Skeleton className="h-6 w-6 rounded-full" /><Skeleton className="h-4 w-24" /></div></td>
+                                            <td className="p-4"><div className="flex gap-2"><Skeleton className="h-8 w-8 rounded-md" /><Skeleton className="h-8 w-8 rounded-md" /></div></td>
+                                        </tr>
+                                    ))
                                 ) : filteredAssets?.length === 0 ? (
                                     <tr><td colSpan="6" className="text-center py-8 text-slate-500">No assets found</td></tr>
                                 ) : (
@@ -317,7 +326,15 @@ const AssetsPage = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {categoriesList.map(cat => (
+                                {isLoading ? (
+                                    [...Array(3)].map((_, i) => (
+                                        <tr key={i}>
+                                            <td className="p-4"><Skeleton className="h-5 w-48" /></td>
+                                            <td className="p-4"><Skeleton className="h-4 w-full" /></td>
+                                            <td className="p-4"><Skeleton className="h-6 w-16 rounded-full" /></td>
+                                        </tr>
+                                    ))
+                                ) : categoriesList.map(cat => (
                                     <tr key={cat.id}>
                                         <td className="font-medium text-slate-900 dark:text-white capitalize">{cat.name}</td>
                                         <td className="text-slate-500">{cat.description || '-'}</td>
@@ -452,14 +469,18 @@ const AssetsPage = () => {
     );
 };
 
-const StatCard = ({ label, value, icon: Icon, color }) => (
+const StatCard = ({ label, value, icon: Icon, color, loading }) => (
     <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
         <div className={`h-12 w-12 rounded-full ${color.replace('bg-', 'bg-').replace('500', '100')} dark:bg-opacity-20 flex items-center justify-center text-${color.replace('bg-', '')}`}>
             <Icon className={`h-6 w-6 text-${color.replace('bg-', 'text-')}`} />
         </div>
         <div>
             <p className="text-slate-500 dark:text-slate-400 text-sm">{label}</p>
-            <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+            {loading ? (
+                <Skeleton className="h-8 w-16 mt-1 rounded-md" />
+            ) : (
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
+            )}
         </div>
     </div>
 );

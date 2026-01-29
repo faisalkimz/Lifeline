@@ -21,12 +21,13 @@ import {
 } from '../../store/api';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
+import { Skeleton } from '../../components/ui/Skeleton';
 import { ROLES, PERMISSIONS, canAccess } from '../../utils/rbac';
 
 const DashboardPage = () => {
     const user = useSelector(selectCurrentUser);
     const { data: stats, isLoading: statsLoading } = useGetEmployeeStatsQuery();
-    const { data: leaveRequests } = useGetLeaveRequestsQuery({ status: 'pending' });
+    const { data: leaveRequests, isLoading: leaveLoading } = useGetLeaveRequestsQuery({ status: 'pending' });
     const { data: announcements, isLoading: announcementsLoading } = useGetAnnouncementsQuery();
 
     const [createAnnouncement, { isLoading: isCreatingAnnouncement }] = useCreateAnnouncementMutation();
@@ -122,6 +123,7 @@ const DashboardPage = () => {
                     change={isHRAdmin ? "+12% from last month" : null}
                     icon={Users}
                     color="blue"
+                    loading={statsLoading}
                 />
                 <StatCard
                     title="On Leave Today"
@@ -129,6 +131,7 @@ const DashboardPage = () => {
                     change={isHRAdmin ? "4 Returning tomorrow" : null}
                     icon={Calendar}
                     color="amber"
+                    loading={statsLoading}
                 />
                 <StatCard
                     title={isHRAdmin ? "Open Positions" : "Training Progress"}
@@ -136,6 +139,7 @@ const DashboardPage = () => {
                     change={isHRAdmin ? "2 Urgent roles" : "Keep it up!"}
                     icon={isHRAdmin ? Briefcase : Activity}
                     color="emerald"
+                    loading={statsLoading}
                 />
                 <StatCard
                     title="Pending Tasks"
@@ -143,6 +147,7 @@ const DashboardPage = () => {
                     change="Requires attention"
                     icon={Bell}
                     color="rose"
+                    loading={statsLoading || leaveLoading}
                 />
             </div>
 
@@ -165,7 +170,20 @@ const DashboardPage = () => {
                                 </Link>
                             </CardHeader>
                             <CardContent className="p-0">
-                                {pendingRequests.length > 0 ? (
+                                {leaveLoading ? (
+                                    <div className="p-6 space-y-4">
+                                        {[1, 2].map((i) => (
+                                            <div key={i} className="flex items-center gap-4">
+                                                <Skeleton className="h-12 w-12 rounded-full" />
+                                                <div className="space-y-2 flex-1">
+                                                    <Skeleton className="h-4 w-32" />
+                                                    <Skeleton className="h-3 w-24" />
+                                                </div>
+                                                <Skeleton className="h-9 w-20 rounded-lg" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : pendingRequests.length > 0 ? (
                                     <div className="divide-y divide-slate-50">
                                         {pendingRequests.slice(0, 4).map((request) => (
                                             <div key={request.id} className="p-6 hover:bg-slate-50/80 transition-colors group">
@@ -214,7 +232,17 @@ const DashboardPage = () => {
                                     <PieChart className="h-5 w-5 text-slate-400" />
                                 </div>
                                 <div className="space-y-4">
-                                    {stats?.departments ? (
+                                    {statsLoading ? (
+                                        [1, 2, 3, 4].map(i => (
+                                            <div key={i} className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <Skeleton className="h-2.5 w-2.5 rounded-full" />
+                                                    <Skeleton className="h-4 w-32" />
+                                                </div>
+                                                <Skeleton className="h-4 w-8" />
+                                            </div>
+                                        ))
+                                    ) : stats?.departments ? (
                                         Object.entries(stats.departments).slice(0, 4).map(([dept, count], idx) => (
                                             <div key={idx} className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
@@ -246,7 +274,12 @@ const DashboardPage = () => {
                                             {isHRAdmin ? "Payroll Status" : "My Performance"}
                                         </span>
                                     </div>
-                                    {isHRAdmin ? (
+                                    {statsLoading ? (
+                                        <div className="space-y-2">
+                                            <Skeleton className={cn("h-8 w-40", isHRAdmin ? "bg-indigo-400/30" : "")} />
+                                            <Skeleton className={cn("h-4 w-full max-w-[200px]", isHRAdmin ? "bg-indigo-400/30" : "")} />
+                                        </div>
+                                    ) : isHRAdmin ? (
                                         <>
                                             <h3 className="text-2xl font-bold">Upcoming Run</h3>
                                             <p className="text-indigo-100 text-sm mt-1">Ready for {new Date(new Date().getFullYear(), new Date().getMonth()).toLocaleString('default', { month: 'long' })}</p>
@@ -305,7 +338,13 @@ const DashboardPage = () => {
                             </div>
                             <div className="flex-1">
                                 <h4 className="font-bold text-slate-900 mb-1">Company Announcement</h4>
-                                {latestAnnouncement ? (
+                                {announcementsLoading ? (
+                                    <div className="space-y-2 mt-2">
+                                        <Skeleton className="h-5 w-3/4" />
+                                        <Skeleton className="h-4 w-full" />
+                                        <Skeleton className="h-4 w-1/2" />
+                                    </div>
+                                ) : latestAnnouncement ? (
                                     <>
                                         <h5 className='text-sm font-bold text-slate-700 mb-1 line-clamp-1'>{latestAnnouncement.title}</h5>
                                         <p className="text-sm text-slate-500 leading-relaxed line-clamp-2">
@@ -414,7 +453,7 @@ const DashboardPage = () => {
     );
 };
 
-const StatCard = ({ title, value, change, icon: Icon, color }) => {
+const StatCard = ({ title, value, change, icon: Icon, color, loading }) => {
     const colorClasses = {
         blue: "bg-blue-50 text-blue-600",
         emerald: "bg-emerald-50 text-emerald-600",
@@ -431,7 +470,7 @@ const StatCard = ({ title, value, change, icon: Icon, color }) => {
                 <div className={`p-3 rounded-2xl ${colorClasses[color]}`}>
                     <Icon className="h-6 w-6" />
                 </div>
-                {change && (
+                {loading ? null : change && (
                     <div className="flex items-center text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
                         <ArrowUpRight className="h-3 w-3 mr-1" />
                         <span className="text-slate-600">{change}</span>
@@ -439,7 +478,11 @@ const StatCard = ({ title, value, change, icon: Icon, color }) => {
                 )}
             </div>
             <div>
-                <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
+                {loading ? (
+                    <Skeleton className="h-9 w-24 mb-2" />
+                ) : (
+                    <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{value}</h3>
+                )}
                 <p className="text-sm font-medium text-slate-500 mt-1">{title}</p>
             </div>
         </motion.div>

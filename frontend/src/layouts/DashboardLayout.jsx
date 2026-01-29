@@ -11,7 +11,7 @@ import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, ClipboardCheck,
   Briefcase, BookOpen, Shield, FileText, Search, ChevronDown, HelpCircle,
-  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun, Laptop, Box, FileEdit, Heart, Globe
+  Building, LayoutGrid, ChevronRight, Activity, Zap, DollarSign, Moon, Sun, Laptop, Box, FileEdit, Heart, Globe, UserPlus
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import ChatWidget from '../components/common/ChatWidget';
@@ -67,6 +67,7 @@ const DashboardLayout = () => {
     { name: 'Training', href: '/training', icon: BookOpen },
     { name: 'Expenses', href: '/expenses', icon: DollarSign },
     { name: 'Benefits', href: '/benefits', icon: Shield },
+    { name: 'Onboarding', href: '/onboarding', icon: UserPlus, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
     { name: 'Documents', href: '/documents', icon: FileText },
     { name: 'Assets', href: '/assets', icon: Laptop, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },
     { name: 'Forms', href: '/forms', icon: FileEdit, roles: [ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER] },

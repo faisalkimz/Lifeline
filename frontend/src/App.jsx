@@ -38,6 +38,7 @@ import BenefitsAdminPage from './features/benefits/BenefitsAdminPage';
 import DocumentsPage from './features/documents/DocumentsPage';
 import SettingsPage from './features/settings/SettingsPage';
 import OffboardingPage from './features/offboarding/OffboardingPage';
+import OnboardingPage from './features/onboarding/OnboardingPage';
 import EmployeePortalLayout from './layouts/EmployeePortalLayout';
 import EmployeeDashboard from './features/employee-portal/EmployeeDashboard';
 import ExpensesPage from './features/payroll/ExpensesPage';
@@ -95,6 +96,7 @@ function App() {
           {/* HR & Admin Only Routes */}
           <Route element={<ProtectedRoute allowedRoles={[ROLES.SUPER_ADMIN, ROLES.COMPANY_ADMIN, ROLES.HR_MANAGER]} />}>
             <Route path="/analytics" element={<AnalyticsDashboard />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/employees/new" element={<EmployeeFormPage />} />
             <Route path="/employees/:id/edit" element={<EmployeeFormPage />} />
             <Route path="/departments" element={<DepartmentListPage />} />

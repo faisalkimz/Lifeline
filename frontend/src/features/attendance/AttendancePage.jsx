@@ -24,7 +24,7 @@ const AttendancePage = () => {
     const { data: todayStatus, refetch, isLoading: statusLoading } = useGetTodayAttendanceQuery(undefined, {
         pollingInterval: 30000
     });
-    const { data: attendancePolicy } = useGetAttendancePolicyQuery();
+    const { data: attendancePolicy, isLoading: isPolicyLoading } = useGetAttendancePolicyQuery();
     const { data: myAttendance } = useGetMyAttendanceQuery({ month: new Date().getMonth() + 1 });
     const [clockIn, { isLoading: isClockingIn }] = useClockInMutation();
     const [clockOut, { isLoading: isClockingOut }] = useClockOutMutation();
@@ -67,12 +67,13 @@ const AttendancePage = () => {
                 return;
             }
 
-            await clockIn({
+            const payload = {
                 notes: `Clocked in via portal`,
-                latitude: coords?.lat,
-                longitude: coords?.lng,
-                qr_token: qrTokenReq || undefined
-            }).unwrap();
+                ...(coords && { latitude: coords.lat, longitude: coords.lng }),
+                ...(qrTokenReq && { qr_token: qrTokenReq })
+            };
+
+            await clockIn(payload).unwrap();
 
             toast.success('Successfully clocked in.');
             setQrMode(false);
@@ -213,13 +214,13 @@ const AttendancePage = () => {
                                     ) : (
                                         <Button
                                             onClick={() => handleClockIn()}
-                                            disabled={isClockingIn}
-                                            className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-2xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-3"
+                                            disabled={isClockingIn || isPolicyLoading}
+                                            className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-2xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
-                                            {isClockingIn ? <Loader2 className="animate-spin h-5 w-5" /> : (
+                                            {isClockingIn || isPolicyLoading ? <Loader2 className="animate-spin h-5 w-5" /> : (
                                                 policy?.enable_qr_clock_in ? <QrCode className="h-5 w-5" /> : <Play className="fill-current h-5 w-5" />
                                             )}
-                                            {policy?.enable_qr_clock_in ? "Scan to Clock In" : "Clock In"}
+                                            {isPolicyLoading ? "Loading Policy..." : (policy?.enable_qr_clock_in ? "Scan to Clock In" : "Clock In")}
                                         </Button>
                                     )
                                 ) : todayStatus?.is_clocked_in ? (

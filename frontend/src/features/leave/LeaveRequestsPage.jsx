@@ -63,24 +63,45 @@ const LeaveRequestsPage = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (new Date(formData.end_date) < new Date(formData.start_date)) {
+        if (isSubmitting) return;
+
+        const start = new Date(formData.start_date);
+        const end = new Date(formData.end_date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Date logic checks
+        if (end < start) {
             toast.error('End date cannot be before start date');
+            return;
+        }
+
+        if (start < today) {
+            // Optional: Allow backdating? If not, uncomment line below
+            // toast.error('Cannot apply for leave in the past'); return;
+        }
+
+        // Check for overlapping requests
+        const hasOverlap = myRequests.some(req => {
+            if (['rejected', 'cancelled'].includes(req.status)) return false;
+            const reqStart = new Date(req.start_date);
+            const reqEnd = new Date(req.end_date);
+            return (start <= reqEnd && end >= reqStart);
+        });
+
+        if (hasOverlap) {
+            toast.error('You already have a leave request for this period');
             return;
         }
 
         // Check for sufficient balance
         if (balances) {
             const balance = balances.find(b => b.leave_type === parseInt(formData.leave_type));
-            // Only block if we found a balance record and it's zero or less.
-            // Some specialized leave types might not tracked in balances or behave differently, 
-            // but usually they should be there.
             if (balance && parseFloat(balance.available_days) <= 0) {
                 toast.error(`Insufficient leave balance. Available: ${parseFloat(balance.available_days).toFixed(1)} days.`);
                 return;
             }
         }
-
-        if (isSubmitting) return;
 
         try {
             const body = new FormData();

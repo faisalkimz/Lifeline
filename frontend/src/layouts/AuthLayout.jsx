@@ -1,77 +1,86 @@
 import React from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectIsAuthenticated } from '../features/auth/authSlice';
-import { Building2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import hero1 from '../assets/auth_hero_1.png';
+import hero2 from '../assets/auth_hero_2.png';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const AuthLayout = () => {
     const isAuthenticated = useSelector(selectIsAuthenticated);
+    const location = useLocation();
 
-    // Redirect to dashboard if already logged in
     if (isAuthenticated) {
         return <Navigate to="/dashboard" replace />;
     }
 
+    const isLogin = location.pathname === '/login';
+    const isRegister = location.pathname === '/register';
+
+    // Default to hero1 for login/other, hero2 for register
+    const currentImage = isRegister ? hero2 : hero1;
+
+    // Dynamic text content based on route
+    const heroContent = isRegister ? {
+        title: "Join the future of work.",
+        subtitle: "Experience the all-in-one platform that transforms how you manage your team, payroll, and culture."
+    } : {
+        title: "Welcome back.",
+        subtitle: "Your workspace is ready. detailed insights and management tools are just a click away."
+    };
+
     return (
-        <div className="min-h-screen w-full flex bg-white dark:bg-slate-950 transition-colors duration-500 overflow-hidden">
-            {/* Left Side - Brand & Marketing */}
-            <div className="hidden lg:flex lg:w-1/2 bg-primary-900 dark:bg-slate-900 relative overflow-hidden items-center justify-center p-12">
-                {/* Abstract Background Shapes */}
-                <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute -top-24 -right-24 w-[600px] h-[600px] bg-primary-500/20 rounded-full blur-[120px] animate-pulse"></div>
-                    <div className="absolute -bottom-24 -left-24 w-[600px] h-[600px] bg-emerald-500/20 rounded-full blur-[120px] animate-pulse delay-1000"></div>
-                </div>
-
-                <div className="relative z-10 max-w-lg text-center">
+        <div className="min-h-screen w-full flex bg-white dark:bg-slate-950 font-sans selection:bg-primary-500/30">
+            {/* Left Side - Immersive Hero */}
+            <div className="hidden lg:block lg:w-1/2 relative overflow-hidden bg-slate-900">
+                <AnimatePresence mode="wait">
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        key={location.pathname}
+                        initial={{ opacity: 0, scale: 1.1 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        className="mb-10 flex justify-center"
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute inset-0 z-0"
                     >
-                        <div className="h-24 w-24 bg-white/10 dark:bg-primary-500/10 rounded-[2rem] flex items-center justify-center backdrop-blur-xl border border-white/20 dark:border-primary-500/20 shadow-2xl">
-                            <Building2 className="h-12 w-12 text-white" />
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 z-10" />
+                        <div className="absolute inset-0 bg-primary-900/20 mix-blend-overlay z-10" />
+                        <img
+                            src={currentImage}
+                            alt="Auth Hero"
+                            className="w-full h-full object-cover"
+                        />
                     </motion.div>
+                </AnimatePresence>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2, duration: 0.8 }}
-                        className="text-5xl font-black text-white mb-8 tracking-tighter leading-[1.1]"
-                    >
-                        The Future of <br />
-                        <span className="text-primary-400">Workforce Management</span>
-                    </motion.h1>
+                <div className="absolute bottom-0 left-0 w-full p-16 z-20 text-white">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={location.pathname}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20 }}
+                            transition={{ delay: 0.3, duration: 0.8 }}
+                        >
+                            <h1 className="text-5xl font-black mb-6 tracking-tight leading-tight">
+                                {heroContent.title}
+                            </h1>
+                            <p className="text-slate-300 text-lg max-w-md leading-relaxed font-medium">
+                                {heroContent.subtitle}
+                            </p>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.4, duration: 0.8 }}
-                        className="text-primary-100/80 text-xl leading-relaxed font-medium"
-                    >
-                        Empower your team with Africa's most intuitive HR & Payroll system.
-                        Simplified, secure, and built for scale.
-                    </motion.p>
-
-                    {/* Trust Indicator */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1, duration: 1 }}
-                        className="mt-16 pt-10 border-t border-white/10"
-                    >
-                        <p className="text-[11px] text-primary-300 font-bold uppercase tracking-[0.3em]">
-                            Powering Enterprises Across Uganda
-                        </p>
-                    </motion.div>
+                            <div className="mt-8 flex gap-3">
+                                <div className="h-1.5 w-16 bg-primary-500 rounded-full" />
+                                <div className="h-1.5 w-4 bg-white/20 rounded-full" />
+                                <div className="h-1.5 w-4 bg-white/20 rounded-full" />
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </div>
 
-            {/* Right Side - Form Area */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 dark:bg-slate-950 p-6 sm:p-12">
-                <div className="w-full max-w-md">
+            {/* Right Side - Form Container */}
+            <div className="w-full lg:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-20 relative overflow-y-auto">
+                <div className="w-full max-w-[420px] mx-auto">
                     <Outlet />
                 </div>
             </div>

@@ -44,71 +44,50 @@ const ForgotPasswordPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                     >
-                        <div className="text-center mb-10">
-                            <motion.div
-                                initial={{ scale: 0, rotate: -20 }}
-                                animate={{ scale: 1, rotate: 0 }}
-                                className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 mb-4"
-                            >
-                                <Shield className="h-8 w-8" />
-                            </motion.div>
-                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Recovery Mode</h2>
-                            <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">We'll send a secure reset link to your email</p>
+                        <div className="text-center mb-8">
+                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Reset Password</h2>
+                            <p className="mt-2 text-slate-500 dark:text-slate-400 font-medium">
+                                Enter your email to receive recovery instructions.
+                            </p>
                         </div>
 
-                        <Card className="border-none shadow-none lg:shadow-xl lg:shadow-slate-200/50 dark:lg:shadow-none bg-transparent lg:bg-white dark:lg:bg-slate-900/50 lg:border border-slate-100 dark:border-slate-800 backdrop-blur-sm">
-                            <CardContent className="p-0 sm:p-8">
-                                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                                    <div className="space-y-2">
-                                        <Input
-                                            label="Email Address"
-                                            type="email"
-                                            placeholder="john@acme.com"
-                                            error={errors.email?.message}
-                                            {...register('email')}
-                                        />
-                                        <p className="text-xs text-slate-400 px-1 font-medium flex items-center gap-1.5">
-                                            <Mail className="h-3 w-3" />
-                                            Enter the email associated with your account
-                                        </p>
-                                    </div>
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                            <div className="space-y-2">
+                                <Input
+                                    label="Email Address"
+                                    type="email"
+                                    placeholder="john@acme.com"
+                                    error={errors.email?.message}
+                                    {...register('email')}
+                                    className="bg-slate-50 dark:bg-slate-900/50"
+                                />
+                            </div>
 
-                                    <div className="pt-2 space-y-3">
-                                        <Button
-                                            type="submit"
-                                            fullWidth
-                                            size="lg"
-                                            isLoading={isLoading}
-                                            className="rounded-xl h-14 font-black text-base shadow-xl dark:shadow-none bg-indigo-600 hover:bg-indigo-700"
-                                        >
-                                            Send Reset Link
-                                        </Button>
+                            <div className="pt-2 space-y-4">
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    size="xl"
+                                    isLoading={isLoading}
+                                    className="rounded-xl font-bold text-base shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/30 dark:shadow-none bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all"
+                                >
+                                    Send Instructions
+                                </Button>
 
-                                        <Link to="/login">
-                                            <Button
-                                                type="button"
-                                                variant="ghost"
-                                                fullWidth
-                                                size="lg"
-                                                className="rounded-xl h-12 font-bold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-                                            >
-                                                <ArrowLeft className="h-4 w-4 mr-2" />
-                                                Back to Sign In
-                                            </Button>
-                                        </Link>
-                                    </div>
-                                </form>
-                            </CardContent>
-
-                            <CardFooter className="flex justify-center p-8 border-t border-slate-50 dark:border-slate-800/50">
-                                <div className="text-center space-y-1">
-                                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Security Notice</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
-                                        For your protection, you'll only receive an email if your account exists.
-                                    </p>
-                                </div>
-                            </CardFooter>
-                        </Card>
+                                <Link to="/login" className="block">
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        fullWidth
+                                        size="lg"
+                                        className="rounded-xl font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                                    >
+                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                        Back to Sign In
+                                    </Button>
+                                </Link>
+                            </div>
+                        </form>
                     </motion.div>
                 ) : (
                     <motion.div

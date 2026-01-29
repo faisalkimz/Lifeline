@@ -108,7 +108,7 @@ const TrainingPage = () => {
                                         <Calendar className="h-4 w-4 mr-2" /> Schedule Session
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-xl bg-white rounded-xl shadow-xl border border-gray-100 p-0 overflow-hidden">
+                                <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                                     <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
                                         <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
                                             <Calendar className="h-6 w-6 text-gray-600" />
@@ -208,7 +208,7 @@ const TrainingPage = () => {
                                         <Plus className="h-4 w-4 mr-2" /> New Program
                                     </Button>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-xl bg-white rounded-xl shadow-xl border border-gray-100 p-0 overflow-hidden">
+                                <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                                     <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
                                         <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
                                             <BookOpen className="h-6 w-6 text-gray-600" />

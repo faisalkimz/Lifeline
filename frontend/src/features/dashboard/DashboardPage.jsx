@@ -383,7 +383,7 @@ const DashboardPage = () => {
             {/* Read Announcement Dialog */}
             <Dialog open={isAnnouncementOpen} onOpenChange={setIsAnnouncementOpen}>
                 {latestAnnouncement && (
-                    <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
+                    <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                         <DialogHeader className="p-8 pb-4 border-b border-slate-50">
                             <DialogTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
                                 <Megaphone className="h-6 w-6 text-rose-500" /> Announcement Details
@@ -410,7 +410,7 @@ const DashboardPage = () => {
 
             {/* Create Announcement Dialog */}
             <Dialog open={isCreateAnnouncementOpen} onOpenChange={setIsCreateAnnouncementOpen}>
-                <DialogContent className="max-w-xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
+                <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                     <DialogHeader className="p-8 pb-4 border-b border-slate-50">
                         <DialogTitle className="text-2xl font-bold text-slate-900">
                             New Announcement

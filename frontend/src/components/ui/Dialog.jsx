@@ -43,15 +43,15 @@ const DialogContent = ({ children, className = "" }) => {
     if (!open) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
             {/* Backdrop */}
             <div
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
                 onClick={() => onOpenChange?.(false)}
             />
 
             {/* Modal Content */}
-            <div className={`relative bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-800 animate-scale-in ${className}`}>
+            <div className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-800 animate-in fade-in zoom-in duration-200 ${className}`}>
                 {children}
             </div>
         </div>
@@ -59,7 +59,7 @@ const DialogContent = ({ children, className = "" }) => {
 };
 
 const DialogHeader = ({ children, className = "" }) => (
-    <div className={`px-6 py-4 border-b border-slate-100 dark:border-slate-800 ${className}`}>
+    <div className={`p-6 border-b border-slate-100 dark:border-slate-800 ${className}`}>
         {children}
     </div>
 );
@@ -77,7 +77,7 @@ const DialogDescription = ({ children, className = "" }) => (
 );
 
 const DialogFooter = ({ children, className = "" }) => (
-    <div className={`px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3 rounded-b-xl ${className}`}>
+    <div className={`p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3 rounded-b-2xl ${className}`}>
         {children}
     </div>
 );

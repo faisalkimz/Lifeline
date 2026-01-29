@@ -126,8 +126,8 @@ const LeaveApprovalPage = () => {
                             key={status}
                             onClick={() => setSelectedStatus(status)}
                             className={`px-4 py-2 rounded-md flex items-center gap-2 transition-all text-sm font-medium capitalize ${selectedStatus === status
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                                ? 'bg-blue-600 text-white'
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                                 }`}
                         >
                             {status === 'pending' && <Clock className="h-4 w-4" />}
@@ -177,7 +177,7 @@ const LeaveApprovalPage = () => {
                                                 </span>
                                             </div>
                                             <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full flex items-center justify-center border-2 border-white ${request.status === 'approved' ? 'bg-green-500' :
-                                                    request.status === 'rejected' ? 'bg-red-500' : 'bg-orange-500'
+                                                request.status === 'rejected' ? 'bg-red-500' : 'bg-orange-500'
                                                 }`}>
                                                 {request.status === 'approved' ? <CheckCircle className="h-3 w-3 text-white" /> :
                                                     request.status === 'rejected' ? <XCircle className="h-3 w-3 text-white" /> :
@@ -255,7 +255,7 @@ const LeaveApprovalPage = () => {
 
             {/* Approval Dialog */}
             <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
-                <DialogContent className="max-w-xl bg-white border border-gray-200 rounded-xl p-0 overflow-hidden">
+                <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                     <div className="p-6 border-b border-gray-100">
                         <DialogHeader>
                             <DialogTitle className="text-xl font-semibold text-gray-900">Approve Leave Request</DialogTitle>
@@ -296,7 +296,7 @@ const LeaveApprovalPage = () => {
 
             {/* Rejection Dialog */}
             <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
-                <DialogContent className="max-w-xl bg-white border border-gray-200 rounded-xl p-0 overflow-hidden">
+                <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                     <div className="p-6 border-b border-gray-100">
                         <DialogHeader>
                             <DialogTitle className="text-xl font-semibold text-gray-900">Reject Leave Request</DialogTitle>

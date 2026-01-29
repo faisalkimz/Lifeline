@@ -191,7 +191,7 @@ const GoalsSection = ({ user }) => {
                                 <Plus className="h-4 w-4 mr-2" /> New Goal
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-xl bg-white rounded-xl shadow-2xl border border-gray-100 p-0 overflow-hidden">
+                        <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                             <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
                                 <div className="h-12 w-12 rounded-xl bg-primary-50 flex items-center justify-center border border-primary-100 shadow-sm">
                                     <Target className="h-6 w-6 text-primary-600" />

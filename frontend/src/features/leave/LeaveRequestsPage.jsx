@@ -142,7 +142,7 @@ const LeaveRequestsPage = () => {
                                 Apply For Leave
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-xl bg-white border-0 rounded-3xl p-0 overflow-hidden shadow-2xl">
+                        <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
                             <div className="bg-slate-900 px-8 py-6 flex items-center gap-4 border-b border-slate-800">
                                 <div className="h-12 w-12 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/20 shadow-sm">
                                     <PlaneLanding className="h-6 w-6 text-primary-500" />

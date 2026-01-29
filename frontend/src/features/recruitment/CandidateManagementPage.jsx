@@ -133,7 +133,7 @@ const CandidateManagementPage = () => {
                             <Plus className="h-4 w-4 mr-2" /> Add Candidate
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl bg-white rounded-3xl p-0 overflow-hidden shadow-2xl">
+                    <DialogContent className="max-w-2xl bg-white p-0 overflow-hidden">
                         <DialogHeader className="p-8 pb-4 border-b border-slate-100">
                             <DialogTitle className="text-2xl font-bold text-slate-900">Add New Candidate</DialogTitle>
                         </DialogHeader>

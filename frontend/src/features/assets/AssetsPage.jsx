@@ -353,8 +353,8 @@ const AssetsPage = () => {
 
             {/* Add/Edit Asset Modal */}
             {isAddModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-lg p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
                         <h2 className="text-xl font-bold mb-4">{selectedAsset ? 'Edit Asset' : 'Add New Asset'}</h2>
                         <form onSubmit={handleCreateAsset} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
@@ -410,8 +410,8 @@ const AssetsPage = () => {
 
             {/* Assign Modal */}
             {isAssignModalOpen && selectedAsset && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
                         <h2 className="text-xl font-bold mb-1">Assign Asset</h2>
                         <p className="text-sm text-slate-500 mb-4">Assigning <strong>{selectedAsset.name}</strong> to an employee.</p>
 
@@ -445,8 +445,8 @@ const AssetsPage = () => {
 
             {/* Add Category Modal */}
             {isCategoryModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-md p-6 animate-fade-in border border-slate-200 dark:border-slate-800">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
                         <h2 className="text-xl font-bold mb-4">Create Asset Category</h2>
                         <form onSubmit={handleCreateCategory} className="space-y-4">
                             <div>

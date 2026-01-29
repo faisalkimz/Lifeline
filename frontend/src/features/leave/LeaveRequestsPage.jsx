@@ -48,7 +48,8 @@ const LeaveRequestsPage = () => {
     });
 
     const { data: leaveTypes } = useGetLeaveTypesQuery();
-    const [createRequest] = useCreateLeaveRequestMutation();
+    const { data: balances } = useGetLeaveBalancesQuery();
+    const [createRequest, { isLoading: isSubmitting }] = useCreateLeaveRequestMutation();
 
     const [formData, setFormData] = useState({
         leave_type: '',
@@ -61,6 +62,26 @@ const LeaveRequestsPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (new Date(formData.end_date) < new Date(formData.start_date)) {
+            toast.error('End date cannot be before start date');
+            return;
+        }
+
+        // Check for sufficient balance
+        if (balances) {
+            const balance = balances.find(b => b.leave_type === parseInt(formData.leave_type));
+            // Only block if we found a balance record and it's zero or less.
+            // Some specialized leave types might not tracked in balances or behave differently, 
+            // but usually they should be there.
+            if (balance && parseFloat(balance.available_days) <= 0) {
+                toast.error(`Insufficient leave balance. Available: ${parseFloat(balance.available_days).toFixed(1)} days.`);
+                return;
+            }
+        }
+
+        if (isSubmitting) return;
+
         try {
             const body = new FormData();
             body.append('leave_type', formData.leave_type);
@@ -75,7 +96,7 @@ const LeaveRequestsPage = () => {
             setIsDialogOpen(false);
             setFormData({ leave_type: '', start_date: '', end_date: '', reason: '', reliever: '', document: null });
         } catch (error) {
-            toast.error('Submission failed');
+            toast.error(error.data?.error || 'Submission failed');
         }
     };
 
@@ -182,9 +203,10 @@ const LeaveRequestsPage = () => {
                                     </Button>
                                     <Button
                                         type="submit"
-                                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black h-14 rounded-2xl shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all uppercase tracking-widest text-xs"
+                                        disabled={isSubmitting}
+                                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black h-14 rounded-2xl shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Submit Request
+                                        {isSubmitting ? 'Submitting...' : 'Submit Request'}
                                     </Button>
                                 </div>
                             </form>
@@ -246,6 +268,7 @@ const LeaveRequestsPage = () => {
 
                         <div className="overflow-x-auto">
                             <table className="w-full text-left border-collapse">
+                                .
                                 <thead>
                                     <tr className="bg-slate-50/70">
                                         <th className="px-6 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Employee</th>

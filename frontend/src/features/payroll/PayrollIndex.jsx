@@ -11,12 +11,7 @@ const PayrollIndex = () => {
 
     return (
         <div className="space-y-10 animate-in fade-in duration-700">
-            {/* Premium Header */}
-            <div className="relative group">
-                <div className="absolute -left-10 top-0 bottom-0 w-1 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 shadow-[0_0_15px_rgba(37,99,235,0.5)]"></div>
-                <h1 className="text-5xl font-black tracking-tighter text-slate-900 leading-none">Financial Operations</h1>
-                <p className="text-slate-500 mt-4 text-xl font-medium max-w-2xl">Manage organizational liquidity, payroll compliance, and employee compensation strategies in one unified command center.</p>
-            </div>
+            {/* Premium Header Removed as per user request to avoid redundancy */}
 
             {/* Navigation Tabs - Modern Segmented Control */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

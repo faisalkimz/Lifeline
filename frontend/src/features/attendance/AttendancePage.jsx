@@ -57,9 +57,9 @@ const AttendancePage = () => {
         try {
             let coords = null;
             if (policy?.enable_geofencing) {
-                toast.loading('Getting location...', { id: 'geo' });
+                toast.loading('Verifying location...', { id: 'geo' });
                 coords = await getLocation();
-                toast.success('Location verified.', { id: 'geo' });
+                toast.success('Location verified', { id: 'geo' });
             }
 
             if (policy?.enable_qr_clock_in && !qrTokenReq) {
@@ -74,14 +74,13 @@ const AttendancePage = () => {
             };
 
             await clockIn(payload).unwrap();
-
-            toast.success('Successfully clocked in.');
+            toast.success('Clocked in successfully');
             setQrMode(false);
             setQrCode('');
             refetch();
         } catch (error) {
             console.error(error);
-            const msg = error?.data?.error || error?.message || 'Failed to clock in.';
+            const msg = error?.data?.error || error?.message || 'Failed to clock in';
             toast.error(msg, { id: 'geo' });
         }
     };
@@ -99,10 +98,10 @@ const AttendancePage = () => {
                 longitude: coords?.lng
             }).unwrap();
 
-            toast.success('Successfully clocked out.');
+            toast.success('Clocked out successfully');
             refetch();
         } catch (error) {
-            toast.error(error?.data?.error || 'Failed to clock out.');
+            toast.error(error?.data?.error || 'Failed to clock out');
         }
     };
 
@@ -127,7 +126,7 @@ const AttendancePage = () => {
 
     const handleExport = () => {
         if (!attendanceArray || attendanceArray.length === 0) {
-            toast.error("No data to export");
+            toast.error("No records to export");
             return;
         }
 
@@ -136,200 +135,171 @@ const AttendancePage = () => {
             'Clock In': record.clock_in_time || '--:--',
             'Clock Out': record.clock_out_time || '--:--',
             Status: record.is_late ? 'Late' : 'On Time',
-            'Hours Worked': record.hours_worked || 0,
-            Notes: record.notes || ''
+            'Worked Hours': record.hours_worked || 0
         }));
 
-        exportToCSV(exportData, `attendance_history_${new Date().toISOString().split('T')[0]}`);
-        toast.success("Attendance history exported");
+        exportToCSV(exportData, `attendance_${new Date().toISOString().split('T')[0]}`);
+        toast.success("History exported");
     };
 
     return (
-        <div className="space-y-10 pb-12">
-            <div className="flex items-center justify-between">
+        <div className="space-y-8 pb-12 animate-fade-in">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Attendance</h1>
-                    <p className="text-slate-500 mt-2">Track your work hours, analyze your schedule, and manage your time effectively.</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Attendance</h1>
+                    <p className="text-slate-500 text-sm mt-1">Manage your daily work hours and check-in status.</p>
                 </div>
                 {['admin', 'hr_manager', 'company_admin'].includes(useSelector(state => state.auth.user?.role)) && (
                     <Button
                         onClick={() => window.location.href = '/attendance/admin'}
                         variant="outline"
-                        className="rounded-2xl border-slate-200 hover:bg-slate-50 text-slate-600 gap-2 h-12 shadow-sm"
+                        className="h-10 px-4 text-xs font-semibold uppercase tracking-wider border-slate-200"
                     >
-                        <Settings className="h-4 w-4" />
-                        Attendance Settings
+                        <Settings className="h-4 w-4 mr-2" />
+                        Admin View
                     </Button>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                {/* Clock Card */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Clocking Interface */}
                 <div className="lg:col-span-1 space-y-6">
-                    <Card className="rounded-[2.5rem] border-none shadow-2xl bg-slate-900 text-white p-8 relative overflow-hidden ring-1 ring-white/10">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mt-32 -mr-32 blur-3xl pointer-events-none"></div>
+                    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl">
+                        <CardContent className="p-8">
+                            <div className="flex flex-col items-center text-center space-y-6">
+                                <div className="p-4 bg-slate-50 rounded-full">
+                                    <Clock className="h-8 w-8 text-[#88B072]" />
+                                </div>
+                                <div>
+                                    <h2 className="text-4xl font-bold text-slate-900 tabular-nums">{formatTime(currentTime)}</h2>
+                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">{formatDate(currentTime)}</p>
+                                </div>
 
-                        <div className="relative z-10 flex flex-col items-center text-center space-y-8 py-4">
-                            <div>
-                                <h2 className="text-5xl font-bold tabular-nums tracking-tight">{formatTime(currentTime)}</h2>
-                                <p className="text-slate-400 font-medium mt-2">{formatDate(currentTime)}</p>
-                            </div>
-
-                            <div className="w-full">
-                                {statusLoading ? (
-                                    <div className="h-16 flex items-center justify-center">
-                                        <Loader2 className="h-8 w-8 text-white/50 animate-spin" />
-                                    </div>
-                                ) : !todayStatus?.is_clocked_in && !todayStatus?.clock_out ? (
-                                    qrMode ? (
-                                        <div className="space-y-4 animate-in fade-in zoom-in duration-300">
-                                            <div className="p-4 bg-white/10 rounded-2xl border border-white/20">
-                                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 text-center">Scan Office QR Code</p>
+                                <div className="w-full pt-4">
+                                    {statusLoading ? (
+                                        <div className="h-14 flex items-center justify-center">
+                                            <Loader2 className="h-6 w-6 text-slate-300 animate-spin" />
+                                        </div>
+                                    ) : !todayStatus?.is_clocked_in && !todayStatus?.clock_out ? (
+                                        qrMode ? (
+                                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
                                                 <input
                                                     type="text"
                                                     autoFocus
                                                     placeholder="Enter QR Token"
-                                                    className="w-full bg-slate-800 border border-white/10 rounded-xl px-4 py-3 text-center text-white placeholder:text-slate-600 focus:ring-2 focus:ring-emerald-500/50 outline-none"
+                                                    className="w-full bg-slate-50 border border-slate-100 rounded h-12 px-4 text-center text-sm font-semibold focus:border-[#88B072] outline-none"
                                                     value={qrCode}
                                                     onChange={e => setQrCode(e.target.value)}
                                                 />
+                                                <div className="flex gap-2">
+                                                    <Button variant="ghost" onClick={() => setQrMode(false)} className="flex-1 text-[10px] font-bold uppercase h-10 border-none">
+                                                        Cancel
+                                                    </Button>
+                                                    <Button onClick={() => handleClockIn(qrCode)} disabled={!qrCode || isClockingIn} className="flex-1 bg-[#88B072] hover:bg-[#7aa265] text-white text-[10px] font-bold uppercase h-10">
+                                                        {isClockingIn ? <Loader2 className="animate-spin h-4 w-4" /> : "Verify"}
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    onClick={() => setQrMode(false)}
-                                                    className="flex-1 text-white hover:bg-white/5"
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleClockIn(qrCode)}
-                                                    disabled={!qrCode || isClockingIn}
-                                                    className="flex-1 bg-emerald-500 hover:bg-emerald-400"
-                                                >
-                                                    {isClockingIn ? <Loader2 className="animate-spin h-5 w-5" /> : "Verify & Clock In"}
-                                                </Button>
+                                        ) : (
+                                            <Button
+                                                onClick={() => handleClockIn()}
+                                                disabled={isClockingIn || isPolicyLoading}
+                                                className="w-full h-14 bg-[#88B072] hover:bg-[#7aa265] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all"
+                                            >
+                                                {isClockingIn || isPolicyLoading ? <Loader2 className="animate-spin h-5 w-5" /> : (
+                                                    policy?.enable_qr_clock_in ? <QrCode className="h-5 w-5 mr-3" /> : <Play className="h-5 w-5 mr-3" />
+                                                )}
+                                                {policy?.enable_qr_clock_in ? "Scan to Clock In" : "Start Working"}
+                                            </Button>
+                                        )
+                                    ) : todayStatus?.is_clocked_in ? (
+                                        <div className="space-y-4">
+                                            <div className="p-4 bg-emerald-50 rounded border border-emerald-100">
+                                                <div className="flex items-center justify-center gap-2 mb-1 text-emerald-600">
+                                                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Active Shift</span>
+                                                </div>
+                                                <p className="text-[11px] text-emerald-500 font-medium">Started at {new Date(todayStatus.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                                             </div>
+                                            <Button
+                                                onClick={handleClockOut}
+                                                disabled={isClockingOut}
+                                                className="w-full h-12 bg-slate-900 text-white hover:bg-black text-[10px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-2"
+                                            >
+                                                {isClockingOut ? <Loader2 className="animate-spin h-4 w-4" /> : <Square className="h-4 w-4" />}
+                                                Clock Out
+                                            </Button>
                                         </div>
                                     ) : (
-                                        <Button
-                                            onClick={() => handleClockIn()}
-                                            disabled={isClockingIn || isPolicyLoading}
-                                            className="w-full h-16 bg-emerald-500 hover:bg-emerald-400 text-white text-lg font-bold rounded-2xl shadow-lg shadow-emerald-900/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
-                                        >
-                                            {isClockingIn || isPolicyLoading ? <Loader2 className="animate-spin h-5 w-5" /> : (
-                                                policy?.enable_qr_clock_in ? <QrCode className="h-5 w-5" /> : <Play className="fill-current h-5 w-5" />
-                                            )}
-                                            {isPolicyLoading ? "Loading Policy..." : (policy?.enable_qr_clock_in ? "Scan to Clock In" : "Clock In")}
-                                        </Button>
-                                    )
-                                ) : todayStatus?.is_clocked_in ? (
-                                    <div className="space-y-4">
-                                        <div className="bg-white/10 rounded-2xl p-4 border border-white/5">
-                                            <div className="flex items-center justify-center gap-2 mb-1">
-                                                <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                                                <span className="text-emerald-400 font-medium text-sm">Currently Working</span>
-                                            </div>
-                                            <p className="text-slate-400 text-xs">Started at {new Date(todayStatus.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-lg text-center">
+                                            <CheckCircle2 className="h-6 w-6 text-[#88B072] mx-auto mb-3" />
+                                            <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Shift Complete</h4>
+                                            <p className="text-[10px] text-slate-500 mt-1 uppercase">Today's hours recorded</p>
                                         </div>
-                                        <Button
-                                            onClick={handleClockOut}
-                                            disabled={isClockingOut}
-                                            className="w-full h-14 bg-white text-slate-900 hover:bg-slate-100 text-base font-bold rounded-2xl shadow-lg transition-all flex items-center justify-center gap-3"
-                                        >
-                                            {isClockingOut ? <Loader2 className="animate-spin h-5 w-5" /> : <Square className="fill-current h-5 w-5" />}
-                                            Clock Out
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="p-6 bg-white/10 border border-white/5 rounded-2xl text-center">
-                                        <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto mb-2" />
-                                        <p className="font-medium text-white">Shift Complete</p>
-                                        <p className="text-xs text-slate-400 mt-1">See you tomorrow!</p>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </CardContent>
                     </Card>
 
-                    {/* Stats Grid */}
                     <div className="grid grid-cols-2 gap-4">
-                        <Card className="p-5 rounded-3xl bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                            <div className="p-3 bg-blue-50 text-blue-600 rounded-xl mb-3">
-                                <Clock className="h-5 w-5" />
-                            </div>
+                        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
                             <p className="text-2xl font-bold text-slate-900">{Math.floor(stats.totalHrs)}h</p>
-                            <p className="text-xs font-medium text-slate-500">Total Hours</p>
-                        </Card>
-                        <Card className="p-5 rounded-3xl bg-white border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
-                            <div className="p-3 bg-purple-50 text-purple-600 rounded-xl mb-3">
-                                <Calendar className="h-5 w-5" />
-                            </div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Work Hours</p>
+                        </div>
+                        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
                             <p className="text-2xl font-bold text-slate-900">{stats.present}</p>
-                            <p className="text-xs font-medium text-slate-500">Days Present</p>
-                        </Card>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Days Present</p>
+                        </div>
                     </div>
                 </div>
 
-                {/* History Table */}
-                <Card className="lg:col-span-2 rounded-[2rem] border border-slate-200 bg-white shadow-sm overflow-hidden">
-                    <CardHeader className="p-8 pb-4 border-b border-slate-100 flex flex-row items-center justify-between">
-                        <CardTitle className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <History className="h-5 w-5 text-slate-400" />
-                            Work History
-                        </CardTitle>
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="rounded-lg h-9 text-xs font-medium"
-                                onClick={handleExport}
-                            >
-                                Export
-                            </Button>
+                {/* History */}
+                <Card className="lg:col-span-2 border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl">
+                    <CardHeader className="border-b border-slate-50 py-4 px-6 flex flex-row items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                <History className="h-4 w-4 text-slate-400" />
+                            </div>
+                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Attendance Log</h3>
                         </div>
+                        <Button variant="ghost" size="sm" onClick={handleExport} className="text-[10px] font-bold uppercase text-[#88B072]">
+                            Export CSV
+                        </Button>
                     </CardHeader>
                     <CardContent className="p-0">
                         {attendanceArray.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left border-collapse">
                                     <thead>
-                                        <tr className="bg-slate-50/50 border-b border-slate-100 text-xs uppercase font-bold text-slate-400 tracking-wider">
-                                            <th className="px-8 py-4">Date</th>
-                                            <th className="px-6 py-4">Check In</th>
-                                            <th className="px-6 py-4">Check Out</th>
-                                            <th className="px-6 py-4">Status</th>
-                                            <th className="px-6 py-4 text-right">Hours</th>
+                                        <tr className="bg-slate-50/50 border-b border-slate-100">
+                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock In</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock Out</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Hours</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-50">
                                         {attendanceArray.map((record, i) => (
-                                            <tr key={i} className="group hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-8 py-5">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="p-2 rounded-lg bg-slate-100 text-slate-500 group-hover:bg-white group-hover:shadow-sm transition-all">
-                                                            <Calendar className="h-4 w-4" />
-                                                        </div>
-                                                        <span className="font-medium text-slate-900 text-sm">
-                                                            {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
-                                                        </span>
-                                                    </div>
+                                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs font-bold text-slate-700 uppercase">
+                                                        {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
+                                                    </span>
                                                 </td>
-                                                <td className="px-6 py-5">
-                                                    <span className="text-sm font-medium text-slate-600">{record.clock_in_time || '--:--'}</span>
-                                                </td>
-                                                <td className="px-6 py-5">
-                                                    <span className="text-sm font-medium text-slate-600">{record.clock_out_time || '--:--'}</span>
-                                                </td>
-                                                <td className="px-6 py-5">
+                                                <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_in_time || '--:--'}</td>
+                                                <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_out_time || '--:--'}</td>
+                                                <td className="px-6 py-4">
                                                     {record.is_late ? (
-                                                        <Badge className="bg-amber-50 text-amber-600 border-amber-100">Late</Badge>
+                                                        <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
                                                     ) : (
-                                                        <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100">On Time</Badge>
+                                                        <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-5 text-right">
-                                                    <span className="text-sm font-bold text-slate-900">{record.hours_worked || 0}h</span>
+                                                <td className="px-6 py-4 text-right">
+                                                    <span className="text-xs font-bold text-slate-900">{record.hours_worked || 0}h</span>
                                                 </td>
                                             </tr>
                                         ))}
@@ -337,9 +307,9 @@ const AttendancePage = () => {
                                 </table>
                             </div>
                         ) : (
-                            <div className="py-20 text-center text-slate-400">
-                                <Calendar className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                                <p className="font-medium">No attendance records found</p>
+                            <div className="py-24 text-center">
+                                <Calendar className="h-10 w-10 text-slate-100 mx-auto mb-4" />
+                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">No activity recorded yet</p>
                             </div>
                         )}
                     </CardContent>

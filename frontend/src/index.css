@@ -7,18 +7,18 @@
 
 /* WorkPay-inspired Professional Color System */
 :root {
-  /* Primary - Emerald (WorkPay brand color) */
-  --color-primary-50: #ecfdf5;
-  --color-primary-100: #d1fae5;
-  --color-primary-200: #a7f3d0;
-  --color-primary-300: #6ee7b7;
-  --color-primary-400: #34d399;
-  --color-primary-500: #10b981;
-  --color-primary-600: #059669;
-  --color-primary-700: #047857;
-  --color-primary-800: #065f46;
-  --color-primary-900: #064e3b;
-  --color-primary-950: #022c22;
+  /* Primary - Professional Green (#88B072) */
+  --color-primary-50: #f4f7f1;
+  --color-primary-100: #e9efe3;
+  --color-primary-200: #d4e0cb;
+  --color-primary-300: #b9ccad;
+  --color-primary-400: #a2ba92;
+  --color-primary-500: #88B072;
+  --color-primary-600: #7aa265;
+  --color-primary-700: #6a8d58;
+  --color-primary-800: #5a784b;
+  --color-primary-900: #4a633e;
+  --color-primary-950: #2a3823;
 
   /* Neutral - Professional grays */
   --color-gray-50: #f9fafb;

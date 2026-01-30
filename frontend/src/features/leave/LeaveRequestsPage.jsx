@@ -127,108 +127,143 @@ const LeaveRequestsPage = () => {
     );
 
     return (
-        <div className="space-y-8 pb-20 animate-fade-in bg-[#F9FAFB] min-h-screen p-4 md:p-8">
+        <div className="space-y-8 pb-12 animate-fade-in">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 tracking-tight">Leave requests</h1>
-                    <p className="text-sm font-bold text-slate-400 mt-1 uppercase tracking-widest">Time & Absence Management</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Leave Requests</h1>
+                    <p className="text-slate-500 text-sm mt-1">Manage and track organization-wide time off.</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex items-center gap-3">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-primary-600 hover:bg-primary-700 text-white font-black px-6 rounded-xl shadow-xl shadow-primary-500/20 active:scale-95 transition-all">
+                            <Button className="bg-[#88B072] hover:bg-[#7aa265] text-white font-semibold h-10 px-4 rounded text-xs uppercase tracking-wider">
                                 <Plus className="h-4 w-4 mr-2" />
-                                Apply For Leave
+                                New Request
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
-                            <div className="bg-slate-900 px-8 py-6 flex items-center gap-4 border-b border-slate-800">
-                                <div className="h-12 w-12 rounded-xl bg-primary-500/10 flex items-center justify-center border border-primary-500/20 shadow-sm">
-                                    <PlaneLanding className="h-6 w-6 text-primary-500" />
-                                </div>
-                                <div className="text-white">
-                                    <DialogTitle className="text-2xl font-black tracking-tight tracking-tight">Plan your Time Off</DialogTitle>
-                                    <p className="text-slate-400 mt-1 font-bold text-sm uppercase tracking-widest">Absence submission</p>
-                                </div>
+                        <DialogContent className="max-w-2xl bg-white p-0 overflow-hidden rounded-lg">
+                            {/* Header */}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+                                <DialogTitle className="text-xl font-semibold text-slate-800">Request Leave</DialogTitle>
                             </div>
 
-                            <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Type of Leave</label>
-                                    <select
-                                        className="w-full h-14 pl-4 pr-10 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none appearance-none cursor-pointer transition-all"
-                                        value={formData.leave_type}
-                                        onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">Select leave type...</option>
-                                        {leaveTypes?.map(type => (
-                                            <option key={type.id} value={type.id}>{type.name}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                            <form onSubmit={handleSubmit} className="p-6">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {/* Form Fields Column */}
+                                    <div className="md:col-span-2 space-y-5">
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-700">
+                                                Leave Policy <span className="text-rose-500">*</span>
+                                            </label>
+                                            <select
+                                                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-md text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                                value={formData.leave_type}
+                                                onChange={e => setFormData({ ...formData, leave_type: e.target.value })}
+                                                required
+                                            >
+                                                <option value="">Search Policy</option>
+                                                {leaveTypes?.map(type => (
+                                                    <option key={type.id} value={type.id}>{type.name}</option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-                                <div className="grid grid-cols-2 gap-5">
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">From</label>
-                                        <Input
-                                            type="date"
-                                            className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
-                                            value={formData.start_date}
-                                            onChange={e => setFormData({ ...formData, start_date: e.target.value })}
-                                            required
-                                        />
+                                        <div className="flex items-center gap-3 py-1">
+                                            <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 cursor-pointer">
+                                                <span className="translate-x-1 inline-block h-4 w-4 rounded-full bg-white transition" />
+                                            </div>
+                                            <span className="text-sm text-slate-600 font-medium">Apply For A Half Day</span>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-700">
+                                                Start Date <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <Input
+                                                    type="date"
+                                                    className="h-11 bg-white border-slate-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal pr-10"
+                                                    value={formData.start_date}
+                                                    onChange={e => setFormData({ ...formData, start_date: e.target.value })}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-700">
+                                                Return Date <span className="text-rose-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                                <Input
+                                                    type="date"
+                                                    className="h-11 bg-white border-slate-300 rounded-md focus:ring-1 focus:ring-primary-500 focus:border-primary-500 font-normal pr-10"
+                                                    value={formData.end_date}
+                                                    onChange={e => setFormData({ ...formData, end_date: e.target.value })}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-700">Reliever</label>
+                                            <select
+                                                className="w-full h-11 px-3 bg-white border border-slate-300 rounded-md text-sm text-slate-700 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500"
+                                                value={formData.reliever}
+                                                onChange={e => setFormData({ ...formData, reliever: e.target.value })}
+                                            >
+                                                <option value="">Search Employees</option>
+                                                {/* This would normally be populated with employees */}
+                                            </select>
+                                            <p className="text-xs text-slate-500">Choose who will relieve you when you are away</p>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-700">Reason</label>
+                                            <textarea
+                                                className="w-full min-h-[100px] p-3 bg-white border border-slate-300 rounded-md text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none"
+                                                placeholder="Reason..."
+                                                value={formData.reason}
+                                                onChange={e => setFormData({ ...formData, reason: e.target.value })}
+                                                required
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">To</label>
-                                        <Input
-                                            type="date"
-                                            className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
-                                            value={formData.end_date}
-                                            onChange={e => setFormData({ ...formData, end_date: e.target.value })}
-                                            required
-                                        />
+
+                                    {/* Sidebar Column (Balances) */}
+                                    <div className="border-l border-slate-200 pl-6 hidden md:block space-y-4">
+                                        <div className="space-y-1">
+                                            <span className="text-xs text-slate-500">Original Leave days</span>
+                                            <p className="text-sm font-medium text-slate-700">0</p>
+                                        </div>
+                                        <div className="space-y-1 pb-4 border-b border-slate-100">
+                                            <span className="text-xs text-slate-500">Leave days used</span>
+                                            <p className="text-sm font-medium text-slate-700">0</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <span className="text-xs text-slate-500">Remaining balance</span>
+                                            <p className="text-sm font-medium text-slate-700">0</p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Reliever (Optional)</label>
-                                    <Input
-                                        placeholder="Who will cover your duties?"
-                                        className="h-14 bg-slate-50 border-slate-200 rounded-2xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
-                                        value={formData.reliever}
-                                        onChange={e => setFormData({ ...formData, reliever: e.target.value })}
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Reason</label>
-                                    <textarea
-                                        className="w-full min-h-[120px] p-5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 outline-none transition-all resize-none"
-                                        placeholder="Why are you taking leave?"
-                                        value={formData.reason}
-                                        onChange={e => setFormData({ ...formData, reason: e.target.value })}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="pt-4 flex gap-3 border-t border-slate-100">
-                                    <Button
+                                {/* Footer Buttons */}
+                                <div className="mt-8 flex justify-center gap-4">
+                                    <button
                                         type="button"
-                                        variant="ghost"
                                         onClick={() => setIsDialogOpen(false)}
-                                        className="h-14 px-8 text-slate-400 hover:text-slate-900 font-black rounded-2xl uppercase tracking-widest text-xs"
+                                        className="w-48 h-10 border border-green-600 text-green-600 hover:bg-green-50 font-medium rounded text-sm transition-colors uppercase"
                                     >
-                                        Cancel
-                                    </Button>
-                                    <Button
+                                        CANCEL
+                                    </button>
+                                    <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-black h-14 rounded-2xl shadow-xl shadow-slate-900/10 active:scale-[0.98] transition-all uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-48 h-10 bg-[#88B072] hover:bg-[#7aa265] text-white font-medium rounded text-sm transition-colors uppercase disabled:opacity-50"
                                     >
-                                        {isSubmitting ? 'Submitting...' : 'Submit Request'}
-                                    </Button>
+                                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                                    </button>
                                 </div>
                             </form>
                         </DialogContent>
@@ -237,9 +272,9 @@ const LeaveRequestsPage = () => {
                         <Button
                             variant="outline"
                             onClick={() => { setSelectedType(null); setShowTypeModal(true); }}
-                            className="bg-white border-slate-200 text-slate-700 font-black rounded-xl hover:bg-slate-50 shadow-sm transition-all"
+                            className="h-10 px-4 text-xs font-semibold uppercase tracking-wider border-slate-200"
                         >
-                            <Settings2 className="h-4 w-4 mr-2 text-slate-400" />
+                            <Settings2 className="h-4 w-4 mr-2" />
                             Policy Setup
                         </Button>
                     )}
@@ -247,13 +282,13 @@ const LeaveRequestsPage = () => {
             </div>
 
             {/* Status Tabs */}
-            <div className="flex gap-1 p-1.5 bg-white rounded-2xl border border-slate-200 shadow-sm w-fit overflow-x-auto scrollbar-hide">
+            <div className="flex gap-1 p-1 bg-white rounded border border-slate-200 w-fit overflow-x-auto">
                 {['submitted', 'approved', 'active', 'disapproved', 'attended', 'cancelled', 'all'].map(status => (
                     <button
                         key={status}
                         onClick={() => setActiveTab(status)}
-                        className={`px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === status
-                            ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
+                        className={`px-4 py-2 rounded text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${activeTab === status
+                            ? 'bg-slate-900 text-white'
                             : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
                     >
                         {status} {status === 'submitted' && <span className="ml-1 opacity-50">({allRequests.filter(r => r.status === 'pending').length})</span>}
@@ -261,26 +296,26 @@ const LeaveRequestsPage = () => {
                 ))}
             </div>
 
-            {/* Leave Balances Horizontal Section */}
+            {/* Leave Balances Section */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between px-1">
-                    <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest italic">Personal Entitlements</h2>
+                <div className="flex items-center gap-2">
+                    <BarChart3 className="h-4 w-4 text-[#88B072]" />
+                    <h2 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Time-off Entitlements</h2>
                 </div>
                 <LeaveBalances />
             </div>
 
-            {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Requests Table */}
+                {/* Requests Log */}
                 <div className="lg:col-span-3 space-y-6">
-                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden bg-white">
+                    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden">
                         <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                            <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">Request Log</h2>
+                            <h2 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Leave History</h2>
                             <div className="relative w-full md:w-80">
-                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                                 <Input
-                                    placeholder="Search entries..."
-                                    className="bg-slate-50/50 h-11 pl-12 border-slate-100 rounded-xl focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 font-bold"
+                                    placeholder="Search request log..."
+                                    className="bg-slate-50/50 h-10 pl-11 border-slate-100 rounded text-xs focus:ring-0 focus:border-[#88B072]"
                                     value={searchTerm}
                                     onChange={e => setSearchTerm(e.target.value)}
                                 />
@@ -303,37 +338,37 @@ const LeaveRequestsPage = () => {
                                 <tbody>
                                     {displayedRequests.length > 0 ? (
                                         displayedRequests.map((req) => (
-                                            <tr key={req.id} className="hover:bg-slate-50/30 transition-colors group">
-                                                <td className="px-6 py-5 border-b border-slate-50">
+                                            <tr key={req.id} className="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                                                <td className="px-6 py-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="h-9 w-9 rounded-xl bg-slate-100 flex items-center justify-center font-black text-slate-900 text-xs uppercase border border-slate-200">
+                                                        <div className="h-8 w-8 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-500 uppercase">
                                                             {req.employee_name?.split(' ').map(n => n[0]).join('')}
                                                         </div>
-                                                        <span className="font-bold text-slate-900 text-sm whitespace-nowrap">{req.employee_name}</span>
+                                                        <span className="text-xs font-bold text-slate-700">{req.employee_name}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-5 border-b border-slate-50">
-                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-tight">{req.leave_type_name}</span>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{req.leave_type_name}</span>
                                                 </td>
-                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                <td className="px-6 py-4">
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm font-bold text-slate-700">{new Date(req.start_date).toLocaleDateString()}</span>
-                                                        <span className="text-[10px] font-bold text-slate-400 uppercase">to {new Date(req.end_date).toLocaleDateString()}</span>
+                                                        <span className="text-xs font-semibold text-slate-600">{new Date(req.start_date).toLocaleDateString()}</span>
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">until {new Date(req.end_date).toLocaleDateString()}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-5 border-b border-slate-50">
+                                                <td className="px-6 py-4">
                                                     <div className="flex items-center gap-2">
-                                                        <Clock className="h-3.5 w-3.5 text-primary-500" />
-                                                        <span className="text-sm font-black text-slate-900">{parseFloat(req.days_requested).toFixed(0)} Days</span>
+                                                        <Clock className="h-3.5 w-3.5 text-[#88B072]" />
+                                                        <span className="text-xs font-bold text-slate-700">{parseFloat(req.days_requested).toFixed(0)} d</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-5 border-b border-slate-50">
-                                                    <span className="text-sm font-bold text-slate-500 italic">{req.reliever_name || 'N/A'}</span>
+                                                <td className="px-6 py-4">
+                                                    <span className="text-xs text-slate-500 italic">{req.reliever_name || '--'}</span>
                                                 </td>
-                                                <td className="px-6 py-5 border-b border-slate-50">
-                                                    <span className={`inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${req.status === 'approved' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm shadow-emerald-500/5' :
-                                                        req.status === 'rejected' ? 'bg-rose-50 text-rose-600 border border-rose-100 shadow-sm shadow-rose-500/5' :
-                                                            'bg-amber-50 text-amber-600 border border-amber-100 shadow-sm shadow-amber-500/5'
+                                                <td className="px-6 py-4">
+                                                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest ${req.status === 'approved' ? 'bg-emerald-50 text-emerald-600' :
+                                                        req.status === 'rejected' ? 'bg-rose-50 text-rose-600' :
+                                                            'bg-amber-50 text-amber-600'
                                                         }`}>
                                                         {req.status}
                                                     </span>
@@ -378,88 +413,89 @@ const LeaveRequestsPage = () => {
                         </div>
                     </Card>
 
-                    {/* My Leave Requests Section */}
+                    {/* Sidebar: Requests Summary */}
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">My Leave Requests</h3>
-                            <div className="h-px flex-1 bg-slate-100 mx-6" />
+                            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-widest">My Recent Requests</h3>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {myRequests.slice(0, 3).map(req => (
-                                <motion.div key={req.id} whileHover={{ y: -5 }} className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                                <div key={req.id} className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all group">
                                     <div className="flex justify-between items-start mb-4">
-                                        <div className="p-3 bg-primary-50 rounded-2xl">
-                                            <Calendar className="h-5 w-5 text-primary-600" />
+                                        <div className="h-8 w-8 rounded bg-slate-50 border border-slate-100 flex items-center justify-center">
+                                            <Calendar className="h-4 w-4 text-[#88B072]" />
                                         </div>
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${req.status === 'approved' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-white'
+                                        <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${req.status === 'approved' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
                                             }`}>{req.status}</span>
                                     </div>
-                                    <h4 className="font-bold text-slate-900 text-lg mb-1">{req.leave_type_name}</h4>
-                                    <p className="text-xs font-black text-slate-400 mb-4">{new Date(req.start_date).toLocaleDateString()} - {new Date(req.end_date).toLocaleDateString()}</p>
-                                    <div className="pt-4 border-t border-slate-50 flex items-center justify-between">
-                                        <span className="text-sm font-black text-slate-900 italic">"{req.reason.substring(0, 20)}..."</span>
-                                        <div className="flex items-center gap-1 text-primary-600 font-black">
-                                            <span className="text-lg">{parseFloat(req.days_requested).toFixed(0)}</span>
-                                            <span className="text-[10px] uppercase">Days</span>
+                                    <h4 className="font-bold text-slate-800 text-sm mb-1">{req.leave_type_name}</h4>
+                                    <p className="text-[10px] text-slate-400 mb-4">{new Date(req.start_date).toLocaleDateString()} - {new Date(req.end_date).toLocaleDateString()}</p>
+                                    <div className="pt-3 border-t border-slate-50 flex items-center justify-between">
+                                        <span className="text-[10px] text-slate-500 italic max-w-[120px] truncate">"{req.reason}"</span>
+                                        <div className="flex items-center gap-1 text-[#88B072] font-bold">
+                                            <span className="text-sm">{parseFloat(req.days_requested).toFixed(0)}</span>
+                                            <span className="text-[9px] uppercase">Days</span>
                                         </div>
                                     </div>
-                                </motion.div>
+                                </div>
                             ))}
                         </div>
                     </div>
                 </div>
 
-                {/* Sidebar Calendar & Employees on Leave */}
-                <div className="lg:col-span-1 space-y-8">
-                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl p-6 bg-white overflow-hidden relative">
-                        <div className="relative z-10 flex flex-col gap-6">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Other Employees on Leave</h3>
-                                <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                            </div>
-
-                            <div className="space-y-6">
+                {/* Sidebar: Calendar & Holidays */}
+                <div className="lg:col-span-1 space-y-6">
+                    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl">
+                        <CardContent className="p-6">
+                            <div className="flex flex-col gap-6">
                                 <div className="flex items-center justify-between">
-                                    <h4 className="text-2xl font-black text-slate-900 tracking-tight">January 2026</h4>
-                                    <div className="flex gap-2">
-                                        <button className="h-8 w-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all font-black text-lg">&lt;</button>
-                                        <button className="h-8 w-8 rounded-lg border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all font-black text-lg">&gt;</button>
-                                    </div>
+                                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Absence Calendar</h3>
+                                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                                 </div>
-                                <LeaveCalendar mini={true} />
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-bold text-slate-800">January 2026</h4>
+                                        <div className="flex gap-1">
+                                            <button className="h-6 w-6 rounded border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all text-xs">←</button>
+                                            <button className="h-6 w-6 rounded border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-all text-xs">→</button>
+                                        </div>
+                                    </div>
+                                    <LeaveCalendar mini={true} />
+                                </div>
                             </div>
-                        </div>
+                        </CardContent>
                     </Card>
 
-                    <Card className="border-0 shadow-xl shadow-slate-200/50 rounded-3xl p-8 bg-slate-900 text-white relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-all">
-                            <Info className="h-40 w-40" />
-                        </div>
-                        <div className="relative space-y-6">
-                            <h4 className="text-xl font-black tracking-tight leading-tight italic">Upcoming Public Holidays</h4>
-                            <div className="space-y-4">
-                                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10">
-                                    <div className="h-10 w-10 bg-primary-500 text-white rounded-xl flex flex-col items-center justify-center font-black leading-none">
-                                        <span className="text-[10px] uppercase">Jan</span>
-                                        <span className="text-lg">26</span>
+                    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl group">
+                        <CardContent className="p-6 space-y-6">
+                            <div className="flex items-center gap-2">
+                                <Info className="h-4 w-4 text-[#88B072]" />
+                                <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Public Holidays</h4>
+                            </div>
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100 group-hover:border-[#88B072]/30 transition-colors">
+                                    <div className="h-8 w-8 bg-[#88B072] text-white rounded flex flex-col items-center justify-center font-bold leading-none">
+                                        <span className="text-[7px] uppercase">Jan</span>
+                                        <span className="text-xs">26</span>
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm">NRM Liberation Day</p>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National Holiday</p>
+                                        <p className="font-bold text-xs text-slate-800">NRM Liberation Day</p>
+                                        <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">National Holiday</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 p-4 bg-white/5 rounded-2xl border border-white/10 opacity-50">
-                                    <div className="h-10 w-10 bg-slate-700 text-white rounded-xl flex flex-col items-center justify-center font-black leading-none">
-                                        <span className="text-[10px] uppercase">Feb</span>
-                                        <span className="text-lg">16</span>
+                                <div className="flex items-center gap-3 p-3 bg-slate-50/50 rounded-lg border border-slate-100 opacity-60">
+                                    <div className="h-8 w-8 bg-slate-300 text-white rounded flex flex-col items-center justify-center font-bold leading-none">
+                                        <span className="text-[7px] uppercase">Feb</span>
+                                        <span className="text-xs">16</span>
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm">Archbishop Janani Luwum Day</p>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National Holiday</p>
+                                        <p className="font-bold text-xs text-slate-800">Janani Luwum Day</p>
+                                        <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">National Holiday</p>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </CardContent>
                     </Card>
                 </div>
             </div>

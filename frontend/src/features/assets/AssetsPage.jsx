@@ -353,42 +353,97 @@ const AssetsPage = () => {
 
             {/* Add/Edit Asset Modal */}
             {isAddModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
-                        <h2 className="text-xl font-bold mb-4">{selectedAsset ? 'Edit Asset' : 'Add New Asset'}</h2>
-                        <form onSubmit={handleCreateAsset} className="space-y-4">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                {selectedAsset ? 'Edit Asset' : 'Add New Asset'}
+                            </h2>
+                            <button
+                                onClick={() => setIsAddModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleCreateAsset} className="p-6 space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Name *</label>
-                                    <input name="name" required defaultValue={selectedAsset?.name} className="input-workpay" placeholder="e.g. MacBook Pro" />
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Asset Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        name="name"
+                                        required
+                                        defaultValue={selectedAsset?.name}
+                                        className="input-workpay"
+                                        placeholder="e.g. MacBook Pro"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Category
+                                    </label>
                                     <select name="category" defaultValue={selectedAsset?.category} className="input-workpay">
                                         <option value="">Select Category</option>
                                         {categoriesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Serial Number</label>
-                                    <input name="serial_number" defaultValue={selectedAsset?.serial_number} className="input-workpay" placeholder="S/N 12345" />
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Serial Number
+                                    </label>
+                                    <input
+                                        name="serial_number"
+                                        defaultValue={selectedAsset?.serial_number}
+                                        className="input-workpay"
+                                        placeholder="S/N 12345"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Asset Tag</label>
-                                    <input name="asset_tag" defaultValue={selectedAsset?.asset_tag} className="input-workpay" placeholder="TAG-001" />
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Asset Tag
+                                    </label>
+                                    <input
+                                        name="asset_tag"
+                                        defaultValue={selectedAsset?.asset_tag}
+                                        className="input-workpay"
+                                        placeholder="TAG-001"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Purchase Date</label>
-                                    <input name="purchase_date" type="date" defaultValue={selectedAsset?.purchase_date} className="input-workpay" />
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Purchase Date
+                                    </label>
+                                    <input
+                                        name="purchase_date"
+                                        type="date"
+                                        defaultValue={selectedAsset?.purchase_date}
+                                        className="input-workpay"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Cost (UGX)</label>
-                                    <input name="purchase_cost" type="number" defaultValue={selectedAsset?.purchase_cost} className="input-workpay" />
+                                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                        Cost (UGX)
+                                    </label>
+                                    <input
+                                        name="purchase_cost"
+                                        type="number"
+                                        defaultValue={selectedAsset?.purchase_cost}
+                                        className="input-workpay"
+                                        placeholder="1500000"
+                                    />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Condition</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Condition
+                                </label>
                                 <select name="condition" defaultValue={selectedAsset?.condition || 'new'} className="input-workpay">
                                     <option value="new">New</option>
                                     <option value="excellent">Excellent</option>
@@ -399,9 +454,21 @@ const AssetsPage = () => {
                                 </select>
                             </div>
 
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="btn-workpay-secondary">Cancel</button>
-                                <button type="submit" className="btn-workpay-primary">Save Asset</button>
+                            {/* Footer Buttons */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddModalOpen(false)}
+                                    className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -410,33 +477,81 @@ const AssetsPage = () => {
 
             {/* Assign Modal */}
             {isAssignModalOpen && selectedAsset && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
-                        <h2 className="text-xl font-bold mb-1">Assign Asset</h2>
-                        <p className="text-sm text-slate-500 mb-4">Assigning <strong>{selectedAsset.name}</strong> to an employee.</p>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                Assign Asset
+                            </h2>
+                            <button
+                                onClick={() => setIsAssignModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
 
-                        <form onSubmit={handleAssign} className="space-y-4">
+                        <form onSubmit={handleAssign} className="p-6 space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Select Employee *</label>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Employee <span className="text-red-500">*</span>
+                                </label>
                                 <select name="employee_id" required className="input-workpay">
-                                    <option value="">-- Choose Employee --</option>
+                                    <option value="">Search Employees</option>
                                     {employees?.map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
+                                        <option key={emp.id} value={emp.id}>
+                                            {emp.first_name} {emp.last_name}
+                                        </option>
                                     ))}
                                 </select>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Assignment Date</label>
-                                <input name="assigned_date" type="date" required defaultValue={new Date().toISOString().split('T')[0]} className="input-workpay" />
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Notes (Optional)</label>
-                                <textarea name="notes" rows="3" className="input-workpay" placeholder="Any specific notes upon checkout..." />
+                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                    Choose who will be assigned this asset
+                                </p>
                             </div>
 
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button type="button" onClick={() => setIsAssignModalOpen(false)} className="btn-workpay-secondary">Cancel</button>
-                                <button type="submit" className="btn-workpay-primary">Confirm Assignment</button>
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Assignment Date <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    name="assigned_date"
+                                    type="date"
+                                    required
+                                    defaultValue={new Date().toISOString().split('T')[0]}
+                                    className="input-workpay"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Notes
+                                </label>
+                                <textarea
+                                    name="notes"
+                                    rows="3"
+                                    className="input-workpay"
+                                    placeholder="Any specific notes..."
+                                ></textarea>
+                            </div>
+
+                            {/* Footer Buttons */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAssignModalOpen(false)}
+                                    className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -445,21 +560,62 @@ const AssetsPage = () => {
 
             {/* Add Category Modal */}
             {isCategoryModalOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-200 border border-slate-200 dark:border-slate-800">
-                        <h2 className="text-xl font-bold mb-4">Create Asset Category</h2>
-                        <form onSubmit={handleCreateCategory} className="space-y-4">
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                                Create Category
+                            </h2>
+                            <button
+                                onClick={() => setIsCategoryModalOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleCreateCategory} className="p-6 space-y-4">
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Category Name *</label>
-                                <input name="name" required className="input-workpay" placeholder="e.g. Laptops, Furniture" />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Category Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    name="name"
+                                    required
+                                    className="input-workpay"
+                                    placeholder="e.g. Laptops, Furniture"
+                                />
                             </div>
                             <div>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
-                                <textarea name="description" rows="3" className="input-workpay" placeholder="Describe this category..." />
+                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    name="description"
+                                    rows="3"
+                                    className="input-workpay"
+                                    placeholder="Describe this category..."
+                                ></textarea>
                             </div>
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button type="button" onClick={() => setIsCategoryModalOpen(false)} className="btn-workpay-secondary">Cancel</button>
-                                <button type="submit" className="btn-workpay-primary">Create Category</button>
+
+                            {/* Footer Buttons */}
+                            <div className="flex justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsCategoryModalOpen(false)}
+                                    className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700"
+                                >
+                                    CANCEL
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md"
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </form>
                     </div>

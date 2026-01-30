@@ -109,51 +109,40 @@ const TrainingPage = () => {
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
-                                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
-                                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
-                                            <Calendar className="h-6 w-6 text-gray-600" />
-                                        </div>
-                                        <div>
-                                            <DialogTitle className="text-xl font-bold text-gray-900 tracking-tight">Schedule Session</DialogTitle>
-                                            <p className="text-sm text-gray-500 mt-1 font-medium">Plan a new training session for an existing program.</p>
-                                        </div>
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+                                        <DialogTitle className="text-xl font-semibold text-slate-800 uppercase tracking-tight">Schedule Session</DialogTitle>
                                     </div>
-                                    <form onSubmit={handleCreateSession} className="p-6 space-y-4">
+                                    <form onSubmit={handleCreateSession} className="p-6 space-y-5">
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Program</label>
-                                            <div className="relative">
-                                                <select
-                                                    className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
-                                                    value={sessionData.program}
-                                                    onChange={e => setSessionData({ ...sessionData, program: e.target.value })}
-                                                    required
-                                                >
-                                                    <option value="">Select program...</option>
-                                                    {programsArray.map(p => (
-                                                        <option key={p.id} value={p.id}>{p.name}</option>
-                                                    ))}
-                                                </select>
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                    <Filter className="h-4 w-4 text-gray-400" />
-                                                </div>
-                                            </div>
+                                            <label className="text-sm font-medium text-slate-700">Program</label>
+                                            <select
+                                                className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all appearance-none cursor-pointer"
+                                                value={sessionData.program}
+                                                onChange={e => setSessionData({ ...sessionData, program: e.target.value })}
+                                                required
+                                            >
+                                                <option value="">Select program...</option>
+                                                {programsArray.map(p => (
+                                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                                ))}
+                                            </select>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-medium text-gray-700">Start Date</label>
-                                                <Input
+                                                <label className="text-sm font-medium text-slate-700">Start Date</label>
+                                                <input
                                                     type="date"
-                                                    className="bg-white"
+                                                    className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                     value={sessionData.start_date}
                                                     onChange={e => setSessionData({ ...sessionData, start_date: e.target.value })}
                                                     required
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-medium text-gray-700">End Date</label>
-                                                <Input
+                                                <label className="text-sm font-medium text-slate-700">End Date</label>
+                                                <input
                                                     type="date"
-                                                    className="bg-white"
+                                                    className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                     value={sessionData.end_date}
                                                     onChange={e => setSessionData({ ...sessionData, end_date: e.target.value })}
                                                     required
@@ -161,42 +150,50 @@ const TrainingPage = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Instructor</label>
-                                            <Input
-                                                className="bg-white"
+                                            <label className="text-sm font-medium text-slate-700">Instructor</label>
+                                            <input
+                                                className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                 value={sessionData.instructor_name}
                                                 onChange={e => setSessionData({ ...sessionData, instructor_name: e.target.value })}
                                                 required
-                                                placeholder="e.g. John Doe, or External Vendor"
+                                                placeholder="Instructor Name"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Location / Link</label>
-                                            <Input
-                                                className="bg-white"
+                                            <label className="text-sm font-medium text-slate-700">Location / Link</label>
+                                            <input
+                                                className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                 value={sessionData.location}
                                                 onChange={e => setSessionData({ ...sessionData, location: e.target.value })}
                                                 required
-                                                placeholder="e.g. Conference Room B or Zoom Link"
+                                                placeholder="Conference Room B or Zoom Link"
                                             />
                                         </div>
                                         <div className="flex items-center gap-2 pt-2">
                                             <input
                                                 type="checkbox"
                                                 id="is_virtual"
-                                                className="h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                                                className="h-4 w-4 text-green-600 rounded border-slate-300 focus:ring-green-600"
                                                 checked={sessionData.is_virtual}
                                                 onChange={e => setSessionData({ ...sessionData, is_virtual: e.target.checked })}
                                             />
-                                            <label htmlFor="is_virtual" className="text-sm font-medium text-gray-700 cursor-pointer">Virtual Session</label>
+                                            <label htmlFor="is_virtual" className="text-sm font-medium text-slate-700 cursor-pointer">Virtual Session</label>
                                         </div>
-                                        <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-4">
-                                            <Button type="button" onClick={() => setIsSessionDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900">
-                                                Cancel
-                                            </Button>
-                                            <Button type="submit" disabled={isCreatingSession} className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
-                                                {isCreatingSession ? 'Scheduling...' : 'Schedule Session'}
-                                            </Button>
+                                        <div className="mt-8 flex justify-center gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsSessionDialogOpen(false)}
+                                                className="w-48 h-10 border border-green-600 text-green-600 hover:bg-green-50 font-medium rounded text-sm transition-colors uppercase"
+                                            >
+                                                CANCEL
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={isCreatingSession}
+                                                className="w-48 h-10 bg-[#88B072] hover:bg-[#7aa265] text-white font-medium rounded text-sm transition-colors uppercase disabled:opacity-50"
+                                            >
+                                                {isCreatingSession ? 'Scheduling...' : 'Schedule'}
+                                            </button>
                                         </div>
                                     </form>
                                 </DialogContent>
@@ -209,43 +206,37 @@ const TrainingPage = () => {
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent className="max-w-xl bg-white p-0 overflow-hidden">
-                                    <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-gray-100">
-                                        <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shadow-sm">
-                                            <BookOpen className="h-6 w-6 text-gray-600" />
-                                        </div>
-                                        <div>
-                                            <DialogTitle className="text-xl font-bold text-gray-900 tracking-tight">Create Training Program</DialogTitle>
-                                            <p className="text-sm text-gray-500 mt-1 font-medium">Define a new course or curriculum for employees.</p>
-                                        </div>
+                                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+                                        <DialogTitle className="text-xl font-semibold text-slate-800 uppercase tracking-tight">Create Training Program</DialogTitle>
                                     </div>
-                                    <form onSubmit={handleCreateProgram} className="p-6 space-y-4">
+                                    <form onSubmit={handleCreateProgram} className="p-6 space-y-5">
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Program Name</label>
-                                            <Input
-                                                className="bg-white"
+                                            <label className="text-sm font-medium text-slate-700">Program Name</label>
+                                            <input
+                                                className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                 value={programData.name}
                                                 onChange={e => setProgramData({ ...programData, name: e.target.value })}
                                                 required
-                                                placeholder="e.g. Advanced Leadership Skills"
+                                                placeholder="Advanced Leadership Skills"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-gray-700">Description</label>
+                                            <label className="text-sm font-medium text-slate-700">Description</label>
                                             <textarea
-                                                className="w-full p-3 bg-white border border-gray-200 rounded-lg text-sm text-gray-900 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-shadow resize-none"
+                                                className="w-full p-3 bg-white border border-slate-300 rounded text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all resize-none"
                                                 rows="3"
                                                 value={programData.description}
                                                 onChange={e => setProgramData({ ...programData, description: e.target.value })}
                                                 required
-                                                placeholder="What will employees learn?"
+                                                placeholder="Description"
                                             />
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-medium text-gray-700">Duration (Hours)</label>
-                                                <Input
+                                                <label className="text-sm font-medium text-slate-700">Duration (Hours)</label>
+                                                <input
                                                     type="number"
-                                                    className="bg-white"
+                                                    className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all"
                                                     value={programData.duration_hours}
                                                     onChange={e => setProgramData({ ...programData, duration_hours: e.target.value })}
                                                     required
@@ -253,41 +244,44 @@ const TrainingPage = () => {
                                                 />
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-sm font-medium text-gray-700">Category</label>
-                                                <div className="relative">
-                                                    <select
-                                                        className="w-full p-2.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none appearance-none text-sm text-gray-900"
-                                                        value={programData.category}
-                                                        onChange={e => setProgramData({ ...programData, category: e.target.value })}
-                                                    >
-                                                        <option value="technical">Technical</option>
-                                                        <option value="soft_skills">Soft Skills</option>
-                                                        <option value="compliance">Compliance</option>
-                                                        <option value="leadership">Leadership</option>
-                                                    </select>
-                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                                                        <Filter className="h-4 w-4 text-gray-400" />
-                                                    </div>
-                                                </div>
+                                                <label className="text-sm font-medium text-slate-700">Category</label>
+                                                <select
+                                                    className="w-full h-10 px-3 rounded border border-slate-300 bg-white text-sm text-slate-900 focus:border-green-600 focus:ring-1 focus:ring-green-600 outline-none transition-all appearance-none cursor-pointer"
+                                                    value={programData.category}
+                                                    onChange={e => setProgramData({ ...programData, category: e.target.value })}
+                                                >
+                                                    <option value="technical">Technical</option>
+                                                    <option value="soft_skills">Soft Skills</option>
+                                                    <option value="compliance">Compliance</option>
+                                                    <option value="leadership">Leadership</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 pt-2">
                                             <input
                                                 type="checkbox"
                                                 id="is_mandatory"
-                                                className="h-4 w-4 text-primary-600 rounded border-gray-300 focus:ring-primary-500"
+                                                className="h-4 w-4 text-green-600 rounded border-slate-300 focus:ring-green-600"
                                                 checked={programData.is_mandatory}
                                                 onChange={e => setProgramData({ ...programData, is_mandatory: e.target.checked })}
                                             />
-                                            <label htmlFor="is_mandatory" className="text-sm font-medium text-gray-700 cursor-pointer">Mandatory Training</label>
+                                            <label htmlFor="is_mandatory" className="text-sm font-medium text-slate-700 cursor-pointer">Mandatory Training</label>
                                         </div>
-                                        <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-4">
-                                            <Button type="button" onClick={() => setIsProgramDialogOpen(false)} variant="ghost" className="text-gray-600 hover:text-gray-900">
-                                                Cancel
-                                            </Button>
-                                            <Button type="submit" disabled={isCreatingProgram} className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm">
-                                                {isCreatingProgram ? 'Creating...' : 'Create Program'}
-                                            </Button>
+                                        <div className="mt-8 flex justify-center gap-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsProgramDialogOpen(false)}
+                                                className="w-48 h-10 border border-green-600 text-green-600 hover:bg-green-50 font-medium rounded text-sm transition-colors uppercase"
+                                            >
+                                                CANCEL
+                                            </button>
+                                            <button
+                                                type="submit"
+                                                disabled={isCreatingProgram}
+                                                className="w-48 h-10 bg-[#88B072] hover:bg-[#7aa265] text-white font-medium rounded text-sm transition-colors uppercase disabled:opacity-50"
+                                            >
+                                                {isCreatingProgram ? 'Creating...' : 'Create'}
+                                            </button>
                                         </div>
                                     </form>
                                 </DialogContent>
@@ -299,40 +293,28 @@ const TrainingPage = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div className="p-6 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Completed</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">{completedTrainings}</p>
-                    </div>
-                    <div className="h-10 w-10 bg-green-50 rounded-lg flex items-center justify-center text-green-600">
-                        <CheckCircle className="h-5 w-5" />
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Completed</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{completedTrainings}</p>
                     </div>
                 </div>
-                <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div className="p-6 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">In Progress</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">{inProgressTrainings}</p>
-                    </div>
-                    <div className="h-10 w-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600">
-                        <PlayCircle className="h-5 w-5" />
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">In Progress</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{inProgressTrainings}</p>
                     </div>
                 </div>
-                <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div className="p-6 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Hours</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">{totalHours}</p>
-                    </div>
-                    <div className="h-10 w-10 bg-purple-50 rounded-lg flex items-center justify-center text-purple-600">
-                        <Clock className="h-5 w-5" />
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Hours</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{totalHours}</p>
                     </div>
                 </div>
-                <div className="p-5 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                <div className="p-6 bg-white rounded-lg border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Certificates</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">{certificates}</p>
-                    </div>
-                    <div className="h-10 w-10 bg-yellow-50 rounded-lg flex items-center justify-center text-yellow-600">
-                        <Award className="h-5 w-5" />
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Certificates</p>
+                        <p className="text-2xl font-bold text-slate-900 mt-1">{certificates}</p>
                     </div>
                 </div>
             </div>

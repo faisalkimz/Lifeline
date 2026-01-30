@@ -90,10 +90,19 @@ const PipelinePage = () => {
                         </Link>
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Hiring Pipeline</h1>
-                    <div className="flex items-center gap-6 mt-2 text-sm text-slate-500 font-medium">
-                        <span className="flex items-center gap-2"><Users className="h-4 w-4" /> {stats.total} Candidates</span>
-                        <span className="flex items-center gap-2"><Activity className="h-4 w-4" /> {stats.active} Active</span>
-                        <span className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-600" /> {stats.hired} Hired</span>
+                    <div className="flex items-center gap-6 mt-3">
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">In Pipeline</span>
+                            <span className="text-sm font-bold text-slate-800">{stats.total} candidates</span>
+                        </div>
+                        <div className="flex flex-col border-l border-slate-200 pl-6">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Stages</span>
+                            <span className="text-sm font-bold text-slate-800">{stats.active}</span>
+                        </div>
+                        <div className="flex flex-col border-l border-slate-200 pl-6">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hired Total</span>
+                            <span className="text-sm font-bold text-[#88B072]">{stats.hired}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,25 +117,25 @@ const PipelinePage = () => {
                     <DragDropContext onDragEnd={onDragEnd}>
                         <div className="flex gap-6 h-full min-w-max px-1">
                             {stages.map((stage) => (
-                                <div key={stage.id} className="w-80 flex flex-col gap-4 h-full">
+                                <div key={stage.id} className="w-80 flex flex-col gap-3 h-full">
                                     <div className="flex items-center justify-between px-2">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="font-bold text-slate-700">{stage.name}</h3>
-                                            <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none px-2 py-0.5 rounded-md text-xs">
+                                            <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">{stage.name}</h3>
+                                            <span className="bg-slate-100/50 text-slate-500 px-1.5 py-0.5 rounded text-[10px] font-bold">
                                                 {columns[stage.id].length}
-                                            </Badge>
+                                            </span>
                                         </div>
                                     </div>
 
-                                    <div className="flex-1 rounded-2xl bg-slate-50 border border-slate-100 p-2 overflow-y-auto w-full">
+                                    <div className="flex-1 rounded border border-slate-200 bg-slate-50/50 p-2 overflow-y-auto w-full">
                                         <Droppable droppableId={stage.id}>
                                             {(provided, snapshot) => (
                                                 <div
                                                     {...provided.droppableProps}
                                                     ref={provided.innerRef}
                                                     className={cn(
-                                                        "min-h-[150px] space-y-3 transition-colors rounded-xl p-1",
-                                                        snapshot.isDraggingOver ? 'bg-slate-100/50 ring-2 ring-slate-200' : ''
+                                                        "min-h-[150px] space-y-2 transition-colors rounded p-1",
+                                                        snapshot.isDraggingOver ? 'bg-[#88B072]/5 ring-1 ring-[#88B072]/20' : ''
                                                     )}
                                                 >
                                                     {columns[stage.id].map((application, index) => (
@@ -188,13 +197,13 @@ const CandidateCard = ({ application, onClick, isDragging }) => {
         <Card
             onClick={onClick}
             className={cn(
-                "cursor-pointer group hover:shadow-md transition-all border-slate-200 shadow-sm",
-                isDragging ? "shadow-xl ring-2 ring-primary-500 rotate-2" : "bg-white"
+                "cursor-pointer group hover:shadow-md transition-all border-slate-100 shadow-sm rounded-lg",
+                isDragging ? "shadow-lg ring-1 ring-[#88B072] rotate-1" : "bg-white"
             )}
         >
             <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="h-9 w-9 rounded-md bg-slate-50 border border-slate-100 overflow-hidden shrink-0 flex items-center justify-center">
                         {candidate?.photo ? (
                             <img
                                 src={getMediaUrl(candidate.photo)}
@@ -203,25 +212,25 @@ const CandidateCard = ({ application, onClick, isDragging }) => {
                                 onError={(e) => { e.target.style.display = 'none'; }}
                             />
                         ) : (
-                            <span className="text-xs font-bold text-slate-400">
+                            <span className="text-[10px] font-bold text-slate-400">
                                 {candidate?.first_name?.[0]}{candidate?.last_name?.[0]}
                             </span>
                         )}
                     </div>
                     <div>
-                        <h4 className="font-bold text-slate-900 text-sm">{candidate?.first_name} {candidate?.last_name}</h4>
-                        <p className="text-xs text-slate-500 truncate max-w-[140px]">{application.job_title}</p>
+                        <h4 className="font-bold text-slate-800 text-xs group-hover:text-[#88B072] transition-colors">{candidate?.first_name} {candidate?.last_name}</h4>
+                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight truncate max-w-[140px] mt-0.5">{application.job_title}</p>
                     </div>
                 </div>
 
                 <div className="flex items-center justify-between pt-2 border-t border-slate-50">
-                    <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                        <Clock className="h-3 w-3" />
+                    <div className="flex items-center gap-1.5 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                        <Calendar className="h-3 w-3 text-slate-300" />
                         <span>{new Date(application.applied_at).toLocaleDateString()}</span>
                     </div>
                     {application.score > 0 && (
-                        <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
-                            {application.score}%
+                        <span className="text-[9px] font-bold text-[#88B072] bg-[#88B072]/10 border border-[#88B072]/10 px-1.5 py-0.5 rounded uppercase">
+                            Score: {application.score}%
                         </span>
                     )}
                 </div>

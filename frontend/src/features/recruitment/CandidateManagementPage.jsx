@@ -129,7 +129,7 @@ const CandidateManagementPage = () => {
                 </div>
                 <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                     <DialogTrigger asChild>
-                        <Button className="rounded-xl h-11 bg-slate-900 text-white font-medium shadow-lg shadow-slate-900/20">
+                        <Button className="h-10 px-4 bg-[#88B072] hover:bg-[#7aa265] text-white text-xs font-semibold uppercase tracking-wider">
                             <Plus className="h-4 w-4 mr-2" /> Add Candidate
                         </Button>
                     </DialogTrigger>
@@ -149,19 +149,19 @@ const CandidateManagementPage = () => {
                                     <label htmlFor="resume-upload" className="cursor-pointer space-y-3 w-full">
                                         {isParsing ? (
                                             <div className="flex flex-col items-center gap-3">
-                                                <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
-                                                <p className="text-sm font-medium text-emerald-600">Parsing resume details...</p>
+                                                <Loader2 className="h-8 w-8 text-[#88B072] animate-spin" />
+                                                <p className="text-sm font-medium text-[#88B072]">Parsing experience & skills...</p>
                                             </div>
                                         ) : (
                                             <>
-                                                <div className="h-12 w-12 rounded-xl bg-white shadow-sm flex items-center justify-center mx-auto text-slate-400 group-hover:text-emerald-500 transition-colors border border-slate-100">
-                                                    <Upload className="h-6 w-6" />
+                                                <div className="h-10 w-10 rounded bg-white shadow-sm flex items-center justify-center mx-auto text-slate-400 group-hover:text-[#88B072] transition-colors border border-slate-100">
+                                                    <Upload className="h-5 w-5" />
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-slate-900">
-                                                        {formData.resume ? formData.resume.name : 'Click to upload resume'}
+                                                    <p className="text-sm font-bold text-slate-700">
+                                                        {formData.resume ? formData.resume.name : 'Choose a file or drag & drop'}
                                                     </p>
-                                                    <p className="text-xs text-slate-500 mt-1">PDF or DOCX up to 10MB</p>
+                                                    <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">PDF, DOCX up to 10MB</p>
                                                 </div>
                                             </>
                                         )}
@@ -212,9 +212,9 @@ const CandidateManagementPage = () => {
                             </div>
 
 
-                            <div className="pt-4 flex gap-3 justify-end">
-                                <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="ghost">Cancel</Button>
-                                <Button type="submit" className="bg-slate-900 text-white hover:bg-slate-800">
+                            <div className="pt-4 flex gap-3 justify-end items-center">
+                                <Button type="button" onClick={() => setIsAddDialogOpen(false)} variant="ghost" className="text-xs font-bold uppercase tracking-widest text-slate-400">Cancel</Button>
+                                <Button type="submit" className="h-10 px-8 bg-[#88B072] hover:bg-[#7aa265] text-white text-xs font-semibold uppercase tracking-wider">
                                     Add Candidate
                                 </Button>
                             </div>
@@ -225,34 +225,34 @@ const CandidateManagementPage = () => {
 
             {/* Stats Row */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatBox label="Total Candidates" value={stats.total} icon={Users} color="bg-blue-50 text-blue-600" />
-                <StatBox label="Screening" value={stats.screening} icon={Filter} color="bg-amber-50 text-amber-600" />
-                <StatBox label="Interviewing" value={stats.interview} icon={Phone} color="bg-purple-50 text-purple-600" />
-                <StatBox label="Offer Sent" value={stats.offer} icon={Mail} color="bg-emerald-50 text-emerald-600" />
+                <StatBox label="Total Pool" value={stats.total} icon={Users} />
+                <StatBox label="Screening" value={stats.screening} icon={Filter} />
+                <StatBox label="Interviews" value={stats.interview} icon={Phone} />
+                <StatBox label="Offer Sent" value={stats.offer} icon={Mail} />
             </div>
 
             {/* Filter Bar */}
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="bg-white p-4 rounded border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
                 <div className="relative w-full md:w-96">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
                     <input
-                        type="text" placeholder="Search candidates..."
-                        className="w-full h-10 pl-10 pr-4 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
+                        type="text" placeholder="Search by name or email..."
+                        className="w-full h-10 pl-10 pr-4 bg-slate-50/50 border border-slate-100 rounded text-sm focus:ring-0 focus:border-[#88B072] outline-none"
                         value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="w-full md:w-48">
                     <select
                         value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}
-                        className="w-full h-10 px-3 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
+                        className="w-full h-10 px-3 bg-white border border-slate-200 rounded text-[11px] font-bold uppercase tracking-widest focus:ring-0 focus:border-[#88B072] outline-none text-slate-500"
                     >
-                        <option value="all">All Statuses</option>
-                        <option value="applied">Applied</option>
-                        <option value="screening">Screening</option>
-                        <option value="interview">Interview</option>
-                        <option value="offer">Offer</option>
-                        <option value="hired">Hired</option>
-                        <option value="rejected">Rejected</option>
+                        <option value="all">ALL STAGES</option>
+                        <option value="applied">APPLIED</option>
+                        <option value="screening">SCREENING</option>
+                        <option value="interview">INTERVIEW</option>
+                        <option value="offer">OFFER</option>
+                        <option value="hired">HIRED</option>
+                        <option value="rejected">REJECTED</option>
                     </select>
                 </div>
             </div>
@@ -283,13 +283,13 @@ const CandidateManagementPage = () => {
     );
 };
 
-const StatBox = ({ label, value, icon: Icon, color }) => (
-    <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+const StatBox = ({ label, value, icon: Icon }) => (
+    <div className="bg-white p-5 rounded border border-slate-200 shadow-sm flex items-center justify-between group hover:border-[#88B072]/30 transition-colors">
         <div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{label}</p>
-            <p className="text-2xl font-bold text-slate-900">{value}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{label}</p>
+            <p className="text-xl font-bold text-slate-900">{value}</p>
         </div>
-        <div className={`p-3 rounded-xl ${color}`}>
+        <div className="h-10 w-10 rounded bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-[#88B072] group-hover:bg-[#88B072]/5 transition-colors">
             <Icon className="h-5 w-5" />
         </div>
     </div>
@@ -297,48 +297,46 @@ const StatBox = ({ label, value, icon: Icon, color }) => (
 
 const CandidateCard = ({ candidate, onClick }) => (
     <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="group">
-        <Card className="rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-xl hover:border-slate-300 transition-all cursor-pointer h-full flex flex-col" onClick={onClick}>
+        <Card className="rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-all h-full flex flex-col" onClick={onClick}>
             <div className="p-6 pb-4 flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                    <div className="h-14 w-14 rounded-2xl bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-100">
+                    <div className="h-12 w-12 rounded bg-slate-50 flex items-center justify-center overflow-hidden border border-slate-100 shadow-inner">
                         {candidate.photo ? (
                             <img src={getMediaUrl(candidate.photo)} alt="" className="h-full w-full object-cover" />
                         ) : (
-                            <span className="text-lg font-bold text-slate-400">
+                            <span className="text-xs font-bold text-slate-400">
                                 {candidate.first_name[0]}{candidate.last_name[0]}
                             </span>
                         )}
                     </div>
                     <div>
-                        <h3 className="font-bold text-slate-900 group-hover:text-primary-600 transition-colors">{candidate.first_name} {candidate.last_name}</h3>
-                        <p className="text-sm text-slate-500">{candidate.current_position || 'Candidate'}</p>
+                        <h3 className="font-bold text-slate-800 text-sm group-hover:text-[#88B072] transition-colors">{candidate.first_name} {candidate.last_name}</h3>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{candidate.current_position || 'Candidate'}</p>
                     </div>
                 </div>
-                <Badge className={cn(
-                    "rounded-md px-2 py-0.5 text-xs font-bold border-none capitalize",
-                    candidate.status === 'hired' ? 'bg-emerald-100 text-emerald-700' :
-                        candidate.status === 'rejected' ? 'bg-red-50 text-red-600' :
-                            'bg-slate-100 text-slate-600'
+                <span className={cn(
+                    "px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-widest",
+                    candidate.status === 'hired' ? 'bg-[#88B072]/10 text-[#88B072]' :
+                        candidate.status === 'rejected' ? 'bg-rose-50 text-rose-600' :
+                            'bg-slate-100 text-slate-500'
                 )}>
                     {candidate.status}
-                </Badge>
+                </span>
             </div>
 
-            <div className="px-6 py-2 flex flex-wrap gap-2 text-xs">
-                <div className="flex items-center gap-1 text-slate-500">
-                    <Mail className="h-3 w-3" /> {candidate.email}
-                </div>
+            <div className="px-6 py-2 flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
+                <Mail className="h-3 w-3" /> {candidate.email}
             </div>
 
             <div className="px-6 py-4 mt-auto">
-                <div className="flex flex-wrap gap-2 mb-4 h-6 overflow-hidden">
+                <div className="flex flex-wrap gap-1.5 mb-4 h-5 overflow-hidden">
                     {candidate.skills?.slice(0, 3).map((skill, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-slate-50 text-slate-600 text-xs font-medium rounded-md border border-slate-100">
+                        <span key={idx} className="px-1.5 py-0.5 bg-slate-50 text-slate-500 text-[9px] font-bold rounded border border-slate-100 uppercase">
                             {skill}
                         </span>
                     ))}
                 </div>
-                <Button variant="outline" className="w-full rounded-xl border-slate-200 hover:bg-slate-50 text-slate-600 h-10 text-sm font-medium">
+                <Button variant="outline" className="w-full rounded border-slate-200 text-slate-400 hover:text-slate-900 h-9 text-[10px] font-bold uppercase tracking-wider">
                     View Profile
                 </Button>
             </div>

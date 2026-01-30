@@ -19,57 +19,42 @@ import {
 } from '../../store/api';
 import { Sparkles, Shield, Zap } from 'lucide-react';
 
-const StatCard = ({ title, value, change, icon: Icon, trend, color = 'primary' }) => {
+const StatCard = ({ title, value, change, icon: Icon, trend, color = 'emerald' }) => {
     const isPositive = trend === 'up';
-    const colorClasses = {
-        primary: 'from-primary-500 to-primary-600',
-        emerald: 'from-emerald-500 to-emerald-600',
-        amber: 'from-amber-500 to-amber-600',
-        rose: 'from-rose-500 to-rose-600',
-        blue: 'from-blue-500 to-blue-600',
-        purple: 'from-purple-500 to-purple-600'
-    };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-        >
-            <Card className="relative overflow-hidden border-none shadow-lg hover:shadow-xl transition-shadow">
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${colorClasses[color]} opacity-10 rounded-full -mr-16 -mt-16`} />
-                <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                            <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
-                            <h3 className="text-3xl font-bold text-slate-900 mb-2">{value}</h3>
-                            {change && (
-                                <div className={`flex items-center gap-1 text-sm font-semibold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                    {isPositive ? (
-                                        <ArrowUpRight className="h-4 w-4" />
-                                    ) : (
-                                        <ArrowDownRight className="h-4 w-4" />
-                                    )}
-                                    <span>{change}</span>
-                                    <span className="text-slate-500 font-normal">vs last month</span>
-                                </div>
-                            )}
-                        </div>
-                        <div className={`h-12 w-12 rounded-xl bg-gradient-to-br ${colorClasses[color]} flex items-center justify-center shadow-lg`}>
-                            <Icon className="h-6 w-6 text-white" />
-                        </div>
+        <Card className="border border-slate-200 shadow-sm hover:shadow-md transition-shadow bg-white">
+            <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{title}</p>
+                        <h3 className="text-2xl font-bold text-slate-900 mb-2">{value}</h3>
+                        {change && (
+                            <div className={`flex items-center gap-1 text-xs font-semibold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                                {isPositive ? (
+                                    <ArrowUpRight className="h-3 w-3" />
+                                ) : (
+                                    <ArrowDownRight className="h-3 w-3" />
+                                )}
+                                <span>{change}</span>
+                                <span className="text-slate-400 font-normal ml-1">vs last month</span>
+                            </div>
+                        )}
                     </div>
-                </CardContent>
-            </Card>
-        </motion.div>
+                    <div className="h-10 w-10 rounded bg-slate-50 border border-slate-100 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-[#88B072]" />
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
     );
 };
 
 const ChartCard = ({ title, children, actions }) => (
-    <Card className="border-none shadow-lg">
-        <CardHeader className="border-b border-slate-100">
+    <Card className="border border-slate-200 shadow-sm bg-white">
+        <CardHeader className="border-b border-slate-50 py-4 px-6">
             <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-bold text-slate-900">{title}</CardTitle>
+                <CardTitle className="text-sm font-bold text-slate-800 uppercase tracking-wider">{title}</CardTitle>
                 {actions}
             </div>
         </CardHeader>
@@ -145,94 +130,55 @@ const AnalyticsDashboard = () => {
     };
 
     return (
-        <div className="space-y-8 pb-12">
+        <div className="space-y-8 pb-12 animate-fade-in">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Analytics Dashboard</h1>
-                    <p className="text-slate-600 mt-2">Comprehensive insights into your workforce</p>
+                    <h1 className="text-2xl font-bold text-slate-900">Analytics</h1>
+                    <p className="text-slate-500 text-sm mt-1">Data-driven workforce insights and trends.</p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-full md:w-auto">
                     <select
                         value={timeRange}
                         onChange={(e) => setTimeRange(e.target.value)}
-                        className="h-10 px-4 rounded-xl border-2 border-slate-200 bg-white text-sm font-medium focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none"
+                        className="h-10 px-3 rounded border border-slate-200 bg-white text-xs font-semibold text-slate-600 focus:border-[#88B072] outline-none cursor-pointer"
                     >
-                        <option value="week">Last 7 days</option>
-                        <option value="month">Last 30 days</option>
-                        <option value="quarter">Last 3 months</option>
-                        <option value="year">Last 12 months</option>
+                        <option value="week">7 Days</option>
+                        <option value="month">30 Days</option>
+                        <option value="quarter">3 Months</option>
+                        <option value="year">12 Months</option>
                     </select>
-                    <Button onClick={handleExport} className="gap-2 bg-primary-500 hover:bg-primary-600">
-                        <Download className="h-4 w-4" />
-                        Export Report
+                    <Button onClick={handleExport} className="bg-[#88B072] hover:bg-[#7aa265] text-white font-semibold h-10 px-4 rounded text-xs uppercase tracking-wider">
+                        <Download className="h-4 w-4 mr-2" />
+                        Export
                     </Button>
                 </div>
             </div>
 
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard
-                    title="Total Employees"
-                    value={totalEmployees}
-                    change="+12%"
-                    trend="up"
-                    icon={Users}
-                    color="primary"
-                />
-                <StatCard
-                    title="Active Employees"
-                    value={activeEmployees}
-                    change="+5%"
-                    trend="up"
-                    icon={Briefcase}
-                    color="emerald"
-                />
-                <StatCard
-                    title="New Hires (30d)"
-                    value={newHires}
-                    change="+8%"
-                    trend="up"
-                    icon={TrendingUp}
-                    color="blue"
-                />
-                <StatCard
-                    title="Pending Leaves"
-                    value={pendingLeaves}
-                    change="-3%"
-                    trend="down"
-                    icon={Calendar}
-                    color="amber"
-                />
+                <StatCard title="Total Employees" value={totalEmployees} change="+1.2%" trend="up" icon={Users} />
+                <StatCard title="Active Status" value={activeEmployees} change="+0.5%" trend="up" icon={Briefcase} />
+                <StatCard title="New Hires (30d)" value={newHires} change="+8.0%" trend="up" icon={TrendingUp} />
+                <StatCard title="Pending Review" value={pendingLeaves} change="-2.1%" trend="down" icon={Calendar} />
             </div>
 
             {/* Charts Row 1 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Department Distribution */}
-                <ChartCard
-                    title="Headcount by Department"
-                    actions={
-                        <Button variant="ghost" size="sm" className="gap-1">
-                            View Details <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    }
-                >
-                    <div className="space-y-4">
+                <ChartCard title="Headcount by Department">
+                    <div className="space-y-4 pt-2">
                         {Object.entries(departmentCounts).map(([dept, count], index) => {
                             const percentage = ((count / totalEmployees) * 100).toFixed(1);
-                            const colors = ['bg-primary-500', 'bg-emerald-500', 'bg-amber-500', 'bg-rose-500', 'bg-blue-500', 'bg-purple-500'];
                             return (
                                 <div key={dept} className="space-y-2">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="font-medium text-slate-700">{dept}</span>
-                                        <span className="text-slate-600">{count} ({percentage}%)</span>
+                                    <div className="flex items-center justify-between text-xs font-semibold">
+                                        <span className="text-slate-600 uppercase tracking-tighter">{dept}</span>
+                                        <span className="text-slate-900">{count} ({percentage}%)</span>
                                     </div>
-                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${percentage}%` }}
-                                            transition={{ duration: 1, delay: index * 0.1 }}
-                                            className={`h-full ${colors[index % colors.length]}`}
+                                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                        <div
+                                            className="h-full bg-[#88B072] transition-all duration-1000"
+                                            style={{ width: `${percentage}%` }}
                                         />
                                     </div>
                                 </div>
@@ -241,30 +187,16 @@ const AnalyticsDashboard = () => {
                     </div>
                 </ChartCard>
 
-                {/* Employment Type Distribution */}
-                <ChartCard
-                    title="Employment Type Breakdown"
-                    actions={
-                        <Button variant="ghost" size="sm" className="gap-1">
-                            View Details <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    }
-                >
+                <ChartCard title="Employment Type">
                     <div className="grid grid-cols-2 gap-4">
                         {Object.entries(employmentTypes).map(([type, count]) => {
                             const percentage = ((count / totalEmployees) * 100).toFixed(1);
-                            const typeLabels = {
-                                'full_time': 'Full-Time',
-                                'part_time': 'Part-Time',
-                                'contract': 'Contract',
-                                'intern': 'Intern',
-                                'casual': 'Casual'
-                            };
+                            const typeLabels = { 'full_time': 'Full-Time', 'part_time': 'Part-Time', 'contract': 'Contract', 'intern': 'Intern', 'casual': 'Casual' };
                             return (
-                                <div key={type} className="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                                    <p className="text-xs font-medium text-slate-600 mb-1">{typeLabels[type] || type}</p>
-                                    <p className="text-2xl font-bold text-slate-900">{count}</p>
-                                    <p className="text-xs text-slate-500 mt-1">{percentage}% of total</p>
+                                <div key={type} className="p-4 bg-slate-50 rounded border border-slate-100">
+                                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">{typeLabels[type] || type}</p>
+                                    <p className="text-xl font-bold text-slate-900">{count}</p>
+                                    <p className="text-[10px] font-semibold text-slate-400 mt-1 uppercase">{percentage}% share</p>
                                 </div>
                             );
                         })}
@@ -272,198 +204,96 @@ const AnalyticsDashboard = () => {
                 </ChartCard>
             </div>
 
-            {/* Charts Row 2 */}
+            {/* AI Insights & Strategic */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Recruitment Funnel */}
-                <ChartCard title="Recruitment Funnel">
-                    <div className="space-y-3">
-                        {Object.entries(recruitmentStages).map(([stage, count], index) => {
-                            const maxCount = Math.max(...Object.values(recruitmentStages));
-                            const percentage = maxCount > 0 ? ((count / maxCount) * 100).toFixed(1) : 0;
-                            return (
-                                <div key={stage} className="space-y-2">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="font-medium text-slate-700">{stage}</span>
-                                        <span className="text-slate-600 font-bold">{count}</span>
-                                    </div>
-                                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-                                        <motion.div
-                                            initial={{ width: 0 }}
-                                            animate={{ width: `${percentage}%` }}
-                                            transition={{ duration: 1, delay: index * 0.1 }}
-                                            className="h-full bg-gradient-to-r from-primary-500 to-primary-600"
-                                        />
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </ChartCard>
-
-                {/* Leave Statistics */}
-                <ChartCard title="Leave Overview">
-                    <div className="space-y-4">
-                        <div className="flex items-center justify-between p-4 bg-amber-50 rounded-xl border border-amber-100">
-                            <div>
-                                <p className="text-sm font-medium text-amber-900">Pending</p>
-                                <p className="text-2xl font-bold text-amber-700">{pendingLeaves}</p>
-                            </div>
-                            <Clock className="h-8 w-8 text-amber-500" />
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-emerald-50 rounded-xl border border-emerald-100">
-                            <div>
-                                <p className="text-sm font-medium text-emerald-900">Approved</p>
-                                <p className="text-2xl font-bold text-emerald-700">{approvedLeaves}</p>
-                            </div>
-                            <Award className="h-8 w-8 text-emerald-500" />
-                        </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <div>
-                                <p className="text-sm font-medium text-slate-900">Total Requests</p>
-                                <p className="text-2xl font-bold text-slate-700">{leaves.length}</p>
-                            </div>
-                            <Calendar className="h-8 w-8 text-slate-500" />
-                        </div>
-                    </div>
-                </ChartCard>
-
-                {/* Quick Actions */}
-                <ChartCard title="Quick Insights">
-                    <div className="space-y-3">
-                        <div className="p-4 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl border border-primary-200">
-                            <div className="flex items-center gap-3 mb-2">
-                                <Target className="h-5 w-5 text-primary-600" />
-                                <p className="text-sm font-semibold text-primary-900">Turnover Rate</p>
-                            </div>
-                            <p className="text-2xl font-bold text-primary-700">2.3%</p>
-                            <p className="text-xs text-primary-600 mt-1">Below industry average</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border border-emerald-200">
-                            <div className="flex items-center gap-3 mb-2">
-                                <TrendingUp className="h-5 w-5 text-emerald-600" />
-                                <p className="text-sm font-semibold text-emerald-900">Avg. Tenure</p>
-                            </div>
-                            <p className="text-2xl font-bold text-emerald-700">3.2 years</p>
-                            <p className="text-xs text-emerald-600 mt-1">+0.4 years vs last year</p>
-                        </div>
-                        <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                            <div className="flex items-center gap-3 mb-2">
-                                <BarChart3 className="h-5 w-5 text-blue-600" />
-                                <p className="text-sm font-semibold text-blue-900">Time to Hire</p>
-                            </div>
-                            <p className="text-2xl font-bold text-blue-700">18 days</p>
-                            <p className="text-xs text-blue-600 mt-1">-3 days improvement</p>
-                        </div>
-                    </div>
-                </ChartCard>
-            </div>
-
-            {/* AI Insights Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="border-none shadow-lg bg-slate-900 text-white overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 rounded-full -mr-32 -mt-32 blur-3xl" />
-                    <CardHeader className="border-b border-white/10">
-                        <CardTitle className="flex items-center gap-2 text-white">
-                            <Sparkles className="h-5 w-5 text-primary-400" />
-                            AI Talent Insights
+                <Card className="lg:col-span-2 border-none shadow-sm bg-slate-900 text-white overflow-hidden rounded-lg">
+                    <CardHeader className="border-b border-white/5 py-4 px-6">
+                        <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/70">
+                            <Sparkles className="h-4 w-4 text-[#88B072]" />
+                            Workforce AI Analysis
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="space-y-4">
-                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-primary-400/50 transition-colors">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <TrendingDown className="h-5 w-5 text-rose-400" />
-                                        <p className="text-sm font-bold text-white/70">Turnover Risk</p>
+                                <div className="p-4 bg-white/5 rounded border border-white/10 group">
+                                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Turnover Risk Score</p>
+                                    <div className="flex items-end gap-3">
+                                        <p className="text-3xl font-bold font-mono text-[#88B072] leading-none">{predictions?.potential_turnover_rate || '0'}%</p>
+                                        <div className="h-5 bg-rose-500/20 text-rose-400 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-500/20 uppercase">Action required</div>
                                     </div>
-                                    <p className="text-3xl font-bold">{predictions?.potential_turnover_rate || '0'}%</p>
-                                    <p className="text-xs text-white/50 mt-1">Predicted exit rate for next quarter</p>
                                 </div>
-                                <div className="p-4 bg-white/5 rounded-2xl border border-white/10 group hover:border-emerald-400/50 transition-colors">
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <Clock className="h-5 w-5 text-emerald-400" />
-                                        <p className="text-sm font-bold text-white/70">Hiring Velocity</p>
-                                    </div>
-                                    <p className="text-3xl font-bold">{predictions?.predicted_hiring_timeline || '25'} Days</p>
-                                    <p className="text-xs text-white/50 mt-1">Avg. time to fill open roles</p>
+                                <div className="p-4 bg-white/5 rounded border border-white/10">
+                                    <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2">Predicted Time to Hire</p>
+                                    <p className="text-3xl font-bold font-mono text-white leading-none">{predictions?.predicted_hiring_timeline || '25'} Days</p>
                                 </div>
                             </div>
-                            <div className="space-y-4">
-                                <div className="p-5 bg-gradient-to-br from-primary-600/20 to-transparent rounded-2xl border border-primary-500/20">
-                                    <h4 className="text-sm font-bold mb-3 flex items-center gap-2">
-                                        <Shield className="h-4 w-4 text-primary-400" />
-                                        Retention Forecast
+                            <div className="flex flex-col justify-between">
+                                <div className="p-5 bg-[#88B072]/10 rounded border border-[#88B072]/20">
+                                    <h4 className="text-[10px] font-bold mb-3 flex items-center gap-2 uppercase tracking-widest text-white/90">
+                                        Health Score
                                     </h4>
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-4xl font-black text-primary-400">{predictions?.retention_score || '95'}</div>
-                                        <div className="text-xs text-white/60">
-                                            Health score based on current tenure and engagement trends.
-                                        </div>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-5xl font-black text-white">{predictions?.retention_score || '95'}</span>
+                                        <span className="text-white/40 font-bold uppercase tracking-widest">/ 100</span>
                                     </div>
-                                    <div className="mt-4 w-full bg-white/10 rounded-full h-1.5">
-                                        <div
-                                            className="bg-primary-500 h-full rounded-full"
-                                            style={{ width: `${predictions?.retention_score || 95}%` }}
-                                        />
+                                    <div className="mt-6 w-full bg-white/10 rounded-full h-1">
+                                        <div className="bg-[#88B072] h-full rounded-full" style={{ width: `${predictions?.retention_score || 95}%` }} />
                                     </div>
                                 </div>
-                                <div className="p-4 bg-white/5 rounded-xl text-xs text-white/60 italic leading-relaxed">
-                                    "Your current hiring speed is {predictions?.predicted_hiring_timeline < 20 ? 'excellent' : 'steady'}. Retention in Engineering shows positive sentiment."
-                                </div>
+                                <p className="text-xs text-white/40 italic leading-relaxed mt-4 border-l border-white/10 pl-4">
+                                    Current trends indicate high engagement levels in technical departments.
+                                </p>
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Strategic Recommendations */}
-                <ChartCard title="Strategic Recommendations">
-                    <div className="space-y-4">
-                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <div className="h-10 w-10 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
-                                <Zap className="h-5 w-5 text-amber-600" />
+                <ChartCard title="Recommendations">
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded border border-slate-100 group hover:border-[#88B072]/30 transition-colors">
+                            <div className="h-8 w-8 bg-amber-50 rounded flex items-center justify-center shrink-0 border border-amber-100">
+                                <Zap className="h-4 w-4 text-amber-600" />
                             </div>
                             <div>
-                                <h4 className="font-bold text-slate-900 text-sm">Critical Role Backfill</h4>
-                                <p className="text-xs text-slate-500 mt-1">Senior roles are likely to take {Math.round(predictions?.predicted_hiring_timeline || 25 + 15)} days. Start sourcing early.</p>
+                                <h4 className="font-bold text-slate-800 text-xs uppercase tracking-tight">Hiring Pipeline</h4>
+                                <p className="text-[10px] text-slate-500 font-medium mt-1 leading-normal">Backfill for critical roles predicted at {Math.round(predictions?.predicted_hiring_timeline || 25 + 10)} days.</p>
                             </div>
                         </div>
-                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                            <div className="h-10 w-10 bg-primary-100 rounded-xl flex items-center justify-center shrink-0">
-                                <Users className="h-5 w-5 text-primary-600" />
+                        <div className="flex items-start gap-4 p-4 bg-slate-50 rounded border border-slate-100 group hover:border-[#88B072]/30 transition-colors">
+                            <div className="h-8 w-8 bg-[#88B072]/10 rounded flex items-center justify-center shrink-0 border border-[#88B072]/20">
+                                <Shield className="h-4 w-4 text-[#88B072]" />
                             </div>
                             <div>
-                                <h4 className="font-bold text-slate-900 text-sm">Retention Alert</h4>
-                                <p className="text-xs text-slate-500 mt-1">Potential {predictions?.potential_turnover_rate || '0'}% churn predicted. Recommend conducting stay interviews.</p>
+                                <h4 className="font-bold text-slate-800 text-xs uppercase tracking-tight">Retention Alert</h4>
+                                <p className="text-[10px] text-slate-500 font-medium mt-1 leading-normal">Low risk detected. Continue current employee engagement programs.</p>
                             </div>
                         </div>
                     </div>
                 </ChartCard>
             </div>
 
-            {/* Custom Report Builder */}
             <CustomReportBuilder />
-
-            {/* Scheduled Reports */}
             <ScheduledReports />
 
             {/* Recent Activity */}
             <ChartCard title="Recent Activity">
-                <div className="space-y-3">
+                <div className="divide-y divide-slate-50">
                     {[
                         { action: 'New employee onboarded', name: 'Sarah Johnson', time: '2 hours ago', icon: Users, color: 'emerald' },
                         { action: 'Leave request approved', name: 'Michael Chen', time: '4 hours ago', icon: Calendar, color: 'blue' },
                         { action: 'Performance review completed', name: 'Emma Davis', time: '6 hours ago', icon: Award, color: 'purple' },
                         { action: 'Candidate moved to interview', name: 'James Wilson', time: '8 hours ago', icon: Briefcase, color: 'amber' },
                     ].map((item, index) => (
-                        <div key={index} className="flex items-center gap-4 p-3 hover:bg-slate-50 rounded-lg transition-colors">
-                            <div className={`h-10 w-10 rounded-lg bg-${item.color}-100 flex items-center justify-center`}>
-                                <item.icon className={`h-5 w-5 text-${item.color}-600`} />
+                        <div key={index} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0 group">
+                            <div className="h-9 w-9 bg-slate-50 rounded border border-slate-100 flex items-center justify-center group-hover:border-[#88B072]/20 transition-colors">
+                                <item.icon className="h-4 w-4 text-slate-400 group-hover:text-[#88B072] transition-colors" />
                             </div>
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-slate-900">{item.action}</p>
-                                <p className="text-xs text-slate-500">{item.name}</p>
+                                <p className="text-sm font-semibold text-slate-800">{item.action}</p>
+                                <p className="text-[11px] text-slate-400 font-medium uppercase tracking-tight">{item.name}</p>
                             </div>
-                            <span className="text-xs text-slate-400">{item.time}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.time}</span>
                         </div>
                     ))}
                 </div>

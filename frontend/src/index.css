@@ -14,6 +14,8 @@
   --notion-border: #E9E9E7;
   --notion-hover: #EFEFEF;
   --notion-primary: #2383E2;
+  --notion-sidebar-30: rgba(247, 247, 245, 0.3);
+  --notion-sidebar-50: rgba(247, 247, 245, 0.5);
   /* Subtle blue for links/actions */
   --notion-selection: rgba(35, 131, 226, 0.14);
 
@@ -44,6 +46,8 @@
   --notion-border: #2E2E2E;
   --notion-hover: #2C2C2C;
   --notion-primary: #2383E2;
+  --notion-sidebar-30: rgba(32, 32, 32, 0.3);
+  --notion-sidebar-50: rgba(32, 32, 32, 0.5);
 
   --color-gray-50: #202020;
   --color-gray-100: #2E2E2E;
@@ -86,8 +90,12 @@
 
   /* Notion-style Card */
   .card-notion {
-    @apply bg-transparent rounded-lg border transition-colors hover:bg-notion-sidebar/50;
+    @apply bg-transparent rounded-lg border transition-colors;
     border-color: var(--notion-border);
+  }
+
+  .card-notion:hover {
+    background-color: var(--notion-sidebar-50);
   }
 
   /* Minimalist Button */
@@ -96,7 +104,21 @@
   }
 
   .btn-notion-primary {
-    @apply btn-notion bg-notion-text text-white hover:bg-notion-text/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-sm;
+    @apply btn-notion text-white shadow-sm;
+    background-color: var(--notion-text);
+  }
+
+  .btn-notion-primary:hover {
+    opacity: 0.9;
+  }
+
+  .dark .btn-notion-primary {
+    background-color: white;
+    color: black;
+  }
+
+  .dark .btn-notion-primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
   }
 
   .btn-notion-ghost {
@@ -117,7 +139,13 @@
 
   /* Flat Sidebar Link */
   .sidebar-link {
-    @apply flex items-center gap-2 px-3 py-1.5 rounded-md text-[14px] text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors;
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-md text-[14px] transition-colors;
+    color: var(--notion-text-light);
+  }
+
+  .sidebar-link:hover {
+    background-color: var(--notion-hover);
+    color: var(--notion-text);
   }
 
   .sidebar-link-active {
@@ -140,7 +168,8 @@
 }
 
 .table-notion th {
-  @apply text-left font-medium text-notion-text-light px-4 py-2 border-b bg-notion-sidebar/30;
+  @apply text-left font-medium text-notion-text-light px-4 py-2 border-b;
+  background-color: var(--notion-sidebar-30);
   border-color: var(--notion-border);
 }
 
@@ -150,7 +179,7 @@
 }
 
 .table-notion tr:hover {
-  @apply bg-notion-sidebar/50;
+  background-color: var(--notion-sidebar-50);
 }
 
 /* Animations */

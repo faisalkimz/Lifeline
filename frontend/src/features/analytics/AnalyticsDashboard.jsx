@@ -7,7 +7,8 @@ import { exportToJSON } from '../../utils/exportUtils';
 import {
     Users, TrendingUp, TrendingDown, DollarSign, Calendar,
     Briefcase, Award, Clock, Target, BarChart3, PieChart,
-    Download, Filter, ChevronRight, ArrowUpRight, ArrowDownRight, BarChart3
+    Download, Filter, ChevronRight, ArrowUpRight, ArrowDownRight,
+    Shield
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +18,7 @@ import {
     useGetReviewsQuery,
     useGetDashboardPredictionsQuery
 } from '../../store/api';
-import { Shield, Target } from 'lucide-react';
+
 
 const StatCard = ({ title, value, change, icon: Icon, trend, color = 'emerald' }) => {
     const isPositive = trend === 'up';

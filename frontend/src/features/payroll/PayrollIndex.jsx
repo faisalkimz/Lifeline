@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Ta
 import { DollarSign, FileText, Users, Briefcase } from 'lucide-react';
 import PayrollDashboard from './PayrollDashboard';
 
-import { SalaryStructurePage } from './SalaryStructurePage';
+import SalaryStructurePage from './SalaryStructurePage';
 import LoanManagementPage from './LoanManagementPage';
 
 const PayrollIndex = () => {

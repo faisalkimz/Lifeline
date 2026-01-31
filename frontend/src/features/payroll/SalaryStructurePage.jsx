@@ -1,20 +1,32 @@
-// src/features/salary/SalaryStructurePage.jsx
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Table, TableHeader, TableBody, TableRow, TableCell } from '../../components/ui/Table';
-import { Dialog, DialogHeader, DialogTitle, DialogContent, DialogFooter } from '../../components/ui/Dialog';
+import {
+  Plus, Search, Filter, DollarSign, Users,
+  Clock, MoreHorizontal, ChevronRight, Calculator,
+  Eye, Edit2, Trash2
+} from 'lucide-react';
 import {
   useGetSalaryStructuresQuery,
   useCreateSalaryStructureMutation,
   useUpdateSalaryStructureMutation,
   useGetEmployeesQuery
 } from '../../store/api';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '../../components/ui/Dialog';
+import { Button } from '../../components/ui/Button';
+import { Input } from '../../components/ui/Input';
+import { cn } from '../../utils/cn';
+import toast from 'react-hot-toast';
 
 const SalaryStructurePage = () => {
+  // 1. State
   const [showForm, setShowForm] = useState(false);
   const [editingStructure, setEditingStructure] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     employee: '',
     effective_date: '',
@@ -27,6 +39,7 @@ const SalaryStructurePage = () => {
     notes: ''
   });
 
+  // 2. Queries
   const { data: salaryStructuresData = [], isLoading: structuresLoading } = useGetSalaryStructuresQuery();
   const { data: employeesData = [], isLoading: employeesLoading } = useGetEmployeesQuery();
   const [createSalaryStructure, { isLoading: creating }] = useCreateSalaryStructureMutation();
@@ -34,26 +47,35 @@ const SalaryStructurePage = () => {
 
   const loading = structuresLoading || employeesLoading;
 
+  // 3. Computed
   const salaryStructures = Array.isArray(salaryStructuresData) ? salaryStructuresData : [];
-  const employees = (employeesData || []).map(emp => ({
+  const employees = (employeesData?.results || employeesData || []).map(emp => ({
     id: emp.id ?? emp.employee_id ?? emp.pk ?? '',
     full_name: emp.full_name ?? emp.name ?? `${emp.first_name ?? ''} ${emp.last_name ?? ''}`.trim(),
     employee_number: emp.employee_number ?? emp.staff_number ?? emp.emp_no ?? '',
-    employment_status: emp.employment_status ?? emp.status ?? 'active'
+    employment_status: emp.employment_status ?? emp.status ?? 'active',
+    job_title: emp.job_title,
+    department_name: emp.department_name
   }));
 
+  const filteredStructures = salaryStructures.filter(s =>
+    s.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.employee_number?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // 4. Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const calculateGrossSalary = () => {
-    const basic = parseFloat(formData.basic_salary) || 0;
-    const housing = parseFloat(formData.housing_allowance) || 0;
-    const transport = parseFloat(formData.transport_allowance) || 0;
-    const medical = parseFloat(formData.medical_allowance) || 0;
-    const lunch = parseFloat(formData.lunch_allowance) || 0;
-    const other = parseFloat(formData.other_allowances) || 0;
+  const calculateGrossSalary = (data = formData) => {
+    const basic = parseFloat(data.basic_salary) || 0;
+    const housing = parseFloat(data.housing_allowance) || 0;
+    const transport = parseFloat(data.transport_allowance) || 0;
+    const medical = parseFloat(data.medical_allowance) || 0;
+    const lunch = parseFloat(data.lunch_allowance) || 0;
+    const other = parseFloat(data.other_allowances) || 0;
     return basic + housing + transport + medical + lunch + other;
   };
 
@@ -73,16 +95,17 @@ const SalaryStructurePage = () => {
 
       if (editingStructure) {
         await updateSalaryStructure({ id: editingStructure.id, ...data }).unwrap();
+        toast.success('Structure updated');
       } else {
         await createSalaryStructure(data).unwrap();
+        toast.success('Structure created');
       }
 
       setShowForm(false);
       setEditingStructure(null);
       resetForm();
     } catch (error) {
-      console.error('Error saving salary structure:', error);
-      alert('Error saving salary structure');
+      toast.error('Failed to save structure');
     }
   };
 
@@ -126,192 +149,231 @@ const SalaryStructurePage = () => {
   };
 
   const formatCurrency = (amount) => {
-    const val = Number(amount) || 0;
     return new Intl.NumberFormat('en-UG', {
       style: 'currency',
       currency: 'UGX',
       minimumFractionDigits: 0
-    }).format(val);
+    }).format(Number(amount) || 0);
   };
 
-  const getEmployeeName = (employeeId) => {
-    const employee = employees.find(emp => String(emp.id) === String(employeeId));
-    return employee ? employee.full_name : 'Unknown';
-  };
-
-  if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
-  }
-
+  // 5. Render
   return (
-    <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={() => { setEditingStructure(null); resetForm(); setShowForm(true); }} className="bg-slate-900 hover:bg-black text-[10px] font-bold uppercase tracking-widest h-10 px-6">
-          Add Structure
-        </Button>
+    <div className="space-y-12 pb-20">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <h1 className="text-4xl font-bold tracking-tight">Compensation</h1>
+          <p className="text-notion-text-light mt-2">Manage employee salary structures and monthly recurring earnings.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => { setEditingStructure(null); resetForm(); setShowForm(true); }}
+            className="btn-notion-primary h-8"
+          >
+            <Plus className="h-3.5 w-3.5 mr-2" />
+            Add structure
+          </Button>
+        </div>
       </div>
 
-      <Card className="bg-white text-black">
-        <CardHeader>
-          <CardTitle>Employee Salary Structures</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableCell>Employee</TableCell>
-                <TableCell>Effective Date</TableCell>
-                <TableCell>Basic Salary</TableCell>
-                <TableCell>Allowances</TableCell>
-                <TableCell>Gross Salary</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {salaryStructures.map((structure) => (
-                <TableRow key={structure.id}>
-                  <TableCell className="font-medium text-black">
-                    {structure.employee_name ?? getEmployeeName(structure.employee)}
-                    <br />
-                    <span className="text-sm text-gray-500">{structure.employee_number}</span>
-                  </TableCell>
-                  <TableCell className="text-gray-700">
-                    {structure.effective_date ? new Date(structure.effective_date).toLocaleDateString() : '-'}
-                  </TableCell>
-                  <TableCell className="text-gray-700">{formatCurrency(structure.basic_salary)}</TableCell>
-                  <TableCell className="text-gray-700">{formatCurrency(structure.total_allowances)}</TableCell>
-                  <TableCell className="font-semibold text-black">{formatCurrency(structure.gross_salary)}</TableCell>
-                  <TableCell>
-                    <Button size="sm" variant="outline" onClick={() => handleEdit(structure)}>Edit</Button>
-                  </TableCell>
-                </TableRow>
+      {/* Flat Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Total headcount</p>
+          <p className="text-2xl font-bold">{salaryStructures.length}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Avg Basic</p>
+          <p className="text-2xl font-bold">
+            {formatCurrency(salaryStructures.reduce((acc, s) => acc + (parseFloat(s.basic_salary) || 0), 0) / (salaryStructures.length || 1))}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Total Monthly Gross</p>
+          <p className="text-2xl font-bold text-[#88B072]">
+            {formatCurrency(salaryStructures.reduce((acc, s) => acc + (parseFloat(s.gross_salary) || 0), 0))}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Pending updates</p>
+          <p className="text-2xl font-bold">0</p>
+        </div>
+      </div>
+
+      {/* Minimal Filters */}
+      <div className="flex flex-col md:flex-row gap-4 py-2 border-y border-notion-border items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-notion-text-light" />
+          <input
+            placeholder="Search by member name or number..."
+            className="w-full pl-8 pr-3 py-1.5 bg-transparent border-none focus:outline-none text-sm placeholder:text-notion-text-light"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto whitespace-nowrap px-1 text-xs font-bold text-notion-text-light uppercase">
+          <span>Export</span>
+          <div className="h-4 w-px bg-notion-border" />
+          <button className="p-1 hover:bg-notion-hover rounded">
+            <MoreHorizontal className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* List */}
+      {loading ? (
+        <div className="py-20 flex flex-col items-center justify-center text-notion-text-light">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-notion-border border-t-notion-text mb-4"></div>
+        </div>
+      ) : filteredStructures.length === 0 ? (
+        <div className="py-24 text-center opacity-60">
+          <DollarSign className="h-12 w-12 mx-auto mb-4 stroke-1" />
+          <h2 className="text-lg font-bold">No structures found</h2>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-notion-border">
+                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider w-[320px]">Member</th>
+                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Effective Date</th>
+                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Basic Salary</th>
+                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider text-right">Gross Pay</th>
+                <th className="px-1 py-3"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-notion-border">
+              {filteredStructures.map((structure) => (
+                <tr
+                  key={structure.id}
+                  className="group hover:bg-notion-hover/50 transition-colors cursor-pointer"
+                  onClick={() => handleEdit(structure)}
+                >
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded bg-notion-sidebar border border-notion-border flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-notion-text-light uppercase">
+                          {structure.employee_name?.[0]}
+                        </span>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-[14px] truncate group-hover:text-notion-primary">{structure.employee_name}</p>
+                        <p className="text-[11px] text-notion-text-light font-medium uppercase tracking-tighter">{structure.employee_number}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-2 text-sm text-notion-text">
+                      <Clock className="h-3.5 w-3.5 opacity-40" />
+                      {structure.effective_date ? new Date(structure.effective_date).toLocaleDateString() : '-'}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <p className="text-sm font-medium text-notion-text">{formatCurrency(structure.basic_salary)}</p>
+                    <p className="text-[10px] text-notion-text-light uppercase font-bold tracking-tighter">
+                      +{formatCurrency(structure.total_allowances)} Allowances
+                    </p>
+                  </td>
+                  <td className="px-4 py-4 text-right">
+                    <p className="text-sm font-bold text-notion-text">{formatCurrency(structure.gross_salary)}</p>
+                    <p className="text-[10px] text-[#88B072] font-bold uppercase tracking-tighter">Current rate</p>
+                  </td>
+                  <td className="px-1 text-right">
+                    <button className="p-1 opacity-0 group-hover:opacity-100 transition-all rounded hover:bg-black/5">
+                      <ChevronRight className="h-4 w-4 text-notion-text-light" />
+                    </button>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+            </tbody>
+          </table>
+        </div>
+      )}
 
+      {/* Modal */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent
-          className="max-w-4xl w-full bg-white text-gray-900 !rounded-2xl shadow-2xl border border-gray-200"
-          style={{ maxWidth: '1100px', backgroundColor: '#ffffff' }} // Extra wide & forced white
-        >
-          {/* Header */}
-          <div className="bg-white border-b border-gray-200 -m-6 pb-5 pt-7 px-8 rounded-t-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-2xl font-bold text-gray-900">
-                {editingStructure ? 'Edit Salary Structure' : 'Add Salary Structure'}
-              </DialogTitle>
-            </DialogHeader>
-          </div>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingStructure ? 'Adjust structure' : 'Initialize structure'}</DialogTitle>
+          </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-7 py-8 px-2 bg-white">
-            {/* Employee + Date */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Employee</label>
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {/* Member Selection */}
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Member</label>
                 <select
                   name="employee"
                   value={formData.employee}
                   onChange={handleInputChange}
-                  className="w-full px-5 py-3.5 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                  className="input-notion bg-transparent"
                   required
                 >
-                  <option value="">Select Employee</option>
+                  <option value="">Select Member</option>
                   {employees
                     .filter(emp => String(emp.employment_status).toLowerCase() === 'active')
                     .map(employee => (
                       <option key={employee.id} value={String(employee.id)}>
-                        {employee.full_name}
+                        {employee.full_name} ({employee.employee_number})
                       </option>
                     ))}
                 </select>
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-800 mb-2">Effective Date</label>
-                <Input
-                  type="date"
-                  name="effective_date"
-                  value={formData.effective_date}
-                  onChange={handleInputChange}
-                  required
-                  className="h-[52px] text-base bg-white border-gray-300 text-gray-900"
-                />
-              </div>
-            </div>
-
-            {/* Salary Components - Now with more breathing room */}
-            <div className="space-y-6">
-              <h3 className="text-lg font-semibold text-gray-800">Salary Components (UGX)</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Basic Salary</label>
-                  <Input type="number" name="basic_salary" value={formData.basic_salary} onChange={handleInputChange} placeholder="0" required className="h-12 bg-white text-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Housing Allowance</label>
-                  <Input type="number" name="housing_allowance" value={formData.housing_allowance} onChange={handleInputChange} placeholder="0" className="h-12 bg-white text-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Transport Allowance</label>
-                  <Input type="number" name="transport_allowance" value={formData.transport_allowance} onChange={handleInputChange} placeholder="0" className="h-12 bg-white text-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Medical Allowance</label>
-                  <Input type="number" name="medical_allowance" value={formData.medical_allowance} onChange={handleInputChange} placeholder="0" className="h-12 bg-white text-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Lunch Allowance</label>
-                  <Input type="number" name="lunch_allowance" value={formData.lunch_allowance} onChange={handleInputChange} placeholder="0" className="h-12 bg-white text-gray-900" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Other Allowances</label>
-                  <Input type="number" name="other_allowances" value={formData.other_allowances} onChange={handleInputChange} placeholder="0" className="h-12 bg-white text-gray-900" />
-                </div>
-              </div>
-            </div>
-
-            {/* Gross Salary */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6">
-              <div className="flex justify-between items-center">
-                <span className="text-xl font-bold text-gray-800">Calculated Gross Salary:</span>
-                <span className="text-3xl font-extrabold text-blue-700">{formatCurrency(calculateGrossSalary())}</span>
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-              <textarea
-                name="notes"
-                value={formData.notes}
+              <InputField
+                label="Effective from"
+                type="date"
+                name="effective_date"
+                value={formData.effective_date}
                 onChange={handleInputChange}
-                rows={4}
-                className="w-full px-5 py-4 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 resize-none"
-                placeholder="e.g. Annual increment, promotion adjustment, new tax regime..."
+                required
               />
             </div>
 
+            {/* Breakdown */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b border-notion-border">
+                <Calculator className="h-4 w-4 text-notion-text-light" />
+                <h3 className="text-xs font-bold text-notion-text uppercase tracking-widest">Calculated Breakdown (UGX)</h3>
+              </div>
+
+              <div className="grid grid-cols-2 gap-x-8 gap-y-4">
+                <InputField label="Basic salary" type="number" name="basic_salary" value={formData.basic_salary} onChange={handleInputChange} required placeholder="0" />
+                <InputField label="Housing allowance" type="number" name="housing_allowance" value={formData.housing_allowance} onChange={handleInputChange} placeholder="0" />
+                <InputField label="Transport allowance" type="number" name="transport_allowance" value={formData.transport_allowance} onChange={handleInputChange} placeholder="0" />
+                <InputField label="Medical allowance" type="number" name="medical_allowance" value={formData.medical_allowance} onChange={handleInputChange} placeholder="0" />
+                <InputField label="Lunch allowance" type="number" name="lunch_allowance" value={formData.lunch_allowance} onChange={handleInputChange} placeholder="0" />
+                <InputField label="Other allowances" type="number" name="other_allowances" value={formData.other_allowances} onChange={handleInputChange} placeholder="0" />
+              </div>
+            </div>
+
+            {/* Gross Result */}
+            <div className="p-6 bg-notion-sidebar rounded-lg border border-notion-border flex justify-between items-center">
+              <div>
+                <p className="text-[11px] font-bold text-notion-text-light uppercase tracking-widest">Projected Gross Monthly</p>
+                <p className="text-3xl font-bold tracking-tighter mt-1">{formatCurrency(calculateGrossSalary())}</p>
+              </div>
+              <div className="h-10 w-10 rounded-full bg-notion-border/20 flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-notion-text-light" />
+              </div>
+            </div>
+
             {/* Footer */}
-            <DialogFooter className="bg-gray-50/80 -m-6 mt-10 p-8 rounded-b-2xl border-t border-gray-200 backdrop-blur">
-              <Button
+            <div className="flex justify-end gap-3 pt-6 border-t border-notion-border">
+              <button
                 type="button"
-                variant="outline"
                 onClick={() => { setShowForm(false); setEditingStructure(null); }}
-                className="px-8 py-6 text-base"
+                className="px-4 py-1.5 text-sm font-medium hover:bg-notion-hover rounded transition-colors"
               >
                 Cancel
-              </Button>
-              <Button
+              </button>
+              <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-6 text-base font-semibold shadow-lg"
                 disabled={creating || updating}
+                className="btn-notion-primary h-9 px-6 uppercase tracking-widest text-[11px] font-black"
               >
-                {creating || updating ? 'Saving...' : (editingStructure ? 'Update' : 'Create') + ' Salary Structure'}
-              </Button>
-            </DialogFooter>
+                {creating || updating ? 'Saving...' : 'Confirm structure'}
+              </button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -319,13 +381,14 @@ const SalaryStructurePage = () => {
   );
 };
 
-export { SalaryStructurePage };
+const InputField = ({ label, ...props }) => (
+  <div className="space-y-1.5">
+    <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">{label}</label>
+    <input
+      {...props}
+      className="input-notion"
+    />
+  </div>
+);
+
 export default SalaryStructurePage;
-
-
-
-
-
-
-
-

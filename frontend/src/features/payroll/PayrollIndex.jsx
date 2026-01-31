@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/Tabs';
 import { DollarSign, FileText, Users, Briefcase } from 'lucide-react';
 import PayrollDashboard from './PayrollDashboard';
-import { PayslipPage } from './PayslipPage';
+
 import { SalaryStructurePage } from './SalaryStructurePage';
 import LoanManagementPage from './LoanManagementPage';
 
@@ -37,7 +37,7 @@ const PayrollIndex = () => {
                         <TabsList className="bg-transparent border-none p-0 flex gap-0.5 sm:gap-1">
                             {[
                                 { id: 'dashboard', label: 'Overview', icon: DollarSign },
-                                { id: 'payslips', label: 'Payslips', icon: FileText },
+
                                 { id: 'salaries', label: 'Structures', icon: Users },
                                 { id: 'loans', label: 'Loans', icon: Briefcase }
                             ].map((tab) => (
@@ -59,9 +59,7 @@ const PayrollIndex = () => {
                         <PayrollDashboard setActiveTab={setActiveTab} />
                     </TabsContent>
 
-                    <TabsContent value="payslips" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
-                        <PayslipPage />
-                    </TabsContent>
+
 
                     <TabsContent value="salaries" className="animate-in fade-in slide-in-from-bottom-2 duration-500 outline-none">
                         <SalaryStructurePage />

@@ -5,14 +5,13 @@ import {
     useGetMyProfileQuery,
     useGetTodayAttendanceQuery,
     useGetLeaveBalancesQuery,
-    useGetMyLeaveRequestsQuery,
-    useGetPayslipsQuery
+    useGetMyLeaveRequestsQuery
 } from '../../store/api';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import {
-    Calendar, Clock, CreditCard, FileText, ArrowRight,
-    CheckCircle, AlertCircle, Activity, MapPin, ChevronRight, DollarSign, User
+    Calendar, Clock, FileText, ArrowRight,
+    CheckCircle, AlertCircle, Activity, MapPin, ChevronRight, User
 } from 'lucide-react';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { Link } from 'react-router-dom';
@@ -23,9 +22,7 @@ const EmployeeDashboard = () => {
     const { data: todayAttendance, isLoading: isAttendanceLoading } = useGetTodayAttendanceQuery();
     const { data: leaveBalances, isLoading: isLeaveLoading } = useGetLeaveBalancesQuery();
     const { data: leaveRequests, isLoading: isRequestsLoading } = useGetMyLeaveRequestsQuery();
-    const { data: payslipsData, isLoading: isPayslipsLoading } = useGetPayslipsQuery();
 
-    const payslips = (payslipsData?.results || payslipsData || []).slice(0, 3);
     const pendingRequestsCount = leaveRequests?.filter(r => r.status === 'pending').length || 0;
 
     const formatCurrency = (val) => new Intl.NumberFormat('en-UG', {
@@ -36,7 +33,7 @@ const EmployeeDashboard = () => {
     const formattedDate = currentDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
 
     const quickActions = [
-        { name: 'Payslips', href: '/employee/payslips', icon: CreditCard, color: 'text-slate-600 bg-slate-50 border-slate-200' },
+
         { name: 'Request Leave', href: '/employee/leave', icon: Calendar, color: 'text-slate-600 bg-slate-50 border-slate-200' },
         { name: 'Attendance', href: '/employee/attendance', icon: Clock, color: 'text-slate-600 bg-slate-50 border-slate-200' },
         { name: 'Documents', href: '/employee/documents', icon: FileText, color: 'text-slate-600 bg-slate-50 border-slate-200' },
@@ -127,47 +124,7 @@ const EmployeeDashboard = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Payslips */}
-                    <Card className="border border-slate-200 shadow-sm overflow-hidden bg-white">
-                        <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Recent Remuneration</h3>
-                            <Link to="/employee/payslips">
-                                <button className="text-[10px] font-bold text-[#88B072] hover:text-[#7aa265] uppercase tracking-widest">History</button>
-                            </Link>
-                        </div>
-                        <CardContent className="p-0">
-                            <div className="divide-y divide-slate-50">
-                                {payslips.length > 0 ? payslips.map((payslip) => (
-                                    <div key={payslip.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors group">
-                                        <div className="flex items-center gap-4">
-                                            <div className="h-10 w-10 rounded bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                <DollarSign className="h-5 w-5" />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-slate-800 group-hover:text-slate-900">{payslip.payroll_period}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Remitted</p>
-                                            </div>
-                                        </div>
-                                        <div className="text-right flex items-center gap-6">
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-900">{formatCurrency(payslip.net_salary)}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase">Net Pay</p>
-                                            </div>
-                                            <Link to="/employee/payslips">
-                                                <button className="h-8 px-4 border border-slate-200 text-slate-600 hover:text-[#88B072] hover:border-[#88B072] font-semibold rounded text-xs transition-all uppercase">
-                                                    PDF
-                                                </button>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                )) : (
-                                    <div className="p-12 text-center">
-                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">No payslips found</p>
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
+
                 </div>
 
                 {/* Sidebar */}

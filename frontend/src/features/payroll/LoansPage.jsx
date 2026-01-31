@@ -1,30 +1,42 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
-import { Button } from '../../components/ui/Button';
-import { Badge } from '../../components/ui/Badge';
-import { Input } from '../../components/ui/Input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/Table';
 import {
-    Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar,
-    Clock, Loader2, TrendingUp, PiggyBank, Calculator, Percent
+    Plus, Search, Filter, PiggyBank, Clock,
+    DollarSign, TrendingUp, ChevronRight, Eye,
+    MoreHorizontal, Calculator, Hash, User,
+    CheckCircle2, AlertCircle, Calendar
 } from 'lucide-react';
-import { useGetSalaryAdvancesQuery, useCreateSalaryAdvanceMutation, useGetEmployeesQuery } from '../../store/api';
-import toast from 'react-hot-toast';
+import {
+    useGetSalaryAdvancesQuery,
+    useCreateSalaryAdvanceMutation,
+    useGetEmployeesQuery
+} from '../../store/api';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter
+} from '../../components/ui/Dialog';
+import { Button } from '../../components/ui/Button';
 import { cn } from '../../utils/cn';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
+import toast from 'react-hot-toast';
+
+const STATUS_CONFIG = {
+    approved: { color: 'text-emerald-700 bg-emerald-50 border-emerald-100', label: 'Approved' },
+    active: { color: 'text-emerald-700 bg-emerald-50 border-emerald-100', label: 'Active' },
+    pending: { color: 'text-orange-700 bg-orange-50 border-orange-100', label: 'Pending' },
+    rejected: { color: 'text-red-700 bg-red-50 border-red-100', label: 'Rejected' },
+    completed: { color: 'text-blue-700 bg-blue-50 border-blue-100', label: 'Completed' },
+    draft: { color: 'text-slate-500 bg-slate-50 border-slate-100', label: 'Draft' }
+};
 
 const LoansPage = () => {
+    // 1. Context & State
     const user = useSelector(selectCurrentUser);
     const isAdmin = user?.role !== 'employee';
-
-    const { data: loansData, isLoading } = useGetSalaryAdvancesQuery({ loan_type: 'loan' });
-    const { data: employees } = useGetEmployeesQuery();
-    const [createLoan, { isLoading: isCreating }] = useCreateSalaryAdvanceMutation();
-
-    const loans = Array.isArray(loansData) ? loansData : (loansData?.results || []);
-
+    const [searchTerm, setSearchTerm] = useState('');
     const [showForm, setShowForm] = useState(false);
     const [selectedLoan, setSelectedLoan] = useState(null);
     const [loanCalculator, setLoanCalculator] = useState({
@@ -32,7 +44,6 @@ const LoansPage = () => {
         interestRate: 5,
         months: 12
     });
-
     const [formData, setFormData] = useState({
         employee: '',
         amount: '',
@@ -41,478 +52,390 @@ const LoansPage = () => {
         interest_rate: '5'
     });
 
-    const formatCurrency = (value) => {
+    // 2. Queries
+    const { data: loansData, isLoading } = useGetSalaryAdvancesQuery({ loan_type: 'loan' });
+    const { data: employeesData } = useGetEmployeesQuery();
+    const [createLoan, { isLoading: isCreating }] = useCreateSalaryAdvanceMutation();
+
+    // 3. Computed
+    const loans = Array.isArray(loansData) ? loansData : (loansData?.results || []);
+    const employees = Array.isArray(employeesData?.results) ? employeesData.results : (Array.isArray(employeesData) ? employeesData : []);
+
+    const filteredLoans = loans.filter(l =>
+        l.employee_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        l.employee_number?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const stats = {
+        totalDisbursed: loans.filter(l => l.status === 'active' || l.status === 'completed')
+            .reduce((sum, l) => sum + parseFloat(l.amount || 0), 0),
+        activeCount: loans.filter(l => l.status === 'active').length,
+        pendingCount: loans.filter(l => l.status === 'pending').length,
+        totalOutstanding: loans.filter(l => l.status === 'active')
+            .reduce((sum, l) => sum + parseFloat(l.outstanding_balance || l.amount || 0), 0)
+    };
+
+    // 4. Handlers
+    const formatCurrency = (val) => {
         return new Intl.NumberFormat('en-UG', {
             style: 'currency',
             currency: 'UGX',
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(value || 0);
+            minimumFractionDigits: 0
+        }).format(Number(val) || 0);
     };
 
     const calculateMonthlyPayment = (principal, rate, months) => {
         const p = parseFloat(principal) || 0;
         const r = (parseFloat(rate) || 0) / 100 / 12;
         const n = parseInt(months) || 1;
-
-        if (r === 0) return p / n;
-
+        if (r === 0) return Math.ceil(p / n);
         const monthly = (p * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
         return Math.ceil(monthly);
     };
 
     const calculateTotalInterest = (principal, rate, months) => {
         const monthly = calculateMonthlyPayment(principal, rate, months);
-        const total = monthly * months;
-        return total - parseFloat(principal) || 0;
-    };
-
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        return (monthly * months) - (parseFloat(principal) || 0);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await createLoan({
-                ...formData,
-                loan_type: 'loan'
-            }).unwrap();
-            toast.success('Loan application submitted successfully!');
+            await createLoan({ ...formData, loan_type: 'loan' }).unwrap();
+            toast.success('Loan application submitted');
             setShowForm(false);
-            setFormData({
-                employee: '',
-                amount: '',
-                loan_purpose: '',
-                repayment_period_months: '12',
-                interest_rate: '5'
-            });
+            setFormData({ employee: '', amount: '', loan_purpose: '', repayment_period_months: '12', interest_rate: '5' });
         } catch (error) {
-            toast.error(error?.data?.error || 'Failed to submit loan application');
+            toast.error(error?.data?.error || 'Submission failed');
         }
     };
 
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'approved':
-            case 'active': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
-            case 'pending': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-            case 'rejected': return 'bg-red-100 text-red-700 border-red-200';
-            case 'completed': return 'bg-blue-100 text-blue-700 border-blue-200';
-            default: return 'bg-slate-100 text-slate-700 border-slate-200';
-        }
-    };
-
-    // Calculate stats
-    const stats = {
-        totalDisbursed: loans.filter(l => l.status === 'active' || l.status === 'completed')
-            .reduce((sum, l) => sum + parseFloat(l.amount || 0), 0),
-        activeLoans: loans.filter(l => l.status === 'active').length,
-        pendingLoans: loans.filter(l => l.status === 'pending').length,
-        completedLoans: loans.filter(l => l.status === 'completed').length,
-        totalOutstanding: loans.filter(l => l.status === 'active')
-            .reduce((sum, l) => sum + parseFloat(l.outstanding_balance || l.amount || 0), 0)
-    };
-
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
-            </div>
-        );
-    }
-
+    // 5. Render
     return (
-        <div className="space-y-6">
+        <div className="space-y-12 pb-20">
             {/* Header */}
-            {/* Actions Only */}
-            <div className="flex justify-end items-center mb-6">
-                <Button onClick={() => setShowForm(true)} className="bg-slate-900 hover:bg-black text-[10px] font-bold uppercase tracking-widest h-10 px-6 gap-2">
-                    <Plus className="h-4 w-4" />
-                    Apply for Loan
-                </Button>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+                <div>
+                    <h1 className="text-4xl font-bold tracking-tight">Loan Portfolio</h1>
+                    <p className="text-notion-text-light mt-2">Oversee staff loans, repayments, and outstanding liabilities.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Button onClick={() => setShowForm(true)} className="btn-notion-primary h-8">
+                        <Plus className="h-3.5 w-3.5 mr-2" />
+                        Apply for loan
+                    </Button>
+                </div>
             </div>
 
-            {/* Loan Calculator Card */}
-            <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-none shadow-2xl rounded-3xl overflow-hidden text-white">
-                <CardContent className="p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                        <Calculator className="h-6 w-6 text-primary-400" />
-                        <h3 className="text-lg font-black uppercase tracking-wider">Quick Loan Calculator</h3>
+            {/* Flat Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                    { label: 'Total Disbursed', value: formatCurrency(stats.totalDisbursed) },
+                    { label: 'Active Loans', value: stats.activeCount },
+                    { label: 'Pending Approval', value: stats.pendingCount, color: 'text-orange-600' },
+                    { label: 'Outstanding Balance', value: formatCurrency(stats.totalOutstanding), color: 'text-red-600' }
+                ].map((s, idx) => (
+                    <div key={idx} className="space-y-1">
+                        <p className="text-[11px] font-semibold text-notion-text-light uppercase tracking-wider">{s.label}</p>
+                        <p className={cn("text-2xl font-bold", s.color)}>{s.value}</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Principal Amount</label>
-                            <input
-                                type="number"
-                                value={loanCalculator.principal}
-                                onChange={(e) => setLoanCalculator(prev => ({ ...prev, principal: e.target.value }))}
-                                placeholder="5,000,000"
-                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-slate-500 outline-none focus:border-primary-400"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Interest Rate (%)</label>
-                            <input
-                                type="number"
-                                value={loanCalculator.interestRate}
-                                onChange={(e) => setLoanCalculator(prev => ({ ...prev, interestRate: e.target.value }))}
-                                placeholder="5"
-                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-slate-500 outline-none focus:border-primary-400"
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Term (Months)</label>
-                            <select
-                                value={loanCalculator.months}
-                                onChange={(e) => setLoanCalculator(prev => ({ ...prev, months: e.target.value }))}
-                                className="w-full h-12 px-4 bg-white/10 border border-white/20 rounded-xl text-white outline-none focus:border-primary-400"
-                            >
-                                <option value="6" className="text-slate-900">6 Months</option>
-                                <option value="12" className="text-slate-900">12 Months</option>
-                                <option value="18" className="text-slate-900">18 Months</option>
-                                <option value="24" className="text-slate-900">24 Months</option>
-                                <option value="36" className="text-slate-900">36 Months</option>
-                            </select>
-                        </div>
-                        <div className="bg-primary-600 rounded-2xl p-4 text-center">
-                            <p className="text-xs font-bold text-primary-200 uppercase tracking-wider mb-1">Monthly Payment</p>
-                            <p className="text-2xl font-black">
-                                {formatCurrency(calculateMonthlyPayment(loanCalculator.principal, loanCalculator.interestRate, loanCalculator.months))}
-                            </p>
-                            <p className="text-xs text-primary-200 mt-1">
-                                Total Interest: {formatCurrency(calculateTotalInterest(loanCalculator.principal, loanCalculator.interestRate, loanCalculator.months))}
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-slate-900 rounded-xl text-white">
-                                <PiggyBank className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Disbursed</p>
-                                <p className="text-2xl font-black text-slate-900 tracking-tighter">
-                                    {formatCurrency(stats.totalDisbursed)}
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                                <TrendingUp className="h-6 w-6 text-emerald-600" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Loans</p>
-                                <p className="text-2xl font-black text-emerald-600 tracking-tighter">{stats.activeLoans}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-orange-50 rounded-xl border border-orange-100">
-                                <Clock className="h-6 w-6 text-orange-600" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pending Approval</p>
-                                <p className="text-2xl font-black text-orange-600 tracking-tighter">{stats.pendingLoans}</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
-                    <CardContent className="p-6">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 bg-red-50 rounded-xl border border-red-100">
-                                <DollarSign className="h-6 w-6 text-red-600" />
-                            </div>
-                            <div>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Outstanding</p>
-                                <p className="text-2xl font-black text-red-600 tracking-tighter">
-                                    {formatCurrency(stats.totalOutstanding)}
-                                </p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                ))}
             </div>
 
-            {/* Loans Table */}
-            <Card className="border-none shadow-xl shadow-slate-200/50 rounded-3xl overflow-hidden">
-                <CardHeader className="bg-slate-50 border-b border-slate-100 p-8">
-                    <CardTitle className="text-sm font-black uppercase tracking-widest text-slate-500">Loan Portfolio</CardTitle>
-                </CardHeader>
-                <CardContent className="p-0">
-                    {loans.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-slate-50/50">
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Employee</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Principal</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Interest</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Term</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Monthly</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loans.map((loan) => (
-                                    <TableRow key={loan.id} className="hover:bg-slate-50/50 transition-all">
-                                        <TableCell className="px-8 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="font-bold text-slate-900">{loan.employee_name}</span>
-                                                <span className="text-xs text-slate-400">{loan.employee_number}</span>
+            {/* Quick Calculator Card - Minimal but Premium */}
+            <div className="p-8 bg-notion-sidebar border border-notion-border rounded-xl">
+                <div className="flex items-center gap-2 mb-6 text-notion-text-light">
+                    <Calculator className="h-4 w-4" />
+                    <h3 className="text-xs font-bold uppercase tracking-widest">Eligibility Calculator</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest leading-none">Principal Amount</label>
+                        <input
+                            type="number"
+                            value={loanCalculator.principal}
+                            onChange={(e) => setLoanCalculator(prev => ({ ...prev, principal: e.target.value }))}
+                            placeholder="5,000,000"
+                            className="input-notion py-1 h-9 bg-white"
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest leading-none">Rate (%)</label>
+                        <input
+                            type="number"
+                            value={loanCalculator.interestRate}
+                            onChange={(e) => setLoanCalculator(prev => ({ ...prev, interestRate: e.target.value }))}
+                            className="input-notion py-1 h-9 bg-white"
+                        />
+                    </div>
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest leading-none">Term (Months)</label>
+                        <select
+                            value={loanCalculator.months}
+                            onChange={(e) => setLoanCalculator(prev => ({ ...prev, months: e.target.value }))}
+                            className="input-notion py-1 h-9 bg-white cursor-pointer"
+                        >
+                            {[6, 12, 18, 24, 36, 48].map(m => <option key={m} value={m}>{m} Months</option>)}
+                        </select>
+                    </div>
+                    <div className="flex flex-col justify-end">
+                        <div className="flex justify-between items-baseline border-b border-notion-border pb-1">
+                            <span className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest">Monthly</span>
+                            <span className="text-sm font-bold">{formatCurrency(calculateMonthlyPayment(loanCalculator.principal, loanCalculator.interestRate, loanCalculator.months))}</span>
+                        </div>
+                        <div className="flex justify-between items-baseline mt-1">
+                            <span className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest opacity-50">Interest</span>
+                            <span className="text-[10px] font-bold text-notion-text-light">{formatCurrency(calculateTotalInterest(loanCalculator.principal, loanCalculator.interestRate, loanCalculator.months))}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* List Controls */}
+            <div className="flex flex-col md:flex-row gap-4 py-2 border-y border-notion-border items-center">
+                <div className="relative flex-1 w-full">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-notion-text-light" />
+                    <input
+                        placeholder="Filter by employee name or number..."
+                        className="w-full pl-8 pr-3 py-1.5 bg-transparent border-none focus:outline-none text-sm placeholder:text-notion-text-light"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto whitespace-nowrap px-1">
+                    <Button variant="ghost" className="btn-notion-outline h-7 px-2 text-[10px] uppercase font-bold tracking-widest">
+                        <Filter className="h-3 w-3 mr-1.5" /> Filter
+                    </Button>
+                    <div className="h-4 w-px bg-notion-border mx-2" />
+                    <button className="p-1 hover:bg-notion-hover rounded">
+                        <MoreHorizontal className="h-4 w-4 text-notion-text-light" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Table */}
+            {isLoading ? (
+                <div className="py-24 text-center text-notion-text-light italic">Loading portfolio...</div>
+            ) : filteredLoans.length === 0 ? (
+                <div className="py-24 text-center opacity-60">
+                    <PiggyBank className="h-12 w-12 mx-auto mb-4 stroke-1" />
+                    <p className="text-sm font-medium">No loans found in records</p>
+                </div>
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-notion-border">
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider w-[320px]">Member</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Loan Principal</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Schedule</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Status</th>
+                                <th className="px-1 py-3 text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-notion-border">
+                            {filteredLoans.map((loan) => (
+                                <tr key={loan.id} className="group hover:bg-notion-hover/40 transition-colors cursor-pointer" onClick={() => setSelectedLoan(loan)}>
+                                    <td className="px-4 py-5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-8 w-8 rounded bg-notion-sidebar border border-notion-border flex items-center justify-center shrink-0">
+                                                <User className="h-4 w-4 text-notion-text-light opacity-50" />
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 font-bold text-slate-900">
-                                            {formatCurrency(loan.amount)}
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6">
-                                            <span className="font-bold text-slate-700">{loan.interest_rate || 5}%</span>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6">
-                                            <span className="font-bold text-slate-700">{loan.repayment_period_months} months</span>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 font-bold text-primary-600">
-                                            {formatCurrency(loan.monthly_deduction)}
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6">
-                                            <Badge className={cn("rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-widest border", getStatusColor(loan.status))}>
-                                                {loan.status}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setSelectedLoan(loan)}
-                                                className="h-10 w-10 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-xl"
-                                            >
-                                                <Eye className="h-5 w-5" />
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    ) : (
-                        <div className="p-20 text-center">
-                            <PiggyBank className="h-16 w-16 mx-auto mb-4 text-slate-200" />
-                            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em]">No loans found</p>
-                            <p className="text-sm text-slate-400 mt-2">Apply for a staff loan to get started</p>
-                        </div>
-                    )}
-                </CardContent>
-            </Card>
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-[14px] truncate">{loan.employee_name}</p>
+                                                <p className="text-[11px] text-notion-text-light font-medium uppercase tracking-tighter flex items-center gap-1.5">
+                                                    <Hash className="h-3 w-3 opacity-30" /> {loan.employee_number}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        <p className="text-sm font-semibold">{formatCurrency(loan.amount)}</p>
+                                        <p className="text-[10px] text-notion-text-light uppercase font-bold tracking-tighter">
+                                            {loan.interest_rate || 5}% Interest applied
+                                        </p>
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        <div className="flex items-center gap-2 text-xs font-medium">
+                                            <span className="text-notion-text-light">{loan.repayment_period_months}M Term</span>
+                                            <div className="h-3 w-px bg-notion-border" />
+                                            <span className="text-[#88B072]">{formatCurrency(loan.monthly_deduction)}/mo</span>
+                                        </div>
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        <span className={cn(
+                                            "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border",
+                                            STATUS_CONFIG[loan.status]?.color || 'bg-slate-50'
+                                        )}>
+                                            {STATUS_CONFIG[loan.status]?.label || loan.status}
+                                        </span>
+                                    </td>
+                                    <td className="px-1 text-right">
+                                        <button className="p-1 opacity-0 group-hover:opacity-100 transition-all rounded hover:bg-black/5">
+                                            <ChevronRight className="h-4 w-4 text-notion-text-light" />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
-            {/* Apply for Loan Dialog */}
+            {/* Application Modal */}
             <Dialog open={showForm} onOpenChange={setShowForm}>
-                <DialogContent className="max-w-2xl p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
-                    <div className="bg-white px-10 pt-10 pb-6">
-                        <DialogTitle className="text-3xl font-semibold text-slate-900 tracking-tight">Loan application</DialogTitle>
-                        <p className="text-slate-500 mt-2 text-sm max-w-md leading-relaxed">
-                            Apply for a personal loan from the company. Please ensure you have reviewed the loan policy before submitting.
-                        </p>
-                    </div>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle>New Loan Application</DialogTitle>
+                    </DialogHeader>
 
-                    <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                        {isAdmin && (
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Select Employee</label>
-                                <select
-                                    name="employee"
-                                    value={formData.employee}
-                                    onChange={handleInputChange}
-                                    className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none"
-                                    required
-                                >
-                                    <option value="">Choose employee...</option>
-                                    {employees?.map(emp => (
-                                        <option key={emp.id} value={emp.id}>{emp.full_name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
+                    <form onSubmit={handleSubmit} className="p-8 space-y-8">
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Loan Amount (UGX)</label>
-                                <Input
-                                    name="amount"
-                                    type="number"
-                                    value={formData.amount}
-                                    onChange={handleInputChange}
-                                    placeholder="5,000,000"
-                                    required
-                                    className="h-12 rounded-xl"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Interest Rate (%)</label>
-                                <Input
-                                    name="interest_rate"
-                                    type="number"
-                                    value={formData.interest_rate}
-                                    onChange={handleInputChange}
-                                    placeholder="5"
-                                    className="h-12 rounded-xl"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Repayment Period</label>
-                            <select
+                            {isAdmin && (
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Applicant</label>
+                                    <select
+                                        name="employee"
+                                        value={formData.employee}
+                                        onChange={(e) => setFormData(p => ({ ...p, employee: e.target.value }))}
+                                        className="input-notion bg-transparent"
+                                        required
+                                    >
+                                        <option value="">Select Employee</option>
+                                        {employees.map(emp => (
+                                            <option key={emp.id} value={emp.id}>{emp.full_name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+                            <InputField
+                                label="Principal Amount (UGX)"
+                                type="number"
+                                name="amount"
+                                value={formData.amount}
+                                onChange={(e) => setFormData(p => ({ ...p, amount: e.target.value }))}
+                                required placeholder="e.g. 1000000"
+                            />
+                            <InputField
+                                label="Repayment Months"
+                                type="number"
                                 name="repayment_period_months"
                                 value={formData.repayment_period_months}
-                                onChange={handleInputChange}
-                                className="w-full h-12 px-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none"
-                            >
-                                <option value="6">6 Months</option>
-                                <option value="12">12 Months</option>
-                                <option value="18">18 Months</option>
-                                <option value="24">24 Months</option>
-                                <option value="36">36 Months</option>
-                            </select>
+                                onChange={(e) => setFormData(p => ({ ...p, repayment_period_months: e.target.value }))}
+                                required
+                            />
+                            <InputField
+                                label="Interest Rate (%)"
+                                type="number"
+                                name="interest_rate"
+                                value={formData.interest_rate}
+                                onChange={(e) => setFormData(p => ({ ...p, interest_rate: e.target.value }))}
+                            />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Purpose of Loan</label>
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Purpose of Loan</label>
                             <textarea
                                 name="loan_purpose"
                                 value={formData.loan_purpose}
-                                onChange={handleInputChange}
-                                rows="3"
-                                className="w-full p-4 border-2 border-slate-100 rounded-xl bg-slate-50 focus:bg-white focus:border-primary-500 outline-none resize-none"
-                                placeholder="Please describe the purpose of this loan..."
+                                onChange={(e) => setFormData(p => ({ ...p, loan_purpose: e.target.value }))}
+                                className="input-notion min-h-[100px] py-3 resize-none bg-transparent"
+                                placeholder="Briefly describe what this loan is for..."
                                 required
                             />
                         </div>
 
                         {formData.amount && (
-                            <div className="bg-slate-900 rounded-2xl p-6 text-white">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h4 className="text-xs font-black uppercase tracking-widest text-primary-400">Loan Summary</h4>
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
+                            <div className="p-6 bg-[#88B072]/5 rounded-lg border border-[#88B072]/20 border-dashed">
+                                <div className="flex justify-between items-center text-[#88B072]">
                                     <div>
-                                        <p className="text-xs text-slate-400">Monthly Payment</p>
-                                        <p className="text-xl font-black">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Estimated Monthly Deduction</p>
+                                        <p className="text-2xl font-bold mt-0.5">
                                             {formatCurrency(calculateMonthlyPayment(formData.amount, formData.interest_rate, formData.repayment_period_months))}
                                         </p>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-slate-400">Total Interest</p>
-                                        <p className="text-xl font-black text-yellow-400">
-                                            {formatCurrency(calculateTotalInterest(formData.amount, formData.interest_rate, formData.repayment_period_months))}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-slate-400">Total Repayment</p>
-                                        <p className="text-xl font-black text-primary-400">
-                                            {formatCurrency(calculateMonthlyPayment(formData.amount, formData.interest_rate, formData.repayment_period_months) * parseInt(formData.repayment_period_months))}
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Total Repayment</p>
+                                        <p className="text-sm font-bold mt-1">
+                                            {formatCurrency(calculateMonthlyPayment(formData.amount, formData.interest_rate, formData.repayment_period_months) * (parseInt(formData.repayment_period_months) || 1))}
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         )}
 
-                        <DialogFooter className="gap-3 pt-6 border-t border-slate-50">
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                onClick={() => setShowForm(false)}
-                                className="h-11 px-6 text-slate-600 font-semibold hover:bg-slate-50 rounded-lg"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                disabled={isCreating}
-                                className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg shadow-sm"
-                            >
-                                {isCreating ? 'Submitting...' : 'Submit application'}
-                            </Button>
-                        </DialogFooter>
+                        <div className="flex justify-end gap-3 pt-6 border-t border-notion-border">
+                            <button type="button" onClick={() => setShowForm(false)} className="px-4 py-1.5 text-sm font-medium hover:bg-notion-hover rounded">Cancel</button>
+                            <button type="submit" disabled={isCreating} className="btn-notion-primary h-9 px-6 text-[11px] uppercase tracking-widest font-black">
+                                {isCreating ? 'Submitting...' : 'Confirm application'}
+                            </button>
+                        </div>
                     </form>
                 </DialogContent>
             </Dialog>
 
-            {/* Loan Details Dialog */}
+            {/* Details Modal */}
             <Dialog open={!!selectedLoan} onOpenChange={() => setSelectedLoan(null)}>
-                <DialogContent className="max-w-lg p-0 border-none shadow-2xl rounded-[2rem] overflow-hidden">
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Loan details</DialogTitle>
+                    </DialogHeader>
                     {selectedLoan && (
-                        <>
-                            <div className="bg-white px-8 py-6 flex items-center gap-4 border-b border-slate-100">
-                                <div className="h-12 w-12 rounded-xl bg-slate-50 flex items-center justify-center border border-slate-100 shadow-sm">
-                                    <DollarSign className="h-6 w-6 text-slate-600" />
+                        <div className="p-8 space-y-8">
+                            <div className="flex items-center gap-4">
+                                <div className="h-10 w-10 rounded-full bg-notion-sidebar border border-notion-border flex items-center justify-center">
+                                    <Calendar className="h-5 w-5 opacity-40" />
                                 </div>
                                 <div>
-                                    <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">Loan Details</DialogTitle>
-                                    <p className="text-slate-500 mt-1 font-medium text-sm">{selectedLoan.employee_name}</p>
+                                    <p className="text-lg font-bold">{selectedLoan.employee_name}</p>
+                                    <p className="text-xs text-notion-text-light font-medium uppercase tracking-tight">Applied on {new Date(selectedLoan.created_at || Date.now()).toLocaleDateString()}</p>
                                 </div>
                             </div>
 
-                            <div className="p-8 space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Principal</p>
-                                        <p className="text-lg font-black text-slate-900">{formatCurrency(selectedLoan.amount)}</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Interest Rate</p>
-                                        <p className="text-lg font-black text-slate-900">{selectedLoan.interest_rate || 5}%</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Term</p>
-                                        <p className="text-lg font-black text-slate-900">{selectedLoan.repayment_period_months} months</p>
-                                    </div>
-                                    <div className="bg-slate-50 rounded-xl p-4">
-                                        <p className="text-xs text-slate-400">Monthly Payment</p>
-                                        <p className="text-lg font-black text-primary-600">{formatCurrency(selectedLoan.monthly_deduction)}</p>
-                                    </div>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                                <div>
+                                    <p className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest mb-1">Principal</p>
+                                    <p className="text-base font-bold">{formatCurrency(selectedLoan.amount)}</p>
                                 </div>
-
-                                <div className="bg-slate-100 rounded-xl p-4">
-                                    <p className="text-xs text-slate-400 mb-2">Purpose</p>
-                                    <p className="text-slate-700">{selectedLoan.loan_purpose}</p>
+                                <div>
+                                    <p className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest mb-1">Status</p>
+                                    <span className={cn(
+                                        "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border",
+                                        STATUS_CONFIG[selectedLoan.status]?.color || 'bg-slate-50'
+                                    )}>
+                                        {STATUS_CONFIG[selectedLoan.status]?.label || selectedLoan.status}
+                                    </span>
                                 </div>
-
-                                <div className="flex justify-between items-center">
-                                    <span className="text-slate-500">Status</span>
-                                    <Badge className={cn("rounded-xl px-4 py-1.5", getStatusColor(selectedLoan.status))}>
-                                        {selectedLoan.status}
-                                    </Badge>
+                                <div>
+                                    <p className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest mb-1">Repayment</p>
+                                    <p className="text-sm font-medium">{formatCurrency(selectedLoan.monthly_deduction)}/mo</p>
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-bold text-notion-text-light uppercase tracking-widest mb-1">Remaining</p>
+                                    <p className="text-sm font-medium">{formatCurrency(selectedLoan.outstanding_balance)}</p>
                                 </div>
                             </div>
 
-                            <DialogFooter className="p-8 pt-0">
-                                <Button variant="outline" onClick={() => setSelectedLoan(null)} className="rounded-xl">
-                                    Close
-                                </Button>
-                            </DialogFooter>
-                        </>
+                            <div className="p-4 bg-notion-sidebar rounded border border-notion-border italic text-xs text-notion-text-light">
+                                "{selectedLoan.loan_purpose || 'No purpose specified'}"
+                            </div>
+
+                            <div className="flex justify-end pt-4 border-t border-notion-border">
+                                <button onClick={() => setSelectedLoan(null)} className="btn-notion-outline h-9 px-6 text-[11px] uppercase font-black">Close</button>
+                            </div>
+                        </div>
                     )}
                 </DialogContent>
             </Dialog>
         </div>
     );
 };
+
+const InputField = ({ label, ...props }) => (
+    <div className="space-y-1.5">
+        <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">{label}</label>
+        <input {...props} className="input-notion bg-transparent" />
+    </div>
+);
 
 export default LoansPage;

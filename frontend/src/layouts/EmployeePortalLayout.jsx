@@ -39,7 +39,7 @@ const EmployeePortalLayout = () => {
 
     const navigation = [
         { name: 'My Dashboard', href: '/employee/dashboard', icon: LayoutDashboard },
-        { name: 'My Payslips', href: '/employee/payslips', icon: CreditCard },
+
         { name: 'My Leave', href: '/employee/leave', icon: Calendar },
         { name: 'My Attendance', href: '/employee/attendance', icon: Clock },
         { name: 'My Performance', href: '/employee/performance', icon: Activity },

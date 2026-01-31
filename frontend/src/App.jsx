@@ -42,7 +42,7 @@ import OnboardingPage from './features/onboarding/OnboardingPage';
 import EmployeePortalLayout from './layouts/EmployeePortalLayout';
 import EmployeeDashboard from './features/employee-portal/EmployeeDashboard';
 import ExpensesPage from './features/payroll/ExpensesPage';
-import MyPayslipsPage from './features/payroll/MyPayslipsPage';
+
 import SalaryAdvancesPage from './features/payroll/SalaryAdvancesPage';
 import LoansPage from './features/payroll/LoansPage';
 import MyDocumentsPage from './features/employee-portal/MyDocumentsPage';
@@ -146,7 +146,7 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={[ROLES.EMPLOYEE]} />}>
         <Route path="/employee" element={<EmployeePortalLayout />}>
           <Route path="dashboard" element={<EmployeeDashboard />} />
-          <Route path="payslips" element={<MyPayslipsPage />} />
+
           <Route path="leave" element={<LeaveRequestsPage />} />
           <Route path="attendance" element={<AttendancePage />} />
           <Route path="documents" element={<MyDocumentsPage />} />

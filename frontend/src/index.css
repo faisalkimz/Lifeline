@@ -60,7 +60,7 @@
 @layer base {
   * {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    @apply border-notion-border;
+    border-color: var(--notion-border);
   }
 
   body {
@@ -86,7 +86,8 @@
 
   /* Notion-style Card */
   .card-notion {
-    @apply bg-transparent rounded-lg border border-notion-border transition-colors hover:bg-notion-sidebar/50;
+    @apply bg-transparent rounded-lg border transition-colors hover:bg-notion-sidebar/50;
+    border-color: var(--notion-border);
   }
 
   /* Minimalist Button */
@@ -103,12 +104,14 @@
   }
 
   .btn-notion-outline {
-    @apply btn-notion border border-notion-border hover:bg-notion-hover;
+    @apply btn-notion border hover:bg-notion-hover;
+    border-color: var(--notion-border);
   }
 
   /* Notion-style Input */
   .input-notion {
-    @apply w-full rounded-md border border-notion-border bg-transparent px-3 py-1.5 text-sm ring-offset-white placeholder:text-notion-text-light focus:outline-none focus:ring-1 focus:ring-notion-primary disabled:cursor-not-allowed disabled:opacity-50;
+    @apply w-full rounded-md border bg-transparent px-3 py-1.5 text-sm ring-offset-white placeholder:text-notion-text-light focus:outline-none focus:ring-1 focus:ring-notion-primary disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: var(--notion-border);
     background-color: var(--notion-bg);
   }
 
@@ -137,11 +140,13 @@
 }
 
 .table-notion th {
-  @apply text-left font-medium text-notion-text-light px-4 py-2 border-b border-notion-border bg-notion-sidebar/30;
+  @apply text-left font-medium text-notion-text-light px-4 py-2 border-b bg-notion-sidebar/30;
+  border-color: var(--notion-border);
 }
 
 .table-notion td {
-  @apply px-4 py-3 border-b border-notion-border;
+  @apply px-4 py-3 border-b;
+  border-color: var(--notion-border);
 }
 
 .table-notion tr:hover {

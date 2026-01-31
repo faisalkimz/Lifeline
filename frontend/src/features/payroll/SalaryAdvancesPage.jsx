@@ -11,7 +11,7 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/Dialog';
-import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, Clock, Zap } from 'lucide-react';
+import { Plus, Eye, CheckCircle, XCircle, DollarSign, Calendar, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '../../utils/cn';
 import { useSelector } from 'react-redux';

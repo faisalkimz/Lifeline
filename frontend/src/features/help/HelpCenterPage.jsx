@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import {
     Search, HelpCircle, BookOpen, MessageCircle, FileText,
-    ChevronDown, ChevronRight, Mail, Phone, ExternalLink, Zap
+    ChevronDown, ChevronRight, Mail, Phone, ExternalLink, Rocket
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -63,7 +63,7 @@ const HelpCenterPage = () => {
 
     const categories = [
         {
-            icon: Zap,
+            icon: Rocket,
             title: "Getting Started",
             description: "New to Lifeline? Learn the basics of setting up your account and workspace.",
             articles: ["Quick Start Guide", "Setting up your profile", "Inviting team members"]

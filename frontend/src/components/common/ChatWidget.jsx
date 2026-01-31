@@ -78,10 +78,10 @@ const ChatWidget = () => {
             <div className="p-4 bg-slate-900 dark:bg-slate-950 text-white flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-xl bg-primary-500 flex items-center justify-center">
-                        <Bot className="h-6 w-6" />
+                        <MessageSquare className="h-6 w-6" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-sm">Lifeline AI</h3>
+                        <h3 className="font-bold text-sm">Lifeline Assistant</h3>
                         <div className="flex items-center gap-1.5">
                             <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                             <span className="text-[10px] text-slate-400 font-medium">Assistant Online</span>
@@ -104,8 +104,8 @@ const ChatWidget = () => {
                     <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-950/50">
                         {currentSession?.messages?.length === 0 && (
                             <div className="text-center py-10 px-6">
-                                <Bot className="h-12 w-12 text-primary-500 mx-auto mb-4 opacity-50" />
-                                <h4 className="font-bold text-slate-800 dark:text-white mb-2">Hello! I'm Lifeline AI</h4>
+                                <MessageSquare className="h-12 w-12 text-primary-500 mx-auto mb-4 opacity-50" />
+                                <h4 className="font-bold text-slate-800 dark:text-white mb-2">Hello! I'm your Lifeline Assistant</h4>
                                 <p className="text-xs text-slate-500">Ask me anything about your leave, payslips, or company policies.</p>
                             </div>
                         )}

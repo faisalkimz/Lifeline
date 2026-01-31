@@ -78,7 +78,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
           </Button>
         </div>
 
-        {/* AI Score Banner */}
+        {/* Compatibility Score Banner */}
         {application?.score > 0 && (
           <div className="mx-6 mt-4 p-4 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
                 {application.score}%
               </div>
               <div>
-                <p className="text-sm font-bold text-emerald-900">AI Compatibility Score</p>
+                <p className="text-sm font-bold text-emerald-900">Compatibility Score</p>
                 <p className="text-xs text-emerald-600 font-medium">Candidate matches {application.score}% of job requirements.</p>
               </div>
             </div>
@@ -190,15 +190,15 @@ const CandidateProfileDrawer = ({ candidate, open, onClose }) => {
               onClick={async () => {
                 try {
                   const res = await screenWithAi(application.id).unwrap();
-                  toast.success(res.message || "AI Screening complete!");
+                  toast.success(res.message || "Screening complete!");
                 } catch (err) {
-                  toast.error("AI Screening failed.");
+                  toast.error("Screening failed.");
                 }
               }}
               disabled={isScreening}
             >
               {isScreening ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
-              AI Screen
+              Analyze Profile
             </Button>
           )}
           <Button

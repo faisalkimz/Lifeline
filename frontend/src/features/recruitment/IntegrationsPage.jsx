@@ -15,7 +15,7 @@ import { Button } from '../../components/ui/Button';
 import { Switch } from '../../components/ui/Switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../../components/ui/Dialog';
 import {
-    Linkedin, Globe, Zap, CheckCircle,
+    Linkedin, Globe, Link, CheckCircle,
     Activity, Share2, Network,
     LayoutGrid, Settings, Calendar, Video, Database,
     Mail, Cloud, Shield, Loader2, Info, Settings2
@@ -117,7 +117,7 @@ const IntegrationCard = ({ platform, integration, isConnected, onConnect, onTogg
                         onClick={() => onConnect(platform)}
                         className="w-full h-14 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 font-black uppercase tracking-widest shadow-xl shadow-slate-900/10 transition-transform active:scale-[0.98]"
                     >
-                        <Zap className="h-4 w-4 mr-2" /> Establish Handshake
+                        <Link className="h-4 w-4 mr-2" /> Establish Handshake
                     </Button>
                 )}
             </div>

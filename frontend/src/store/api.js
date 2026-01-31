@@ -1710,7 +1710,7 @@ export const api = createApi({
       query: (data) => ({ url: '/documents/signatures/', method: 'POST', body: data }),
       invalidatesTags: ['DocumentSignature', 'EmployeeDocument', 'Document']
     }),
-    // --- AI Assistant ---
+    // --- Support Assistant ---
     getChatSessions: builder.query({
       query: () => '/bot/chats/',
       transformResponse: (response) => {
@@ -2012,7 +2012,7 @@ export const {
   // Signatures
   useGetDocumentSignaturesQuery,
   useSignDocumentMutation,
-  // AI Bot
+  // Assistant Bot
   useGetChatSessionsQuery,
   useCreateChatSessionMutation,
   useSendChatMessageMutation,

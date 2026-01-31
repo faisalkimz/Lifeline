@@ -7,7 +7,7 @@ import { exportToJSON } from '../../utils/exportUtils';
 import {
     Users, TrendingUp, TrendingDown, DollarSign, Calendar,
     Briefcase, Award, Clock, Target, BarChart3, PieChart,
-    Download, Filter, ChevronRight, ArrowUpRight, ArrowDownRight
+    Download, Filter, ChevronRight, ArrowUpRight, ArrowDownRight, BarChart3
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +17,7 @@ import {
     useGetReviewsQuery,
     useGetDashboardPredictionsQuery
 } from '../../store/api';
-import { Sparkles, Shield, Zap } from 'lucide-react';
+import { Shield, Target } from 'lucide-react';
 
 const StatCard = ({ title, value, change, icon: Icon, trend, color = 'emerald' }) => {
     const isPositive = trend === 'up';
@@ -204,13 +204,13 @@ const AnalyticsDashboard = () => {
                 </ChartCard>
             </div>
 
-            {/* AI Insights & Strategic */}
+            {/* Strategic Insights */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <Card className="lg:col-span-2 border-none shadow-sm bg-slate-900 text-white overflow-hidden rounded-lg">
                     <CardHeader className="border-b border-white/5 py-4 px-6">
                         <CardTitle className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-white/70">
-                            <Sparkles className="h-4 w-4 text-[#88B072]" />
-                            Workforce AI Analysis
+                            <BarChart3 className="h-4 w-4 text-[#88B072]" />
+                            Workforce Strategic Analysis
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="p-6">
@@ -253,7 +253,7 @@ const AnalyticsDashboard = () => {
                     <div className="space-y-3">
                         <div className="flex items-start gap-4 p-4 bg-slate-50 rounded border border-slate-100 group hover:border-[#88B072]/30 transition-colors">
                             <div className="h-8 w-8 bg-amber-50 rounded flex items-center justify-center shrink-0 border border-amber-100">
-                                <Zap className="h-4 w-4 text-amber-600" />
+                                <Target className="h-4 w-4 text-amber-600" />
                             </div>
                             <div>
                                 <h4 className="font-bold text-slate-800 text-xs uppercase tracking-tight">Hiring Pipeline</h4>

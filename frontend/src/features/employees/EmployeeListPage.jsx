@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Users, Plus, Search, Filter,
-    Mail, Phone, Building2, Sparkles,
+    Mail, Phone, Building2,
     CheckCircle, XCircle, Clock, LogOut, AlertCircle, Upload, MoreHorizontal
 } from 'lucide-react';
 import { useGetEmployeesQuery, useGetEmployeeStatsQuery } from '../../store/api';

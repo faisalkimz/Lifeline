@@ -16,8 +16,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import {
     Plus, Shield, Heart, DollarSign, Gift, Users,
     Edit, Trash2, CheckCircle, XCircle, FileText, Settings,
-    Activity, ShieldCheck, Zap, TrendingUp, Filter, Loader2,
-    ArrowUpRight, Search, Target, Anchor, Sparkles, HeartPulse,
+    Activity, ShieldCheck, TrendingUp, Filter, Loader2,
+    ArrowUpRight, Search, Target, Anchor, HeartPulse,
     ShieldAlert, Command, Briefcase
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -74,7 +74,7 @@ const BenefitsCatalog = () => {
     const categories = [
         { value: 'insurance', label: 'Insurance', icon: ShieldCheck },
         { value: 'allowance', label: 'Allowance', icon: DollarSign },
-        { value: 'perk', label: 'Perk', icon: Sparkles },
+        { value: 'perk', label: 'Perk', icon: Gift },
         { value: 'retirement', label: 'Retirement', icon: Anchor }
     ];
 

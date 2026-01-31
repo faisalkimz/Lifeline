@@ -7,7 +7,7 @@ import { Label } from '../../components/ui/Label';
 import {
     Building, Users, Shield, Bell, Lock,
     Mail, Globe, Phone, Save, UserPlus,
-    Zap, Calendar, Video, Cloud
+    Calendar, Video, Cloud
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../auth/authSlice';
@@ -144,7 +144,7 @@ const SettingsPage = () => {
                         <Users className="h-4 w-4 mr-2" /> Users
                     </TabsTrigger>
                     <TabsTrigger value="integrations" className="data-[state=active]:bg-white">
-                        <Zap className="h-4 w-4 mr-2" /> Integrations
+                        <Globe className="h-4 w-4 mr-2" /> Integrations
                     </TabsTrigger>
                     <TabsTrigger value="security" className="data-[state=active]:bg-white">
                         <ShieldCheck className="h-4 w-4 mr-2" /> Security

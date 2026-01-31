@@ -155,13 +155,13 @@ const JobDetailsPage = () => {
                                         toast.success(res.message || `Processed ${res.applications_processed} applications!`);
                                         refetchApps();
                                     } catch (err) {
-                                        toast.error("Bulk AI Screening failed.");
+                                        toast.error("Screening analysis failed.");
                                     }
                                 }}
                                 disabled={isRanking || !job.application_count}
                             >
                                 {isRanking ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingUp className="h-4 w-4" />}
-                                AI Screening
+                                Evaluate Candidates
                             </Button>
                         </CardContent>
                     </Card>

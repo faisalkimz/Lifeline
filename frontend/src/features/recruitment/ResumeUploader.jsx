@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/Button';
 import { Card, CardContent } from '../../components/ui/Card';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, Sparkles } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -97,7 +97,7 @@ const ResumeUploader = ({ onDataExtracted }) => {
 
                         <h3 className="text-lg font-bold text-slate-900 mb-2">Upload Resume</h3>
                         <p className="text-sm text-slate-600 mb-6">
-                            Upload a PDF or DOCX resume to automatically extract candidate information
+                            Upload a PDF or DOCX resume to scan candidate information
                         </p>
 
                         {!file ? (
@@ -150,8 +150,8 @@ const ResumeUploader = ({ onDataExtracted }) => {
                                         </>
                                     ) : (
                                         <>
-                                            <Sparkles className="h-4 w-4" />
-                                            Parse Resume with AI
+                                            <FileText className="h-4 w-4" />
+                                            Extract Information
                                         </>
                                     )}
                                 </Button>

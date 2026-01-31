@@ -9,7 +9,7 @@ import {
 } from '../../store/api';
 import {
     Upload, Download, FileSpreadsheet, CheckCircle, XCircle,
-    Users, Sparkles, Loader2, AlertCircle, ArrowRight, FileCheck, Edit, Building2
+    Users, Loader2, AlertCircle, ArrowRight, FileCheck, Edit, Building2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -814,8 +814,7 @@ const BulkEmployeeUpload = ({ isOpen, onClose, onSuccess }) => {
                                 </>
                             ) : (
                                 <>
-                                    <Sparkles className="h-4 w-4 text-emerald-400" />
-                                    Sync Your Team
+                                    Import Team
                                     <ArrowRight className="h-3 w-3 opacity-50" />
                                 </>
                             )}

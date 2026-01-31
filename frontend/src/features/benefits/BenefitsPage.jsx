@@ -5,9 +5,9 @@ import { Badge } from '../../components/ui/Badge';
 import { Input } from '../../components/ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
 import {
-    Plus, Shield, DollarSign, Wallet, Anchor, Sparkles,
+    Plus, Shield, DollarSign, Wallet, Anchor,
     Check, Search, Edit, Trash2, Umbrella,
-    User, Users, ChevronRight, ChevronLeft, Building, Zap, Info,
+    User, Users, ChevronRight, ChevronLeft, Building, Info,
     Heart, Smile, Home, Palmtree, Gift, Briefcase
 } from 'lucide-react';
 import {

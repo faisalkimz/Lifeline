@@ -6,7 +6,7 @@ import * as z from 'zod';
 import {
     User, Briefcase, FileText, CreditCard,
     Save, ArrowLeft, Upload, X, Wallet,
-    CheckCircle, ChevronRight, Star, Sparkles,
+    CheckCircle, ChevronRight,
     Building2, Calendar, Phone, Mail, MapPin, Shield,
     Lock, Key, ChevronLeft, Home, Heart, AlertCircle,
     UserCircle, Globe, Camera, BadgeCheck, Clock, Users, Info
@@ -266,7 +266,7 @@ const EmployeeFormPage = () => {
                     };
                     await createSalaryStructure({ employee: res.id, ...salaryData }).unwrap();
                 }
-                toast.success("Welcome aboard! Employee created 🚀");
+                toast.success("Welcome aboard! Employee created successfully.");
             }
 
             // Navigate back

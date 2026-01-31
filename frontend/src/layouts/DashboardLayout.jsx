@@ -10,7 +10,7 @@ import {
   LayoutDashboard, Users, Building2, Settings, LogOut, Menu, X, Bell,
   TrendingUp, User, Crown, CreditCard, Calendar, Clock, Activity, Briefcase,
   BookOpen, Shield, FileText, Search, ChevronDown, HelpCircle,
-  Building, LayoutGrid, ChevronRight, Zap, DollarSign, Moon, Sun, Laptop,
+  Building, LayoutGrid, ChevronRight, DollarSign, Moon, Sun, Laptop,
   Box, FileEdit, Heart, Globe, UserPlus, MoreHorizontal
 } from 'lucide-react';
 import { cn } from '../utils/cn';

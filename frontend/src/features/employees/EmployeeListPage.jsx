@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     Users, Plus, Search, Filter,
     Mail, Phone, Building2,
-    CheckCircle, XCircle, Clock, LogOut, AlertCircle, Upload, MoreHorizontal
+    CheckCircle, XCircle, Clock, LogOut, AlertCircle, Upload, MoreHorizontal,
+    ChevronRight
 } from 'lucide-react';
 import { useGetEmployeesQuery, useGetEmployeeStatsQuery } from '../../store/api';
 import { Button } from '../../components/ui/Button';

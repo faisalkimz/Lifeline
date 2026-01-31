@@ -127,10 +127,10 @@ const OvertimePage = () => {
                     <div className="flex-1 space-y-10 text-center xl:text-left">
                         <div className="space-y-4">
                             <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.5em] px-6 py-2 rounded-full">
-                                Personnel Overtime Management
+                                Overtime Management
                             </Badge>
                             <h1 className="text-5xl lg:text-8xl font-black text-white tracking-tighter leading-[0.9] uppercase italic">
-                                Workplace <br />
+                                Workforce <br />
                                 <span className="text-emerald-500">Overtime</span>
                             </h1>
                         </div>
@@ -138,7 +138,7 @@ const OvertimePage = () => {
                         <div className="flex flex-wrap items-center justify-center xl:justify-start gap-8">
                             <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-6 py-3 rounded-2xl backdrop-blur-xl">
                                 <Clock className="h-4 w-4 text-emerald-500 animate-pulse" />
-                                <span className="text-xs font-black text-white uppercase tracking-widest">Status: Active Tracking</span>
+                                <span className="text-xs font-black text-white uppercase tracking-widest">Status: Active</span>
                             </div>
                         </div>
                     </div>
@@ -148,13 +148,13 @@ const OvertimePage = () => {
                             onClick={() => setShowForm(true)}
                             className="h-24 px-12 bg-emerald-500 hover:bg-emerald-400 text-white font-black uppercase tracking-[0.3em] text-sm rounded-[2rem] shadow-[0_20px_40px_-10px_rgba(16,185,129,0.3)] transition-all flex items-center justify-center gap-4"
                         >
-                            <Plus className="h-6 w-6" /> REQUEST OVERTIME
+                            <Plus className="h-6 w-6" /> SUBMIT REQUEST
                         </Button>
                     </div>
                 </div>
             </div>
 
-            {/* Tactical Policies Section */}
+            {/* Overtime Policies Section */}
             <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -167,7 +167,7 @@ const OvertimePage = () => {
                     <Card className="rounded-[3.5rem] border-none shadow-2xl bg-white overflow-hidden">
                         <CardHeader className="bg-slate-900 px-12 py-10">
                             <CardTitle className="text-xl font-black text-white tracking-tighter uppercase italic leading-none flex items-center gap-4">
-                                <Activity className="h-6 w-6 text-emerald-500" /> Recent <span className="text-emerald-500">Overtime Logs</span>
+                                <Activity className="h-6 w-6 text-emerald-500" /> Recent <span className="text-emerald-500">Overtime Records</span>
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
@@ -186,7 +186,7 @@ const OvertimePage = () => {
                                         {isLoading ? (
                                             <TableRow><TableCell colSpan={5} className="text-center py-20"><Loader2 className="h-8 w-8 animate-spin mx-auto text-emerald-500" /></TableCell></TableRow>
                                         ) : records.length === 0 ? (
-                                            <TableRow><TableCell colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">No cycles detected in this sector.</TableCell></TableRow>
+                                            <TableRow><TableCell colSpan={5} className="text-center py-20 font-bold text-slate-400 italic">No records found for the current period.</TableCell></TableRow>
                                         ) : records.map((record) => (
                                             <TableRow key={record.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors group cursor-pointer" onClick={() => setSelectedOvertime(record)}>
                                                 <TableCell className="px-12 py-8 font-black text-slate-900 italic">{new Date(record.date).toLocaleDateString()}</TableCell>

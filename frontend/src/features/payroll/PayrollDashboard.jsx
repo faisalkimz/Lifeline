@@ -97,20 +97,15 @@ const PayrollDashboard = ({ setActiveTab }) => {
   return (
     <div className="space-y-8 pb-12 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Payroll Management</h1>
-          <p className="text-slate-500 text-sm mt-1">Process and track organization-wide compensation.</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" onClick={handleExport} className="h-10 px-4 text-xs font-semibold uppercase tracking-wider border-slate-200">
-            <FileText className="h-4 w-4 mr-2" />
-            Export Report
-          </Button>
-          <Button onClick={handleCreatePayrollRun} className="bg-[#88B072] hover:bg-[#7aa265] text-white font-semibold h-10 px-4 rounded text-xs uppercase tracking-wider">
-            New Payroll Run
-          </Button>
-        </div>
+      {/* Header Actions Only */}
+      <div className="flex flex-col sm:flex-row justify-end items-center gap-3">
+        <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto h-10 px-4 text-[10px] font-bold uppercase tracking-widest border-slate-200">
+          <FileText className="h-4 w-4 mr-2" />
+          Export Report
+        </Button>
+        <Button onClick={handleCreatePayrollRun} className="w-full sm:w-auto bg-[#88B072] hover:bg-[#7aa265] text-white font-bold h-10 px-4 rounded text-[10px] uppercase tracking-widest">
+          New Payroll Run
+        </Button>
       </div>
 
       {/* Filters */}
@@ -185,7 +180,7 @@ const PayrollDashboard = ({ setActiveTab }) => {
                 <h4 className="font-bold text-slate-900 mb-2">No Employee Data Found</h4>
                 <p className="text-xs text-slate-500 max-w-sm mb-8">
                   This payroll run exists but no staff salary structures were processed.
-                  Make sure employees have active salary units configured.
+                  Make sure employees have salary structures configured.
                 </p>
                 <div className="flex gap-3">
                   <Button onClick={() => navigate(`/payroll/runs/${currentPayroll.id}`)} className="bg-slate-900 text-white text-[10px] font-bold uppercase h-9 px-4">
@@ -207,11 +202,10 @@ const PayrollDashboard = ({ setActiveTab }) => {
                   <p className="text-lg font-bold text-slate-800">{currentPayroll.employee_count}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded border border-slate-100">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Company Cost</p>
                   <p className="text-lg font-bold text-emerald-600">{formatCurrency(currentPayroll.total_gross)}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded border border-slate-100">
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Net Distribution</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Net Payable</p>
                   <p className="text-lg font-bold text-blue-600">{formatCurrency(currentPayroll.total_net)}</p>
                 </div>
               </div>
@@ -229,7 +223,7 @@ const PayrollDashboard = ({ setActiveTab }) => {
               System found no records for {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}.
             </p>
             <Button onClick={handleCreatePayrollRun} className="bg-[#88B072] hover:bg-[#7aa265] text-white font-semibold h-12 px-8 rounded text-xs uppercase tracking-wider">
-              Initialize {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long' })} Run
+              Start {new Date(selectedYear, selectedMonth - 1).toLocaleString('en-US', { month: 'long' })} Run
             </Button>
           </CardContent>
         </Card>
@@ -251,7 +245,7 @@ const PayrollDashboard = ({ setActiveTab }) => {
                 <TableRow className="border-none">
                   <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest h-12">Period</TableHead>
                   <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Status</TableHead>
-                  <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Units</TableHead>
+                  <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Staff</TableHead>
                   <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Gross</TableHead>
                   <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Net</TableHead>
                   <TableHead className="text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center">Actions</TableHead>

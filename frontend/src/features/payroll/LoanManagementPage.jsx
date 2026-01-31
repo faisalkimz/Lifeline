@@ -116,17 +116,13 @@ const LoanManagementPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
 
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Loan Management</h1>
-          <p className="text-lg text-gray-600 mt-1">Create and manage loan requests</p>
-        </div>
+      {/* ACTIONS */}
+      <div className="flex justify-end items-center mb-6">
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl text-lg font-semibold shadow"
+          className="bg-slate-900 hover:bg-black text-white px-6 py-2 rounded-lg text-xs font-bold uppercase tracking-widest"
         >
-          + New Loan
+          + Create Loan
         </Button>
       </div>
 
@@ -226,162 +222,162 @@ const LoanManagementPage = () => {
           </Table>
         </CardContent>
       </Card>
-{/* WHITE LOAN MODAL — FIXED TITLE + FULL WHITE BACKGROUND */}
-<Dialog open={showForm} onOpenChange={setShowForm}>
-  <DialogContent
-    className="max-w-4xl w-full mx-4 rounded-2xl border border-gray-200 shadow-xl 
+      {/* WHITE LOAN MODAL — FIXED TITLE + FULL WHITE BACKGROUND */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent
+          className="max-w-4xl w-full mx-4 rounded-2xl border border-gray-200 shadow-xl 
                p-0 bg-white !bg-white [&>*]:bg-white"
-    style={{ maxHeight: "90vh", backgroundColor: "white" }}
-  >
-    {/* HEADER — pure white */}
-    <div
-      className="px-10 py-8 border-b border-gray-200"
-      style={{ background: "white" }}
-    >
-      <p className="text-2xl font-semibold text-gray-600">
-        Create New Loan Request
-      </p>
-
-      <p className="text-gray-600 mt-2 text-base">
-        Fill in the details below
-      </p>
-    </div>
-
-    {/* FORM */}
-    <form
-      onSubmit={handleSubmit}
-      className="px-10 py-8 space-y-7 overflow-y-auto bg-white"
-      style={{ maxHeight: "calc(90vh - 200px)" }}
-    >
-      {/* Employee + Loan Type */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        
-        {/* Employee */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            Employee
-          </label>
-          <select
-            name="employee"
-            value={formData.employee}
-            onChange={handleInputChange}
-            required
-            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl bg-white text-gray-900
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+          style={{ maxHeight: "90vh", backgroundColor: "white" }}
+        >
+          {/* HEADER — pure white */}
+          <div
+            className="px-10 py-8 border-b border-gray-200"
+            style={{ background: "white" }}
           >
-            <option value="">Select Employee</option>
-            {activeEmployees.map(emp => (
-              <option key={emp.id} value={emp.id}>
-                {emp.full_name}
-              </option>
-            ))}
-          </select>
-        </div>
+            <p className="text-2xl font-semibold text-gray-600">
+              Create New Loan Request
+            </p>
 
-        {/* Loan Type */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            Loan Type
-          </label>
-          <select
-            name="loan_type"
-            value={formData.loan_type}
-            onChange={handleInputChange}
-            className="w-full px-5 py-3.5 border border-gray-300 rounded-xl bg-white text-gray-900
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <p className="text-gray-600 mt-2 text-base">
+              Fill in the details below
+            </p>
+          </div>
+
+          {/* FORM */}
+          <form
+            onSubmit={handleSubmit}
+            className="px-10 py-8 space-y-7 overflow-y-auto bg-white"
+            style={{ maxHeight: "calc(90vh - 200px)" }}
           >
-            <option value="salary_advance">Salary Advance</option>
-            <option value="personal_loan">Personal Loan</option>
-            <option value="emergency_loan">Emergency Loan</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
+            {/* Employee + Loan Type */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-      </div>
+              {/* Employee */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                  Employee
+                </label>
+                <select
+                  name="employee"
+                  value={formData.employee}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-5 py-3.5 border border-gray-300 rounded-xl bg-white text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Select Employee</option>
+                  {activeEmployees.map(emp => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.full_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-      {/* Amount + Repayment */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            Loan Amount (UGX)
-          </label>
-          <Input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleInputChange}
-            placeholder="500000"
-            min="1000"
-            required
-            className="bg-white border-gray-300 text-gray-900"
-          />
-        </div>
+              {/* Loan Type */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                  Loan Type
+                </label>
+                <select
+                  name="loan_type"
+                  value={formData.loan_type}
+                  onChange={handleInputChange}
+                  className="w-full px-5 py-3.5 border border-gray-300 rounded-xl bg-white text-gray-900
+                       focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="salary_advance">Salary Advance</option>
+                  <option value="personal_loan">Personal Loan</option>
+                  <option value="emergency_loan">Emergency Loan</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
 
-        <div>
-          <label className="block text-sm font-semibold text-gray-800 mb-2">
-            Repayment Period (Months)
-          </label>
-          <Input
-            type="number"
-            name="repayment_period_months"
-            value={formData.repayment_period_months}
-            onChange={handleInputChange}
-            min="1"
-            max="24"
-            required
-            className="bg-white border-gray-300 text-gray-900"
-          />
-        </div>
-      </div>
+            </div>
 
-      {/* Monthly Deduction Box */}
-      <div className="bg-white border border-blue-300 rounded-2xl p-8 text-center shadow-sm">
-        <p className="text-lg font-medium text-gray-700 mb-2">Monthly Deduction</p>
-        <p className="text-4xl font-bold text-blue-700">
-          {formatCurrency(calculateMonthlyDeduction())}
-        </p>
-      </div>
+            {/* Amount + Repayment */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                  Loan Amount (UGX)
+                </label>
+                <Input
+                  type="number"
+                  name="amount"
+                  value={formData.amount}
+                  onChange={handleInputChange}
+                  placeholder="500000"
+                  min="1000"
+                  required
+                  className="bg-white border-gray-300 text-gray-900"
+                />
+              </div>
 
-      {/* Purpose */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-800 mb-2">
-          Purpose (Optional)
-        </label>
-        <textarea
-          name="loan_purpose"
-          value={formData.loan_purpose}
-          onChange={handleInputChange}
-          rows={5}
-          className="w-full px-5 py-4 border border-gray-300 rounded-xl bg-white text-gray-900 
+              <div>
+                <label className="block text-sm font-semibold text-gray-800 mb-2">
+                  Repayment Period (Months)
+                </label>
+                <Input
+                  type="number"
+                  name="repayment_period_months"
+                  value={formData.repayment_period_months}
+                  onChange={handleInputChange}
+                  min="1"
+                  max="24"
+                  required
+                  className="bg-white border-gray-300 text-gray-900"
+                />
+              </div>
+            </div>
+
+            {/* Monthly Deduction Box */}
+            <div className="bg-white border border-blue-300 rounded-2xl p-8 text-center shadow-sm">
+              <p className="text-lg font-medium text-gray-700 mb-2">Monthly Deduction</p>
+              <p className="text-4xl font-bold text-blue-700">
+                {formatCurrency(calculateMonthlyDeduction())}
+              </p>
+            </div>
+
+            {/* Purpose */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Purpose (Optional)
+              </label>
+              <textarea
+                name="loan_purpose"
+                value={formData.loan_purpose}
+                onChange={handleInputChange}
+                rows={5}
+                className="w-full px-5 py-4 border border-gray-300 rounded-xl bg-white text-gray-900 
                      focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-          placeholder="Briefly describe the purpose..."
-        />
-      </div>
+                placeholder="Briefly describe the purpose..."
+              />
+            </div>
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 bg-white">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowForm(false)}
-          className="px-8 py-3.5 border-gray-300 text-gray-700 hover:bg-gray-100 
+            {/* Buttons */}
+            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 bg-white">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowForm(false)}
+                className="px-8 py-3.5 border-gray-300 text-gray-700 hover:bg-gray-100 
                      rounded-xl font-medium"
-        >
-          Cancel
-        </Button>
+              >
+                Cancel
+              </Button>
 
-        <Button
-          type="submit"
-          disabled={creating || !formData.employee || !formData.amount}
-          className="px-10 py-3.5 bg-blue-600 hover:bg-blue-700 text-white 
+              <Button
+                type="submit"
+                disabled={creating || !formData.employee || !formData.amount}
+                className="px-10 py-3.5 bg-blue-600 hover:bg-blue-700 text-white 
                      font-medium rounded-xl shadow-md disabled:opacity-50"
-        >
-          {creating ? "Creating..." : "Create Request"}
-        </Button>
-      </div>
-    </form>
-  </DialogContent>
-</Dialog>
+              >
+                {creating ? "Creating..." : "Create Request"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

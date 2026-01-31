@@ -131,7 +131,7 @@ const PayslipPage = () => {
                                         {(payslip.employee_name || payslip.employee?.full_name || '??').split(' ').map(n => n[0]).join('')}
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Authenticated Employee</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Employee Details</p>
                                         <h3 className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">
                                             {payslip.employee_name || payslip.employee?.full_name}
                                         </h3>
@@ -181,7 +181,7 @@ const PayslipPage = () => {
                                             <span className="text-slate-900 font-bold">{formatCurrency(payslip.transport_allowance || 0)}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-slate-500 font-medium">Other Tactical Allowances</span>
+                                            <span className="text-slate-500 font-medium">Other Allowances</span>
                                             <span className="text-slate-900 font-bold">{formatCurrency((payslip.medical_allowance || 0) + (payslip.other_allowances || 0))}</span>
                                         </div>
                                         <div className="pt-5 border-t-2 border-dashed border-emerald-200 mt-2 flex justify-between items-center">
@@ -240,7 +240,7 @@ const PayslipPage = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 font-mono">Digital Signature Hash</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 font-mono">Digital ID</p>
                                     <p className="text-[8px] font-mono text-slate-400 break-all leading-tight">
                                         LIF-SEC-PAY-{payslip.id}-882XJ-7721-AA92-1102-LL-KIMZ-PLATINUM
                                     </p>
@@ -255,7 +255,7 @@ const PayslipPage = () => {
                     {/* Premium Modal Footer */}
                     <div className="p-8 sm:p-10 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
                         <div className="flex-1 flex flex-col">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Net Disbursement</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Net Salary</p>
                             <p className="text-4xl font-black text-primary-600 tracking-tight leading-none">{formatCurrency(payslip.net_salary)}</p>
                         </div>
                         <div className="flex gap-4">
@@ -286,20 +286,16 @@ const PayslipPage = () => {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Page Header */}
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 pb-2">
-                <div>
-                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 leading-none">Payslip Audit</h1>
-                    <p className="text-slate-500 mt-3 font-medium text-lg">Centralized monitoring and dispatch of organizational pay records.</p>
-                </div>
-
+            {/* Actions Only */}
+            <div className="flex justify-end pb-2">
                 <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-3 bg-white p-2.5 rounded-[1.5rem] shadow-xl shadow-slate-200/50 border border-slate-100 pr-5">
-                        <div className="flex items-center gap-2 pl-3 border-r border-slate-100 pr-5">
-                            <Calendar className="h-5 w-5 text-primary-500" />
+                    <div className="flex items-center gap-3 bg-white p-2 sm:p-2.5 rounded-xl sm:rounded-[1.5rem] shadow-sm border border-slate-100 pr-3 sm:pr-5">
+                        <div className="flex items-center gap-2 pl-2 sm:pl-3 border-r border-slate-100 pr-3 sm:pr-5">
+                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary-500" />
                             <select
                                 value={filterMonth}
                                 onChange={(e) => setFilterMonth(parseInt(e.target.value))}
-                                className="text-sm font-black text-slate-700 bg-transparent border-none focus:ring-0 cursor-pointer appearance-none pr-6"
+                                className="text-xs sm:text-sm font-black text-slate-700 bg-transparent border-none focus:ring-0 cursor-pointer appearance-none pr-4 sm:pr-6"
                             >
                                 {Array.from({ length: 12 }, (_, i) => (
                                     <option key={i + 1} value={i + 1}>
@@ -308,11 +304,11 @@ const PayslipPage = () => {
                                 ))}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2 pl-3">
+                        <div className="flex items-center gap-2 pl-2 sm:pl-3">
                             <select
                                 value={filterYear}
                                 onChange={(e) => setFilterYear(parseInt(e.target.value))}
-                                className="text-sm font-black text-slate-700 bg-transparent border-none focus:ring-0 cursor-pointer appearance-none pr-6"
+                                className="text-xs sm:text-sm font-black text-slate-700 bg-transparent border-none focus:ring-0 cursor-pointer appearance-none pr-4 sm:pr-6"
                             >
                                 {[2024, 2025, 2026].map(y => (
                                     <option key={y} value={y}>{y}</option>
@@ -331,7 +327,7 @@ const PayslipPage = () => {
                         <div className="h-12 w-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-5">
                             <TrendingUp className="h-6 w-6" />
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Monthly Gross Liability</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Monthly Gross Pay</p>
                         <h4 className="text-2xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">{formatCurrency(stats.totalGross)}</h4>
                     </div>
                 </div>
@@ -342,7 +338,7 @@ const PayslipPage = () => {
                         <div className="h-12 w-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mb-5">
                             <ShieldCheck className="h-6 w-6" />
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Net Disbursement</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Net Pay</p>
                         <h4 className="text-2xl font-black text-slate-900 group-hover:text-primary-600 transition-colors">{formatCurrency(stats.totalNet)}</h4>
                     </div>
                 </div>
@@ -353,7 +349,7 @@ const PayslipPage = () => {
                         <div className="h-12 w-12 rounded-2xl bg-white/10 text-primary-300 flex items-center justify-center mb-5">
                             <Users className="h-6 w-6" />
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 italic">Average Employee Net</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 italic">Average Salary</p>
                         <h4 className="text-2xl font-black text-white">{formatCurrency(stats.avgNet)}</h4>
                     </div>
                 </div>
@@ -384,7 +380,7 @@ const PayslipPage = () => {
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-xs font-black uppercase tracking-[0.3em] text-slate-400 flex items-center gap-3">
                             <div className="h-2 w-2 rounded-full bg-primary-500"></div>
-                            Transactional History Logs
+                            Transaction History
                         </CardTitle>
                         <div className="text-[10px] font-bold text-slate-500 bg-white px-4 py-2 rounded-xl border border-slate-100">
                             Showing {filteredPayslips.length} Records
@@ -396,12 +392,12 @@ const PayslipPage = () => {
                         <Table>
                             <TableHeader>
                                 <TableRow className="bg-slate-50/30">
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em]">Personnel Identity</TableHead>
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Gross</TableHead>
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Deductions</TableHead>
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-900 uppercase tracking-[0.15em] text-right">Net Salary</TableHead>
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-center">Status</TableHead>
-                                    <TableHead className="px-10 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Actions</TableHead>
+                                    <TableHead className="px-6 py-6 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em]">Employee</TableHead>
+                                    <TableHead className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Gross</TableHead>
+                                    <TableHead className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Deductions</TableHead>
+                                    <TableHead className="px-6 py-4 text-[11px] font-black text-slate-900 uppercase tracking-[0.15em] text-right">Net Salary</TableHead>
+                                    <TableHead className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-center">Status</TableHead>
+                                    <TableHead className="px-6 py-4 text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -423,7 +419,7 @@ const PayslipPage = () => {
                                 ) : filteredPayslips.length > 0 ? (
                                     filteredPayslips.map((payslip) => (
                                         <TableRow key={payslip.id} className="group hover:bg-primary-50/30 transition-all duration-300 border-b border-slate-50 last:border-none">
-                                            <TableCell className="px-10 py-8">
+                                            <TableCell className="px-6 py-4">
                                                 <div className="flex items-center gap-5">
                                                     <div className="h-14 w-14 rounded-[1.25rem] bg-slate-900 text-white flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-2xl group-hover:shadow-slate-900/30">
                                                         <User className="h-6 w-6" />
@@ -453,7 +449,7 @@ const PayslipPage = () => {
                                                     {payslip.payment_status || (payslip.is_paid ? 'Paid' : 'Pending')}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell className="px-10 py-8">
+                                            <TableCell className="px-6 py-4">
                                                 <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                     <Button
                                                         variant="ghost"
@@ -496,8 +492,8 @@ const PayslipPage = () => {
                                                     <FileText className="h-10 w-10 text-slate-200 group-hover:scale-110 transition-transform" />
                                                 </div>
                                                 <div className="max-w-[280px]">
-                                                    <p className="text-lg font-black text-slate-900 uppercase tracking-widest">Archive Vault Empty</p>
-                                                    <p className="text-sm text-slate-400 mt-2 font-medium">No transactional payslip records found for the selected criteria. Try adjusting your temporal filters.</p>
+                                                    <p className="text-lg font-black text-slate-900 uppercase tracking-widest">No Records Found</p>
+                                                    <p className="text-sm text-slate-400 mt-2 font-medium">No payslip records found for the selected criteria. Try adjusting your date filters.</p>
                                                 </div>
                                             </div>
                                         </TableCell>

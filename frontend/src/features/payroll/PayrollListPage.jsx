@@ -104,14 +104,11 @@ const PayrollListPage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Payroll Management</h1>
-          <p className="text-slate-600 mt-1">Manage monthly payroll processing and employee payments</p>
-        </div>
+      {/* Actions Only */}
+      <div className="flex justify-end items-center mb-6">
         <Button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-slate-900 hover:bg-black text-[10px] font-bold uppercase tracking-widest h-10 px-6"
         >
           New Payroll Run
         </Button>

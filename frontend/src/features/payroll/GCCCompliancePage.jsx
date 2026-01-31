@@ -39,23 +39,18 @@ const GCCCompliancePage = () => {
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                        GCC <span className="text-primary-600">Compliance</span>
-                    </h1>
-                    <p className="text-slate-500 dark:text-slate-400 font-medium">Statutory rules and End-of-Service benefits for the Gulf region.</p>
-                </div>
-                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+            {/* Actions Only */}
+            <div className="flex justify-end items-center mb-6">
+                <div className="flex bg-slate-100 p-1 rounded-xl">
                     <button
                         onClick={() => setActiveTab('settings')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'settings' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'settings' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Regional Settings
                     </button>
                     <button
                         onClick={() => setActiveTab('gratuity')}
-                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'gratuity' ? 'bg-white dark:bg-slate-700 text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${activeTab === 'gratuity' ? 'bg-white text-primary-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
                         Gratuity Accruals
                     </button>

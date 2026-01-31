@@ -145,13 +145,9 @@ const SalaryStructurePage = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Salary Structures</h1>
-          <p className="text-gray-600 mt-1">Manage employee salary structures and allowances</p>
-        </div>
-        <Button onClick={() => { setEditingStructure(null); resetForm(); setShowForm(true); }} className="bg-blue-600 hover:bg-blue-700">
-          Add Salary Structure
+      <div className="flex justify-end items-center">
+        <Button onClick={() => { setEditingStructure(null); resetForm(); setShowForm(true); }} className="bg-slate-900 hover:bg-black text-[10px] font-bold uppercase tracking-widest h-10 px-6">
+          Add Structure
         </Button>
       </div>
 
@@ -195,8 +191,8 @@ const SalaryStructurePage = () => {
         </CardContent>
       </Card>
 
-    <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent 
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent
           className="max-w-4xl w-full bg-white text-gray-900 !rounded-2xl shadow-2xl border border-gray-200"
           style={{ maxWidth: '1100px', backgroundColor: '#ffffff' }} // Extra wide & forced white
         >
@@ -214,10 +210,10 @@ const SalaryStructurePage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Employee</label>
-                <select 
-                  name="employee" 
-                  value={formData.employee} 
-                  onChange={handleInputChange} 
+                <select
+                  name="employee"
+                  value={formData.employee}
+                  onChange={handleInputChange}
                   className="w-full px-5 py-3.5 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
                   required
                 >
@@ -234,12 +230,12 @@ const SalaryStructurePage = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-800 mb-2">Effective Date</label>
-                <Input 
-                  type="date" 
-                  name="effective_date" 
-                  value={formData.effective_date} 
-                  onChange={handleInputChange} 
-                  required 
+                <Input
+                  type="date"
+                  name="effective_date"
+                  value={formData.effective_date}
+                  onChange={handleInputChange}
+                  required
                   className="h-[52px] text-base bg-white border-gray-300 text-gray-900"
                 />
               </div>
@@ -248,7 +244,7 @@ const SalaryStructurePage = () => {
             {/* Salary Components - Now with more breathing room */}
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-800">Salary Components (UGX)</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">Basic Salary</label>
@@ -288,11 +284,11 @@ const SalaryStructurePage = () => {
             {/* Notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-              <textarea 
-                name="notes" 
-                value={formData.notes} 
-                onChange={handleInputChange} 
-                rows={4} 
+              <textarea
+                name="notes"
+                value={formData.notes}
+                onChange={handleInputChange}
+                rows={4}
                 className="w-full px-5 py-4 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 resize-none"
                 placeholder="e.g. Annual increment, promotion adjustment, new tax regime..."
               />
@@ -300,16 +296,16 @@ const SalaryStructurePage = () => {
 
             {/* Footer */}
             <DialogFooter className="bg-gray-50/80 -m-6 mt-10 p-8 rounded-b-2xl border-t border-gray-200 backdrop-blur">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => { setShowForm(false); setEditingStructure(null); }}
                 className="px-8 py-6 text-base"
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-10 py-6 text-base font-semibold shadow-lg"
                 disabled={creating || updating}
               >

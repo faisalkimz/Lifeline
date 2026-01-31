@@ -52,6 +52,16 @@ export default {
           600: '#d97706',
           700: '#b45309',
         },
+        // Notion-inspired Colors
+        notion: {
+          bg: 'var(--notion-bg)',
+          sidebar: 'var(--notion-sidebar)',
+          text: 'var(--notion-text)',
+          'text-light': 'var(--notion-text-light)',
+          border: 'var(--notion-border)',
+          hover: 'var(--notion-hover)',
+          primary: 'var(--notion-primary)',
+        },
       },
       spacing: {
         // Compact spacing system

@@ -188,12 +188,9 @@ const SalaryAdvancesPage = () => {
     return (
         <div className="space-y-6">
             {/* Header */}
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Salary Advances</h1>
-                    <p className="text-gray-600 mt-2">Request and track your salary advance applications</p>
-                </div>
-                <Button onClick={() => setShowForm(true)} className="gap-2">
+            {/* Actions Only */}
+            <div className="flex justify-end items-center mb-6">
+                <Button onClick={() => setShowForm(true)} className="bg-slate-900 hover:bg-black text-[10px] font-bold uppercase tracking-widest h-10 px-6 gap-2">
                     <Plus className="h-4 w-4" />
                     Request Advance
                 </Button>

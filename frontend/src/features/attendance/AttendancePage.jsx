@@ -270,42 +270,75 @@ const AttendancePage = () => {
                     </CardHeader>
                     <CardContent className="p-0">
                         {attendanceArray.length > 0 ? (
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="bg-slate-50/50 border-b border-slate-100">
-                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock In</th>
-                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock Out</th>
-                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                            <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Hours</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-50">
-                                        {attendanceArray.map((record, i) => (
-                                            <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <span className="text-xs font-bold text-slate-700 uppercase">
-                                                        {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_in_time || '--:--'}</td>
-                                                <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_out_time || '--:--'}</td>
-                                                <td className="px-6 py-4">
-                                                    {record.is_late ? (
-                                                        <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
-                                                    ) : (
-                                                        <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <span className="text-xs font-bold text-slate-900">{record.hours_worked || 0}h</span>
-                                                </td>
+                            <>
+                                {/* Table for Desktop */}
+                                <div className="hidden md:block overflow-x-auto">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr className="bg-slate-50/50 border-b border-slate-100">
+                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date</th>
+                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock In</th>
+                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock Out</th>
+                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
+                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Hours</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-50">
+                                            {attendanceArray.map((record, i) => (
+                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
+                                                    <td className="px-6 py-4">
+                                                        <span className="text-xs font-bold text-slate-700 uppercase">
+                                                            {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_in_time || '--:--'}</td>
+                                                    <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_out_time || '--:--'}</td>
+                                                    <td className="px-6 py-4">
+                                                        {record.is_late ? (
+                                                            <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
+                                                        ) : (
+                                                            <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        <span className="text-xs font-bold text-slate-900">{record.hours_worked || 0}h</span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                {/* Cards for Mobile */}
+                                <div className="md:hidden divide-y divide-slate-100">
+                                    {attendanceArray.map((record, i) => (
+                                        <div key={i} className="p-4 space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm font-bold text-slate-900">
+                                                    {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
+                                                </span>
+                                                {record.is_late ? (
+                                                    <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
+                                                ) : (
+                                                    <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
+                                                )}
+                                            </div>
+                                            <div className="flex justify-between items-end text-xs">
+                                                <div className="space-y-1">
+                                                    <p className="text-slate-400 font-bold uppercase tracking-tighter text-[10px]">Clocking</p>
+                                                    <p className="text-slate-600 font-medium">
+                                                        {record.clock_in_time || '--:--'} → {record.clock_out_time || '--:--'}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-slate-400 font-bold uppercase tracking-tighter text-[10px]">Worked</p>
+                                                    <p className="text-slate-900 font-bold">{record.hours_worked || 0} Hours</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
                         ) : (
                             <div className="py-24 text-center">
                                 <Calendar className="h-10 w-10 text-slate-100 mx-auto mb-4" />

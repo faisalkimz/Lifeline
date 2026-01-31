@@ -212,11 +212,19 @@ const DashboardLayout = () => {
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
 
         {/* Top Header - Fixed & Clean */}
-        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-6 shadow-sm z-20 shrink-0">
-          <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-4 lg:px-6 shadow-sm z-20 shrink-0">
+          <div className="flex items-center gap-2 lg:gap-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
               <Menu className="h-6 w-6" />
             </button>
+
+            {/* Mobile Branding */}
+            <Link to="/dashboard" className="flex lg:hidden items-center gap-2">
+              <div className="h-8 w-8 bg-primary-500 rounded-lg flex items-center justify-center shadow-lg shadow-primary-900/20">
+                <Building className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Lifeline</span>
+            </Link>
 
             {/* Context Switcher (Platform mimic) */}
             <div className="hidden md:flex items-center gap-3 px-3 py-1.5 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-primary-300 dark:hover:border-primary-700 hover:bg-white dark:hover:bg-slate-800 transition-all group">
@@ -231,7 +239,7 @@ const DashboardLayout = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             {/* Search Bar */}
             <div className="hidden md:flex relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
@@ -242,7 +250,7 @@ const DashboardLayout = () => {
               />
             </div>
 
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+            <div className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
 
             {/* Theme Toggle */}
             <button

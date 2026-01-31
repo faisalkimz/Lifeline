@@ -134,68 +134,116 @@ const MyPayslipsPage = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                     {payslips.length > 0 ? (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-slate-50/50">
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pay Period</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Gross Salary</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Deductions</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Net Salary</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</TableHead>
-                                    <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
+                        <>
+                            {/* Table for Desktop */}
+                            <div className="hidden lg:block overflow-x-auto">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow className="bg-slate-50/50">
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Pay Period</TableHead>
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Gross Salary</TableHead>
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Deductions</TableHead>
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Net Salary</TableHead>
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</TableHead>
+                                            <TableHead className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Actions</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {payslips.map((payslip) => (
+                                            <TableRow key={payslip.id} className="hover:bg-slate-50/50 transition-all">
+                                                <TableCell className="px-8 py-6">
+                                                    <div className="flex flex-col">
+                                                        <span className="font-black text-slate-900">
+                                                            {new Date(payslip.year, payslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell className="px-8 py-6 text-right font-bold text-slate-700">
+                                                    {formatCurrency(payslip.gross_salary)}
+                                                </TableCell>
+                                                <TableCell className="px-8 py-6 text-right font-bold text-orange-600">
+                                                    -{formatCurrency(payslip.total_deductions)}
+                                                </TableCell>
+                                                <TableCell className="px-8 py-6 text-right font-black text-emerald-600 text-lg">
+                                                    {formatCurrency(payslip.net_salary)}
+                                                </TableCell>
+                                                <TableCell className="px-8 py-6">
+                                                    <Badge className="bg-emerald-100 text-emerald-700 rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-widest">
+                                                        {payslip.is_paid ? 'Paid' : 'Pending'}
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="px-8 py-6">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => setSelectedPayslip(payslip)}
+                                                            className="h-10 px-4 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl gap-2"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                            View
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => handleDownloadPdf(payslip.id)}
+                                                            disabled={isGenerating}
+                                                            className="h-10 px-4 text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-xl gap-2"
+                                                        >
+                                                            <Download className="h-4 w-4" />
+                                                            PDF
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Cards for Mobile */}
+                            <div className="lg:hidden divide-y divide-slate-100">
                                 {payslips.map((payslip) => (
-                                    <TableRow key={payslip.id} className="hover:bg-slate-50/50 transition-all">
-                                        <TableCell className="px-8 py-6">
-                                            <div className="flex flex-col">
-                                                <span className="font-black text-slate-900">
+                                    <div key={payslip.id} className="p-6 space-y-4">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="text-sm font-black text-slate-900">
                                                     {new Date(payslip.year, payslip.month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' })}
-                                                </span>
+                                                </p>
+                                                <Badge className="mt-1 bg-emerald-50 text-emerald-700 rounded-lg px-2 py-0.5 text-[9px] font-black uppercase tracking-widest border-none">
+                                                    {payslip.is_paid ? 'Paid' : 'Pending'}
+                                                </Badge>
                                             </div>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 text-right font-bold text-slate-700">
-                                            {formatCurrency(payslip.gross_salary)}
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 text-right font-bold text-orange-600">
-                                            -{formatCurrency(payslip.total_deductions)}
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6 text-right font-black text-emerald-600 text-lg">
-                                            {formatCurrency(payslip.net_salary)}
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6">
-                                            <Badge className="bg-emerald-100 text-emerald-700 rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-widest">
-                                                {payslip.is_paid ? 'Paid' : 'Pending'}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className="px-8 py-6">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => setSelectedPayslip(payslip)}
-                                                    className="h-10 px-4 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl gap-2"
-                                                >
-                                                    <Eye className="h-4 w-4" />
-                                                    View
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => handleDownloadPdf(payslip.id)}
-                                                    disabled={isGenerating}
-                                                    className="h-10 px-4 text-primary-500 hover:text-primary-700 hover:bg-primary-50 rounded-xl gap-2"
-                                                >
-                                                    <Download className="h-4 w-4" />
-                                                    PDF
-                                                </Button>
+                                            <div className="text-right">
+                                                <p className="text-xs font-black text-emerald-600">
+                                                    {formatCurrency(payslip.net_salary)}
+                                                </p>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Net Salary</p>
                                             </div>
-                                        </TableCell>
-                                    </TableRow>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setSelectedPayslip(payslip)}
+                                                className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-xl"
+                                            >
+                                                View Details
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => handleDownloadPdf(payslip.id)}
+                                                disabled={isGenerating}
+                                                className="flex-1 h-10 text-[10px] font-black uppercase tracking-widest rounded-xl border-primary-100 text-primary-600"
+                                            >
+                                                Download PDF
+                                            </Button>
+                                        </div>
+                                    </div>
                                 ))}
-                            </TableBody>
-                        </Table>
+                            </div>
+                        </>
                     ) : (
                         <div className="p-20 text-center">
                             <FileText className="h-16 w-16 mx-auto mb-4 text-slate-200" />

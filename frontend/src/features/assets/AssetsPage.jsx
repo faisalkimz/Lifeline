@@ -1,565 +1,290 @@
 import React, { useState } from 'react';
 import {
-    Laptop, Monitor, Smartphone, Box, Plus, Search, Filter,
-    User, CheckCircle, RefreshCw, RotateCcw, PenSquare, Trash2
+    Plus, Search, Filter, Laptop, Smartphone,
+    Monitor, MousePointer, MoreVertical,
+    CheckCircle2, AlertCircle, Clock, User,
+    ArrowUpRight, Download, FilterX, Archive,
+    ChevronRight, MoreHorizontal, Layout, Box, Hash
 } from 'lucide-react';
 import {
     useGetAssetsQuery,
-    useGetAssetCategoriesQuery,
-    useGetEmployeesQuery,
     useCreateAssetMutation,
     useUpdateAssetMutation,
-    useDeleteAssetMutation,
-    useAssignAssetMutation,
-    useReturnAssetMutation,
-    useCreateAssetCategoryMutation
+    useGetAssetCategoriesQuery,
+    useCreateAssetCategoryMutation,
+    useAssignAssetMutation
 } from '../../store/api';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle
+} from '../../components/ui/Dialog';
+import { Button } from '../../components/ui/Button';
 import toast from 'react-hot-toast';
-import { Skeleton } from '../../components/ui/Skeleton';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../components/ui/Dialog';
+
+const STATUS_CONFIG = {
+    available: { color: 'text-emerald-700 bg-emerald-50', label: 'Available' },
+    assigned: { color: 'text-blue-700 bg-blue-50', label: 'Assigned' },
+    maintenance: { color: 'text-orange-700 bg-orange-50', label: 'Maintenance' },
+    disposed: { color: 'text-slate-500 bg-slate-50', label: 'Disposed' }
+};
 
 const AssetsPage = () => {
-    const [activeTab, setActiveTab] = useState('inventory');
-    const [searchTerm, setSearchTerm] = useState('');
-    const [filterStatus, setFilterStatus] = useState('all');
-
-    // Queries
-    const { data: assets, isLoading } = useGetAssetsQuery();
-    const { data: categories } = useGetAssetCategoriesQuery();
-    const { data: employees } = useGetEmployeesQuery();
-
-    // Mutations
-    const [createAsset] = useCreateAssetMutation();
-    const [updateAsset] = useUpdateAssetMutation();
-    const [deleteAsset] = useDeleteAssetMutation();
-    const [assignAsset] = useAssignAssetMutation();
-    const [returnAsset] = useReturnAssetMutation();
-    const [createCategory] = useCreateAssetCategoryMutation();
-
-    // Modal States
+    // 1. Core State
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
     const [selectedAsset, setSelectedAsset] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
 
-    // Derived state
-    const assetsList = assets?.results || [];
-    const categoriesList = categories?.results || categories || [];
-
-    const filteredAssets = assetsList.filter(asset => {
-        const matchesSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            asset.serial_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            asset.assigned_to_details?.first_name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesStatus = filterStatus === 'all' || asset.status === filterStatus;
-        return matchesSearch && matchesStatus;
+    // 2. API Queries
+    const { data: assets, isLoading, refetch } = useGetAssetsQuery({
+        search: searchTerm,
+        category: selectedCategory !== 'all' ? selectedCategory : undefined
     });
+    const { data: categories } = useGetAssetCategoriesQuery();
+    const [createAsset] = useCreateAssetMutation();
+    const [updateAsset] = useUpdateAssetMutation();
+    const [createCategory] = useCreateAssetCategoryMutation();
+    const [assignAsset] = useAssignAssetMutation();
 
-    const stats = {
-        total: assets?.count || assetsList.length || 0,
-        assigned: assetsList.filter(a => a.status === 'assigned').length,
-        available: assetsList.filter(a => a.status === 'available').length,
-        maintenance: assetsList.filter(a => a.status === 'maintenance').length,
-    };
+    const assetsList = Array.isArray(assets?.results) ? assets.results : (Array.isArray(assets) ? assets : []);
 
-    const handleCreateCategory = async (e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-        try {
-            await createCategory(data).unwrap();
-            toast.success('Category created successfully');
-            setIsCategoryModalOpen(false);
-        } catch (err) {
-            toast.error('Failed to create category');
-        }
-    };
-
+    // 3. Handlers
     const handleCreateAsset = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
+        const data = Object.fromEntries(formData);
         try {
             if (selectedAsset) {
                 await updateAsset({ id: selectedAsset.id, ...data }).unwrap();
-                toast.success('Asset updated successfully');
+                toast.success('Asset updated');
             } else {
                 await createAsset(data).unwrap();
-                toast.success('Asset created successfully');
+                toast.success('Asset added');
             }
             setIsAddModalOpen(false);
             setSelectedAsset(null);
-        } catch (err) {
-            toast.error('Failed to save asset');
-            console.error(err);
-        }
+            refetch();
+        } catch (error) { toast.error('Check your input'); }
     };
 
     const handleAssign = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData.entries());
-
         try {
-            await assignAsset({ id: selectedAsset.id, ...data }).unwrap();
-            toast.success('Asset assigned successfully');
+            await assignAsset({
+                asset_id: selectedAsset.id,
+                employee_id: formData.get('employee_id'),
+                notes: formData.get('notes')
+            }).unwrap();
+            toast.success('Asset assigned');
             setIsAssignModalOpen(false);
-            setSelectedAsset(null);
-        } catch (err) {
-            toast.error(err.data?.error || 'Failed to assign asset');
-        }
+            refetch();
+        } catch (error) { toast.error('Failed to assign'); }
     };
 
-    const handleReturn = async (asset) => {
-        if (!window.confirm(`Mark ${asset.name} as returned?`)) return;
+    const handleCreateCategory = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
         try {
-            await returnAsset({ id: asset.id, condition: asset.condition }).unwrap();
-            toast.success('Asset returned successfully');
-        } catch (err) {
-            toast.error('Failed to return asset');
-        }
-    };
-
-    const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure you want to delete this asset?')) return;
-        try {
-            await deleteAsset(id).unwrap();
-            toast.success('Asset deleted');
-        } catch (err) {
-            toast.error('Failed to delete asset');
-        }
+            await createCategory(Object.fromEntries(formData)).unwrap();
+            toast.success('Category created');
+            setIsCategoryModalOpen(false);
+        } catch (error) { toast.error('Failed'); }
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-12 pb-20">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Assets Management</h1>
-                    <p className="text-slate-500 dark:text-slate-400">Track and manage company hardware and licenses</p>
+                    <h1 className="text-4xl font-bold tracking-tight">Inventory</h1>
+                    <p className="text-notion-text-light mt-2">Manage organization hardware, licenses, and equipment.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button
-                        onClick={() => setIsCategoryModalOpen(true)}
-                        className="btn-workpay-secondary flex items-center gap-2"
+                    <Button variant="ghost" onClick={() => setIsCategoryModalOpen(true)} className="btn-notion-outline h-8">
+                        <Plus className="h-3.5 w-3.5 mr-2" /> Categories
+                    </Button>
+                    <Button onClick={() => { setSelectedAsset(null); setIsAddModalOpen(true); }} className="btn-notion-primary h-8">
+                        <Plus className="h-3.5 w-3.5 mr-2" /> Add Asset
+                    </Button>
+                </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {[
+                    { label: 'Total items', value: assetsList.length },
+                    { label: 'Available', value: assetsList.filter(a => a.status === 'available').length },
+                    { label: 'Assigned', value: assetsList.filter(a => a.status === 'assigned').length },
+                    { label: 'Value', value: 'UGX ' + assetsList.reduce((sum, a) => sum + (parseFloat(a.purchase_cost) || 0), 0).toLocaleString() }
+                ].map((s, idx) => (
+                    <div key={idx} className="space-y-1">
+                        <p className="text-[11px] font-semibold text-notion-text-light uppercase tracking-wider">{s.label}</p>
+                        <p className="text-2xl font-bold">{s.value}</p>
+                    </div>
+                ))}
+            </div>
+
+            {/* Tabs / Filters Bar */}
+            <div className="flex flex-col md:flex-row gap-4 py-2 border-y border-notion-border items-center">
+                <div className="relative flex-1 w-full">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-notion-text-light" />
+                    <input
+                        placeholder="Search assets..."
+                        className="w-full pl-8 pr-3 py-1.5 bg-transparent border-none focus:outline-none text-sm placeholder:text-notion-text-light"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto whitespace-nowrap px-1">
+                    <span className="text-xs font-bold text-notion-text-light uppercase tracking-tighter">Category</span>
+                    <select
+                        className="bg-transparent border-none text-sm font-medium focus:outline-none text-notion-text-light outline-none"
+                        value={selectedCategory}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                     >
-                        <Plus className="h-4 w-4" />
-                        Add Category
-                    </button>
-                    <button
-                        onClick={() => { setSelectedAsset(null); setIsAddModalOpen(true); }}
-                        className="btn-workpay-primary flex items-center gap-2"
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add New Asset
+                        <option value="all">ALL ITEMS</option>
+                        {categories?.map(c => <option key={c.id} value={c.id}>{c.name?.toUpperCase()}</option>)}
+                    </select>
+                    <div className="h-4 w-px bg-notion-border mx-2" />
+                    <button className="p-1 hover:bg-notion-hover rounded">
+                        <MoreHorizontal className="h-4 w-4 text-notion-text-light" />
                     </button>
                 </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <StatCard label="Total Assets" value={stats.total} icon={Box} color="bg-blue-500" loading={isLoading} />
-                <StatCard label="Assigned" value={stats.assigned} icon={User} color="bg-green-500" loading={isLoading} />
-                <StatCard label="Available" value={stats.available} icon={CheckCircle} color="bg-indigo-500" loading={isLoading} />
-                <StatCard label="Maintenance" value={stats.maintenance} icon={RefreshCw} color="bg-orange-500" loading={isLoading} />
-            </div>
-
-            {/* Main Content */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                {/* Toolbar */}
-                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-                        {['inventory', 'categories'].map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-md text-sm font-medium capitalize transition-all ${activeTab === tab ? 'bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex gap-2 w-full sm:w-auto">
-                        <div className="relative flex-1 sm:w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <input
-                                type="text"
-                                placeholder="Search assets..."
-                                className="pl-10 input-workpay"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
-                        <div className="relative">
-                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                            <select
-                                className="pl-10 input-workpay appearance-none pr-8"
-                                value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value)}
-                            >
-                                <option value="all">All Status</option>
-                                <option value="available">Available</option>
-                                <option value="assigned">Assigned</option>
-                                <option value="maintenance">Maintenance</option>
-                                <option value="retired">Retired</option>
-                            </select>
-                        </div>
-                    </div>
+            {/* Table */}
+            {isLoading ? (
+                <div className="py-24 text-center text-notion-text-light italic">Loading inventory...</div>
+            ) : assetsList.length === 0 ? (
+                <div className="py-32 text-center border-2 border-dashed border-notion-border rounded-lg">
+                    <Box className="h-10 w-10 mx-auto text-notion-border mb-3" />
+                    <p className="text-sm font-medium text-notion-text-light">No assets found</p>
                 </div>
-
-                {/* Table for Desktop, Cards for Mobile */}
-                {activeTab === 'inventory' && (
-                    <>
-                        {/* Desktop Table */}
-                        <div className="hidden lg:block overflow-x-auto">
-                            <table className="table-workpay">
-                                <thead>
-                                    <tr>
-                                        <th>Asset Name</th>
-                                        <th>Category</th>
-                                        <th>Serial / Tag</th>
-                                        <th>Status</th>
-                                        <th>Assignee</th>
-                                        <th className="text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {isLoading ? (
-                                        [...Array(5)].map((_, i) => (
-                                            <tr key={i}>
-                                                <td className="p-4"><div className="flex items-center gap-3"><Skeleton className="h-10 w-10 rounded-lg" /><div className="space-y-1"><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-20" /></div></div></td>
-                                                <td className="p-4"><Skeleton className="h-4 w-24" /></td>
-                                                <td className="p-4"><div className="space-y-1"><Skeleton className="h-4 w-28" /><Skeleton className="h-3 w-16" /></div></td>
-                                                <td className="p-4"><Skeleton className="h-6 w-20 rounded-full" /></td>
-                                                <td className="p-4"><div className="flex items-center gap-2"><Skeleton className="h-6 w-6 rounded-full" /><Skeleton className="h-4 w-24" /></div></td>
-                                                <td className="p-4 text-right"><div className="flex justify-end gap-2"><Skeleton className="h-8 w-8 rounded-md" /><Skeleton className="h-8 w-8 rounded-md" /></div></td>
-                                            </tr>
-                                        ))
-                                    ) : filteredAssets?.length === 0 ? (
-                                        <tr><td colSpan="6" className="text-center py-8 text-slate-500">No assets found</td></tr>
-                                    ) : (
-                                        filteredAssets?.map(asset => (
-                                            <tr key={asset.id} className="group">
-                                                <td className="font-medium">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                                                            {getIconForCategory(asset.category_details?.name)}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-slate-900 dark:text-white font-medium">{asset.name}</p>
-                                                            <p className="text-xs text-slate-500">Purchased: {asset.purchase_date || 'N/A'}</p>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td>{asset.category_details?.name || 'Uncategorized'}</td>
-                                                <td>
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-mono">{asset.serial_number}</span>
-                                                        <span className="text-[10px] text-slate-400">Tag: {asset.asset_tag || '-'}</span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <StatusBadge status={asset.status} />
-                                                </td>
-                                                <td>
-                                                    {asset.assigned_to_details ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-xs font-bold text-primary-600 dark:text-primary-400">
-                                                                {asset.assigned_to_details.first_name[0]}{asset.assigned_to_details.last_name[0]}
-                                                            </div>
-                                                            <span className="text-sm">{asset.assigned_to_details.first_name} {asset.assigned_to_details.last_name}</span>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-slate-400 text-xs italic">Unassigned</span>
-                                                    )}
-                                                </td>
-                                                <td className="text-right">
-                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        {asset.status === 'available' && (
-                                                            <button
-                                                                onClick={() => { setSelectedAsset(asset); setIsAssignModalOpen(true); }}
-                                                                title="Assign Asset"
-                                                                className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-primary-600 transition-colors"
-                                                            >
-                                                                <User className="h-4 w-4" />
-                                                            </button>
-                                                        )}
-                                                        {asset.status === 'assigned' && (
-                                                            <button
-                                                                onClick={() => handleReturn(asset)}
-                                                                title="Return Asset"
-                                                                className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-orange-600 transition-colors"
-                                                            >
-                                                                <RotateCcw className="h-4 w-4" />
-                                                            </button>
-                                                        )}
-                                                        <button
-                                                            onClick={() => { setSelectedAsset(asset); setIsAddModalOpen(true); }}
-                                                            className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-blue-600 transition-colors"
-                                                        >
-                                                            <PenSquare className="h-4 w-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDelete(asset.id)}
-                                                            className="p-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-red-600 transition-colors"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Mobile & Tablet Card View */}
-                        <div className="lg:hidden p-4 space-y-4">
-                            {isLoading ? (
-                                [...Array(3)].map((_, i) => (
-                                    <div key={i} className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-4 space-y-3">
-                                        <div className="flex items-center gap-3">
-                                            <Skeleton className="h-10 w-10 rounded-lg" />
-                                            <div className="flex-1 space-y-2">
-                                                <Skeleton className="h-4 w-3/4" />
-                                                <Skeleton className="h-3 w-1/2" />
+            ) : (
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-notion-border">
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider w-[350px]">Asset Details</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Status</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Storage</th>
+                                <th className="px-4 py-3 text-xs font-semibold text-notion-text-light uppercase tracking-wider">Purchase</th>
+                                <th className="px-1 py-3 text-right"></th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-notion-border">
+                            {assetsList.map((asset) => (
+                                <tr key={asset.id} className="group hover:bg-notion-hover/40 transition-colors">
+                                    <td className="px-4 py-5">
+                                        <div className="flex items-center gap-4">
+                                            <div className="h-9 w-9 bg-notion-sidebar rounded border border-notion-border flex items-center justify-center shrink-0">
+                                                <Laptop className="h-4 w-4 text-notion-text-light" />
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="font-semibold text-[14px] truncate">{asset.name}</p>
+                                                <p className="text-[11px] text-notion-text-light uppercase tracking-wide flex items-center gap-1.5">
+                                                    <Hash className="h-3 w-3 opacity-40" /> {asset.serial_number}
+                                                </p>
                                             </div>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <Skeleton className="h-6 w-20 rounded-full" />
-                                            <Skeleton className="h-6 w-24 rounded-full" />
-                                        </div>
-                                    </div>
-                                ))
-                            ) : filteredAssets?.length === 0 ? (
-                                <div className="text-center py-8 text-slate-500">No assets found</div>
-                            ) : (
-                                filteredAssets?.map(asset => (
-                                    <div key={asset.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm">
-                                        <div className="flex items-start justify-between mb-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-500 shrink-0">
-                                                    {getIconForCategory(asset.category_details?.name)}
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-slate-900 dark:text-white leading-tight">{asset.name}</h4>
-                                                    <p className="text-xs text-slate-500">{asset.category_details?.name || 'Uncategorized'}</p>
-                                                </div>
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        {asset.status === 'assigned' ? (
+                                            <div className="space-y-1">
+                                                <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-100">Assigned</span>
+                                                <p className="text-[11px] text-notion-text-light font-medium truncate max-w-[150px]">To: {asset.assigned_to_name}</p>
                                             </div>
-                                            <StatusBadge status={asset.status} />
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4 mb-4 text-xs">
-                                            <div>
-                                                <p className="text-slate-400 mb-0.5">Serial Number</p>
-                                                <p className="font-mono text-slate-700 dark:text-slate-300">{asset.serial_number || '-'}</p>
-                                            </div>
-                                            <div>
-                                                <p className="text-slate-400 mb-0.5">Asset Tag</p>
-                                                <p className="font-semibold text-slate-700 dark:text-slate-300">{asset.asset_tag || '-'}</p>
-                                            </div>
-                                            <div className="col-span-2">
-                                                <p className="text-slate-400 mb-1">Assignee</p>
-                                                {asset.assigned_to_details ? (
-                                                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg">
-                                                        <div className="h-6 w-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-[10px] font-bold text-primary-600 dark:text-primary-400">
-                                                            {asset.assigned_to_details.first_name[0]}{asset.assigned_to_details.last_name[0]}
-                                                        </div>
-                                                        <span className="font-medium text-slate-700 dark:text-slate-300">
-                                                            {asset.assigned_to_details.first_name} {asset.assigned_to_details.last_name}
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 italic">Unassigned</span>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                                        ) : (
+                                            <span className={cn(
+                                                "inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border",
+                                                STATUS_CONFIG[asset.status]?.color || 'bg-slate-50 border-slate-100'
+                                            )}>
+                                                {STATUS_CONFIG[asset.status]?.label || asset.status}
+                                            </span>
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        <p className="text-xs font-medium">{asset.location || 'N/A'}</p>
+                                        <p className="text-[11px] text-notion-text-light">{asset.category_name}</p>
+                                    </td>
+                                    <td className="px-4 py-5">
+                                        <p className="text-xs font-medium">UGX {parseFloat(asset.purchase_cost).toLocaleString()}</p>
+                                        <p className="text-[11px] text-notion-text-light">{asset.purchase_date || 'No Date'}</p>
+                                    </td>
+                                    <td className="px-1 py-5 text-right">
+                                        <div className="flex justify-end items-center opacity-0 group-hover:opacity-100 transition-all">
+                                            <button
+                                                onClick={() => { setSelectedAsset(asset); setIsAddModalOpen(true); }}
+                                                className="p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded text-xs font-bold text-notion-text-light hover:text-notion-text"
+                                            >
+                                                Edit
+                                            </button>
                                             {asset.status === 'available' && (
                                                 <button
                                                     onClick={() => { setSelectedAsset(asset); setIsAssignModalOpen(true); }}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 rounded-lg text-xs font-bold"
+                                                    className="p-1.5 hover:bg-black/5 dark:hover:bg-white/5 rounded text-xs font-bold text-notion-primary"
                                                 >
-                                                    <User className="h-3.5 w-3.5" /> Assign
+                                                    Assign
                                                 </button>
                                             )}
-                                            {asset.status === 'assigned' && (
-                                                <button
-                                                    onClick={() => handleReturn(asset)}
-                                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-lg text-xs font-bold"
-                                                >
-                                                    <RotateCcw className="h-3.5 w-3.5" /> Return
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => { setSelectedAsset(asset); setIsAddModalOpen(true); }}
-                                                className="p-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg"
-                                            >
-                                                <PenSquare className="h-4 w-4" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(asset.id)}
-                                                className="p-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg"
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                            </button>
                                         </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </>
-                )}
-
-                {/* Categories Tab */}
-                {activeTab === 'categories' && (
-                    <div className="overflow-x-auto">
-                        <table className="table-workpay">
-                            <thead>
-                                <tr>
-                                    <th>Category Name</th>
-                                    <th>Description</th>
-                                    <th>Assets Count</th>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {isLoading ? (
-                                    [...Array(3)].map((_, i) => (
-                                        <tr key={i}>
-                                            <td className="p-4"><Skeleton className="h-5 w-48" /></td>
-                                            <td className="p-4"><Skeleton className="h-4 w-full" /></td>
-                                            <td className="p-4"><Skeleton className="h-6 w-16 rounded-full" /></td>
-                                        </tr>
-                                    ))
-                                ) : categoriesList.map(cat => (
-                                    <tr key={cat.id}>
-                                        <td className="font-medium text-slate-900 dark:text-white capitalize">{cat.name}</td>
-                                        <td className="text-slate-500">{cat.description || '-'}</td>
-                                        <td>
-                                            <span className="badge-workpay badge-neutral">
-                                                {assetsList.filter(a => a.category === cat.id).length} Items
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
-            {/* Add/Edit Asset Modal */}
+            {/* Asset Modal */}
             <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle>
-                            {selectedAsset ? 'Edit Asset' : 'Add New Asset'}
-                        </DialogTitle>
+                        <DialogTitle>{selectedAsset ? 'Edit Asset' : 'New Asset'}</DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleCreateAsset} className="p-6 space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Asset Name <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    name="name"
+                    <form onSubmit={handleCreateAsset} className="p-8 space-y-6">
+                        <div className="grid grid-cols-2 gap-6">
+                            <InputField label="Asset Name" name="name" defaultValue={selectedAsset?.name} required placeholder="e.g. MacBook Pro M3" />
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Category</label>
+                                <select
+                                    name="category"
+                                    defaultValue={selectedAsset?.category}
                                     required
-                                    defaultValue={selectedAsset?.name}
-                                    className="input-workpay"
-                                    placeholder="e.g. MacBook Pro"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Category
-                                </label>
-                                <select name="category" defaultValue={selectedAsset?.category} className="input-workpay">
+                                    className="w-full bg-transparent border border-notion-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-notion-text"
+                                >
                                     <option value="">Select Category</option>
-                                    {categoriesList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Serial Number
-                                </label>
-                                <input
-                                    name="serial_number"
-                                    defaultValue={selectedAsset?.serial_number}
-                                    className="input-workpay"
-                                    placeholder="S/N 12345"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Asset Tag
-                                </label>
-                                <input
-                                    name="asset_tag"
-                                    defaultValue={selectedAsset?.asset_tag}
-                                    className="input-workpay"
-                                    placeholder="TAG-001"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Purchase Date
-                                </label>
-                                <input
-                                    name="purchase_date"
-                                    type="date"
-                                    defaultValue={selectedAsset?.purchase_date}
-                                    className="input-workpay"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                    Cost (UGX)
-                                </label>
-                                <input
-                                    name="purchase_cost"
-                                    type="number"
-                                    defaultValue={selectedAsset?.purchase_cost}
-                                    className="input-workpay"
-                                    placeholder="1500000"
-                                />
-                            </div>
+                            <InputField label="Serial Number" name="serial_number" defaultValue={selectedAsset?.serial_number} required placeholder="S/N: 123-456" />
+                            <InputField label="Location" name="location" defaultValue={selectedAsset?.location} placeholder="Office Desk / Storage" />
+                            <InputField label="Purchase Cost" name="purchase_cost" type="number" defaultValue={selectedAsset?.purchase_cost} placeholder="UGX" />
+                            <InputField label="Purchase Date" name="purchase_date" type="date" defaultValue={selectedAsset?.purchase_date} />
                         </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Condition
-                            </label>
-                            <select name="condition" defaultValue={selectedAsset?.condition || 'new'} className="input-workpay">
-                                <option value="new">New</option>
-                                <option value="excellent">Excellent</option>
-                                <option value="good">Good</option>
-                                <option value="fair">Fair</option>
-                                <option value="poor">Poor</option>
-                                <option value="damaged">Damaged</option>
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Status</label>
+                            <select
+                                name="status"
+                                defaultValue={selectedAsset?.status || 'available'}
+                                className="w-full bg-transparent border border-notion-border rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-notion-text"
+                            >
+                                <option value="available">Available</option>
+                                <option value="assigned">Assigned</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="disposed">Disposed</option>
                             </select>
                         </div>
 
-                        {/* Footer Buttons */}
-                        <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-                            <button
-                                type="button"
-                                onClick={() => setIsAddModalOpen(false)}
-                                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
-                            >
-                                CANCEL
-                            </button>
-                            <button
-                                type="submit"
-                                className="btn-workpay-primary"
-                            >
-                                SAVE ASSET
-                            </button>
+                        <div className="flex justify-end gap-3 pt-8 border-t border-notion-border">
+                            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-1.5 text-sm font-medium hover:bg-notion-hover rounded">Cancel</button>
+                            <button type="submit" className="btn-notion-primary h-9 px-6">Save Asset</button>
                         </div>
                     </form>
                 </DialogContent>
@@ -571,113 +296,36 @@ const AssetsPage = () => {
                     <DialogHeader>
                         <DialogTitle>Assign Asset</DialogTitle>
                     </DialogHeader>
-
-                    <form onSubmit={handleAssign} className="p-6 space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Employee <span className="text-red-500">*</span>
-                            </label>
-                            <select name="employee_id" required className="input-workpay">
-                                <option value="">Search Employees</option>
-                                {employees?.map(emp => (
-                                    <option key={emp.id} value={emp.id}>
-                                        {emp.first_name} {emp.last_name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Assignment Date <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                name="assigned_date"
-                                type="date"
-                                required
-                                defaultValue={new Date().toISOString().split('T')[0]}
-                                className="input-workpay"
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Notes
-                            </label>
+                    <form onSubmit={handleAssign} className="p-8 space-y-6">
+                        <InputField label="Employee ID" name="employee_id" required placeholder="EMP-001" />
+                        <div className="space-y-1">
+                            <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Notes</label>
                             <textarea
                                 name="notes"
-                                rows="3"
-                                className="input-workpay"
-                                placeholder="Any specific notes..."
-                            ></textarea>
+                                className="w-full bg-transparent border border-notion-border rounded-md p-3 text-sm focus:outline-none focus:ring-1 focus:ring-notion-text h-24"
+                                placeholder="Condition at handover..."
+                            />
                         </div>
-
-                        {/* Footer Buttons */}
-                        <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-                            <button
-                                type="button"
-                                onClick={() => setIsAssignModalOpen(false)}
-                                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
-                            >
-                                CANCEL
-                            </button>
-                            <button
-                                type="submit"
-                                className="btn-workpay-primary"
-                            >
-                                ASSIGN ASSET
-                            </button>
+                        <div className="flex justify-end gap-3 pt-6 border-t border-notion-border">
+                            <button type="button" onClick={() => setIsAssignModalOpen(false)} className="px-4 py-1.5 text-sm font-medium hover:bg-notion-hover rounded">Cancel</button>
+                            <button type="submit" className="btn-notion-primary h-9 px-6 text-[11px] uppercase tracking-widest font-black">Confirm Assignment</button>
                         </div>
                     </form>
                 </DialogContent>
             </Dialog>
 
-            {/* Add Category Modal */}
+            {/* Category Modal */}
             <Dialog open={isCategoryModalOpen} onOpenChange={setIsCategoryModalOpen}>
                 <DialogContent className="max-w-md">
                     <DialogHeader>
-                        <DialogTitle>Create Category</DialogTitle>
+                        <DialogTitle>Management Categories</DialogTitle>
                     </DialogHeader>
-
-                    <form onSubmit={handleCreateCategory} className="p-6 space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Category Name <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                name="name"
-                                required
-                                className="input-workpay"
-                                placeholder="e.g. Laptops, Furniture"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                                Description
-                            </label>
-                            <textarea
-                                name="description"
-                                rows="3"
-                                className="input-workpay"
-                                placeholder="Describe this category..."
-                            ></textarea>
-                        </div>
-
-                        {/* Footer Buttons */}
-                        <div className="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
-                            <button
-                                type="button"
-                                onClick={() => setIsCategoryModalOpen(false)}
-                                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700"
-                            >
-                                CANCEL
-                            </button>
-                            <button
-                                type="submit"
-                                className="btn-workpay-primary"
-                            >
-                                CREATE CATEGORY
-                            </button>
+                    <form onSubmit={handleCreateCategory} className="p-8 space-y-6">
+                        <InputField label="Category Name" name="name" required placeholder="e.g. Laptops" />
+                        <InputField label="Description" name="description" placeholder="Short summary..." />
+                        <div className="flex justify-end gap-3 pt-6 border-t border-notion-border">
+                            <button type="button" onClick={() => setIsCategoryModalOpen(false)} className="px-4 py-1.5 text-sm font-medium hover:bg-notion-hover rounded">Cancel</button>
+                            <button type="submit" className="btn-notion-primary h-9 px-6 text-[11px] uppercase tracking-widest font-black">Create</button>
                         </div>
                     </form>
                 </DialogContent>
@@ -686,45 +334,14 @@ const AssetsPage = () => {
     );
 };
 
-const StatCard = ({ label, value, icon: Icon, color, loading }) => (
-    <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">
-        <div className={`h-12 w-12 rounded-full ${color.replace('bg-', 'bg-').replace('500', '100')} dark:bg-opacity-20 flex items-center justify-center text-${color.replace('bg-', '')}`}>
-            <Icon className={`h-6 w-6 text-${color.replace('bg-', 'text-')}`} />
-        </div>
-        <div>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">{label}</p>
-            {loading ? (
-                <Skeleton className="h-8 w-16 mt-1 rounded-md" />
-            ) : (
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
-            )}
-        </div>
+const InputField = ({ label, ...props }) => (
+    <div className="space-y-1">
+        <label className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">{label}</label>
+        <input
+            {...props}
+            className="w-full bg-transparent border border-notion-border rounded-md px-3 py-1.5 text-sm placeholder:text-notion-text-light/50 focus:outline-none focus:ring-1 focus:ring-notion-text"
+        />
     </div>
 );
-
-const StatusBadge = ({ status }) => {
-    const styles = {
-        available: 'badge-success',
-        assigned: 'badge-info',
-        maintenance: 'badge-warning',
-        retired: 'badge-neutral',
-        lost: 'badge-error'
-    };
-
-    return (
-        <span className={`badge-workpay ${styles[status] || 'badge-neutral'} uppercase`}>
-            {status}
-        </span>
-    );
-};
-
-const getIconForCategory = (categoryName) => {
-    if (!categoryName) return <Box className="h-4 w-4" />;
-    const name = categoryName.toLowerCase();
-    if (name.includes('laptop') || name.includes('macbook')) return <Laptop className="h-4 w-4" />;
-    if (name.includes('monitor') || name.includes('screen')) return <Monitor className="h-4 w-4" />;
-    if (name.includes('phone') || name.includes('mobile')) return <Smartphone className="h-4 w-4" />;
-    return <Box className="h-4 w-4" />;
-};
 
 export default AssetsPage;

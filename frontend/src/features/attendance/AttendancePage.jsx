@@ -6,7 +6,8 @@ import { Badge } from '../../components/ui/Badge';
 import {
     Clock, Calendar, CheckCircle2,
     Play, Square, Loader2, History, AlertCircle,
-    Coffee, MapPin, QrCode, Settings
+    Coffee, MapPin, QrCode, Settings, MoreHorizontal, User,
+    ChevronDown, ArrowUpRight
 } from 'lucide-react';
 import {
     useClockInMutation,
@@ -17,7 +18,7 @@ import {
 } from '../../store/api';
 import { exportToCSV } from '../../utils/exportUtils';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { cn } from '../../utils/cn';
 
 const AttendancePage = () => {
     // 1. Core State & Queries
@@ -74,7 +75,7 @@ const AttendancePage = () => {
             };
 
             await clockIn(payload).unwrap();
-            toast.success('Clocked in successfully');
+            toast.success('Shift started');
             setQrMode(false);
             setQrCode('');
             refetch();
@@ -98,7 +99,7 @@ const AttendancePage = () => {
                 longitude: coords?.lng
             }).unwrap();
 
-            toast.success('Clocked out successfully');
+            toast.success('Shift ended');
             refetch();
         } catch (error) {
             toast.error(error?.data?.error || 'Failed to clock out');
@@ -117,7 +118,7 @@ const AttendancePage = () => {
     }, [attendanceArray]);
 
     const formatTime = (date) => date.toLocaleTimeString('en-US', {
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
     });
 
     const formatDate = (date) => date.toLocaleDateString('en-US', {
@@ -139,214 +140,171 @@ const AttendancePage = () => {
         }));
 
         exportToCSV(exportData, `attendance_${new Date().toISOString().split('T')[0]}`);
-        toast.success("History exported");
+        toast.success("Log exported");
     };
 
     return (
-        <div className="space-y-8 pb-12 animate-fade-in">
+        <div className="space-y-12 pb-20">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Attendance</h1>
-                    <p className="text-slate-500 text-sm mt-1">Manage your daily work hours and check-in status.</p>
+                    <h1 className="text-4xl font-bold tracking-tight">Time & Attendance</h1>
+                    <p className="text-notion-text-light mt-2">Log your work hours and track your daily productivity.</p>
                 </div>
                 {['admin', 'hr_manager', 'company_admin'].includes(useSelector(state => state.auth.user?.role)) && (
                     <Button
                         onClick={() => window.location.href = '/attendance/admin'}
-                        variant="outline"
-                        className="h-10 px-4 text-xs font-semibold uppercase tracking-wider border-slate-200"
+                        variant="ghost"
+                        className="btn-notion-outline h-8"
                     >
-                        <Settings className="h-4 w-4 mr-2" />
+                        <Settings className="h-3.5 w-3.5 mr-2" />
                         Admin View
                     </Button>
                 )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Clocking Interface */}
-                <div className="lg:col-span-1 space-y-6">
-                    <Card className="border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl">
-                        <CardContent className="p-8">
-                            <div className="flex flex-col items-center text-center space-y-6">
-                                <div className="p-4 bg-slate-50 rounded-full">
-                                    <Clock className="h-8 w-8 text-[#88B072]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-4xl font-bold text-slate-900 tabular-nums">{formatTime(currentTime)}</h2>
-                                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-2">{formatDate(currentTime)}</p>
-                                </div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                {/* Clock Interface */}
+                <div className="lg:col-span-1 space-y-8">
+                    <div className="p-8 rounded-lg border border-notion-border space-y-8">
+                        <div className="space-y-1">
+                            <p className="text-[11px] font-semibold text-notion-text-light uppercase tracking-wider">Current Time</p>
+                            <h2 className="text-5xl font-bold tracking-tighter tabular-nums text-notion-text">
+                                {formatTime(currentTime)}
+                            </h2>
+                            <p className="text-sm font-medium text-notion-text-light opacity-60">{formatDate(currentTime)}</p>
+                        </div>
 
-                                <div className="w-full pt-4">
-                                    {statusLoading ? (
-                                        <div className="h-14 flex items-center justify-center">
-                                            <Loader2 className="h-6 w-6 text-slate-300 animate-spin" />
-                                        </div>
-                                    ) : !todayStatus?.is_clocked_in && !todayStatus?.clock_out ? (
-                                        qrMode ? (
-                                            <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2">
-                                                <input
-                                                    type="text"
-                                                    autoFocus
-                                                    placeholder="Enter QR Token"
-                                                    className="w-full bg-slate-50 border border-slate-100 rounded h-12 px-4 text-center text-sm font-semibold focus:border-[#88B072] outline-none"
-                                                    value={qrCode}
-                                                    onChange={e => setQrCode(e.target.value)}
-                                                />
-                                                <div className="flex gap-2">
-                                                    <Button variant="ghost" onClick={() => setQrMode(false)} className="flex-1 text-[10px] font-bold uppercase h-10 border-none">
-                                                        Cancel
-                                                    </Button>
-                                                    <Button onClick={() => handleClockIn(qrCode)} disabled={!qrCode || isClockingIn} className="flex-1 bg-[#88B072] hover:bg-[#7aa265] text-white text-[10px] font-bold uppercase h-10">
-                                                        {isClockingIn ? <Loader2 className="animate-spin h-4 w-4" /> : "Verify"}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <Button
-                                                onClick={() => handleClockIn()}
-                                                disabled={isClockingIn || isPolicyLoading}
-                                                className="w-full h-14 bg-[#88B072] hover:bg-[#7aa265] text-white text-xs font-bold uppercase tracking-wider rounded-lg shadow-sm transition-all"
-                                            >
-                                                {isClockingIn || isPolicyLoading ? <Loader2 className="animate-spin h-5 w-5" /> : (
-                                                    policy?.enable_qr_clock_in ? <QrCode className="h-5 w-5 mr-3" /> : <Play className="h-5 w-5 mr-3" />
-                                                )}
-                                                {policy?.enable_qr_clock_in ? "Scan to Clock In" : "Start Working"}
-                                            </Button>
-                                        )
-                                    ) : todayStatus?.is_clocked_in ? (
-                                        <div className="space-y-4">
-                                            <div className="p-4 bg-emerald-50 rounded border border-emerald-100">
-                                                <div className="flex items-center justify-center gap-2 mb-1 text-emerald-600">
-                                                    <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest">Active Shift</span>
-                                                </div>
-                                                <p className="text-[11px] text-emerald-500 font-medium">Started at {new Date(todayStatus.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
-                                            </div>
-                                            <Button
-                                                onClick={handleClockOut}
-                                                disabled={isClockingOut}
-                                                className="w-full h-12 bg-slate-900 text-white hover:bg-black text-[10px] font-bold uppercase tracking-wider rounded-lg flex items-center justify-center gap-2"
-                                            >
-                                                {isClockingOut ? <Loader2 className="animate-spin h-4 w-4" /> : <Square className="h-4 w-4" />}
-                                                Clock Out
-                                            </Button>
-                                        </div>
-                                    ) : (
-                                        <div className="p-6 bg-slate-50 border border-slate-100 rounded-lg text-center">
-                                            <CheckCircle2 className="h-6 w-6 text-[#88B072] mx-auto mb-3" />
-                                            <h4 className="text-[11px] font-bold text-slate-800 uppercase tracking-widest">Shift Complete</h4>
-                                            <p className="text-[10px] text-slate-500 mt-1 uppercase">Today's hours recorded</p>
-                                        </div>
-                                    )}
+                        <div className="pt-4 border-t border-notion-border">
+                            {statusLoading ? (
+                                <div className="h-12 flex items-center justify-center">
+                                    <Loader2 className="h-5 w-5 animate-spin opacity-20" />
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+                            ) : !todayStatus?.is_clocked_in && !todayStatus?.clock_out ? (
+                                qrMode ? (
+                                    <div className="space-y-4">
+                                        <input
+                                            type="text"
+                                            autoFocus
+                                            placeholder="Enter QR Token"
+                                            className="w-full bg-notion-sidebar border border-notion-border rounded-md h-10 px-4 text-sm font-medium focus:ring-1 focus:ring-notion-text outline-none"
+                                            value={qrCode}
+                                            onChange={e => setQrCode(e.target.value)}
+                                        />
+                                        <div className="flex gap-2">
+                                            <Button variant="ghost" onClick={() => setQrMode(false)} className="flex-1 h-9 text-xs font-semibold">
+                                                Cancel
+                                            </Button>
+                                            <Button onClick={() => handleClockIn(qrCode)} disabled={!qrCode || isClockingIn} className="flex-1 btn-notion-primary h-9">
+                                                Verify
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        onClick={() => handleClockIn()}
+                                        disabled={isClockingIn || isPolicyLoading}
+                                        className="w-full btn-notion-primary h-12 text-sm font-bold uppercase tracking-wider"
+                                    >
+                                        {isClockingIn || isPolicyLoading ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : (
+                                            policy?.enable_qr_clock_in ? <QrCode className="h-4 w-4 mr-2" /> : <Play className="h-4 w-4 mr-2" />
+                                        )}
+                                        {policy?.enable_qr_clock_in ? "Scan to Clock In" : "Start Shift"}
+                                    </Button>
+                                )
+                            ) : todayStatus?.is_clocked_in ? (
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-notion-sidebar border border-notion-border rounded-md flex items-center justify-between">
+                                        <div className="space-y-0.5">
+                                            <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Active Shift</p>
+                                            <p className="text-xs font-medium opacity-60">Since {new Date(todayStatus.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}</p>
+                                        </div>
+                                        <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    </div>
+                                    <Button
+                                        onClick={handleClockOut}
+                                        disabled={isClockingOut}
+                                        className="w-full h-11 btn-notion-outline border-red-200 text-red-600 hover:bg-red-50"
+                                    >
+                                        <Square className="h-3.5 w-3.5 mr-2" />
+                                        Stop Shift
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="p-6 bg-notion-sidebar border border-notion-border rounded-md text-center space-y-2">
+                                    <CheckCircle2 className="h-6 w-6 text-notion-text opacity-20 mx-auto" />
+                                    <p className="text-[11px] font-bold uppercase tracking-widest">Shift Complete</p>
+                                    <p className="text-xs text-notion-text-light opacity-60">Hours recorded for today.</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-                            <p className="text-2xl font-bold text-slate-900">{Math.floor(stats.totalHrs)}h</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Work Hours</p>
+                        <div className="p-5 rounded-lg border border-notion-border space-y-1">
+                            <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Hours</p>
+                            <p className="text-2xl font-bold">{Math.floor(stats.totalHrs)}h</p>
                         </div>
-                        <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-                            <p className="text-2xl font-bold text-slate-900">{stats.present}</p>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Days Present</p>
+                        <div className="p-5 rounded-lg border border-notion-border space-y-1">
+                            <p className="text-xs font-semibold text-notion-text-light uppercase tracking-wider">Present</p>
+                            <p className="text-2xl font-bold">{stats.present}</p>
                         </div>
                     </div>
                 </div>
 
-                {/* History */}
-                <Card className="lg:col-span-2 border border-slate-200 shadow-sm bg-white overflow-hidden rounded-xl">
-                    <CardHeader className="border-b border-slate-50 py-4 px-6 flex flex-row items-center justify-between">
-                        <div className="flex items-center gap-3">
-                            <div className="h-8 w-8 rounded bg-slate-50 border border-slate-100 flex items-center justify-center">
-                                <History className="h-4 w-4 text-slate-400" />
-                            </div>
-                            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Attendance Log</h3>
-                        </div>
-                        <Button variant="ghost" size="sm" onClick={handleExport} className="text-[10px] font-bold uppercase text-[#88B072]">
-                            Export CSV
-                        </Button>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                        {attendanceArray.length > 0 ? (
-                            <>
-                                {/* Table for Desktop */}
-                                <div className="hidden md:block overflow-x-auto">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-slate-50/50 border-b border-slate-100">
-                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Date</th>
-                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock In</th>
-                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clock Out</th>
-                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</th>
-                                                <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Hours</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-50">
-                                            {attendanceArray.map((record, i) => (
-                                                <tr key={i} className="hover:bg-slate-50/50 transition-colors">
-                                                    <td className="px-6 py-4">
-                                                        <span className="text-xs font-bold text-slate-700 uppercase">
-                                                            {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_in_time || '--:--'}</td>
-                                                    <td className="px-6 py-4 text-xs font-medium text-slate-500">{record.clock_out_time || '--:--'}</td>
-                                                    <td className="px-6 py-4">
-                                                        {record.is_late ? (
-                                                            <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
-                                                        ) : (
-                                                            <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        <span className="text-xs font-bold text-slate-900">{record.hours_worked || 0}h</span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                {/* History Section */}
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="flex items-center justify-between border-b border-notion-border pb-2">
+                        <h3 className="text-sm font-semibold text-notion-text-light uppercase tracking-wider">Attendance Log</h3>
+                        <button onClick={handleExport} className="text-[11px] font-bold text-notion-primary hover:underline uppercase tracking-wider">
+                            Export Log
+                        </button>
+                    </div>
 
-                                {/* Cards for Mobile */}
-                                <div className="md:hidden divide-y divide-slate-100">
+                    {attendanceArray.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left border-collapse">
+                                <thead>
+                                    <tr className="border-b border-notion-border">
+                                        <th className="px-4 py-3 text-[11px] font-bold text-notion-text-light uppercase tracking-widest">Date</th>
+                                        <th className="px-4 py-3 text-[11px] font-bold text-notion-text-light uppercase tracking-widest">Clocking</th>
+                                        <th className="px-4 py-3 text-[11px] font-bold text-notion-text-light uppercase tracking-widest">Status</th>
+                                        <th className="px-4 py-3 text-[11px] font-bold text-notion-text-light uppercase tracking-widest text-right">Hrs</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-notion-border">
                                     {attendanceArray.map((record, i) => (
-                                        <div key={i} className="p-4 space-y-3">
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-sm font-bold text-slate-900">
+                                        <tr key={i} className="group hover:bg-notion-hover/40 transition-colors">
+                                            <td className="px-4 py-4">
+                                                <span className="text-sm font-semibold">
                                                     {new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', weekday: 'short' })}
                                                 </span>
+                                            </td>
+                                            <td className="px-4 py-4 text-xs font-medium text-notion-text-light">
+                                                {record.clock_in_time || '--:--'} • {record.clock_out_time || '--:--'}
+                                            </td>
+                                            <td className="px-4 py-4">
                                                 {record.is_late ? (
-                                                    <Badge className="bg-amber-50 text-amber-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">Late</Badge>
+                                                    <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-orange-50 text-orange-600 border border-orange-100">Late</span>
                                                 ) : (
-                                                    <Badge className="bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase rounded px-2 py-0.5 border-none">On Time</Badge>
+                                                    <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-600 border border-emerald-100">On Time</span>
                                                 )}
-                                            </div>
-                                            <div className="flex justify-between items-end text-xs">
-                                                <div className="space-y-1">
-                                                    <p className="text-slate-400 font-bold uppercase tracking-tighter text-[10px]">Clocking</p>
-                                                    <p className="text-slate-600 font-medium">
-                                                        {record.clock_in_time || '--:--'} → {record.clock_out_time || '--:--'}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-slate-400 font-bold uppercase tracking-tighter text-[10px]">Worked</p>
-                                                    <p className="text-slate-900 font-bold">{record.hours_worked || 0} Hours</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            </td>
+                                            <td className="px-4 py-4 text-right">
+                                                <span className="text-sm font-bold">{record.hours_worked || 0}h</span>
+                                            </td>
+                                        </tr>
                                     ))}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="py-24 text-center">
-                                <Calendar className="h-10 w-10 text-slate-100 mx-auto mb-4" />
-                                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">No activity recorded yet</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : (
+                        <div className="py-24 text-center border-2 border-dashed border-notion-border rounded-lg opacity-40">
+                            <History className="h-8 w-8 mx-auto mb-3 stroke-1" />
+                            <p className="text-xs font-medium uppercase tracking-widest">No activity recorded</p>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

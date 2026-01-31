@@ -1,191 +1,162 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Tailwind layers */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* WorkPay-inspired Professional Color System */
+/* Notion-inspired Minimalist Color System */
 :root {
-  /* Primary - Professional Green (#88B072) */
-  --color-primary-50: #f4f7f1;
-  --color-primary-100: #e9efe3;
-  --color-primary-200: #d4e0cb;
-  --color-primary-300: #b9ccad;
-  --color-primary-400: #a2ba92;
-  --color-primary-500: #88B072;
-  --color-primary-600: #7aa265;
-  --color-primary-700: #6a8d58;
-  --color-primary-800: #5a784b;
-  --color-primary-900: #4a633e;
-  --color-primary-950: #2a3823;
+  --notion-bg: #FFFFFF;
+  --notion-sidebar: #F7F7F5;
+  --notion-text: #37352F;
+  --notion-text-light: #5A5A58;
+  --notion-border: #E9E9E7;
+  --notion-hover: #EFEFEF;
+  --notion-primary: #2383E2;
+  /* Subtle blue for links/actions */
+  --notion-selection: rgba(35, 131, 226, 0.14);
 
-  /* Neutral - Professional grays */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+  /* Neutral scale */
+  --color-gray-50: #F7F7F5;
+  --color-gray-100: #E9E9E7;
+  --color-gray-200: #D3D3D3;
+  --color-gray-300: #BCBCBC;
+  --color-gray-400: #9B9B9B;
+  --color-gray-500: #737373;
+  --color-gray-600: #5A5A58;
+  --color-gray-700: #4B4B4B;
+  --color-gray-800: #37352F;
+  --color-gray-900: #1A1A1A;
 
-  /* Success - Green */
-  --color-success: #10b981;
-  --color-success-light: #d1fae5;
-
-  /* Warning - Orange */
-  --color-warning: #f59e0b;
-  --color-warning-light: #fef3c7;
-
-  /* Error - Red */
-  --color-error: #ef4444;
-  --color-error-light: #fee2e2;
-
-  /* Info - Blue */
-  --color-info: #3b82f6;
-  --color-info-light: #dbeafe;
+  /* Accent - Keeping it minimal */
+  --color-primary-500: #37352F;
+  /* Default to dark text/gray */
+  --color-primary-600: #1A1A1A;
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode - Notion style */
 .dark {
-  /* Neutral - Dark mode grays (Inverted logic) */
-  --color-gray-50: #111827;
-  /* Dark background */
-  --color-gray-100: #1f2937;
-  /* Card background */
-  --color-gray-200: #374151;
-  /* Borders */
-  --color-gray-300: #4b5563;
-  /* Subtle text */
-  --color-gray-400: #6b7280;
-  /* Text */
-  --color-gray-500: #9ca3af;
-  /* Text */
-  --color-gray-600: #d1d5db;
-  /* Primary text */
-  --color-gray-700: #e5e7eb;
-  /* Headings */
-  --color-gray-800: #f3f4f6;
-  /* Bright Headings */
-  --color-gray-900: #f9fafb;
-  /* White text */
+  --notion-bg: #191919;
+  --notion-sidebar: #202020;
+  --notion-text: #D4D4D4;
+  --notion-text-light: #9B9B9B;
+  --notion-border: #2E2E2E;
+  --notion-hover: #2C2C2C;
+  --notion-primary: #2383E2;
+
+  --color-gray-50: #202020;
+  --color-gray-100: #2E2E2E;
+  --color-gray-200: #3E3E3E;
+  --color-gray-300: #505050;
+  --color-gray-400: #707070;
+  --color-gray-500: #909090;
+  --color-gray-600: #B0B0B0;
+  --color-gray-700: #D4D4D4;
+  --color-gray-800: #E4E4E4;
+  --color-gray-900: #FFFFFF;
 }
 
 @layer base {
   * {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply border-notion-border;
   }
 
   body {
-    @apply font-sans antialiased;
-    @apply bg-slate-50 text-slate-900;
-    @apply dark:bg-slate-950 dark:text-slate-100;
-    @apply transition-colors duration-200;
+    @apply antialiased text-[15px] leading-relaxed;
+    background-color: var(--notion-bg);
+    color: var(--notion-text);
+    @apply transition-none;
+    /* Notion is snappy, no slow transitions */
   }
 
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Professional focus states */
-  *:focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-semibold tracking-tight;
+    color: var(--notion-text);
   }
 }
 
 @layer components {
 
-  /* WorkPay-style Card - Enhanced */
-  .card-workpay {
-    @apply bg-white dark:bg-slate-900 rounded-xl border border-gray-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200;
+  /* Notion-style Card */
+  .card-notion {
+    @apply bg-transparent rounded-lg border border-notion-border transition-colors hover:bg-notion-sidebar/50;
   }
 
-  /* WorkPay-style Primary Button */
-  .btn-workpay-primary {
-    @apply bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white shadow-sm hover:shadow-md hover:shadow-primary-600/20 transition-all duration-200 rounded-lg font-medium px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  /* Minimalist Button */
+  .btn-notion {
+    @apply inline-flex items-center justify-center rounded-md px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50;
   }
 
-  /* WorkPay-style Secondary Button */
-  .btn-workpay-secondary {
-    @apply bg-white dark:bg-slate-900 hover:bg-gray-50 dark:hover:bg-slate-800 active:bg-gray-100 dark:active:bg-slate-700 text-gray-700 dark:text-slate-300 border border-gray-300 dark:border-slate-700 shadow-sm transition-all duration-200 rounded-lg font-medium px-4 py-2;
+  .btn-notion-primary {
+    @apply btn-notion bg-notion-text text-white hover:bg-notion-text/90 dark:bg-white dark:text-black dark:hover:bg-white/90 shadow-sm;
   }
 
-  /* WorkPay-style Input */
-  .input-workpay {
-    @apply w-full rounded-lg border-gray-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100 placeholder:text-gray-400 focus:border-primary-500 focus:ring-primary-500 focus:ring-1 focus:outline-none transition-all duration-200 px-3 py-2;
+  .btn-notion-ghost {
+    @apply btn-notion text-notion-text hover:bg-notion-hover;
   }
 
-  /* WorkPay-style Badge */
-  .badge-workpay {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium ring-1 ring-inset;
+  .btn-notion-outline {
+    @apply btn-notion border border-notion-border hover:bg-notion-hover;
   }
 
-  .badge-success {
-    @apply bg-green-50 dark:bg-green-500/10 text-green-700 dark:text-green-400 ring-green-600/20 dark:ring-green-500/20;
+  /* Notion-style Input */
+  .input-notion {
+    @apply w-full rounded-md border border-notion-border bg-transparent px-3 py-1.5 text-sm ring-offset-white placeholder:text-notion-text-light focus:outline-none focus:ring-1 focus:ring-notion-primary disabled:cursor-not-allowed disabled:opacity-50;
+    background-color: var(--notion-bg);
   }
 
-  .badge-warning {
-    @apply bg-yellow-50 dark:bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20 dark:ring-yellow-500/20;
+  /* Flat Sidebar Link */
+  .sidebar-link {
+    @apply flex items-center gap-2 px-3 py-1.5 rounded-md text-[14px] text-notion-text-light hover:bg-notion-hover hover:text-notion-text transition-colors;
   }
 
-  .badge-error {
-    @apply bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400 ring-red-600/20 dark:ring-red-500/20;
-  }
-
-  .badge-info {
-    @apply bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 ring-blue-600/20 dark:ring-blue-500/20;
-  }
-
-  .badge-neutral {
-    @apply bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-slate-400 ring-gray-500/10 dark:ring-slate-700;
-  }
-
-  /* Glassmorphism Utilities */
-  .glass-panel {
-    @apply bg-white/70 dark:bg-slate-900/70 backdrop-blur-lg border border-white/20 dark:border-slate-800/50 shadow-xl;
+  .sidebar-link-active {
+    @apply bg-notion-hover text-notion-text font-medium;
   }
 }
 
-/* Professional animations */
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Remove Emojis and complex shadows */
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl {
+  box-shadow: none !important;
+  border: 1px solid var(--notion-border) !important;
 }
 
+/* Notion Table */
+.table-notion {
+  @apply w-full border-collapse text-sm;
+}
+
+.table-notion th {
+  @apply text-left font-medium text-notion-text-light px-4 py-2 border-b border-notion-border bg-notion-sidebar/30;
+}
+
+.table-notion td {
+  @apply px-4 py-3 border-b border-notion-border;
+}
+
+.table-notion tr:hover {
+  @apply bg-notion-sidebar/50;
+}
+
+/* Animations */
 .animate-fade-in {
-  animation: fade-in 0.4s ease-out;
+  animation: none;
+  /* Notion is static and fast */
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-slide-up {
-  animation: slide-up 0.5s ease-out;
-}
-
-/* Global Professional Scrollbar */
+/* Keep scrollbar minimal */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -193,111 +164,11 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
+  background: var(--notion-border);
+  border: 2px solid var(--notion-bg);
+  border-radius: 10px;
 }
 
-/* Professional selection */
-::selection {
-  @apply bg-primary-100 dark:bg-primary-900 text-primary-900 dark:text-primary-300;
-}
-
-/* Skeleton loading */
-.skeleton {
-  @apply animate-pulse bg-gray-200 dark:bg-slate-800 rounded;
-}
-
-/* Hover states - WorkPay style */
-.hover-lift {
-  @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:hover:shadow-slate-900/50;
-}
-
-/* Status indicators */
-.status-dot {
-  @apply inline-block w-2 h-2 rounded-full;
-}
-
-.status-dot-success {
-  @apply bg-green-500;
-}
-
-.status-dot-warning {
-  @apply bg-yellow-500;
-}
-
-.status-dot-error {
-  @apply bg-red-500;
-}
-
-.status-dot-info {
-  @apply bg-blue-500;
-}
-
-/* Professional table styles */
-.table-workpay {
-  @apply w-full text-sm text-left;
-}
-
-.table-workpay th {
-  @apply bg-gray-50 dark:bg-slate-800/50 px-4 py-3 text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-wider border-b border-gray-200 dark:border-slate-700;
-}
-
-.table-workpay td {
-  @apply px-4 py-3 border-b border-gray-100 dark:border-slate-800/50 text-gray-700 dark:text-slate-300;
-}
-
-.table-workpay tr:hover {
-  @apply bg-gray-50 dark:bg-slate-800 transition-colors;
-}
-
-/* Clean shadows - WorkPay style */
-.shadow-workpay {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
-}
-
-.shadow-workpay-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-}
-
-.shadow-workpay-lg {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-}
-
-/* Styles for Recharts in Dark Mode */
-.dark .recharts-cartesian-grid-horizontal line,
-.dark .recharts-cartesian-grid-vertical line {
-  stroke: #334155;
-  /* slate-700 */
-}
-
-.dark .recharts-text {
-  fill: #94a3b8;
-  /* slate-400 */
-}
-
-.dark .recharts-tooltip-cursor {
-  fill: #1e293b;
-  /* slate-800 */
-  opacity: 0.4;
-}
-
-/* Professional spacing utilities */
-.spacing-workpay {
-  @apply space-y-6;
-}
-
-.spacing-workpay-sm {
-  @apply space-y-4;
-}
-
-.spacing-workpay-xs {
-  @apply space-y-3;
-}
-
-/* Clean borders */
-.border-workpay {
-  @apply border border-gray-200;
-}
-
-.border-workpay-hover {
-  @apply border border-gray-200 hover:border-gray-300;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--notion-text-light);
 }
